@@ -1,0 +1,140 @@
+﻿@model IEnumerable<DCI.Models.ViewModel.UserInRoleViewModel>
+<style>
+
+
+	.ulAction {
+		min-width: 100px;
+		padding-left: 0px;
+		margin-bottom: 0px;
+	}
+
+		.ulAction > li {
+			display: inline-block;
+		}
+
+			.ulAction > li .btn {
+				font-size: 14px;
+			}
+
+	.userRoleDiv {
+		text-align: center;
+	}
+
+		.userRoleDiv i.roleIcon {
+			font-size: 80px;
+			display: block;
+			margin-bottom: 10px;
+			color: #b1b1b1;
+		}
+
+		.userRoleDiv label.title {
+			font-size: 20px;
+			font-weight: 600;
+			color: black;
+		}
+
+		.userRoleDiv ul.descList {
+			padding-left: 0px;
+		}
+
+			.userRoleDiv ul.descList li {
+				display: inline-block;
+			}
+
+				.userRoleDiv ul.descList li + li:before {
+					padding: 3px;
+					color: #c9c9c9;
+					content: "|";
+				}
+
+				.userRoleDiv ul.descList li label {
+					font-size: 12px;
+					color: black;
+				}
+
+				.userRoleDiv ul.descList li span {
+					font-weight: 600;
+				}
+
+</style>
+<p>
+	@*     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createmodal">Add User Role</button> *@
+	<a asp-controller="Maintenance" asp-action="RoleModule" asp-route-id="0" class="btn btn-primary">Add User Role</a>
+</p>
+
+<div class="container-fluid">
+	<div class="row">
+
+		@foreach (var userrole in Model)
+		{
+			<div class="col-xl-4 col-md-6">
+				<div class="card shadow mb-4">
+					<div class="card-body userRoleDiv">
+						<i class="fa-solid fa-circle-user roleIcon text-gray-300"></i>
+						<label class="title">@userrole.RoleName</label>
+						<ul class="descList">
+							<li><label>Users: <span>@userrole.UserCount</span></label></li>
+							<li><label>Module Access: <span>@userrole.ModuleCount</span></label></li>
+							<li><label>Submodule Access: <span>@userrole.SubModuleCount</span></label></li>
+						</ul>
+						<ul class="ulAction">
+							<!--VIEW-->
+							<li>
+								@* <a href="http://202.57.47.34/DCI-ESS-STG/system-management/user-role/view?id=1" class="btn btnPrimary"><i class="fas fa-search"></i></a> *@
+								<a asp-controller="Maintenance" asp-action="RoleModule" asp-route-id="@userrole.RoleId" class="btn btnPrimary"><i class="fas fa-search"></i></a>
+							</li>
+
+							<!--UPDATE-->
+							<li>
+								@*   <a href="http://202.57.47.34/DCI-ESS-STG/system-management/user-role/update?id=1" class="btn btnSuccess"><i class="fa fa-edit"></i></a> *@
+								<a asp-controller="Maintenance" asp-action="RoleModule" asp-route-id="@userrole.RoleId" class="btn btnSuccess"><i class="fa fa-edit"></i></a>
+							</li>
+
+							<!--DELETE-->
+							<li>
+								<a href="#" id="deleteform" class="btn btnPrimary" onclick="deleteform(@userrole.RoleId)"><i class="far fa-trash-alt"></i></a>	
+								@* <button class"btn btnPrimary" onclick="deleteform(@userrole.RoleId)"> <i class="far fa-trash-alt"></i></button> *@
+									
+							@* 	<a asp-controller="Maintenance" asp-action="DeleteUserRole" asp-route-id="@userrole.RoleId" class="btn btnPrimary"><i class="far fa-trash-alt"></i></a> *@
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		}
+	</div>
+</div>
+
+@section scripts {
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function () {
+
+
+		});
+		function deleteform(id) {
+
+			bootbox.confirm('Are you sure?', function (result) {
+				if (result) {
+					$.ajax({
+						type: 'POST',
+						url: '@Url.Action("DeleteUserRole", "Maintenance")',
+						data: { id: id },
+						success: function (response) {
+							if (response.success) {
+								bootbox.alert(response.message, function () {
+									location.reload();
+								});
+							} else {
+								bootbox.alert(response.message);
+							}
+						},
+						error: function () {
+							bootbox.alert('An error occurred. Please try again.');
+						}
+					});
+				}
+			});
+		}
+	</script>
+}

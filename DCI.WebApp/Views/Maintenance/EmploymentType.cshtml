@@ -1,0 +1,211 @@
+﻿@model IEnumerable<DCI.Models.Entities.EmploymentType>
+
+<link href="~/css/main.css" rel="stylesheet" />
+
+
+<div class="container-fluid">
+	<div class="d-sm-flex align-items-center justify-content-between mb-3">
+		<h6 class="m-0 font-weight-bold text-gray-800">Administration</h6>
+		<div class="upperRightDivBtn">
+			<a href="#" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#createmodal">
+				<span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
+				<span class="text"><small>Add Record</small></span>
+			</a>
+		</div>
+
+	</div>
+	<div class="col-12 p0">
+		<ul class="breadcrumb">
+			<li><a href="~/Home/Index">Home</a></li>
+			<li><a href="~/Maintenance/Index">Administration</a></li>
+			<li>Department</li>
+		</ul>
+	</div>
+
+	@* <p>
+	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createmodal">Add Employment Type</button>
+	</p> *@
+	<div class="card shadow mb-4">
+		<div class="card-header">
+			<label class="mb0">Data</label>
+		</div>
+		<div class="card-body">
+			<div class="table-responsive mt20">
+				<table class="table table-bordered" id="tblEmploymentType" width="100%" cellspacing="0">
+					<thead>
+						<tr>
+							<th>
+								<label>Id</label>
+							</th>
+							<th>
+								<label>Employment Type</label>
+							</th>
+							<th>
+								<label>Description</label>
+							</th>
+							<th>
+								<label>Date Created</label>
+							</th>
+							<th>
+								<label>Created By</label>
+							</th>
+							<th>
+								Action
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var item in Model)
+						{
+							<tr>
+								<td>
+									@item.EmploymentTypeId
+								</td>
+								<td>
+									@item.EmploymentTypeName
+								</td>
+								<td>
+									@item.Description
+								</td>
+								<td>
+									@item.DateCreated.ToShortDateString()
+								</td>
+								<td>
+									@item.CreatedBy
+								</td>
+
+								<td>
+									<a href="#" class="btn btn-primary"><i class="fas fa-search"></i></a> |
+									<a href="#" id="editForm" onclick="editForm(@item.EmploymentTypeId)" class="btn btn-info"><i class="fa fa-edit"></i></a> |
+									<a href="#" id="deleteform" class="btn btn-danger" onclick="deleteform(@item.EmploymentTypeId)"><i class="far fa-trash-alt"></i></a>
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+			</<div>
+			</div>
+
+			<div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="exampleModalLabel">New Employment Type</h5>
+							@* 			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+							</button> *@
+						</div>
+						<form id="createForm">
+							<div class="modal-body">
+								<input type="hidden" id="EmploymentTypeId" name="EmploymentTypeId" value="0">
+								<div class="form-group">
+									<label for="EmploymentType" class="col-form-label">EmploymentType:</label>
+									<input type="text" class="form-control" id="EmploymentTypeName" name="EmploymentTypeName" maxlength="25">
+								</div>
+								<div class="form-group">
+									<label for="Description" class="col-form-label">Description:</label>
+									<textarea class="form-control" id="Description" name="Description" maxlength="255"></textarea>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+								<button type="submit" class="btn btn-primary">Save</button>
+							</div>
+						</form>
+
+					</div>
+				</div>
+			</div>
+
+
+
+			@section scripts {
+				<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
+				<script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
+
+				<script type="text/javascript">
+					var js = jQuery.noConflict(true);
+
+					$(document).ready(function () {
+						js('#tblEmploymentType').DataTable({
+						});
+
+						$('#createForm').submit(function (event) {
+							event.preventDefault();
+							var formData = $(this).serialize();
+
+							bootbox.confirm('Are you sure?', function (result) {
+								if (result) {
+
+									$.ajax({
+										type: 'POST',
+										url: '@Url.Action("SaveEmploymentType", "Maintenance")',
+										data: formData,
+										success: function (response) {
+											if (response.success) {
+												$('#createForm')[0].reset();
+												js('#createmodal').modal('hide');
+												bootbox.alert(response.message, function () {
+													location.reload();
+												});
+											} else {
+												bootbox.alert(response.message);
+											}
+										},
+										error: function () {
+											bootbox.alert('An error occurred. Please try again.');
+										}
+									});
+								}
+							});
+						});
+
+					});
+
+					function editForm(id) {
+						$.ajax({
+							type: 'POST',
+							url: '@Url.Action("EditEmploymentType", "Maintenance")',
+							data: { EmploymentTypeId: id },
+							success: function (response) {
+								if (response.success) {
+									$('#EmploymentTypeId').val(response.data.employmentTypeId);
+									$('#EmploymentTypeName').val(response.data.employmentTypeName);
+									$('#Description').val(response.data.description);
+									js('#createmodal').modal('show');
+								} else {
+									bootbox.alert(response.message);
+								}
+							},
+							error: function () {
+								bootbox.alert('An error occurred. Please try again.');
+							}
+						});
+					}
+
+					function deleteform(id) {
+						bootbox.confirm('Are you sure?', function (result) {
+							if (result) {
+								$.ajax({
+									type: 'POST',
+									url: '@Url.Action("DeleteEmploymentType", "Maintenance")',
+									data: { EmploymentTypeId: id },
+									success: function (response) {
+										if (response.success) {
+											bootbox.alert(response.message, function () {
+												location.reload();
+											});
+										} else {
+											bootbox.alert(response.message);
+										}
+									},
+									error: function () {
+										bootbox.alert('An error occurred. Please try again.');
+									}
+								});
+							}
+						});
+					}
+				</script>
+			}

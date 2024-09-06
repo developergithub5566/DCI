@@ -1,0 +1,162 @@
+﻿
+/*Login Page*/
+
+.loginBG {
+    background: #e0e7f2;
+    min-height: 100vh;
+}
+
+.loginBG .companyLogo {
+        position: flex;
+        text-align: center;
+        left: 0;
+        top: -8%;
+        width: 100%;
+    }
+
+ .loginBG .companyLogo > div {
+            border: 5px solid #e0e7f2;
+            margin: auto;
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+            padding: 10px;
+            display: inline-block;
+            vertical-align: middle;
+}
+
+ .loginBG .companyLogo div > img {
+            width: 100%;
+            display: inline-block;
+            height: 100%;
+            vertical-align: middle;
+            border-radius: 50%;
+ }
+
+.loginBG .companyLogo div > i {
+            display: block;
+            font-size: 60px;
+            color: #5487ec;
+            margin-top: 15px;
+}
+
+.loginBG .loginDiv {
+        background: white;
+        padding: 60px 20px 30px 20px;
+        border-radius: 20px;
+        text-align: center;
+        color: #1f1f1f;
+        margin-top: 40px;
+}
+
+.loginBG .loginDiv label.title {
+            font-weight: 600;
+            font-size: 25px;
+}
+
+.loginBG .loginDiv p.desc {
+            font-size: 12px;
+        }
+
+.loginBG .loginDiv .responseMessage {
+            font-size: 12px;
+            margin-top: 10px;
+            color: #1f1f1f;
+            text-align: left;
+            font-weight: 600;
+}
+
+#LoginAccess .inputLogin {
+    font-size: 12px;
+    padding: 20px 10px;
+    color: #1f1f1f;
+    border-radius: 10px;
+    border: #f1f1f1;
+    background: #f1f1f1;
+}
+
+#LoginAccess .forgotPasswordLink {
+    font-size: 12px;
+    text-decoration: underline !important;
+}
+
+#LoginAccess .btnLogin {
+    border-radius: 10px;
+    color: white;
+    background: #5587ec;
+    font-size: 14px;
+    padding: 10px 0px;
+}
+
+    #LoginAccess .btnLogin:hover,
+    #LoginAccess .btnLogin:focus {
+        background: #3d76e9;
+    }
+
+.loginBG .copyrights {
+    text-align: center;
+    font-size: 12px;
+    margin-top: 20px;
+    color: black;
+}
+
+
+
+.divBG {
+    background: #e0e7f2;
+    min-height: 100vh;
+}
+
+    .divBG .companyLogo {
+        position: absolute;
+        text-align: center;
+        left: 0;
+        top: -8%;
+        width: 100%;
+    }
+
+        .divBG .companyLogo > div {
+            border: 5px solid #e0e7f2;
+            margin: auto;
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+            padding: 10px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .divBG .companyLogo div > img {
+            width: 100%;
+            display: inline-block;
+            height: 100%;
+            vertical-align: middle;
+            border-radius: 50%;
+        }
+
+        .divBG .companyLogo div > i {
+            display: block;
+            font-size: 60px;
+            color: #5487ec;
+            margin-top: 15px;
+        }
+
+    .divBG .loginDiv {
+        background: white;
+        padding: 30px 20px 30px 20px;
+        border-radius: 20px;
+        text-align: center;
+        color: #1f1f1f;
+        margin-top: 40px;
+    }
+
+        .divBG .loginDiv label.title {
+            font-weight: 600;
+            font-size: 25px;
+        }
+
+        .divBG .loginDiv p.desc {
+            font-size: 12px;
+        }

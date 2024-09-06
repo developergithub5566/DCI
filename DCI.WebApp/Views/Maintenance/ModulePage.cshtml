@@ -1,0 +1,186 @@
+﻿@model IEnumerable<DCI.Models.Entities.ModulePage>
+
+@{
+	ViewData["Title"] = "Module Page";
+}
+
+
+<h2>Module Page</h2>
+
+<p>
+	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createmodal">Add Module</button>
+</p>
+
+<table class="table table-bordered table-striped" id="tblModulePage">
+	<thead>
+		<tr>
+			<th>
+				<label>Id</label>
+			</th>
+			<th>
+				<label>Module Name</label>
+			</th>
+			<th>
+				<label>Description</label>
+			</th>
+			<th>
+				<label>Date Created</label>
+			</th>
+			<th>
+				<label>Created By</label>
+			</th>
+			<th>
+				Action
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model)
+		{
+			<tr>
+				<td>
+					@item.ModulePageId
+				</td>
+				<td>
+					@item.ModuleName
+				</td>
+				<td>
+					@item.Description
+				</td>
+				<td>
+					@item.DateCreated.ToShortDateString()
+				</td>
+				<td>
+					@item.CreatedBy
+				</td>
+				<td>
+					<a href="#" id="editForm" onclick="editForm(@item.ModulePageId)">Edit</a> |
+					<a href="#">Details</a> |
+					<a href="#" id="deleteform" onclick="deleteform(@item.ModulePageId)">Delete</a>
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>
+
+<div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">New Module</h5>
+				@* 			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+				</button> *@
+			</div>
+			<form id="createForm">
+				<div class="modal-body">
+					<input type="hidden" id="RoleId" name="ModulePageId" value="0">
+					<div class="form-group">
+						<label for="Role" class="col-form-label">Module Name:</label>
+						<input type="text" class="form-control" id="ModuleName" name="ModuleName" maxlength="50">
+					</div>
+					<div class="form-group">
+						<label for="Description" class="col-form-label">Description:</label>
+						<textarea class="form-control" id="Description" name="Description" maxlength="255"></textarea>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary">Save</button>
+				</div>
+			</form>
+
+		</div>
+	</div>
+</div>
+
+
+@section scripts {
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
+	<script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
+
+	<script type="text/javascript">
+		var js = jQuery.noConflict(true);
+
+		$(document).ready(function () {
+			js('#tblModulePage').DataTable({
+			});
+
+			$('#createForm').submit(function (event) {
+				event.preventDefault();
+				var formData = $(this).serialize();
+
+				bootbox.confirm('Are you sure?', function (result) {
+					if (result) {
+
+						$.ajax({
+							type: 'POST',
+							url: '@Url.Action("SaveModulePage", "Maintenance")',
+							data: formData,
+							success: function (response) {
+								if (response.success) {
+									$('#createForm')[0].reset();
+									js('#createmodal').modal('hide');
+									bootbox.alert(response.message, function () {
+										location.reload();
+									});
+								} else {
+									bootbox.alert(response.message);
+								}
+							},
+							error: function () {
+								bootbox.alert('An error occurred. Please try again.');
+							}
+						});
+					}
+				});
+			});
+
+		});
+
+		function editForm(id) {
+			$.ajax({
+				type: 'POST',
+				url: '@Url.Action("EditModulePage", "Maintenance")',
+				data: { ModulePageId: id },
+				success: function (response) {
+					if (response.success) {
+						$('#ModulePageId').val(response.data.modulepageId);
+						$('#ModuleName').val(response.data.moduleName);
+						$('#Description').val(response.data.description);
+						js('#createmodal').modal('show');
+					} else {
+						bootbox.alert(response.message);
+					}
+				},
+				error: function () {
+					bootbox.alert('An error occurred. Please try again.');
+				}
+			});
+		}
+
+		function deleteform(id) {
+			bootbox.confirm('Are you sure?', function (result) {
+				if (result) {
+					$.ajax({
+						type: 'POST',
+						url: '@Url.Action("DeleteModulePage", "Maintenance")',
+						data: { ModulePageId: id },
+						success: function (response) {
+							if (response.success) {
+								bootbox.alert(response.message, function () {
+									location.reload();
+								});
+							} else {
+								bootbox.alert(response.message);
+							}
+						},
+						error: function () {
+							bootbox.alert('An error occurred. Please try again.');
+						}
+					});
+				}
+			});
+		}
+	</script>
+}

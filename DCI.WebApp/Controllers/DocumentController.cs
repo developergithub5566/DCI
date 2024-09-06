@@ -1,0 +1,177 @@
+﻿using DCI.Models.Configuration;
+using DCI.Models.Entities;
+using DCI.Models.ViewModel;
+using DCI.WebApp.Configuration;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Serilog;
+using System.Text;
+
+namespace DCI.WebApp.Controllers
+{
+	public class DocumentController : Controller
+	{
+		private readonly IOptions<APIConfigModel> _apiconfig;
+		private readonly UserSessionHelper _userSessionHelper;
+		public DocumentController(IOptions<APIConfigModel> apiconfig, UserSessionHelper userSessionHelper)
+		{
+			this._apiconfig = apiconfig;
+			this._userSessionHelper = userSessionHelper;
+		}
+		public async Task<IActionResult> Index()
+		{
+			List<DocumentViewModel> model = new List<DocumentViewModel>();
+
+			using (var _httpclient = new HttpClient())
+			{
+				HttpResponseMessage response = await _httpclient.GetAsync(_apiconfig.Value.apiConnection + "api/Document/GetAllDocument");
+				string responseBody = await response.Content.ReadAsStringAsync();
+
+				if (response.IsSuccessStatusCode)
+				{
+					model = JsonConvert.DeserializeObject<List<DocumentViewModel>>(responseBody)!;
+				}
+			}
+			return View(model);
+		}
+		//public async Task<IActionResult> Document()
+		//{
+		//	List<Document> model = new List<Document>();
+
+		//	using (var _httpclient = new HttpClient())
+		//	{
+		//		HttpResponseMessage response = await _httpclient.GetAsync(_apiconfig.Value.apiConnection + "api/Document/GetAllDocument");
+		//		string responseBody = await response.Content.ReadAsStringAsync();
+
+		//		if (response.IsSuccessStatusCode)
+		//		{
+		//			model = JsonConvert.DeserializeObject<List<Document>>(responseBody)!;
+		//		}
+		//	}
+		//	return View(model);
+		//}
+		public async Task<IActionResult> EditDocument(DocumentViewModel model)
+		{
+			try
+			{
+				using (var _httpclient = new HttpClient())
+				{
+					var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+					var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Document/GetDocumentById");
+					request.Content = stringContent;
+					var response = await _httpclient.SendAsync(request);
+					var responseBody = await response.Content.ReadAsStringAsync();
+					DocumentViewModel vm = JsonConvert.DeserializeObject<DocumentViewModel>(responseBody)!;
+
+
+					if (response.IsSuccessStatusCode)
+					{
+						return Json(new { success = true, data = vm });
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
+				return Json(new { success = false, message = ex.Message });
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+			return Json(new { success = false, message = "An error occurred. Please try again." });
+		}
+
+		public async Task<IActionResult> SaveDocument(DocumentViewModel model)
+		{
+			try
+			{
+				using (var _httpclient = new HttpClient())
+				{
+					var currentUser = _userSessionHelper.GetCurrentUser();
+					model.CreatedBy = currentUser.UserId;
+					model.ModifiedBy = currentUser.UserId;
+
+					//var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+					//var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Document/SaveDocument");
+
+					//request.Content = stringContent;
+					//var response = await _httpclient.SendAsync(request);
+
+					_httpclient.BaseAddress = new Uri(_apiconfig.Value.apiConnection + "api/Document/SaveDocument");
+
+					var data = new MultipartFormDataContent();
+					data.Add(new StringContent(model.DocId.ToString() ?? ""), "DocId");
+					data.Add(new StringContent(model.DocNo ?? ""), "DocNo");
+					data.Add(new StringContent(model.DocName ?? ""), "DocName");
+					data.Add(new StringContent(model.DocTypeId.ToString() ?? ""), "DocTypeId");
+					data.Add(new StringContent(model.Version.ToString() ?? ""), "Version");
+					data.Add(new StringContent(model.DateCreated.ToString() ?? ""), "DateCreated");
+					data.Add(new StringContent(model.CreatedBy.ToString() ?? ""), "CreatedBy");
+					data.Add(new StringContent(model.ModifiedBy.ToString() ?? ""), "ModifiedBy");
+					data.Add(new StringContent(model.DateModified.ToString() ?? ""), "DateModified");
+					data.Add(new StringContent(model.IsActive.ToString() ?? ""), "IsActive");
+					if (model.DocFile != null)
+					{
+						var fileContent = new StreamContent(model.DocFile!.OpenReadStream());
+						data.Add(fileContent, "DocFile", model.DocFile.FileName);
+					}
+				
+
+					var response = await _httpclient.PostAsync("http://localhost:5085/api/Document/SaveDocument", data);
+				
+
+					if (response.IsSuccessStatusCode)
+					{
+						return Json(new { success = true, message = "Document successfully created." });
+					}
+				}
+				return Json(new { success = false, message = "An error occurred. Please try again." });
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.Message.ToString());
+				return Json(new { success = false, message = ex.Message });
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+		}
+
+		public async Task<IActionResult> DeleteDocumentType(DocumentTypeViewModel model)
+		{
+			try
+			{
+				using (var _httpclient = new HttpClient())
+				{
+					var currentUser = _userSessionHelper.GetCurrentUser();
+					model.ModifiedBy = currentUser.UserId;
+
+					var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+					var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Document/DeleteDocument");
+
+					request.Content = stringContent;
+					var response = await _httpclient.SendAsync(request);
+
+					if (response.IsSuccessStatusCode)
+					{
+						return Json(new { success = true, message = "Document Type successfully deleted." });
+					}
+				}
+				return Json(new { success = false, message = "An error occurred. Please try again." });
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
+				return Json(new { success = false, message = ex.Message });
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+		}
+
+	}
+}

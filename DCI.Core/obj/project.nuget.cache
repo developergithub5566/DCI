@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "muFpkc5C4cA=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\DCI-15\\Documents\\Visual Studio 2022\\Projects\\DMS\\DCI.Core\\DCI.Core.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\DCI-15\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

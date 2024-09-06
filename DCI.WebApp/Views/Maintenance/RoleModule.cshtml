@@ -1,0 +1,476 @@
+﻿@* @model DCI.Models.ViewModel.ModuleInRoleViewModel; *@
+@model DCI.Models.ViewModel.SystemManagementViewModel;
+
+
+<div class="row">
+	<div class="col-12">
+		<!-- DataTales Example -->
+		<div class="card shadow mb-4">
+			<div class="card-header py-3">
+			</div>
+			<div class="card-body">
+				<div class="cardTitle">
+					<label>User Role</label>
+					<p>Add new user role</p>
+				</div>
+				<form id="frmAdd" method="POST">
+					@* 	<input type="text" class="form-control" name="ModuleInRoleId" id="ModuleInRoleId" value="@Model.ModuleInRoleId" hidden> *@
+					<input type="text" class="form-control" name="RoleId" id="RoleId" value="@Model.RoleId" hidden>
+					<div class="form-group">
+						<label>Name:<span class="required">*</span></label>
+						<input type="text" class="form-control" name="RoleName" id="RoleName" value="@Model.RoleName">
+					</div>
+					<div class="form-group">
+						<label>Description:</label>
+						<input type="text" class="form-control" name="Description" id="Description" value="@Model.Description">
+					</div>
+
+
+					<div class="form-group">
+						<label>Module:</label>
+						<div class="accordion" id="accordion">
+
+							<div class="accordion-item no-caret no-collapse">
+								<div class="accordion-header">
+									<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
+
+										<input type="checkbox" name="mainModule[]" value="3" id="module3" class="form-check-input" @(Model.File201 == true ? "checked" : "")>
+										<label for="module3" class="text-dark">201 File</label>
+									</button>
+								</div>
+								@*          <div id="module3" class="collapse" data-parent="#accordion">
+								<div class="card-body">
+								</div>
+								</div> *@
+							</div>
+
+							<div class="accordion-item no-caret no-collapse">
+								<div class="accordion-header">
+									<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="true" aria-controls="collapse2">
+										<input type="checkbox" name="mainModule[]" value="4" id="module4" class="form-check-input" @(Model.Leave == true ? "checked" : "")>
+										<label for="module4" class="text-dark">Leave</label>
+									</button>
+								</div>
+								@*  <div id="module4" class="collapse" data-parent="#accordion">
+								<div class="card-body">
+								</div>
+								</div> *@
+							</div>
+
+							<div class="accordion-item no-caret no-collapse">
+								<div class="accordion-header">
+									<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="true" aria-controls="collapse3">
+										<input type="checkbox" name="mainModule[]" value="5" id="module5" class="form-check-input" @(Model.DailyTimeRecord == true ? "checked" : "")>
+										<label for="module5" class="text-dark">Daily Time Record</label>
+									</button>
+								</div>
+								@* <div id="collapse5" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+								<div class="accordion-body">
+								</div>
+								</div> *@
+							</div>
+
+							<div class="accordion-item no-caret no-collapse">
+								<div class="accordion-header">
+									<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="true" aria-controls="collapse4">
+										<input type="checkbox" name="mainModule[]" value="6" id="module6" class="form-check-input" @(Model.DepartmentMain == true ? "checked" : "")>
+										<label for="module6" class="text-dark">Department</label>
+									</button>
+								</div>
+								@*      <div id="module6" class="collapse" data-parent="#accordion">
+								<div class="card-body">
+								</div>
+								</div> *@
+							</div>
+
+							<div class="accordion-item no-caret no-collapse">
+								<div class="accordion-header">
+									<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-expanded="true" aria-controls="collapse5">
+										<input type="checkbox" name="mainModule[]" value="7" id="module7" class="form-check-input" @(Model.JobApplicants == true ? "checked" : "")>
+										<label for="module7" class="text-dark">Job Applicants</label>
+									</button>
+								</div>
+								@*   <div id="module7" class="collapse" data-parent="#accordion">
+								<div class="card-body">
+								</div>
+								</div> *@
+							</div>
+
+							<div class="accordion-item no-caret no-collapse">
+								<div class="accordion-header">
+									<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse6" aria-expanded="true" aria-controls="collapse6">
+										<input type="checkbox" name="mainModule[]" value="8" id="module8" class="form-check-input" @(Model.DTRManagement == true ? "checked" : "")>
+										<label for="module8" class="text-dark">DTR Management</label>
+									</button>
+								</div>
+								@* 	<div id="collapse6" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+								<div class="accordion-body">
+								</div>
+								</div> *@
+								@*           <div id="module8" class="collapse" data-parent="#accordion">
+								<div class="card-body">
+								</div>
+								</div> *@
+							</div>
+
+							<div class="accordion-item no-caret no-collapse">
+								<div class="accordion-header">
+									<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse7" aria-expanded="true" aria-controls="collapse7">
+										<input type="checkbox" name="mainModule[]" value="9" id="module9" class="form-check-input" @(Model.EmployeeManagement == true ? "checked" : "")>
+										<label for="module9" class="text-dark">Employee Management</label>
+									</button>
+								</div>
+								@* 		<div id="collapse7" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+								<div class="accordion-body">
+								</div>
+								</div> *@
+
+								<div id="module9" class="collapse" data-parent="#accordion">
+									<div class="card-body">
+									</div>
+								</div>
+							</div>
+
+
+							<div class="accordion-item">
+
+								<div class="accordion-header">
+									<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse8" aria-expanded="true" aria-controls="collapse8">
+										<input type="checkbox" name="mainModule[]" value="10" id="module10" class="form-check-input" @(Model.Administration == true ? "checked" : "")>
+										<label for="module10" class="text-dark">Administration</label>
+									</button>
+								</div>
+
+								<div id="collapse8" class="accordion-collapse collapse" data-bs-parent="#accordionExample8">
+									<div class="accordion-body">
+
+										<input type="checkbox" name="mainModule[]" id="chkAllUserManagement" value="11">
+										<label class="subLabel">User Management</label>
+										<ul class="ulPermission">
+											<li>
+												<input type="checkbox" name="subModule11[]" id="view2_2" value="1" class="user_management" @(Model.UserManagementView == true ? "checked" : "") />
+												<label for="view2_2"> View</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule11[]" id="add2_2" value="2" class="user_management" @(Model.UserManagementAdd == true ? "checked" : "")>
+												<label for="add2_2"> Add</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule11[]" id="update2_2" value="3" class="user_management" @(Model.UserManagementUpdate == true ? "checked" : "")>
+												<label for="update2_2"> Update</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule11[]" id="delete2_2" value="4" class="user_management" @(Model.UserManagementDelete == true ? "checked" : "")>
+												<label for="delete2_2"> Delete</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule11[]" id="import2_2" value="5" class="user_management" @(Model.UserManagementImport == true ? "checked" : "")>
+												<label for="import2_2"> Import</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule11[]" id="export2_2" value="6" class="user_management" @(Model.UserManagementExport == true ? "checked" : "")>
+												<label for="export2_2"> Export</label>
+											</li>
+										</ul>
+
+
+										<input type="checkbox" name="mainModule[]" id="chkAllDepartment" value="12">
+										<label class="subLabel">Departments</label>
+										<ul class="ulPermission">
+											<li>
+												<input type="checkbox" name="subModule12[]" id="view2_5" value="1" class="chk_departments" @(Model.DepartmentSubView == true ? "checked" : "")>
+												<label for="view2_5"> View</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule12[]" id="add2_5" value="2" class="chk_departments" @(Model.DepartmentSubAdd == true ? "checked" : "")>
+												<label for="add2_5"> Add</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule12[]" id="update2_5" value="3" class="chk_departments" @(Model.DepartmentSubUpdate == true ? "checked" : "")>
+												<label for="update2_5"> Update</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule12[]" id="delete2_5" value="4" class="chk_departments" @(Model.DepartmentSubDelete == true ? "checked" : "")>
+												<label for="delete2_5"> Delete</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule12[]" id="import2_5" value="5" class="chk_departments" @(Model.DepartmentSubImport == true ? "checked" : "")>
+												<label for="import2_5"> Import</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule12[]" id="export2_5" value="6" class="chk_departments" @(Model.DepartmentSubExport == true ? "checked" : "")>
+												<label for="export2_5"> Export</label>
+											</li>
+										</ul>
+
+
+										<input type="checkbox" name="mainModule[]" id="chkAllEmploymenttype" value="13">
+										<label class="subLabel">Employment Type</label>
+										<ul class="ulPermission">
+											<li>
+												<input type="checkbox" name="subModule13[]" id="view2_6" value="1" class="chk_employmenttype" @(Model.EmployeeTypeView == true ? "checked" : "")>
+												<label for="view2_6"> View</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule13[]" id="add2_6" value="2" class="chk_employmenttype" @(Model.EmployeeTypeAdd == true ? "checked" : "")>
+												<label for="add2_6"> Add</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule13[]" id="update2_6" value="3" class="chk_employmenttype" @(Model.EmployeeTypeUpdate == true ? "checked" : "")>
+												<label for="update2_6"> Update</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule13[]" id="delete2_6" value="4" class="chk_employmenttype" @(Model.EmployeeTypeDelete == true ? "checked" : "")>
+												<label for="delete2_6"> Delete</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule13[]" id="import2_6" value="5" class="chk_employmenttype" @(Model.EmployeeTypeImport == true ? "checked" : "")>
+												<label for="import2_6"> Import</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule13[]" id="export2_6" value="6" class="chk_employmenttype" @(Model.EmployeeTypeExport == true ? "checked" : "")>
+												<label for="export2_6"> Export</label>
+											</li>
+										</ul>
+
+
+										<input type="checkbox" name="mainModule[]" id="chkAllAnnouncement" value="14">
+										<label class="subLabel">Announcement</label>
+										<ul class="ulPermission">
+											<li>
+												<input type="checkbox" name="subModule14[]" id="view2_7" value="1" class="chk_announcement" @(Model.AnnouncementView == true ? "checked" : "")>
+												<label for="view2_7"> View</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule14[]" id="add2_7" value="2" class="chk_announcement" @(Model.AnnouncementAdd == true ? "checked" : "")>
+												<label for="add2_7"> Add</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule14[]" id="update2_7" value="3" class="chk_announcement" @(Model.AnnouncementUpdate == true ? "checked" : "")>
+												<label for="update2_7"> Update</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule14[]" id="delete2_7" value="4" class="chk_announcement" @(Model.AnnouncementDelete == true ? "checked" : "")>
+												<label for="delete2_7"> Delete</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule14[]" id="import2_7" value="5" class="chk_announcement" @(Model.AnnouncementImport == true ? "checked" : "")>
+												<label for="import2_7"> Import</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule14[]" id="export2_7" value="6" class="chk_announcement" @(Model.AnnouncementExport == true ? "checked" : "")>
+												<label for="export2_7"> Export</label>
+											</li>
+										</ul>
+
+
+
+									</div>
+								</div>
+							</div>
+
+
+							<div class="accordion-item">
+
+								<div class="accordion-header">
+									<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse9" aria-expanded="true" aria-controls="collapse9">
+										<input type="checkbox" name="mainModule[]" value="15" id="module3" class="form-check-input">
+										<label for="module15" class="text-dark">System Management</label>
+									</button>
+								</div>
+
+								<div id="collapse9" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+									<div class="accordion-body">
+
+										<input type="checkbox" name="mainModule[]" id="chkAllAuditTrail" value="16">
+										<label for="module16" class="subLabel">Audit Trail</label>
+										<ul class="ulPermission">
+											<li>
+												<input type="checkbox" name="subModule16[]" id="view3_3" value="1" class="chk_auditTrail" @(Model.AuditTrailView == true ? "checked" : "")>
+												<label for="view3_3"> View</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule16[]" id="add3_3" value="2" class="chk_auditTrail" @(Model.AuditTrailAdd == true ? "checked" : "")>
+												<label for="add3_3"> Add</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule16[]" id="update3_3" value="3" class="chk_auditTrail" @(Model.AuditTrailUpdate == true ? "checked" : "")>
+												<label for="update3_3"> Update</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule16[]" id="delete3_3" value="4" class="chk_auditTrail" @(Model.AuditTrailDelete == true ? "checked" : "")>
+												<label for="delete3_3"> Delete</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule16[]" id="import3_3" value="5" class="chk_auditTrail" @(Model.AuditTrailImport == true ? "checked" : "")>
+												<label for="import3_3"> Import</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule16[]" id="export3_3" value="6" class="chk_auditTrail" @(Model.AuditTrailExport == true ? "checked" : "")>
+												<label for="export3_3"> Export</label>
+											</li>
+										</ul>
+
+										<input type="checkbox" name="mainModule[]" id="chkAllUserRoleManagement" value="17">
+										<label for="module17" class="subLabel">User Role Management</label>
+										<ul class="ulPermission">
+											<li>
+												<input type="checkbox" name="subModule17[]" id="view3_4" value="1" class="chk_userRoleManagement" @(Model.UserRoleManagementView == true ? "checked" : "")>
+												<label for="view3_4"> View</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule17[]" id="add3_4" value="2" class="chk_userRoleManagement" @(Model.UserRoleManagementAdd == true ? "checked" : "")>
+												<label for="add3_4"> Add</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule17[]" id="update3_4" value="3" class="chk_userRoleManagement" @(Model.UserRoleManagementUpdate == true ? "checked" : "")>
+												<label for="update3_4"> Update</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule17[]" id="delete3_4" value="4" class="chk_userRoleManagement" @(Model.UserRoleManagementDelete == true ? "checked" : "")>
+												<label for="delete3_4"> Delete</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule17[]" id="import3_4" value="5" class="chk_userRoleManagement" @(Model.UserRoleManagementImport == true ? "checked" : "")>
+												<label for="import3_4"> Import</label>
+											</li>
+											<li>
+												<input type="checkbox" name="subModule17[]" id="export3_4" value="6" class="chk_userRoleManagement" @(Model.UserRoleManagementExport == true ? "checked" : "")>
+												<label for="export3_4"> Export</label>
+											</li>
+										</ul>
+
+									</div>
+								</div>
+
+								<div id="module3" class="collapse" data-parent="#accordion">
+									<div class="card-body">
+									</div>
+								</div>
+							</div>
+
+
+						</div>
+					</div>
+					<div class="form-group">
+						<button class="btn btn-Primary" type="submit" value="submit">
+							@* <span class="text text-white"><small>Save </small></span>
+							<span class="icon text-white"><i class="fa-regular fa-floppy-disk"></i></span> *@
+							Save
+						</button>
+
+						<a asp-controller="Maintenance" asp-action="UserRole" class="btn btnSecondary btn-icon-split pl10">
+						@* 	<span class="text text-white"><small>Cancel</small></span>
+							<span class="icon text-white"><i class="fa-solid fa-xmark"></i></span> *@
+							Cancel
+						</a>
+					</div>
+				</form>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+			</div>
+
+@section scripts {
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
+	<script src="~/js/user-role-checkboxes.js"></script>
+	<script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
+
+
+	<script type="text/javascript">
+		var js = jQuery.noConflict(true);
+		$(document).ready(function () {
+
+
+		});
+
+		$('#frmAdd').submit(function (event) {
+			event.preventDefault();
+			bootbox.confirm('Are you sure?', function (result) {
+				if (result) {
+
+					let data = {}; // JSON object to hold the result
+
+					// Get all checked main modules
+					let mainModulesChecked = document.querySelectorAll('input[name="mainModule[]"]:checked');
+
+					let roleId = document.getElementById("RoleId").value;
+					let roleName = document.getElementById("RoleName").value;
+					let description = document.getElementById("Description").value;
+
+
+					mainModulesChecked.forEach((checkbox) => {
+						let moduleId = checkbox.value; // Main module ID
+						let subModulesChecked = document.querySelectorAll('input[name="subModule' + moduleId + '[]"]:checked');
+
+						// Collect checked submodules
+						let subModuleValues = [];
+						subModulesChecked.forEach((subCheckbox) => {
+							subModuleValues.push(subCheckbox.value);
+						});
+
+						// Add main module and its submodules to the data object
+						data[moduleId] = {
+							"roleId": roleId,
+							"roleName": roleName,
+							"description": description,
+							"mainModule": moduleId,
+							"subModules": subModuleValues
+						};
+
+
+					});
+					$.ajax({
+						type: 'POST',
+						url: '@Url.Action("SaveRoleModule", "Maintenance")',
+						data: JSON.stringify(data),
+						contentType: "application/json; charset=utf-8",
+						success: function (response) {
+							if (response.success) {
+								bootbox.alert(response.message, function () {
+									location.reload();
+								});
+							} else {
+								bootbox.alert(response.message);
+							}
+						},
+						error: function () {
+							bootbox.alert('An error occurred. Please try again.');
+						}
+					});
+
+				}
+			});
+		});
+
+	</script>
+}
+<style>
+	/* Custom styling for accordion headers */
+	.accordion-header {
+		background-color: #f8f8f8;
+	}
+
+	.accordion-button {
+		color: #f8f8f8;
+		background-color: #f8f8f8;
+		border: none;
+	}
+
+	.no-caret .accordion-button::after {
+		content: none;
+	}
+
+	.accordion-button:not(.collapsed) {
+		color: #f8f8f8;
+		background-color: #f8f8f8;
+	}
+
+	.form-check-input {
+		margin-right: 10px; /* Adjust the value as needed */
+	}
+
+</style>

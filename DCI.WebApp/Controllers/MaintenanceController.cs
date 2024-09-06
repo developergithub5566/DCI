@@ -1,0 +1,911 @@
+﻿using DCI.Models.Configuration;
+using DCI.Models.Entities;
+using DCI.Models.ViewModel;
+using DCI.WebApp.Configuration;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Serilog;
+using System.Data;
+using System.Reflection;
+using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+
+namespace DCI.WebApp.Controllers
+{
+    public class MaintenanceController : Controller
+    {
+        private readonly IOptions<APIConfigModel> _apiconfig;
+        private readonly UserSessionHelper _userSessionHelper;
+        public MaintenanceController(IOptions<APIConfigModel> apiconfig, UserSessionHelper userSessionHelper)
+        {
+            this._apiconfig = apiconfig;
+            this._userSessionHelper = userSessionHelper;
+        }
+		public async Task<IActionResult> Index()
+		{
+			return View();
+		}
+
+
+		#region User
+		public async Task<IActionResult> User()
+        {
+            List<User> model = new List<User>();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    HttpResponseMessage response = await _httpclient.GetAsync(_apiconfig.Value.apiConnection + "api/Maintenance/GetAllUsers");
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<List<User>>(responseBody)!;
+                    }
+                }
+
+                UserModel vm = new UserModel();
+                //vm.Options = vm.RoleList.Select(x =>
+                //							   new SelectListItem
+                //							   {
+                //								   Value = x.RoleId.ToString(),
+                //								   Text = x.RoleName
+                //							   }).ToList();
+
+                vm.EmployeeList = model;
+                return View(vm);
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return View(model);
+        }
+
+        public async Task<IActionResult> CreateUser(UserViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/GetUserRoleListById");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    UserModel vm = JsonConvert.DeserializeObject<UserModel>(responseBody)!;
+
+                    vm.Options = vm.RoleList.Select(x =>
+                                                   new SelectListItem
+                                                   {
+                                                       Value = x.RoleId.ToString(),
+                                                       Text = x.RoleName
+                                                   }).ToList();
+
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, data = vm });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
+        public async Task<IActionResult> EditUser(UserViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/GetUserRoleListById");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    UserModel vm = JsonConvert.DeserializeObject<UserModel>(responseBody)!;
+
+                    vm.Options = vm.RoleList?.Select(x =>
+                                                   new SelectListItem
+                                                   {
+                                                       Value = x.RoleId.ToString(),
+                                                       Text = x.RoleName
+                                                   }).ToList();
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, data = vm });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
+
+        public async Task<IActionResult> DeleteUser(UserViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/DeleteUser");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = "User successfully deleted." });
+                    }
+                }
+                return Json(new { success = false, message = "An error occurred. Please try again." });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        #endregion
+
+        #region Role
+        public async Task<IActionResult> Role()
+        {
+            List<Role> model = new List<Role>();
+
+            using (var _httpclient = new HttpClient())
+            {
+                HttpResponseMessage response = await _httpclient.GetAsync(_apiconfig.Value.apiConnection + "api/Maintenance/GetAllRoles");
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    model = JsonConvert.DeserializeObject<List<Role>>(responseBody)!;
+                }
+            }
+            return View(model);
+        }
+        public async Task<IActionResult> EditRole(RoleViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/GetRoleById");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    RoleViewModel vm = JsonConvert.DeserializeObject<RoleViewModel>(responseBody)!;
+
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, data = vm });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
+        public async Task<IActionResult> SaveRole(RoleViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    model.CreatedBy = currentUser.UserId;
+                    model.ModifiedBy = currentUser.UserId;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/SaveRole");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = "Role successfully created." });
+                    }
+                }
+                return Json(new { success = false, message = "An error occurred. Please try again." });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        public async Task<IActionResult> DeleteRole(RoleViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    model.ModifiedBy = currentUser.UserId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/DeleteRole");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = "Role successfully deleted." });
+                    }
+                }
+                return Json(new { success = false, message = "An error occurred. Please try again." });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+        #endregion
+
+        #region Module In Role
+        public async Task<IActionResult> ModulePage()
+        {
+            List<ModulePage> model = new List<ModulePage>();
+
+            using (var _httpclient = new HttpClient())
+            {
+                HttpResponseMessage response = await _httpclient.GetAsync(_apiconfig.Value.apiConnection + "api/Maintenance/GetAllModulePage");
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode == true)
+                {
+                    model = JsonConvert.DeserializeObject<List<ModulePage>>(responseBody)!;
+                }
+            }
+            return View(model);
+        }
+
+        public async Task<IActionResult> SaveModulePage(ModulePageViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    model.CreatedBy = currentUser.UserId;
+                    model.ModifiedBy = currentUser.UserId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/SaveModulePage");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = "Module successfully created." });
+                    }
+                }
+                return Json(new { success = false, message = "An error occurred. Please try again." });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        public async Task<IActionResult> EditModulePage(ModulePageViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/GetModulePageById");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    ModulePageViewModel vm = JsonConvert.DeserializeObject<ModulePageViewModel>(responseBody)!;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, data = vm });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
+        public async Task<IActionResult> DeleteModulePage(ModulePageViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    model.ModifiedBy = currentUser.UserId;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/DeleteModulePage");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = "Module page successfully deleted." });
+                    }
+                }
+                return Json(new { success = false, message = "An error occurred. Please try again." });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+        #endregion
+
+        #region Department
+        public async Task<IActionResult> Department()
+        {
+            List<Department> model = new List<Department>();
+
+            using (var _httpclient = new HttpClient())
+            {
+                HttpResponseMessage response = await _httpclient.GetAsync(_apiconfig.Value.apiConnection + "api/Maintenance/GetAllDepartment");
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    model = JsonConvert.DeserializeObject<List<Department>>(responseBody)!;
+                }
+            }
+            return View(model);
+        }
+        public async Task<IActionResult> EditDepartment(DepartmentViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/GetDepartmentById");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    DepartmentViewModel vm = JsonConvert.DeserializeObject<DepartmentViewModel>(responseBody)!;
+
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, data = vm });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
+        public async Task<IActionResult> SaveDepartment(DepartmentViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    model.CreatedBy = currentUser.UserId;
+                    model.ModifiedBy = currentUser.UserId;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/SaveDepartment");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = "Department successfully created." });
+                    }
+                }
+                return Json(new { success = false, message = "An error occurred. Please try again." });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        public async Task<IActionResult> DeleteDepartment(DepartmentViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    model.ModifiedBy = currentUser.UserId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/DeleteDepartment");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = "Department successfully deleted." });
+                    }
+                }
+                return Json(new { success = false, message = "An error occurred. Please try again." });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+        #endregion
+
+        #region Employment Type
+        public async Task<IActionResult> EmploymentType()
+        {
+            List<EmploymentType> model = new List<EmploymentType>();
+
+            using (var _httpclient = new HttpClient())
+            {
+                HttpResponseMessage response = await _httpclient.GetAsync(_apiconfig.Value.apiConnection + "api/Maintenance/GetAllEmploymentType");
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    model = JsonConvert.DeserializeObject<List<EmploymentType>>(responseBody)!;
+                }
+            }
+            return View(model);
+        }
+        public async Task<IActionResult> EditEmploymentType(EmploymentTypeViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/GetEmploymentTypeById");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    EmploymentTypeViewModel vm = JsonConvert.DeserializeObject<EmploymentTypeViewModel>(responseBody)!;
+
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, data = vm });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
+        public async Task<IActionResult> SaveEmploymentType(EmploymentTypeViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    model.CreatedBy = currentUser.UserId;
+                    model.ModifiedBy = currentUser.UserId;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/SaveEmploymentType");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = "Employment Type successfully created." });
+                    }
+                }
+                return Json(new { success = false, message = "An error occurred. Please try again." });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        public async Task<IActionResult> DeleteEmploymentType(EmploymentTypeViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    model.ModifiedBy = currentUser.UserId;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/DeleteEmploymentType");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = "Employment Type successfully deleted." });
+                    }
+                }
+                return Json(new { success = false, message = "An error occurred. Please try again." });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+        #endregion
+
+        #region Role Module
+
+        public async Task<IActionResult> RoleModule(int id)
+        {
+            SystemManagementViewModel model = new SystemManagementViewModel();
+            model.RoleId = id;
+            if (model.RoleId == 0)
+            {
+                return View(model);
+            }
+            else
+            {
+                //	List<RoleInModuleViewModel> roleInModuleVM = new List<RoleInModuleViewModel>();
+
+                using (var _httpclient = new HttpClient())
+                {
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/GetModuleAccessRoleByRoleId");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    SystemManagementViewModel vm = JsonConvert.DeserializeObject<SystemManagementViewModel>(responseBody)!;
+                    return View(vm);
+                }
+            }
+
+        }
+
+        public async Task<IActionResult> SaveRoleModule([FromBody] Dictionary<string, ModuleJson> inputJson)
+        {
+            try
+            {
+                //int _roleId = inputJson.Values != null ?  Convert.ToInt32(inputJson.Values.FirstOrDefault().RoleId) : 0;
+                // string _roleName = inputJson.Values != null ? inputJson.Values.FirstOrDefault().RoleName.ToString() : 0;
+                // string _desc = inputJson.Values != null ? inputJson.Values.FirstOrDefault().Description.ToString() : 0;
+                int _roleId = inputJson.Values?.FirstOrDefault(v => v.RoleId != null)?.RoleId ?? 0;
+                string _roleName = inputJson.Values?.FirstOrDefault(v => v.RoleName != null)?.RoleName ?? string.Empty;
+                string _desc = inputJson.Values?.FirstOrDefault(v => v.Description != null)?.Description ?? string.Empty;
+
+                var currentUser = _userSessionHelper.GetCurrentUser();
+
+                var moduleCollection = new RoleInModuleViewModel
+                {
+                    Modules = inputJson,
+                    RoleVM = new RoleViewModel
+                    {
+                        RoleId = _roleId,
+                        RoleName = _roleName,
+                        Description = _desc,
+                        CreatedBy = currentUser.UserId,
+                        DateCreated = DateTime.Now,
+                        ModifiedBy = currentUser.UserId,
+                        DateModified = DateTime.Now,
+                        IsActive = true,
+                    }
+                };
+
+                using (var _httpclient = new HttpClient())
+                {
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(moduleCollection), Encoding.UTF8, "application/json");
+
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/SaveRoleModule");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = "Successfully created." });
+                    }
+                }
+                return Json(new { success = false, message = "An error occurred. Please try again." });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        #endregion
+
+        #region User In Role
+        public async Task<IActionResult> UserRole()
+        {
+            List<UserInRoleViewModel> model = new List<UserInRoleViewModel>();
+
+            using (var _httpclient = new HttpClient())
+            {
+                HttpResponseMessage response = await _httpclient.GetAsync(_apiconfig.Value.apiConnection + "api/Maintenance/GetUserRole");
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    model = JsonConvert.DeserializeObject<List<UserInRoleViewModel>>(responseBody)!;
+                }
+            }
+            return View(model);
+        }
+
+        public async Task<IActionResult> DeleteUserRole(int id)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    UserInRoleViewModel model = new UserInRoleViewModel();
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    model.ModifiedBy = currentUser.UserId;
+                    model.RoleId = id;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/DeleteUserRole");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = "User Role successfully deleted." });
+                    }
+                }
+                return Json(new { success = false, message = "An error occurred. Please try again." });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+		#endregion
+
+		#region Document Type
+		public async Task<IActionResult> DocumentType()
+		{
+			List<DocumentType> model = new List<DocumentType>();
+
+			using (var _httpclient = new HttpClient())
+			{
+				HttpResponseMessage response = await _httpclient.GetAsync(_apiconfig.Value.apiConnection + "api/Maintenance/GetAllDocumentType");
+				string responseBody = await response.Content.ReadAsStringAsync();
+
+				if (response.IsSuccessStatusCode)
+				{
+					model = JsonConvert.DeserializeObject<List<DocumentType>>(responseBody)!;
+				}
+			}
+			return View(model);
+		}
+		public async Task<IActionResult> EditDocumentType(DocumentTypeViewModel model)
+		{
+			try
+			{
+				using (var _httpclient = new HttpClient())
+				{
+					var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+					var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/GetDocumentTypeById");
+					request.Content = stringContent;
+					var response = await _httpclient.SendAsync(request);
+					var responseBody = await response.Content.ReadAsStringAsync();
+					DocumentTypeViewModel vm = JsonConvert.DeserializeObject<DocumentTypeViewModel>(responseBody)!;
+
+
+					if (response.IsSuccessStatusCode)
+					{
+						return Json(new { success = true, data = vm });
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
+				return Json(new { success = false, message = ex.Message });
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+			return Json(new { success = false, message = "An error occurred. Please try again." });
+		}
+
+		public async Task<IActionResult> SaveDocumentType(DocumentTypeViewModel model)
+		{
+			try
+			{
+				using (var _httpclient = new HttpClient())
+				{
+					var currentUser = _userSessionHelper.GetCurrentUser();
+					model.CreatedBy = currentUser.UserId;
+					model.ModifiedBy = currentUser.UserId;
+
+					var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+					var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/SaveDocumentType");
+
+					request.Content = stringContent;
+					var response = await _httpclient.SendAsync(request);
+
+					if (response.IsSuccessStatusCode)
+					{
+						return Json(new { success = true, message = "Document Type successfully created." });
+					}
+				}
+				return Json(new { success = false, message = "An error occurred. Please try again." });
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
+				return Json(new { success = false, message = ex.Message });
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+		}
+
+		public async Task<IActionResult> DeleteDocumentType(DocumentTypeViewModel model)
+		{
+			try
+			{
+				using (var _httpclient = new HttpClient())
+				{
+					var currentUser = _userSessionHelper.GetCurrentUser();
+					model.ModifiedBy = currentUser.UserId;
+
+					var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+					var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/DeleteDocumentType");
+
+					request.Content = stringContent;
+					var response = await _httpclient.SendAsync(request);
+
+					if (response.IsSuccessStatusCode)
+					{
+						return Json(new { success = true, message = "Document Type successfully deleted." });
+					}
+				}
+				return Json(new { success = false, message = "An error occurred. Please try again." });
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
+				return Json(new { success = false, message = ex.Message });
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+		}
+		#endregion
+	}
+}

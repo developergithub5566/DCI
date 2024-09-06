@@ -1,0 +1,8 @@
+﻿
+
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="user-info">
+    @User.FindFirst("FullName").Value
+    </div>
+}

@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\DCI.API.props" />
+</Project>
