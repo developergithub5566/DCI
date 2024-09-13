@@ -48,7 +48,7 @@ namespace DCI.Repositories
 
             var userAccessEntity = await _userAccessRepository.GetUserAccessByUserId(userEntity.UserId);
 
-            string _http = "https://localhost:7236/Account/ChangePassword?token=";
+            string _http = "https://localhost:7236/Account/ValidateToken?token=";
             string emailBody = $@"
             <html>
             <body>

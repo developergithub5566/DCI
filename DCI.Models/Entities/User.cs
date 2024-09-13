@@ -17,9 +17,9 @@ namespace DCI.Models.Entities
 		public int RoleId { get; set; }
 		//public virtual Role RoleList { get; set; }
 		public DateTime? DateCreated { get; set; } = DateTime.Now;
-		public string CreatedBy { get; set; }
-		public DateTime DateModified { get; set; }
-		public string ModifiedBy { get; set; }
+		public int CreatedBy { get; set; }
+		public DateTime? DateModified { get; set; }
+		public int? ModifiedBy { get; set; }
 		public bool IsActive { get; set; }
 		public virtual UserAccess UserAccess { get; set; }
 		//public ICollection<Role> UserRolelist { get; set; }

@@ -1,13 +1,17 @@
 ﻿using DCI.Data;
+using DCI.Models.Configuration;
 using DCI.Models.Entities;
 using DCI.Models.ViewModel;
 using DCI.Repositories.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,23 +20,92 @@ namespace DCI.Repositories
 	public class DocumentRepository : IDocumentRepository, IDisposable
 	{
 		private DCIdbContext _dbContext;
-		public DocumentRepository(DCIdbContext context)
+		private readonly IOptions<FileModel> _filelocation;
+		public DocumentRepository(DCIdbContext context, IOptions<FileModel> filelocation)
 		{
 			this._dbContext = context;
+			this._filelocation = filelocation;
 		}
 		public void Dispose()
 		{
 			_dbContext.Dispose();
 		}
 
-		public async Task<IList<Document>> GetAllDocument()
+		public async Task<IList<DocumentViewModel>> GetAllDocument()
 		{
-			return await _dbContext.Document.AsNoTracking().Where(x => x.IsActive == true).ToListAsync();
+			//return await _dbContext.Document.AsNoTracking().Where(x => x.IsActive == true).ToListAsync();
+
+			var context = _dbContext.Document.AsQueryable();
+			//var doctypeList = _dbContext.DocumentType.AsQueryable().ToList();
+			var userList = _dbContext.User.AsQueryable().ToList();
+
+			var query = from doc in context
+						join doctype in _dbContext.DocumentType on doc.DocTypeId equals doctype.DocTypeId
+						join user in _dbContext.User on doc.CreatedBy equals user.UserId
+						where doc.IsActive == true
+						select new DocumentViewModel
+						{
+							DocId = doc.DocId,
+							DocName = doc.DocName,
+							DocNo = doc.DocNo,
+							Version = doc.Version,
+							Filename = doc.Filename,
+							DocTypeId = doc.DocTypeId,
+							DocumentTypeList = null,
+							DocTypeName = doctype.Name,
+							CreatedName = user.Email,
+							DateCreated = doc.DateCreated,
+						};
+
+
+			//result.DocumentTypeList = doctypeList.Count() > 0 ? doctypeList : null;
+			//result.DocumentList = query.ToList();
+			return query.ToList();
 		}
 
-		public async Task<Document> GetDocumentById(int docId)
+		public async Task<DocumentViewModel> GetDocumentById(int docId)
 		{
-			return await _dbContext.Document.FindAsync(docId);
+			try
+			{
+				//DocumentViewModel usermodel = new DocumentViewModel();
+
+				var context = _dbContext.Document.AsQueryable();
+				var doctypeList = _dbContext.DocumentType.AsQueryable().ToList();
+
+				var query = from doc in context
+							where doc.DocId == docId
+							select new DocumentViewModel
+							{
+								DocId = doc.DocId,
+								DocName = doc.DocName,
+								DocNo = doc.DocNo,
+								Version = doc.Version,
+								Filename = doc.Filename,
+								FileLocation = doc.FileLocation,
+								DocTypeId = doc.DocTypeId,
+								DocumentTypeList = null,
+								DocTypeName = string.Empty,							
+							};
+
+				var result = query.FirstOrDefault();
+
+				if (result == null)
+				{
+					result = new DocumentViewModel();
+				}
+				result.DocumentTypeList = doctypeList.Count() > 0 ? doctypeList : null;
+				result.DocumentList = null;
+				return result;
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
+				return null;
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
 		}
 
 		public async Task<bool> IsExistsDocument(int docId)
@@ -52,15 +125,16 @@ namespace DCI.Repositories
 					entity.DocName = model.DocName;
 					entity.DocTypeId = model.DocTypeId;
 					entity.Version = model.Version;
-					entity.Filename = model.Filename;
+					entity.Filename = model.DocFile.FileName;
 					entity.CreatedBy = model.CreatedBy;
 					entity.DateCreated = DateTime.Now;
-
 					entity.ModifiedBy = null;
-					entity.DateModified = null;					
+					entity.DateModified = null;
 					entity.IsActive = true;
 					await _dbContext.Document.AddAsync(entity);
 					await _dbContext.SaveChangesAsync();
+					model.DocId = entity.DocId;
+					await SaveFile(model);
 					return (StatusCodes.Status200OK, "Successfully saved");
 				}
 				else
@@ -71,7 +145,7 @@ namespace DCI.Repositories
 					entity.DocName = model.DocName;
 					entity.DocTypeId = model.DocTypeId;
 					entity.Version = model.Version;
-					entity.Filename = model.Filename;
+					entity.Filename = model.DocFile.FileName;
 					entity.DateCreated = entity.DateCreated;
 					entity.CreatedBy = entity.CreatedBy;
 					entity.DateModified = DateTime.Now;
@@ -80,6 +154,8 @@ namespace DCI.Repositories
 
 					_dbContext.Document.Entry(entity).State = EntityState.Modified;
 					await _dbContext.SaveChangesAsync();
+					model.DocId = entity.DocId;
+					await SaveFile(model);
 					return (StatusCodes.Status200OK, "Successfully updated");
 				}
 			}
@@ -98,10 +174,10 @@ namespace DCI.Repositories
 		{
 			try
 			{
-				var entity = await _dbContext.Document.FirstOrDefaultAsync(x => x.DocTypeId == model.DocTypeId && x.IsActive == true);
+				var entity = await _dbContext.Document.FirstOrDefaultAsync(x => x.DocId == model.DocId && x.IsActive == true);
 				if (entity == null)
 				{
-					return (StatusCodes.Status406NotAcceptable, "Invalid document type Id");
+					return (StatusCodes.Status406NotAcceptable, "Invalid document Id");
 				}
 
 				entity.IsActive = false;
@@ -115,6 +191,37 @@ namespace DCI.Repositories
 			{
 				Log.Error(ex.ToString());
 				return (StatusCodes.Status400BadRequest, ex.ToString());
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+		}
+
+		private async Task SaveFile(DocumentViewModel model)
+		{
+			try
+			{
+				string fileloc = _filelocation.Value.FileLocation + model.DocId.ToString();
+
+				if (!Directory.Exists(fileloc))
+					Directory.CreateDirectory(fileloc);
+
+				string filenameLocation = Path.Combine(fileloc, model.DocFile.FileName);
+
+				using (var stream = new FileStream(filenameLocation, FileMode.Create, FileAccess.Write))
+				{
+					model.DocFile.CopyTo(stream);
+				}
+				var entity = await _dbContext.Document.FirstOrDefaultAsync(x => x.DocId == model.DocId && x.IsActive == true);
+				entity.FileLocation = fileloc;
+				entity.Filename = model.DocFile.FileName;
+				_dbContext.Document.Entry(entity).State = EntityState.Modified;
+				await _dbContext.SaveChangesAsync();
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
 			}
 			finally
 			{

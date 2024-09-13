@@ -21,9 +21,10 @@ namespace DCI.API.Controllers
 		IEmploymentTypeRepository _employmentTypeRepository;
 		IUserRoleRepository _userRoleRepository;
 		IDocumentTypeRepository _documentTypeRepository;
+		IAuditLogRepository _auditLogRepository;
 		public MaintenanceController(IModulePageRepository modulePageRepository, IModuleInRoleRepository moduleInRoleRepository,
 			IRoleRepository roleRepository, IUserRepository userRepository, IDepartmentRepository DepartmentRepository, IEmploymentTypeRepository employmentTypeRepository,
-            IUserRoleRepository userRoleRepository,IDocumentTypeRepository documentTypeRepository)	
+            IUserRoleRepository userRoleRepository,IDocumentTypeRepository documentTypeRepository,IAuditLogRepository auditLogRepository)	
 		{
 			this._userRepository = userRepository;
 			this._moduleInRoleRepository = moduleInRoleRepository;
@@ -33,6 +34,7 @@ namespace DCI.API.Controllers
 			this._employmentTypeRepository = employmentTypeRepository;
 			this._userRoleRepository = userRoleRepository;
 			this._documentTypeRepository = documentTypeRepository;
+			this._auditLogRepository = auditLogRepository;
 		}
 		
 
@@ -67,7 +69,7 @@ namespace DCI.API.Controllers
 
 		[HttpPost]
         [Route("UpdateUser")]
-        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserViewModel model)
+        public async Task<IActionResult> UpdateUser([FromBody] UserViewModel model)
         {
 			var userIdexist = await _userRepository.GetUserById(model.UserId);
             if (userIdexist == null)
@@ -348,6 +350,22 @@ namespace DCI.API.Controllers
 		{
 			var result = await _documentTypeRepository.Delete(model);
 			return StatusCode(result.statuscode, result.message);
+		}
+		#endregion
+
+		#region Audit Logs
+		[HttpPost]
+		[Route("GetAuditLogById")]
+		public async Task<IActionResult> GetAuditLogById([FromBody] AuditLogViewModel model)
+		{
+			return Ok(await _auditLogRepository.GetAuditLogById(model));
+		}
+
+		[HttpGet]
+		[Route("GetAllAuditLogs")]
+		public async Task<IActionResult> GetAllAuditLogs()
+		{
+			return Ok(await _auditLogRepository.GetAllAuditLogs());
 		}
 		#endregion
 	}

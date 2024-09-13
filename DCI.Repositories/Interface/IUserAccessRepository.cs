@@ -10,10 +10,10 @@ namespace DCI.Repositories.Interface
 {
     public interface IUserAccessRepository
     {
-        Task SaveUserAccess(RegistrationViewModel model);
+        Task SaveUserAccess(UserViewModel model);
         Task<UserAccess> GetUserAccessByUserId(int userId);
         Task UpdateUserAccess(UserAccess usr);
-        Task<(int statuscode, string message)> ValidatePasswordToken(string token);
+        Task<(int statuscode, string message)> ValidateToken(string token);
         Task<(int statuscode, string message)> ChangePassword(ChangePasswordViewModel pass);
 		Task SaveExternalUserAccess(int userId);
 	}

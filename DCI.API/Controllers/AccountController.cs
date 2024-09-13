@@ -45,7 +45,7 @@ namespace DCI.API.Controllers
 
 		[HttpPost]
 		[Route("Registration")]
-		public async Task<IActionResult> Registration([FromBody] RegistrationViewModel model)
+		public async Task<IActionResult> Registration([FromBody] UserViewModel model)
 		{
 			if (model.UserId == 0 && await _userRepository.IsExistsUsername(model.Email))
 			{
@@ -94,12 +94,12 @@ namespace DCI.API.Controllers
 		}
 
 		[HttpPost]
-		[Route("ValidatePasswordToken")]
-		public async Task<IActionResult> ValidatePasswordToken([FromBody] ValidatePasswordTokenViewModel model)
+		[Route("ValidateToken")]
+		public async Task<IActionResult> ValidateToken([FromBody] ValidatePasswordTokenViewModel model)
 		{
 			try
 			{
-				var result = await _useraccessRepository.ValidatePasswordToken(model.Token);
+				var result = await _useraccessRepository.ValidateToken(model.Token);
 				return StatusCode(result.statuscode, result.message);
 			}
 			catch (Exception ex)

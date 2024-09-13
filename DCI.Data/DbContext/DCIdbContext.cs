@@ -3,15 +3,15 @@ using DCI.Models.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.AspNetCore.Http;
 
 namespace DCI.Data
 {
 	public class DCIdbContext : DbContext
 	{
-		private readonly string _username;
 		public DCIdbContext(DbContextOptions<DCIdbContext> options) : base(options)
 		{
-			_username = "Admin";
+		
 		}
 		public DbSet<User> User { get; set; }
 		public DbSet<UserAccess> UserAccess { get; set; }
@@ -25,13 +25,13 @@ namespace DCI.Data
 		public DbSet<JobApplicant> JobApplicant { get; set; }
 		public DbSet<Document> Document { get; set; }
 		public DbSet<DocumentType> DocumentType { get; set; }
-		
+
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<AuditLog>().Property(ae => ae.Changes).HasConversion(
 				value => JsonConvert.SerializeObject(value),
-				serializedValue => JsonConvert.DeserializeObject<Dictionary<string, object>>(serializedValue));	
+				serializedValue => JsonConvert.DeserializeObject<Dictionary<string, object>>(serializedValue));
 		}
 		public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
 		{
@@ -57,21 +57,41 @@ namespace DCI.Data
 				if (entry.State == EntityState.Detached || entry.State == EntityState.Unchanged || !(entry.Entity is IAuditable))
 					continue;
 
-				var auditLog = new AuditLog
+				var _createdBy = string.Empty;
+				try
 				{
-					ActionType = entry.State == EntityState.Added ? "INSERT" : entry.State == EntityState.Deleted ? "DELETE" : "UPDATE",
-					EntityId = entry.Properties.Single(p => p.Metadata.IsPrimaryKey()).CurrentValue.ToString(),
-					EntityName = entry.Metadata.ClrType.Name,
-					Username = _username,
-					TimeStamp = DateTime.UtcNow,
-					Changes = entry.Properties.Select(p => new { p.Metadata.Name, p.CurrentValue }).ToDictionary(i => i.Name, i => i.CurrentValue),
+					if (entry.State == EntityState.Added)
+					{
+						_createdBy = entry.Properties.FirstOrDefault(p => p.Metadata.Name == "CreatedBy").CurrentValue.ToString();
+					}
+					else
+					{
+						_createdBy = entry.Properties.FirstOrDefault(p => p.Metadata.Name == "ModifiedBy").CurrentValue.ToString();
+					}
+				}
+				catch (Exception ex)
+				{
+					_createdBy = "0";
+				}
+				finally
+				{
+					var auditLog = new AuditLog
+					{
+						ActionType = entry.State == EntityState.Added ? "INSERT" : entry.State == EntityState.Deleted ? "DELETE" : "UPDATE",
+						EntityId = entry.Properties.Single(p => p.Metadata.IsPrimaryKey()).CurrentValue.ToString(),
+						EntityName = entry.Metadata.ClrType.Name,
+						//Username = _username,
+						Username = _createdBy,
+						TimeStamp = DateTime.UtcNow,
+						Changes = entry.Properties.Select(p => new { p.Metadata.Name, p.CurrentValue }).ToDictionary(i => i.Name, i => i.CurrentValue),
 
-					// TempProperties are properties that are only generated on save, e.g. ID's
-					// These properties will be set correctly after the audited entity has been saved
-					TempProperties = entry.Properties.Where(p => p.IsTemporary).ToList(),
-				};
+						// TempProperties are properties that are only generated on save, e.g. ID's
+						// These properties will be set correctly after the audited entity has been saved
+						TempProperties = entry.Properties.Where(p => p.IsTemporary).ToList(),
+					};
 
-				entries.Add(auditLog);
+					entries.Add(auditLog);
+				}
 			}
 
 			return entries;

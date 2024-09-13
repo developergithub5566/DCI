@@ -5,8 +5,8 @@ namespace DCI.Repositories.Interface
 {
 	public interface IDocumentRepository : IDisposable
 	{
-		Task<Document> GetDocumentById(int docId);
-		Task<IList<Document>> GetAllDocument();
+		Task<DocumentViewModel> GetDocumentById(int docId);
+		Task<IList<DocumentViewModel>> GetAllDocument();
 		Task<bool> IsExistsDocument(int docId);
 		Task<(int statuscode, string message)> Save(DocumentViewModel model);
 		Task<(int statuscode, string message)> Delete(DocumentViewModel model);

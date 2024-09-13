@@ -1,4 +1,5 @@
-﻿using DCI.Data;
+﻿using DCI.API.Service;
+using DCI.Data;
 using DCI.Models.ViewModel;
 using DCI.Repositories;
 using DCI.Repositories.Interface;
@@ -12,11 +13,11 @@ namespace DCI.API.Controllers
 	{
 		private readonly DCIdbContext _dcIdbContext;
 		IDocumentRepository _documentRepository;
-		
-        public DocumentController(IDocumentRepository documentRepository)
+
+		public DocumentController(IDocumentRepository documentRepository)
         {
-            this._documentRepository = documentRepository;
-        }
+            this._documentRepository = documentRepository;			
+		}
 
 		[HttpGet]
 		[Route("GetAllDocument")]
@@ -38,6 +39,16 @@ namespace DCI.API.Controllers
 		public async Task<IActionResult> SaveDocument(DocumentViewModel model)
 		{
 			var result = await _documentRepository.Save(model);
+			return StatusCode(result.statuscode, result.message);
+		}
+
+
+		[HttpPost]
+		[Route("DeleteDocument")]
+		public async Task<IActionResult> DeleteDocument([FromBody] DocumentViewModel model)
+		{
+
+			var result = await _documentRepository.Delete(model);
 			return StatusCode(result.statuscode, result.message);
 		}
 	}

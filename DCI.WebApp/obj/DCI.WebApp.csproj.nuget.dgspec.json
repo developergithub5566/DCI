@@ -129,6 +129,22 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Aspose.Words": {
+              "target": "Package",
+              "version": "[24.9.0, )"
+            },
+            "DocumentFormat.OpenXml": {
+              "target": "Package",
+              "version": "[3.1.0, )"
+            },
+            "GroupDocs.Viewer": {
+              "target": "Package",
+              "version": "[24.8.0, )"
+            },
+            "LibreOfficeLibrary": {
+              "target": "Package",
+              "version": "[1.0.7, )"
+            },
             "Microsoft.AspNetCore.Authentication.Cookies": {
               "target": "Package",
               "version": "[2.2.0, )"

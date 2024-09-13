@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using DCI.Models.Configuration;
 using Serilog;
 using DCI.WebApp.Configuration;
+using DCI.WebApp.Services;
 
 //using DCI.Repositories.Interface;
 //using DCI.Repositories;
@@ -53,12 +54,14 @@ builder.Services.AddAuthentication(options =>
 		  options.CallbackPath = new PathString("/signin-facebook");
 	  });
 
+
 Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).CreateLogger();
 
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSession();
 builder.Services.AddScoped<UserSessionHelper>();
+builder.Services.AddScoped<DocumentService>();
 
 var app = builder.Build();
 

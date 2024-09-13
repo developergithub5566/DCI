@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DCI.Models")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ecf39f1145bc0d1340acb77acdc1424a927ba969")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+010b510d72b89a8a7b93fa6a826ed308dcbb0075")]
 [assembly: System.Reflection.AssemblyProductAttribute("DCI.Models")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DCI.Models")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

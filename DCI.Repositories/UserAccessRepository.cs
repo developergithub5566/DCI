@@ -25,7 +25,7 @@ namespace DCI.Repositories
 		{
 			return await _dbContext.UserAccess.FirstOrDefaultAsync(x => x.UserId == userId && x.IsActive == true);
 		}
-		public async Task SaveUserAccess(RegistrationViewModel model)
+		public async Task SaveUserAccess(UserViewModel model)
 		{
 			try
 			{
@@ -89,17 +89,18 @@ namespace DCI.Repositories
 			}
 		}
 
-		public async Task<(int statuscode, string message)> ValidatePasswordToken(string token)
+		public async Task<(int statuscode, string message)> ValidateToken(string token)
 		{
 			try
 			{
 				var tokenExist = await _dbContext.UserAccess.FirstOrDefaultAsync(x => x.PasswordResetToken == token);
+				var email =  _dbContext.User.FirstOrDefault(x => x.UserId == tokenExist.UserId).Email;
 
 				if (tokenExist?.UserId > 0)
 				{
 					if (tokenExist.PasswordResetTokenExpiry > DateTime.UtcNow && tokenExist.IsActive == true)
 					{
-						return (StatusCodes.Status200OK, "Change your password");
+						return (StatusCodes.Status200OK, email);
 					}
 					else if (tokenExist.PasswordResetTokenExpiry > DateTime.UtcNow && tokenExist.IsActive == false)
 					{
@@ -147,10 +148,10 @@ namespace DCI.Repositories
 
 				var useraccessEntity = query.Count() > 0 ? query.FirstOrDefault() : null;
 
-				if (!PasswordHashingHelper.VerifyPassword(pass.CurrentPassword, useraccessEntity.Password))
-				{
-					return (StatusCodes.Status401Unauthorized, "Invalid Current Password");
-				}
+				//if (!PasswordHashingHelper.VerifyPassword(pass.CurrentPassword, useraccessEntity.Password))
+				//{
+				//	return ((int)StatusCodes.Status401Unauthorized, "Invalid Current Password");
+				//}
 				if (pass.NewPassword != pass.ConfirmPassword)
 				{
 					return (StatusCodes.Status401Unauthorized, "Passwords do not match.");

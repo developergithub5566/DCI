@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using DCI.Repositories.Interface;
 using DCI.API.Service;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -28,13 +29,15 @@ builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 builder.Services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
 builder.Services.AddScoped<IDocumentTypeRepository, DocumentTypeRepository>();
 builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
+builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 builder.Services.Configure<SMTPModel>(builder.Configuration.GetSection("SmtpSettings"));
 builder.Services.AddSingleton<AuthenticationModel>();
 builder.Services.Configure<AuthenticationModel>(builder.Configuration.GetSection("Authentication"));
-
+builder.Services.Configure<FileModel>(builder.Configuration.GetSection("DocumentStorage"));
 
 builder.Services.AddScoped<IUserContextService, UserContextService>();
 builder.Services.AddHttpContextAccessor();
+
 
 //builder.Services.AddSingleton<IUserContextService, UserContextService>();
 

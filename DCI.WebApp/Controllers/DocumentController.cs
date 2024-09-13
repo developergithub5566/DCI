@@ -1,12 +1,19 @@
-﻿using DCI.Models.Configuration;
+﻿using Aspose.Words.Drawing;
+using Aspose.Words;
+using DCI.Models.Configuration;
 using DCI.Models.Entities;
 using DCI.Models.ViewModel;
 using DCI.WebApp.Configuration;
+using DCI.WebApp.Services;
+
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Serilog;
 using System.Text;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace DCI.WebApp.Controllers
 {
@@ -14,10 +21,12 @@ namespace DCI.WebApp.Controllers
 	{
 		private readonly IOptions<APIConfigModel> _apiconfig;
 		private readonly UserSessionHelper _userSessionHelper;
-		public DocumentController(IOptions<APIConfigModel> apiconfig, UserSessionHelper userSessionHelper)
+		private readonly DocumentService _documentService;
+		public DocumentController(IOptions<APIConfigModel> apiconfig, UserSessionHelper userSessionHelper, DocumentService documentService)
 		{
 			this._apiconfig = apiconfig;
 			this._userSessionHelper = userSessionHelper;
+			this._documentService = documentService;
 		}
 		public async Task<IActionResult> Index()
 		{
@@ -35,22 +44,7 @@ namespace DCI.WebApp.Controllers
 			}
 			return View(model);
 		}
-		//public async Task<IActionResult> Document()
-		//{
-		//	List<Document> model = new List<Document>();
 
-		//	using (var _httpclient = new HttpClient())
-		//	{
-		//		HttpResponseMessage response = await _httpclient.GetAsync(_apiconfig.Value.apiConnection + "api/Document/GetAllDocument");
-		//		string responseBody = await response.Content.ReadAsStringAsync();
-
-		//		if (response.IsSuccessStatusCode)
-		//		{
-		//			model = JsonConvert.DeserializeObject<List<Document>>(responseBody)!;
-		//		}
-		//	}
-		//	return View(model);
-		//}
 		public async Task<IActionResult> EditDocument(DocumentViewModel model)
 		{
 			try
@@ -64,6 +58,12 @@ namespace DCI.WebApp.Controllers
 					var responseBody = await response.Content.ReadAsStringAsync();
 					DocumentViewModel vm = JsonConvert.DeserializeObject<DocumentViewModel>(responseBody)!;
 
+					vm.Options = vm.DocumentTypeList.Select(x =>
+									   new SelectListItem
+									   {
+										   Value = x.DocTypeId.ToString(),
+										   Text = x.Name
+									   }).ToList();
 
 					if (response.IsSuccessStatusCode)
 					{
@@ -93,12 +93,6 @@ namespace DCI.WebApp.Controllers
 					model.CreatedBy = currentUser.UserId;
 					model.ModifiedBy = currentUser.UserId;
 
-					//var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-					//var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Document/SaveDocument");
-
-					//request.Content = stringContent;
-					//var response = await _httpclient.SendAsync(request);
-
 					_httpclient.BaseAddress = new Uri(_apiconfig.Value.apiConnection + "api/Document/SaveDocument");
 
 					var data = new MultipartFormDataContent();
@@ -112,15 +106,15 @@ namespace DCI.WebApp.Controllers
 					data.Add(new StringContent(model.ModifiedBy.ToString() ?? ""), "ModifiedBy");
 					data.Add(new StringContent(model.DateModified.ToString() ?? ""), "DateModified");
 					data.Add(new StringContent(model.IsActive.ToString() ?? ""), "IsActive");
+
 					if (model.DocFile != null)
 					{
 						var fileContent = new StreamContent(model.DocFile!.OpenReadStream());
 						data.Add(fileContent, "DocFile", model.DocFile.FileName);
 					}
-				
 
-					var response = await _httpclient.PostAsync("http://localhost:5085/api/Document/SaveDocument", data);
-				
+					var response = await _httpclient.PostAsync(_apiconfig.Value.apiConnection + "api/Document/SaveDocument", data);
+
 
 					if (response.IsSuccessStatusCode)
 					{
@@ -140,7 +134,7 @@ namespace DCI.WebApp.Controllers
 			}
 		}
 
-		public async Task<IActionResult> DeleteDocumentType(DocumentTypeViewModel model)
+		public async Task<IActionResult> DeleteDocument(DocumentViewModel model)
 		{
 			try
 			{
@@ -172,6 +166,58 @@ namespace DCI.WebApp.Controllers
 				Log.CloseAndFlush();
 			}
 		}
+		public async Task<IActionResult> ViewDocument(DocumentViewModel model)
+		{
+			//string filePath = @"C:\\DCI File\\Output\dci.txt"; 		
+			//var pdfFilePath = _documentService.ConvertWordToPdf(filePath);
 
+			//var pdfBytes = await System.IO.File.ReadAllBytesAsync(pdfFilePath);
+
+			//Response.Headers.Add("Content-Disposition", "inline; filename=dci.txt");
+
+			//return File(pdfBytes, "application/pdf");
+			//return View();
+
+			try
+			{
+				using (var _httpclient = new HttpClient())
+				{
+					var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+					var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Document/GetDocumentById");
+					request.Content = stringContent;
+					var response = await _httpclient.SendAsync(request);
+					var responseBody = await response.Content.ReadAsStringAsync();
+					DocumentViewModel vm = JsonConvert.DeserializeObject<DocumentViewModel>(responseBody)!;
+
+					string filePath = vm.FileLocation + @"\" + vm.Filename;
+
+					//var pdfFilePath = _documentService.ConvertWordToPdf(filePath);
+
+					var pdfBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+
+					// View PDF next tab
+					//Response.Headers.Add("Content-Disposition", "inline; filename=" + vm.Filename);
+					//return File(pdfBytes, "application/pdf");
+
+					
+
+
+					// automatic download file
+					return File(pdfBytes, "application/pdf", vm.Filename, true);
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
+				return Json(new { success = false, message = ex.Message });
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+			return Json(new { success = false, message = "An error occurred. Please try again." });
+		}
+
+	
 	}
 }

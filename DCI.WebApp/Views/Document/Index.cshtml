@@ -2,11 +2,31 @@
 
 <link href="~/css/main.css" rel="stylesheet" />
 
+<style>
+	/* Hide the default file input */
+	/* 	#fileUpload {
+							display: none;
+						} */
+
+	/* Style the custom button */
+	.custom-file-label {
+		padding: 8px 16px;
+		background-color: #007bff;
+		color: white;
+		border-radius: 4px;
+		cursor: pointer;
+	}
+
+	.file-name {
+		margin-left: 10px;
+		font-style: italic;
+	}
+</style>
 <div class="container-fluid">
 	<div class="d-sm-flex align-items-center justify-content-between mb-3">
 		<h6 class="m-0 font-weight-bold text-gray-800">Document</h6>
 		<div class="upperRightDivBtn">
-			<a href="#" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#createmodal">
+			<a href="#" class="btn btnPrimary btn-icon-split" onclick="newForm()">
 				<span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
 				<span class="text"><small>Add Document</small></span>
 			</a>
@@ -16,7 +36,7 @@
 	<div class="col-12 p0">
 		<ul class="breadcrumb">
 			<li><a href="~/Home/Index">Home</a></li>
-			<li><a href="~/Maintenance/Index">Document</a></li>
+			<li>Document</li>
 		</ul>
 	</div>
 
@@ -69,13 +89,13 @@
 									@item.DocName
 								</td>
 								<td>
-									@item.DocTypeId
+									@item.DocTypeName
 								</td>
 								<td>
 									@item.DateCreated.ToShortDateString()
 								</td>
 								<td>
-									@item.CreatedBy
+									@item.CreatedName
 								</td>
 
 								<td>
@@ -116,22 +136,24 @@
 								<div class="row">
 									<div class="col">
 										<label for="DocTypeId" class="col-form-label">Document Type:</label>
-
 										<select id="documentSelect" class="form-select">
 											<option value="">select type</option>
-											<option value="1">LOI</option>
-											<option value="2">MOA</option>
-											<option value="3">Proposal</option>
-											<option value="4">Findings</option>
-											<option value="5">HR</option>
-											<option value="6">Certification</option>
-											<option value="7">BAC</option>
 										</select>
 									</div>
 									<div class="col">
-										<label for="fileUpload" class="col-form-label">File Upload:</label>
-										<input type="file" class="form-control" id="fileUpload" name="fileUpload" />
 
+
+										<label for="fileUpload" class="col-form-label">File Upload:</label>
+										<br id="nextline"/>
+										<input type="file" class="form-control" id="fileUpload" name="fileUpload" />
+									
+										<span class="file-name">No file chosen</span>							
+
+
+										<a asp-controller="Document" asp-action="ViewDocument" asp-route-id="0" id="viewFile" target="_blank" class="btn btn-primary"> | <i class="fa fa-download"></i></a>
+
+										<a href="#" id="deleteFile" onclick="removefile()" class="btn btn-danger">| <i class="far fa-trash-alt"></i></a>
+								
 									</div>
 								</div>
 							</div>
@@ -144,12 +166,19 @@
 					</div>
 				</div>
 			</div>
+
+
+
+
 		</div>
 
 
 		@section scripts {
 			<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
 			<script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
+
+
+
 			<script src="~/js/file-upload.js"></script>
 
 			<script type="text/javascript">
@@ -159,6 +188,19 @@
 					js('#tblDocument').DataTable({
 					});
 
+					$('#fileUpload').on('change', function () {
+						var fileName = this.files[0] ? this.files[0].name : 'No file chosen';
+						document.querySelector('.file-name').textContent = '';
+
+						const newrecord = $('#DocId').val();
+
+						if (newrecord != 0)
+						{
+							$('.file-name').text(fileName);
+						}
+					
+					});
+
 					$('#createForm').submit(function (event) {
 						event.preventDefault();
 						const fileInput = document.getElementById('fileUpload');
@@ -166,13 +208,14 @@
 						const docId = $('#DocId').val();
 						const docNo = $('#DocNo').val();
 						const docName = $('#DocName').val();
+						const doctypeId = $('#documentSelect').val();
 
 						// var formData = $(this).serialize();
 						const formData = new FormData();
 						formData.append('DocId', docId);
 						formData.append('DocNo', docNo);
 						formData.append('DocName', docName);
-						formData.append('DocName', docName);
+						formData.append('DocTypeId', doctypeId);
 						formData.append('DocFile', file);
 
 						bootbox.confirm('Are you sure?', function (result) {
@@ -205,6 +248,45 @@
 
 				});
 
+				function newForm() {
+					$.ajax({
+						type: 'POST',
+						url: '@Url.Action("EditDocument", "Document")',
+						success: function (response) {
+							console.log(response.data);
+							if (response.success) {
+								$('#DocId').val("0");
+								$('#DocNo').val("");
+								$('#DocName').val("");
+								$('#DocTypeId').val(0);
+
+								var $select = $('#documentSelect');
+								$select.empty();
+								$select.append('<option value="">Select type</option>');
+
+								$.each(response.data.options, function (index, item) {
+									if (item.value == response.data.docTypeId) {
+										$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+									} else {
+										$select.append('<option value="' + item.value + '">' + item.text + '</option>');
+									}
+								});
+
+								document.querySelector('.file-name').textContent = '';
+								$('#fileUpload').show();
+								$('#viewFile').hide();
+								$('#deleteFile').hide();
+								js('#createmodal').modal('show');
+							} else {
+								bootbox.alert(response.message);
+							}
+						},
+						error: function () {
+							bootbox.alert('An error occurred. Please try again.');
+						}
+					});
+				}
+
 				function editForm(id) {
 
 					$.ajax({
@@ -212,24 +294,32 @@
 						url: '@Url.Action("EditDocument", "Document")',
 						data: { DocId: id },
 						success: function (response) {
+							console.log(response.data);
 							if (response.success) {
 								$('#DocId').val(response.data.docId);
 								$('#DocNo').val(response.data.docNo);
 								$('#DocName').val(response.data.docName);
 								$('#DocTypeId').val(response.data.docTypeId);
 
-								// var $select = $('#documentSelect');
-								// $select.empty(); 
-								// $select.append('<option value="">select type</option>');
+								var $select = $('#documentSelect');
+								$select.empty();
+								$select.append('<option value="">Select type</option>');
 
-								// $.each(response.data.options, function (index, item) {
-								// 	if (item.value == response.data.roleId) {
-								// 		$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
-								// 	} else {
-								// 		$select.append('<option value="' + item.value + '">' + item.text + '</option>');
-								// 	}
-								// });
+								$.each(response.data.options, function (index, item) {
+									if (item.value == response.data.docTypeId) {
+										$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+									} else {
+										$select.append('<option value="' + item.value + '">' + item.text + '</option>');
+									}
+								});
 
+								var linkElement = document.getElementById("viewFile");
+								linkElement.setAttribute('href', '/Document/ViewDocument?DocId=' + response.data.docId);
+
+								document.querySelector('.file-name').textContent = response.data.filename;
+								$('#fileUpload').hide();
+								$('#viewFile').show();
+								$('#deleteFile').show();
 								js('#createmodal').modal('show');
 							} else {
 								bootbox.alert(response.message);
@@ -246,7 +336,7 @@
 						if (result) {
 							$.ajax({
 								type: 'POST',
-								url: '@Url.Action("DeleteDocument", "Maintenance")',
+								url: '@Url.Action("DeleteDocument", "Document")',
 								data: { DocId: id },
 								success: function (response) {
 									if (response.success) {
@@ -261,6 +351,22 @@
 									bootbox.alert('An error occurred. Please try again.');
 								}
 							});
+						}
+					});
+				}
+
+				function removefile() {
+					bootbox.confirm('Are you sure?', function (result) {
+						if (result) {
+							document.querySelector('.file-name').textContent = '';
+							$('#fileUpload').show();
+							$('#viewFile').hide();
+							$('#deleteFile').hide();
+
+							// $('#fileUpload').on('change', function () {
+							// 	var fileName = this.files[0] ? this.files[0].name : 'No file chosen';
+							// 	$('.file-name').text(fileName);
+							// });
 						}
 					});
 				}

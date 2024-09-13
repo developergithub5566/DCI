@@ -1,0 +1,101 @@
+﻿@model IEnumerable<DCI.Models.ViewModel.AuditLogViewModel>
+
+<div class="container-fluid">
+	<div class="d-sm-flex align-items-center justify-content-between mb-3">
+		<h6 class="m-0 font-weight-bold text-gray-800">Administration</h6>
+		<div class="upperRightDivBtn">
+			@* 	<a href="#" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#createmodal">
+			<span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
+			<span class="text"><small>Add Department</small></span>
+			</a> *@
+		</div>
+
+	</div>
+	<div class="col-12 p0">
+		<ul class="breadcrumb">
+			<li><a href="~/Home/Index">Home</a></li>
+			<li><a href="~/Maintenance/Index">Administration</a></li>
+			<li>Activity Log</li>
+		</ul>
+	</div>
+
+	<div class="card shadow mb-4">
+		<div class="card-header">
+			<label class="mb0">Data</label>
+		</div>
+		<div class="card-body">
+			<div class="table-responsive mt20">
+				<table class="table table-bordered" id="tblAuditLog">
+					<thead>
+						<tr>
+							<th>
+								<label>Id</label>
+							</th>
+							<th>
+								<label>Module</label>
+							</th>
+							<th>
+								<label>Action Type</label>
+							</th>
+							<th>
+								<label>Performed By</label>
+							</th>
+							<th>
+								<label>Time Stamp</label>
+							</th>
+							<th>
+								<label>Logs</label>
+							</th>
+						@* 	<th>
+								Action
+							</th> *@
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var item in Model)
+						{
+							<tr>
+								<td>
+									@item.Id
+								</td>
+								<td>
+									@item.EntityName
+								</td>
+								<td>
+									@item.ActionType
+								</td>
+								<td>
+									@item.Username
+								</td>
+								<td>
+									@item.TimeStamp.ToString("yyyy-mm-dd HH:mm")
+								</td>
+								<td style="font-size:x-small" width="30%">
+									@item.ChangesSerialized
+								</td>
+
+							@* 	<td>
+									<a href="#" class="btn btn-primary"><i class="fas fa-search"></i></a> |
+										<a href="#" id="editForm" onclick="editForm(@item.Id)" class="btn btn-info"><i class="fa fa-edit"></i></a> | 
+									 <a href="#" id="deleteform" class="btn btn-danger" onclick="deleteform(@item.Id)"><i class="far fa-trash-alt"></i></a>
+								</td> *@
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	@section scripts {
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
+		<script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
+
+		<script type="text/javascript">
+			var js = jQuery.noConflict(true);
+			$(document).ready(function () {
+				js('#tblAuditLog').DataTable({
+					order: [[0, 'desc']]
+				});
+			});
+		</script>
+	}

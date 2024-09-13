@@ -37,268 +37,210 @@
 			<label class="mb0">Data</label>
 		</div>
 		<div class="card-body">
-		<div class="table-responsive mt20">
-	<table class="table table-bordered" id="tblUser" width="100%" cellspacing="0">
-		<thead>
-			<tr>
-				<th>
-					<label>Id</label>
-				</th>
-				<th>
+			<div class="table-responsive mt20">
+				<table class="table table-bordered" id="tblUser" width="100%" cellspacing="0">
+					<thead>
+						<tr>
+							<th>
+								<label>Id</label>
+							</th>
+							<th>
 								<label>Email</label>
-				</th>
-				<th>
-					<label>Firstname</label>
-				</th>
-				<th>
-					<label>Lastname</label>
-				</th>
-				<th>
-					<label>Contact No</label>
-				</th>
-				
-				<th>
-					Action
-				</th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach (var item in Model.EmployeeList)
-			{
-				<tr>
-					<td>
-						@item.UserId
-					</td>
-					<td>
-						@item.Email
-					</td>
-					<td>
-						@item.Firstname
-					</td>
-					<td>
-						@item.Lastname
-					</td>
-					<td>
-						@item.ContactNo
-					</td>					
-					<td>
+							</th>
+							<th>
+								<label>Firstname</label>
+							</th>
+							<th>
+								<label>Lastname</label>
+							</th>
+							<th>
+								<label>Contact No</label>
+							</th>
+
+							<th>
+								Action
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var item in Model.EmployeeList)
+						{
+							<tr>
+								<td>
+									@item.UserId
+								</td>
+								<td>
+									@item.Email
+								</td>
+								<td>
+									@item.Firstname
+								</td>
+								<td>
+									@item.Lastname
+								</td>
+								<td>
+									@item.ContactNo
+								</td>
+								<td>
 									<a href="#" class="btn btn-primary"><i class="fas fa-search"></i></a> |
 									<a href="#" id="editForm" onclick="editForm(@item.UserId)" class="btn btn-info"><i class="fa fa-edit"></i></a> |
 
 									<a href="#" id="deleteform" class="btn btn-danger" onclick="deleteform(@item.UserId)"><i class="far fa-trash-alt"></i></a>
-					</td>
-				</tr>
-			}
-		</tbody>
-	</table>
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
 
 			</div>
 			</<div>
-	</div>
-	<div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-		<div class="modal-dialog" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="exampleModalLabel">New Registration User</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
+			</div>
+			<div class="modal fade bd-example-modal-lg" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-lg" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="exampleModalLabel">New User</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<form id="createForm">
+							<div class="container mt-5">
+								<input type="hidden" id="UserId" name="UserId" value="0">
+
+								<div class="row mb-3">
+									<div class="col-md-6">
+										@* <label for="Username" class="col-form-label">Username:</label>
+										<input type="text" class="form-control" id="Username" name="Username" maxlength="25"> *@
+										<label for="Email" class="col-form-label">Email:</label>
+										<input class="form-control" id="Email" name="Email" maxlength="50"></input>
+									</div>
+									<div class="col-md-6">
+										<label for="Firstname" class="col-form-label">Firstname:</label>
+										<input class="form-control" id="Firstname" name="Firstname" maxlength="25"></input>
+									</div>
+								</div>
+
+								<div class="row mb-3">
+									<div class="col-md-6">
+										<label for="Lastname" class="col-form-label">Lastname:</label>
+										<input class="form-control" id="Lastname" name="Lastname" maxlength="25"></input>
+									</div>
+									<div class="col-md-6">
+										<label for="ContactNo" class="col-form-label">ContactNo:</label>
+										<input class="form-control" id="ContactNo" name="ContactNo" maxlength="15"></input>
+									</div>
+								</div>
+
+								<div class="row mb-3">
+									@* 	<div class="col-md-6">
+									<label for="Email" class="col-form-label">Email:</label>
+									<input class="form-control" id="Email" name="Email" maxlength="25"></input>
+									</div> *@
+									<div class="col-md-6">
+										<label for="RoleId" class="col-form-label">Role:</label>
+										<input type="hidden" id="RoleId" name="RoleId" value="0">
+										<select id="roleSelect" class="form-select">
+											<option value="">Select Role</option>
+										</select>
+
+									</div>
+								</div>
+
+
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+								<button type="submit" class="btn btn-primary">Save</button>
+							</div>
+						</form>
+
+					</div>
 				</div>
-				<form id="createForm">
-					<div class="container mt-5">
-						<input type="hidden" id="UserId" name="UserId" value="0">
-
-						<div class="row mb-3">
-							<div class="col-md-6">
-								<label for="Username" class="col-form-label">Username:</label>
-								<input type="text" class="form-control" id="Username" name="Username" maxlength="25">
-							</div>
-							<div class="col-md-6">
-								<label for="Firstname" class="col-form-label">Firstname:</label>
-								<input class="form-control" id="Firstname" name="Firstname" maxlength="25"></input>
-							</div>
-						</div>
-
-						<div class="row mb-3">
-							<div class="col-md-6">
-								<label for="Lastname" class="col-form-label">Lastname:</label>
-								<input class="form-control" id="Lastname" name="Lastname" maxlength="25"></input>
-							</div>
-							<div class="col-md-6">
-								<label for="ContactNo" class="col-form-label">ContactNo:</label>
-								<input class="form-control" id="ContactNo" name="ContactNo" maxlength="15"></input>
-							</div>
-						</div>
-
-						<div class="row mb-3">
-							<div class="col-md-6">
-								<label for="Email" class="col-form-label">Email:</label>
-								<input class="form-control" id="Email" name="Email" maxlength="25"></input>
-							</div>
-							<div class="col-md-6">
-								<label for="Role" class="col-form-label">Role:</label>
-								@* <input class="form-control" id="Role" name="Role"></input>
-								<select asp-for="@Model.RoleId" asp-items="@Model.Options" class="form-select"></select> *@
-								<select id="roleSelect" class="form-select">
-									<option value="">Select Role</option>
-								</select>
-
-							</div>
-						</div>
-					
-
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-						<button type="submit" class="btn btn-primary">Save</button>
-					</div>
-				</form>
-
 			</div>
 		</div>
-	</div>
-</div>
 
-@section scripts {
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
-	<script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
-			
+		@section scripts {
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
+			<script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
 
-	<script type="text/javascript">
 
-		var js = jQuery.noConflict(true);
+			<script type="text/javascript">
 
-		js(document).ready(function () {
+				var js = jQuery.noConflict(true);
 
-			
-			js('#tblUser').DataTable({
-			});
+				js(document).ready(function () {
 
-			$('#createForm').submit(function (event) {
-				event.preventDefault();
-				var formData = $(this).serialize();
 
-				bootbox.confirm('Are you sure?', function (result) {
-					if (result) {
+					js('#tblUser').DataTable({
+					});
 
-						$.ajax({
-							type: 'POST',
-							url: '@Url.Action("SaveUser", "Maintenance")',
-							data: formData,
-							success: function (response) {
-								if (response.success) {
-									$('#createForm')[0].reset();
-									js('#createmodal').modal('hide');
-									bootbox.alert(response.message, function () {
-										location.reload();
-									});
-								} else {
-									bootbox.alert(response.message);
-								}
-							},
-							error: function () {
-								bootbox.alert('An error occurred. Please try again.');
+					$('#createForm').submit(function (event) {
+						event.preventDefault();
+						// var roleIdselect = $('#roleSelect').val();
+						// $('#RoleId').val(roleIdselect)
+						document.getElementById("RoleId").value = $('#roleSelect').val();
+						var formData = $(this).serialize();
+						
+
+						bootbox.confirm('Are you sure?', function (result) {
+							if (result) {
+
+								$.ajax({
+									type: 'POST',
+									url: '@Url.Action("SaveUser", "Maintenance")',
+									data: formData,
+									success: function (response) {
+										if (response.success) {
+											$('#createForm')[0].reset();
+											js('#createmodal').modal('hide');
+											bootbox.alert(response.message, function () {
+												location.reload();
+											});
+										} else {
+											bootbox.alert(response.message);
+										}
+									},
+									error: function () {
+										bootbox.alert('An error occurred. Please try again.');
+									}
+								});
 							}
 						});
-					}
+					});
 				});
-			});
-		});
 
-		function newForm() {
-			$.ajax({
-				type: 'POST',
-				url: '@Url.Action("CreateUser", "Maintenance")',
-				// data: { UserId: id },
-				success: function (response) {
-					console.log(response.data);
-					if (response.success) {
-						$('#UserId').val("");
-						$('#Username').val("");
-						$('#Firstname').val("");
-						$('#Lastname').val("");
-						$('#ContactNo').val("");
-						$('#Email').val("");
-						$('#RoleId').val(0);
-
-
-						var $select = $('#roleSelect');
-						$select.empty(); // Clear the current options
-						$select.append('<option value="">Select Role</option>');
-
-						$.each(response.data.options, function (index, item) {
-							if (item.value == response.data.roleId) {
-								$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
-							} else {
-								$select.append('<option value="' + item.value + '">' + item.text + '</option>');
-							}
-						});
-
-
-						js('#createmodal').modal('show');
-					} else {
-						bootbox.alert(response.message);
-					}
-				},
-				error: function () {
-					bootbox.alert('An error occurred. Please try again.');
-				}
-			});
-		}
-
-		function editForm(id) {
-			$.ajax({
-				type: 'POST',
-				url: '@Url.Action("EditUser", "Maintenance")',
-				data: { UserId: id },
-				success: function (response) {
-					console.log(response.data);
-					if (response.success) {
-						$('#UserId').val(response.data.userId);
-						$('#Username').val(response.data.username);
-						$('#Firstname').val(response.data.firstname);
-						$('#Lastname').val(response.data.lastname);
-						$('#ContactNo').val(response.data.contactNo);
-						$('#Email').val(response.data.email);
-						$('#RoleId').val(response.data.roleId);
-
-
-						var $select = $('#roleSelect');
-						$select.empty(); // Clear the current options
-						$select.append('<option value="">Select Role</option>');
-
-						$.each(response.data.options, function (index, item) {
-							if (item.value == response.data.roleId) {
-								$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
-							} else {
-								$select.append('<option value="' + item.value + '">' + item.text + '</option>');
-							}
-						});
-
-
-						js('#createmodal').modal('show');
-					} else {
-						bootbox.alert(response.message);
-					}
-				},
-				error: function () {
-					bootbox.alert('An error occurred. Please try again.');
-				}
-			});
-		}
-
-		function deleteform(id) {
-			bootbox.confirm('Are you sure?', function (result) {
-				if (result) {
+				function newForm() {
 					$.ajax({
 						type: 'POST',
-						url: '@Url.Action("DeleteUser", "Maintenance")',
-						data: { UserId: id },
+						url: '@Url.Action("EditUser", "Maintenance")',
+						// data: { UserId: id },
 						success: function (response) {
+							console.log(response.data);
 							if (response.success) {
-								bootbox.alert(response.message, function () {
-									location.reload();
+								$('#UserId').val("");
+								// $('#Username').val("");
+								$('#Firstname').val("");
+								$('#Lastname').val("");
+								$('#ContactNo').val("");
+								$('#Email').val("");
+								$('#RoleId').val(0);
+
+
+								var $select = $('#roleSelect');
+								$select.empty(); // Clear the current options
+								$select.append('<option value="">Select Role</option>');
+
+								$.each(response.data.options, function (index, item) {
+									if (item.value == response.data.roleId) {
+										$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+									} else {
+										$select.append('<option value="' + item.value + '">' + item.text + '</option>');
+									}
 								});
+
+
+								js('#createmodal').modal('show');
 							} else {
 								bootbox.alert(response.message);
 							}
@@ -308,8 +250,72 @@
 						}
 					});
 				}
-			});
-		}
 
-	</script>
-}
+				function editForm(id) {
+					$.ajax({
+						type: 'POST',
+						url: '@Url.Action("EditUser", "Maintenance")',
+						data: { UserId: id },
+						success: function (response) {
+							console.log(response.data);
+							if (response.success) {
+								$('#UserId').val(response.data.userId);
+								$('#Username').val(response.data.username);
+								$('#Firstname').val(response.data.firstname);
+								$('#Lastname').val(response.data.lastname);
+								$('#ContactNo').val(response.data.contactNo);
+								$('#Email').val(response.data.email);
+								$('#RoleId').val(response.data.roleId);
+
+
+								var $select = $('#roleSelect');
+								$select.empty(); // Clear the current options
+								$select.append('<option value="">Select Role</option>');
+
+								$.each(response.data.options, function (index, item) {
+									if (item.value == response.data.roleId) {
+										$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+									} else {
+										$select.append('<option value="' + item.value + '">' + item.text + '</option>');
+									}
+								});
+
+
+
+								js('#createmodal').modal('show');
+							} else {
+								bootbox.alert(response.message);
+							}
+						},
+						error: function () {
+							bootbox.alert('An error occurred. Please try again.');
+						}
+					});
+				}
+
+				function deleteform(id) {
+					bootbox.confirm('Are you sure?', function (result) {
+						if (result) {
+							$.ajax({
+								type: 'POST',
+								url: '@Url.Action("DeleteUser", "Maintenance")',
+								data: { UserId: id },
+								success: function (response) {
+									if (response.success) {
+										bootbox.alert(response.message, function () {
+											location.reload();
+										});
+									} else {
+										bootbox.alert(response.message);
+									}
+								},
+								error: function () {
+									bootbox.alert('An error occurred. Please try again.');
+								}
+							});
+						}
+					});
+				}
+
+			</script>
+		}

@@ -85,7 +85,7 @@ namespace DCI.Repositories
 			return await _dbContext.User.AsNoTracking().Where(x => x.IsActive == true).ToListAsync();
 		}
 
-		public async Task<(int statuscode, string message)> Registration(RegistrationViewModel model)
+		public async Task<(int statuscode, string message)> Registration(UserViewModel model)
 		{
 			try
 			{
@@ -98,9 +98,9 @@ namespace DCI.Repositories
 					user.ContactNo = model.ContactNo;		
 					user.RoleId = model.RoleId;
 					user.DateCreated = DateTime.Now;
-					user.CreatedBy = "Admin";
-					user.DateModified = DateTime.Now;
-					user.ModifiedBy = "Admin";
+					user.CreatedBy = model.CreatedBy;
+					user.DateModified = null;
+					user.ModifiedBy = null;
 					user.IsActive = true;
 					await _dbContext.User.AddAsync(user);
 					await _dbContext.SaveChangesAsync();
@@ -144,7 +144,7 @@ namespace DCI.Repositories
 				Log.CloseAndFlush();
 			}
 		}
-		public async Task<(int statuscode, string message)> UpdateUser(UpdateUserViewModel model)
+		public async Task<(int statuscode, string message)> UpdateUser(UserViewModel model)
 		{
 			try
 			{
@@ -159,7 +159,7 @@ namespace DCI.Repositories
 				entities.DateCreated = entities.DateCreated;
 				entities.CreatedBy = entities.CreatedBy;
 				entities.DateModified = DateTime.Now;
-				entities.ModifiedBy = "Admin";
+				entities.ModifiedBy = 1;
 				entities.IsActive = true;
 
 				_dbContext.User.Entry(entities).State = EntityState.Modified;
@@ -215,7 +215,7 @@ namespace DCI.Repositories
 					return (StatusCodes.Status406NotAcceptable, "Invalid User Id");
 				}
 				entity.IsActive = false;
-				entity.ModifiedBy = "Admin";
+				entity.ModifiedBy = 1;
 				entity.DateModified = DateTime.Now;
 				_dbContext.User.Entry(entity).State = EntityState.Modified;
 				await _dbContext.SaveChangesAsync();
@@ -246,9 +246,9 @@ namespace DCI.Repositories
 					user.ContactNo = string.Empty;					
 					user.RoleId = (int)EnumRole.User;
 					user.DateCreated = DateTime.Now;
-					user.CreatedBy = "Admin";
+					user.CreatedBy = 1;
 					user.DateModified = DateTime.Now;
-					user.ModifiedBy = "Admin";
+					user.ModifiedBy = 1;
 					user.IsActive = true;
 					await _dbContext.User.AddAsync(user);
 					await _dbContext.SaveChangesAsync();
