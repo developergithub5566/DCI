@@ -3,17 +3,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DCI.Models.ViewModel
 {
-	//public class RegistrationViewModel
-	//{
-	//	public int UserId { get; set; } = 0;
-	//	public string Email { get; set; } = string.Empty;
-	//	public string Firstname { get; set; } = string.Empty;
-	//	public string Lastname { get; set; } = string.Empty;
-	//	public string ContactNo { get; set; } = string.Empty;
-	//	public int RoleId { get; set; } = 0;
-	//	public string Password { get; set; } = string.Empty;
-	//}
-
 	public class LoginViewModel
 	{
 		public int UserId { get; set; } = 0;
