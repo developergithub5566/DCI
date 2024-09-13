@@ -189,7 +189,7 @@ namespace DCI.WebApp.Controllers
 					var responseBody = await response.Content.ReadAsStringAsync();
 					DocumentViewModel vm = JsonConvert.DeserializeObject<DocumentViewModel>(responseBody)!;
 
-					string filePath = vm.FileLocation + @"\" + vm.Filename;
+					string filePath = vm.FileLocation  + vm.Filename;
 
 					//var pdfFilePath = _documentService.ConvertWordToPdf(filePath);
 

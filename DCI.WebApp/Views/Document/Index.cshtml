@@ -99,8 +99,8 @@
 								</td>
 
 								<td>
-									<a href="#" class="btn btn-primary"><i class="fas fa-search"></i></a> |
-									<a href="#" id="editForm" onclick="editForm(@item.DocId)" class="btn btn-info"><i class="fa fa-edit"></i></a> |
+									<a href="#" onclick="editForm(@item.DocId,1)" class="btn btn-primary"><i class="fas fa-search"></i></a> |
+									<a href="#" id="editForm" onclick="editForm(@item.DocId,0)" class="btn btn-info"><i class="fa fa-edit"></i></a> |
 									<a href="#" id="deleteform" class="btn btn-danger" onclick="deleteform(@item.DocId)"><i class="far fa-trash-alt"></i></a>
 								</td>
 							</tr>
@@ -126,7 +126,7 @@
 								<div class="row">
 									<div class="col">
 										<label for="DocNo" class="col-form-label">Document No:</label>
-										<input type="text" class="form-control" id="DocNo" name="DocNo" value="DOC-MOA-20240906-001" maxlength="15">
+										<input type="text" class="form-control" id="DocNo" name="DocNo" value="DOC-MOA-20240906-001" disabled maxlength="15">
 									</div>
 									<div class="col">
 										<label for="DocName" class="col-form-label">Document Name:</label>
@@ -276,6 +276,10 @@
 								$('#fileUpload').show();
 								$('#viewFile').hide();
 								$('#deleteFile').hide();
+
+								$('#DocName').prop('disabled', false);
+								$('#documentSelect').prop('disabled', false);
+								$('#fileUpload').prop('disabled', false);
 								js('#createmodal').modal('show');
 							} else {
 								bootbox.alert(response.message);
@@ -287,7 +291,7 @@
 					});
 				}
 
-				function editForm(id) {
+				function editForm(id,view) {
 
 					$.ajax({
 						type: 'POST',
@@ -319,7 +323,21 @@
 								document.querySelector('.file-name').textContent = response.data.filename;
 								$('#fileUpload').hide();
 								$('#viewFile').show();
-								$('#deleteFile').show();
+								
+
+								if (view == 1) {	//VIEW button							
+									$('#DocName').prop('disabled', true);
+									$('#documentSelect').prop('disabled', true);
+									$('#fileUpload').prop('disabled', true);								
+									$('#deleteFile').hide();
+								}
+								else{  //Edit button
+									$('#DocName').prop('disabled', false);
+									$('#documentSelect').prop('disabled', false);
+									$('#fileUpload').prop('disabled', false);
+									$('#deleteFile').show();
+								}
+
 								js('#createmodal').modal('show');
 							} else {
 								bootbox.alert(response.message);
@@ -329,7 +347,7 @@
 							bootbox.alert('An error occurred. Please try again.');
 						}
 					});
-				}
+				}			
 
 				function deleteform(id) {
 					bootbox.confirm('Are you sure?', function (result) {

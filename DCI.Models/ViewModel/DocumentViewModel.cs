@@ -25,6 +25,12 @@ namespace DCI.Models.ViewModel
 		public IList<DocumentType>? DocumentTypeList { get; set; }
 		public IList<DocumentViewModel>? DocumentList { get; set; }
 	}
-
+	public class DocumentCodeViewModel
+	{
+	    public int DocumentCategory { get; set; } = 0; //internal or internal/external
+		public int DepartmentId { get; set; } = 0;
+		public int DocumentTypeId { get; set; } = 0;
+		public int VersionNo { get; set; } = 0;
+	}
 
 }

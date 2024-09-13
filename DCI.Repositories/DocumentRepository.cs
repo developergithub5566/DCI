@@ -84,7 +84,7 @@ namespace DCI.Repositories
 								FileLocation = doc.FileLocation,
 								DocTypeId = doc.DocTypeId,
 								DocumentTypeList = null,
-								DocTypeName = string.Empty,							
+								DocTypeName = string.Empty,
 							};
 
 				var result = query.FirstOrDefault();
@@ -125,7 +125,7 @@ namespace DCI.Repositories
 					entity.DocName = model.DocName;
 					entity.DocTypeId = model.DocTypeId;
 					entity.Version = model.Version;
-					entity.Filename = model.DocFile.FileName;
+					entity.Filename = model.DocFile != null ? model.DocFile.FileName : string.Empty;
 					entity.CreatedBy = model.CreatedBy;
 					entity.DateCreated = DateTime.Now;
 					entity.ModifiedBy = null;
@@ -134,7 +134,11 @@ namespace DCI.Repositories
 					await _dbContext.Document.AddAsync(entity);
 					await _dbContext.SaveChangesAsync();
 					model.DocId = entity.DocId;
-					await SaveFile(model);
+
+					if (model.DocFile != null)
+					{
+						await SaveFile(model);
+					}
 					return (StatusCodes.Status200OK, "Successfully saved");
 				}
 				else
@@ -145,7 +149,7 @@ namespace DCI.Repositories
 					entity.DocName = model.DocName;
 					entity.DocTypeId = model.DocTypeId;
 					entity.Version = model.Version;
-					entity.Filename = model.DocFile.FileName;
+					entity.Filename = model.DocFile != null ? model.DocFile.FileName : entity.Filename;
 					entity.DateCreated = entity.DateCreated;
 					entity.CreatedBy = entity.CreatedBy;
 					entity.DateModified = DateTime.Now;
@@ -155,7 +159,11 @@ namespace DCI.Repositories
 					_dbContext.Document.Entry(entity).State = EntityState.Modified;
 					await _dbContext.SaveChangesAsync();
 					model.DocId = entity.DocId;
-					await SaveFile(model);
+
+					if (model.DocFile != null)
+					{
+						await SaveFile(model);
+					}
 					return (StatusCodes.Status200OK, "Successfully updated");
 				}
 			}
@@ -202,7 +210,7 @@ namespace DCI.Repositories
 		{
 			try
 			{
-				string fileloc = _filelocation.Value.FileLocation + model.DocId.ToString();
+				string fileloc = _filelocation.Value.FileLocation + model.DocId.ToString() + @"\";
 
 				if (!Directory.Exists(fileloc))
 					Directory.CreateDirectory(fileloc);
@@ -227,6 +235,37 @@ namespace DCI.Repositories
 			{
 				Log.CloseAndFlush();
 			}
+		}
+		private async Task<string> GenerateDocCode(DocumentCodeViewModel param)
+		{
+			string DOT = ".";
+
+			var _docContext = _dbContext.Document.AsQueryable();
+			int totalrecords = _docContext.Count() + 1;
+
+
+			//     string strFormat = String.Format("Hello {0}", name);
+			if (param.DocumentCategory == 1) //internal
+			{
+				string deptcode = string.Empty; // TID,HRD, 
+				string deptsec = string.Empty; //PM 
+				string setNoFirst = totalrecords.ToString();
+				string setNoSecond = string.Empty;
+				string version = "0.0";
+
+				return string.Format(deptcode, DOT, deptsec, DOT, setNoFirst, DOT, setNoSecond, "Ver.", version);
+			}
+			else if (param.DocumentCategory == 2) //internal and external
+			{
+				string compcode = string.Empty; //DCI
+				string doctype = string.Empty; //MOA,NOA,IA
+				string setNoFirst = string.Empty; 
+				string setNoSecond = string.Empty;
+				string version =  "0.0"; 
+
+				return string.Format(compcode, DOT, doctype, DOT, setNoFirst, DOT, setNoSecond, "Ver.", version);
+			}
+			return string.Empty;
 		}
 	}
 }
