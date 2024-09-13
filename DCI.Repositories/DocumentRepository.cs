@@ -236,12 +236,12 @@ namespace DCI.Repositories
 				Log.CloseAndFlush();
 			}
 		}
-		private async Task<string> GenerateDocCode(DocumentCodeViewModel param)
+		private async Task<string> GenerateDocCode(DocumentViewModel param)
 		{
 			string DOT = ".";
 
 			var _docContext = _dbContext.Document.AsQueryable();
-			var _docTypeContext = _dbContext.DocumentType.AsQueryable().Where(x => x.DocTypeId == param.DocumentTypeId);
+			var _docTypeContext = _dbContext.DocumentType.AsQueryable().Where(x => x.DocTypeId == param.DocTypeId);
 
 			int totalrecords = _docContext.Count() + 1;
 
@@ -250,17 +250,17 @@ namespace DCI.Repositories
 			//DCI.MOA.001.000
 			//string strFormat = String.Format("Hello {0}", name);
 
-			if (param.DocumentCategory == 1) //internal
+			if (param.DocCategory == 0) //internal
 			{
 				string deptcode = string.Empty; // TID,HRD, 
-				string deptsec = string.Empty; //PM 
+				string section = string.Empty; //PM 
 				string setNoFirst = totalrecords.ToString();
 				string setNoSecond = string.Empty;
 				string version = "0.0";
 
-				return string.Format(deptcode, DOT, deptsec, DOT, setNoFirst, DOT, setNoSecond, "Ver.", version);
+				return string.Format(deptcode, DOT, section, DOT, setNoFirst, DOT, setNoSecond, "Ver.", version);
 			}
-			else if (param.DocumentCategory == 2) //internal and external
+			else if (param.DocCategory == 1) //internal and external
 			{
 				string compcode = "DCI"; //DCI
 				string doctype = string.Empty; //MOA,NOA,IA //_docTypeContext.DocTypeCode

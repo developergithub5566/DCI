@@ -24,6 +24,8 @@ namespace DCI.Models.ViewModel
 		public List<SelectListItem>? Options { get; set; }
 		public IList<DocumentType>? DocumentTypeList { get; set; }
 		public IList<DocumentViewModel>? DocumentList { get; set; }
+		public int DocCategory { get; set; } = 0; //internal or internal/external 
+		public int Section { get; set; } = 0; 
 	}
 	public class DocumentCodeViewModel
 	{

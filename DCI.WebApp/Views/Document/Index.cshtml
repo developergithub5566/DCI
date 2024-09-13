@@ -5,8 +5,8 @@
 <style>
 	/* Hide the default file input */
 	/* 	#fileUpload {
-							display: none;
-						} */
+									display: none;
+								} */
 
 	/* Style the custom button */
 	.custom-file-label {
@@ -141,19 +141,34 @@
 										</select>
 									</div>
 									<div class="col">
+										<div class="col">
+											<label for="DocCatId" class="col-form-label">Document Category:</label>
+											<select id="docCategorySelect" class="form-select">
+												<option value="">select type</option>
+												<option value="0">Internal</option>
+												<option value="1">Internal/External</option>
+											</select>
+										</div>
 
 
+
+									</div>
+								</div>
+						
+								<div class="row">
+									<div class="col">
 										<label for="fileUpload" class="col-form-label">File Upload:</label>
-										<br id="nextline"/>
+										<br id="nextline" />
 										<input type="file" class="form-control" id="fileUpload" name="fileUpload" />
-									
-										<span class="file-name">No file chosen</span>							
+
+										<span class="file-name">No file chosen</span>
 
 
 										<a asp-controller="Document" asp-action="ViewDocument" asp-route-id="0" id="viewFile" target="_blank" class="btn btn-primary"> | <i class="fa fa-download"></i></a>
 
 										<a href="#" id="deleteFile" onclick="removefile()" class="btn btn-danger">| <i class="far fa-trash-alt"></i></a>
-								
+									</div>
+									<div class="col">
 									</div>
 								</div>
 							</div>
@@ -194,11 +209,10 @@
 
 						const newrecord = $('#DocId').val();
 
-						if (newrecord != 0)
-						{
+						if (newrecord != 0) {
 							$('.file-name').text(fileName);
 						}
-					
+
 					});
 
 					$('#createForm').submit(function (event) {
@@ -291,7 +305,7 @@
 					});
 				}
 
-				function editForm(id,view) {
+				function editForm(id, view) {
 
 					$.ajax({
 						type: 'POST',
@@ -323,15 +337,15 @@
 								document.querySelector('.file-name').textContent = response.data.filename;
 								$('#fileUpload').hide();
 								$('#viewFile').show();
-								
 
-								if (view == 1) {	//VIEW button							
+
+								if (view == 1) {	//VIEW button
 									$('#DocName').prop('disabled', true);
 									$('#documentSelect').prop('disabled', true);
-									$('#fileUpload').prop('disabled', true);								
+									$('#fileUpload').prop('disabled', true);
 									$('#deleteFile').hide();
 								}
-								else{  //Edit button
+								else {  //Edit button
 									$('#DocName').prop('disabled', false);
 									$('#documentSelect').prop('disabled', false);
 									$('#fileUpload').prop('disabled', false);
@@ -347,7 +361,7 @@
 							bootbox.alert('An error occurred. Please try again.');
 						}
 					});
-				}			
+				}
 
 				function deleteform(id) {
 					bootbox.confirm('Are you sure?', function (result) {

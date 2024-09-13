@@ -56,4 +56,18 @@ namespace DCI.Core.Common
 		Draft = 0,
 		Save = 1
 	}
+	public enum EnumDocumentCategory
+	{
+		[Description("Internal")]
+		Internal = 0,
+		[Description("Internal/External")] 
+		BothInExternal = 1
+	}
+	public enum EnumDocumentSection
+	{ 	
+		[Description("Project Management")]
+		PM = 0,
+		[Description("HR")]
+		HR = 1
+	}
 }
