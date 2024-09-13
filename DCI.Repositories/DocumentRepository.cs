@@ -241,10 +241,15 @@ namespace DCI.Repositories
 			string DOT = ".";
 
 			var _docContext = _dbContext.Document.AsQueryable();
+			var _docTypeContext = _dbContext.DocumentType.AsQueryable().Where(x => x.DocTypeId == param.DocumentTypeId);
+
 			int totalrecords = _docContext.Count() + 1;
 
+			//CD.DCC.002.000 Ver. 0.1
+			//TID.PM.001.000
+			//DCI.MOA.001.000
+			//string strFormat = String.Format("Hello {0}", name);
 
-			//     string strFormat = String.Format("Hello {0}", name);
 			if (param.DocumentCategory == 1) //internal
 			{
 				string deptcode = string.Empty; // TID,HRD, 
@@ -257,9 +262,9 @@ namespace DCI.Repositories
 			}
 			else if (param.DocumentCategory == 2) //internal and external
 			{
-				string compcode = string.Empty; //DCI
-				string doctype = string.Empty; //MOA,NOA,IA
-				string setNoFirst = string.Empty; 
+				string compcode = "DCI"; //DCI
+				string doctype = string.Empty; //MOA,NOA,IA //_docTypeContext.DocTypeCode
+				string setNoFirst = totalrecords.ToString();
 				string setNoSecond = string.Empty;
 				string version =  "0.0"; 
 
