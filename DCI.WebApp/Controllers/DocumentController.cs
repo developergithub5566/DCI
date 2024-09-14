@@ -58,11 +58,18 @@ namespace DCI.WebApp.Controllers
 					var responseBody = await response.Content.ReadAsStringAsync();
 					DocumentViewModel vm = JsonConvert.DeserializeObject<DocumentViewModel>(responseBody)!;
 
-					vm.Options = vm.DocumentTypeList.Select(x =>
+					vm.OptionsDocumentType = vm.DocumentTypeList.Select(x =>
 									   new SelectListItem
 									   {
 										   Value = x.DocTypeId.ToString(),
 										   Text = x.Name
+									   }).ToList();
+
+					vm.OptionsDepartment = vm.DepartmentList.Select(x =>
+									   new SelectListItem
+									   {
+										   Value = x.DepartmentId.ToString(),
+										   Text = x.DepartmentName
 									   }).ToList();
 
 					if (response.IsSuccessStatusCode)

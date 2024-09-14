@@ -53,8 +53,8 @@ namespace DCI.Repositories
 							DocTypeId = doc.DocTypeId,
 							DocumentTypeList = null,
 							DocTypeName = doctype.Name,
-							CreatedName = user.Email,
-							DateCreated = doc.DateCreated,
+							CreatedName = user.Email,						
+							DateCreated = doc.DateCreated,							
 						};
 
 
@@ -71,6 +71,7 @@ namespace DCI.Repositories
 
 				var context = _dbContext.Document.AsQueryable();
 				var doctypeList = _dbContext.DocumentType.AsQueryable().ToList();
+				var departmentList = _dbContext.Department.AsQueryable().ToList();
 
 				var query = from doc in context
 							where doc.DocId == docId
@@ -85,6 +86,10 @@ namespace DCI.Repositories
 								DocTypeId = doc.DocTypeId,
 								DocumentTypeList = null,
 								DocTypeName = string.Empty,
+								StatusId = doc.StatusId,
+								Reviewer = doc.Reviewer,
+								Approver = doc.Approver,
+								DepartmentId = doc.DepartmentId,
 							};
 
 				var result = query.FirstOrDefault();
@@ -94,6 +99,7 @@ namespace DCI.Repositories
 					result = new DocumentViewModel();
 				}
 				result.DocumentTypeList = doctypeList.Count() > 0 ? doctypeList : null;
+				result.DepartmentList = departmentList.Count() > 0 ? departmentList : null;
 				result.DocumentList = null;
 				return result;
 			}

@@ -18,6 +18,10 @@ namespace DCI.Models.Entities
 		public DateTime? DateModified { get; set; } = null;
 		public int? ModifiedBy { get; set; } = null;
 		public bool IsActive { get; set; } = true;
+		public int StatusId { get; set; } = 0;
+		public int Reviewer { get; set; } = 0;
+		public int Approver { get; set; } = 0;
+		public int DepartmentId { get; set; } = 0;
 
 	}
 }

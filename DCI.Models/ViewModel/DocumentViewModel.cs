@@ -21,11 +21,20 @@ namespace DCI.Models.ViewModel
 		public int? ModifiedBy { get; set; } = null;
 		public bool IsActive { get; set; } = true;
 		public IFormFile? DocFile { get; set; }
-		public List<SelectListItem>? Options { get; set; }
-		public IList<DocumentType>? DocumentTypeList { get; set; }
 		public IList<DocumentViewModel>? DocumentList { get; set; }
+
+		public IList<DocumentType>? DocumentTypeList { get; set; }
+		public List<SelectListItem>? OptionsDocumentType { get; set; }
+
+		public IList<Department>? DepartmentList { get; set; }
+		public List<SelectListItem>? OptionsDepartment { get; set; }
+
 		public int DocCategory { get; set; } = 0; //internal or internal/external 
 		public int Section { get; set; } = 0; 
+		public int StatusId { get; set; } = 0;
+        public int Reviewer { get; set; } = 0;
+        public int Approver { get; set; } = 0;
+		public int DepartmentId { get; set; } = 0;
 	}
 	public class DocumentCodeViewModel
 	{
