@@ -11637,7 +11637,7 @@ a:focus {
 
     .btn-icon-split .text {
         display: inline-block;
-        padding: .375rem .75rem
+        padding: .375rem .75rem; 
     }
 
     .btn-group-sm > .btn-icon-split.btn .icon, .btn-icon-split.btn-sm .icon {
