@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<DCI.Models.ViewModel.DocumentViewModel>
 
-<link href="~/css/main.css" rel="stylesheet" />
+@* <link href="~/css/main.css" rel="stylesheet" /> *@
 
 <style>
 	/* Hide the default file input */
@@ -68,7 +68,7 @@
 								<label>Date Created</label>
 							</th>
 							<th>
-								<label>Created By</label>
+								<label>Prepared By</label>
 							</th>
 							<th>
 								Action
@@ -142,11 +142,11 @@
 									</div>
 									<div class="col">
 										<div class="col">
-											<label for="DocCatId" class="col-form-label">Document Category:</label>
+											<label for="DocCategory" class="col-form-label">Document Category:</label>
 											<select id="docCategorySelect" class="form-select">
-												<option value="">select type</option>
-												<option value="0">Internal</option>
-												<option value="1">Internal/External</option>
+												<option value="0">select type</option>
+												<option value="1">Internal</option>
+												<option value="2">Internal/External</option>
 											</select>
 										</div>
 									
@@ -323,7 +323,8 @@
 									} else {
 										$select.append('<option value="' + item.value + '">' + item.text + '</option>');
 									}
-								});
+								});					
+								
 
 								document.querySelector('.file-name').textContent = '';
 								$('#fileUpload').show();
@@ -357,11 +358,11 @@
 								$('#DocNo').val(response.data.docNo);
 								$('#DocName').val(response.data.docName);
 								$('#DocTypeId').val(response.data.docTypeId);
+								$('#docCategorySelect').val(response.data.docCategory)
 
 								var $select = $('#documentSelect');
 								$select.empty();
 								$select.append('<option value="">Select type</option>');
-
 								$.each(response.data.optionsDocumentType, function (index, item) {
 									if (item.value == response.data.docTypeId) {
 										$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
@@ -373,7 +374,6 @@
 								var $select = $('#departmentSelect');
 								$select.empty();
 								$select.append('<option value="">Select type</option>');
-
 								$.each(response.data.optionsDepartment, function (index, item) {
 									if (item.value == response.data.departmentId) {
 										$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
@@ -382,6 +382,9 @@
 									}
 								});
 
+							
+							
+								
 
 								var linkElement = document.getElementById("viewFile");
 								linkElement.setAttribute('href', '/Document/ViewDocument?DocId=' + response.data.docId);

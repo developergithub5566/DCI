@@ -29,12 +29,13 @@ namespace DCI.Models.ViewModel
 		public IList<Department>? DepartmentList { get; set; }
 		public List<SelectListItem>? OptionsDepartment { get; set; }
 
-		public int DocCategory { get; set; } = 0; //internal or internal/external 
+		public int? DocCategory { get; set; } = 0; //internal or internal/external 
 		public int Section { get; set; } = 0; 
 		public int StatusId { get; set; } = 0;
         public int Reviewer { get; set; } = 0;
         public int Approver { get; set; } = 0;
 		public int DepartmentId { get; set; } = 0;
+	
 	}
 	public class DocumentCodeViewModel
 	{

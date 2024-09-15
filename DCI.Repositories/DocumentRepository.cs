@@ -90,6 +90,7 @@ namespace DCI.Repositories
 								Reviewer = doc.Reviewer,
 								Approver = doc.Approver,
 								DepartmentId = doc.DepartmentId,
+								DocCategory = doc.DocCategory,
 							};
 
 				var result = query.FirstOrDefault();
@@ -130,6 +131,7 @@ namespace DCI.Repositories
 					entity.DocNo = model.DocNo;
 					entity.DocName = model.DocName;
 					entity.DocTypeId = model.DocTypeId;
+					entity.DocCategory = model.DocCategory;
 					entity.Version = model.Version;
 					entity.Filename = model.DocFile != null ? model.DocFile.FileName : string.Empty;
 					entity.CreatedBy = model.CreatedBy;
@@ -154,6 +156,7 @@ namespace DCI.Repositories
 					entity.DocNo = model.DocNo;
 					entity.DocName = model.DocName;
 					entity.DocTypeId = model.DocTypeId;
+					entity.DocCategory = model.DocCategory;
 					entity.Version = model.Version;
 					entity.Filename = model.DocFile != null ? model.DocFile.FileName : entity.Filename;
 					entity.DateCreated = entity.DateCreated;

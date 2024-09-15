@@ -225,6 +225,10 @@ namespace DCI.WebApp.Controllers
 			return Json(new { success = false, message = "An error occurred. Please try again." });
 		}
 
-	
-	}
+		public async Task<IActionResult> Workflow()
+		{
+			return View();
+		}
+
+		}
 }

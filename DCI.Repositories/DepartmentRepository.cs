@@ -40,6 +40,7 @@ namespace DCI.Repositories
 				{
 					Department entity = new Department();
 					entity.DepartmentId = model.DepartmentId;
+					entity.DepartmentCode = model.DepartmentCode;
 					entity.DepartmentName = model.DepartmentName;
 					entity.Description = model.Description;
 					entity.CreatedBy = model.CreatedBy;
@@ -54,6 +55,7 @@ namespace DCI.Repositories
 				else
 				{
 					var entity = await _dbContext.Department.FirstOrDefaultAsync(x => x.DepartmentId == model.DepartmentId);
+					entity.DepartmentCode = model.DepartmentCode;
 					entity.DepartmentName = model.DepartmentName;
 					entity.Description = model.Description;
 					entity.DateCreated = entity.DateCreated;

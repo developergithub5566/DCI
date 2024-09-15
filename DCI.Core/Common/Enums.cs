@@ -14,7 +14,12 @@ namespace DCI.Core.Common
 	}
 	public enum EnumStatusType
 	{
-		Draft = 0
+		Draft = 1,
+		ForReview = 2,
+		ForApproval = 3,
+		Approved = 4,
+		ForDisposal = 5,
+		Disposed = 6
 	}
 
 	public enum EnumModulePage
