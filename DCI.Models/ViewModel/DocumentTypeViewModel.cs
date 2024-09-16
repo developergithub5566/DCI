@@ -15,5 +15,7 @@ namespace DCI.Models.ViewModel
 		public DateTime? DateModified { get; set; } = null;
 		public int? ModifiedBy { get; set; } = null;
 		public bool IsActive { get; set; } = true;
+		public string CreatedName { get; set; } = string.Empty;
+		public string? Description { get; set; } = string.Empty;
 	}
 }

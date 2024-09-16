@@ -1,5 +1,6 @@
 ﻿@model IEnumerable<DCI.Models.ViewModel.DocumentViewModel>
 
+<link href="~/css/dcicustom.css" rel="stylesheet" />
 <style>
 	/* Hide the default file input */
 	/* 	#fileUpload {
@@ -7,7 +8,8 @@
 								} */
 
 	/* Style the custom button */
-	.custom-file-label {
+
+.custom-file-label {
 		padding: 8px 16px;
 		background-color: #007bff;
 		color: white;
@@ -19,15 +21,18 @@
 		margin-left: 10px;
 		font-style: italic;
 	}
+
+
 </style>
 <div class="container-fluid">
 	<div class="d-sm-flex align-items-center justify-content-between mb-3">
 		<h6 class="m-0 font-weight-bold text-gray-800">Document</h6>
 		<div class="upperRightDivBtn">
-			<a href="#" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#" onclick="newForm()">
+			<a href="#" class="btn btnPrimary btn-icon-split"  data-toggle="modal" data-target="#" onclick="newForm()">
 				<span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
-				<span class="text"><small>Add Document</small></span>
+				<span class="text text-white"><small>Add Document</small></span>
 			</a>	
+	
 		</div>
 
 	</div>
@@ -50,9 +55,9 @@
 				<table class="table table-bordered nowrap" id="tblDocument" width="100%" cellspacing="0">
 					<thead>
 						<tr>
-							<th>
+						@* 	<th>
 								<label>Id</label>
-							</th>
+							</th> *@
 							<th>
 								<label>Document No</label>
 							</th>
@@ -77,9 +82,9 @@
 						@foreach (var item in Model)
 						{
 							<tr>
-								<td>
+								@* <td>
 									@item.DocId
-								</td>
+								</td> *@
 								<td>
 									@item.DocNo
 								</td>
@@ -124,7 +129,7 @@
 								<div class="row">
 									<div class="col">
 										<label for="DocNo" class="col-form-label">Document No:</label>
-										<input type="text" class="form-control" id="DocNo" name="DocNo" value="DOC-MOA-20240906-001" disabled maxlength="15">
+										<input type="text" class="form-control" id="DocNo" name="DocNo" value="" disabled maxlength="15">
 									</div>
 									<div class="col">
 										<label for="DocName" class="col-form-label">Document Name:</label>
@@ -167,9 +172,8 @@
 										<span class="file-name">No file chosen</span>
 
 
-										<a asp-controller="Document" asp-action="ViewDocument" asp-route-id="0" id="viewFile" target="_blank" class="btn btn-primary"> | <i class="fa fa-download"></i></a>
-
-										<a href="#" id="deleteFile" onclick="removefile()" class="btn btn-danger">| <i class="far fa-trash-alt"></i></a>
+										<a asp-controller="Document" asp-action="ViewDocument" asp-route-id="0" id="viewFile" target="_blank" class="btn btn-primary" title="View">  <i class="fa fa-download"></i></a>
+										<a href="#" id="deleteFile" onclick="removefile()" class="btn btn-danger" title="remove"> <i class="far fa-trash-alt"></i></a>
 									</div>
 								</div>
 								<hr />
@@ -248,6 +252,8 @@
 						const docNo = $('#DocNo').val();
 						const docName = $('#DocName').val();
 						const doctypeId = $('#documentSelect').val();
+						const deptId = $('#departmentSelect').val();
+						const docCatId = $('#docCategorySelect').val();
 
 						// var formData = $(this).serialize();
 						const formData = new FormData();
@@ -255,6 +261,8 @@
 						formData.append('DocNo', docNo);
 						formData.append('DocName', docName);
 						formData.append('DocTypeId', doctypeId);
+						formData.append('DepartmentId', deptId);
+						formData.append('DocCategory', docCatId);
 						formData.append('DocFile', file);
 
 						bootbox.confirm('Are you sure?', function (result) {
@@ -357,6 +365,9 @@
 								$('#DocName').val(response.data.docName);
 								$('#DocTypeId').val(response.data.docTypeId);
 								$('#docCategorySelect').val(response.data.docCategory)
+
+								// $('#departmentSelect').val(response.data.departmentId)
+								// $('#docCategorySelect').val(response.data.docCategory)
 
 								var $select = $('#documentSelect');
 								$select.empty();

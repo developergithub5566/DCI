@@ -23,9 +23,28 @@ namespace DCI.Repositories
 		{
 			return await _dbContext.Department.FindAsync(DepartmentId);
 		}
-		public async Task<IList<Department>> GetAllDepartment()
+		public async Task<IList<DepartmentViewModel>> GetAllDepartment()
 		{
-			return await _dbContext.Department.AsNoTracking().Where(x => x.IsActive == true).ToListAsync();
+			//return await _dbContext.Department.AsNoTracking().Where(x => x.IsActive == true).ToListAsync();
+			var context = _dbContext.Department.AsQueryable().ToList();
+			var userList = _dbContext.User.AsQueryable().ToList();
+
+
+			var query = from dept in context
+						join user in userList on dept.CreatedBy equals user.UserId
+						where dept.IsActive == true
+						select new DepartmentViewModel
+						{
+							DepartmentId = dept.DepartmentId,
+							DepartmentCode = dept.DepartmentCode,
+							DepartmentName = dept.DepartmentName,
+							Description = dept.Description,
+							CreatedName = user.Email,
+							CreatedBy = dept.CreatedBy,
+							DateCreated = dept.DateCreated,
+						};
+
+			return query.ToList();
 		}
 		public async Task<bool> IsExistsDepartment(int DepartmentId)
 		{

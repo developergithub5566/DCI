@@ -36,7 +36,7 @@ namespace DCI.API.Controllers
 		[HttpPost]
 		[Route("SaveDocument")]
 		//public async Task<IActionResult> SaveDocument([FromBody] DocumentViewModel model)
-		public async Task<IActionResult> SaveDocument(DocumentViewModel model)
+		public async Task<IActionResult> SaveDocument( DocumentViewModel model)
 		{
 			var result = await _documentRepository.Save(model);
 			return StatusCode(result.statuscode, result.message);

@@ -73,3 +73,28 @@ body {
             border-radius: 10px;
             margin-bottom: 10px;
         }
+
+.btn-icon-split {
+    padding: 0;
+    overflow: hidden;
+    display: -webkit-inline-box;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    -webkit-box-align: stretch;
+    -ms-flex-align: stretch;
+    align-items: stretch;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center
+}
+
+    .btn-icon-split .icon {
+        background: rgba(0,0,0,.15);
+        display: inline-block;
+        padding: .375rem .75rem
+    }
+
+    .btn-icon-split .text {
+        display: inline-block;
+        padding: .375rem .75rem
+    }

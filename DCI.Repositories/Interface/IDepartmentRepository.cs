@@ -8,7 +8,7 @@ namespace DCI.Repositories.Interface
 		Task<(int statuscode, string message)> Save(DepartmentViewModel model);
 		Task<(int statuscode, string message)> Delete(DepartmentViewModel model);
 		Task<Department> GetDepartmentById(int DepartmentId);
-		Task<IList<Department>> GetAllDepartment();
+		Task<IList<DepartmentViewModel>> GetAllDepartment();
 		Task<bool> IsExistsDepartment(int DepartmentId);
 	}
 }

@@ -25,9 +25,26 @@ namespace DCI.Repositories
 			_dbContext.Dispose();
 		}
 
-		public async Task<IList<DocumentType>> GetAllDocumentType()
+		public async Task<IList<DocumentTypeViewModel>> GetAllDocumentType()
 		{
-			return await _dbContext.DocumentType.AsNoTracking().Where(x => x.IsActive == true).ToListAsync();
+			var context = _dbContext.DocumentType.AsQueryable().ToList();
+			var userList = _dbContext.User.AsQueryable().ToList();
+
+
+			var query = from doctype in context
+						join user in userList on doctype.CreatedBy equals user.UserId
+						where doctype.IsActive == true
+						select new DocumentTypeViewModel
+						{
+							DocTypeId = doctype.DocTypeId,
+							Name = doctype.Name,
+							Description = doctype.Description,
+							CreatedName = user.Email,
+							CreatedBy = doctype.DocTypeId,
+							DateCreated = doctype.DateCreated,
+						};
+
+			return query.ToList();
 		}
 
 		public async Task<DocumentType> GetDocumentTypeById(int docTypeId)
@@ -49,6 +66,7 @@ namespace DCI.Repositories
 					DocumentType entity = new DocumentType();
 					entity.DocTypeId = model.DocTypeId;
 					entity.Name = model.Name;
+					entity.Description = model.Description;
 					entity.CreatedBy = model.CreatedBy;
 					entity.DateCreated = DateTime.Now;
 					entity.ModifiedBy = null;
@@ -63,6 +81,7 @@ namespace DCI.Repositories
 					var entity = await _dbContext.DocumentType.FirstOrDefaultAsync(x => x.DocTypeId == model.DocTypeId);
 					entity.DocTypeId = model.DocTypeId;
 					entity.Name = model.Name;
+					entity.Description = model.Description;
 					entity.DateCreated = entity.DateCreated;
 					entity.CreatedBy = entity.CreatedBy;
 					entity.DateModified = DateTime.Now;

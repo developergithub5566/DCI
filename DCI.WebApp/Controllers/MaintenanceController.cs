@@ -436,7 +436,7 @@ namespace DCI.WebApp.Controllers
 		#region Department
 		public async Task<IActionResult> Department()
 		{
-			List<Department> model = new List<Department>();
+			List<DepartmentViewModel> model = new List<DepartmentViewModel>();
 
 			using (var _httpclient = new HttpClient())
 			{
@@ -445,7 +445,7 @@ namespace DCI.WebApp.Controllers
 
 				if (response.IsSuccessStatusCode)
 				{
-					model = JsonConvert.DeserializeObject<List<Department>>(responseBody)!;
+					model = JsonConvert.DeserializeObject<List<DepartmentViewModel>>(responseBody)!;
 				}
 			}
 			return View(model);
@@ -811,7 +811,7 @@ namespace DCI.WebApp.Controllers
 		#region Document Type
 		public async Task<IActionResult> DocumentType()
 		{
-			List<DocumentType> model = new List<DocumentType>();
+			List<DocumentTypeViewModel> model = new List<DocumentTypeViewModel>();
 
 			using (var _httpclient = new HttpClient())
 			{
@@ -820,7 +820,7 @@ namespace DCI.WebApp.Controllers
 
 				if (response.IsSuccessStatusCode)
 				{
-					model = JsonConvert.DeserializeObject<List<DocumentType>>(responseBody)!;
+					model = JsonConvert.DeserializeObject<List<DocumentTypeViewModel>>(responseBody)!;
 				}
 			}
 			return View(model);

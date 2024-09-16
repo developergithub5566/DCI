@@ -100,6 +100,10 @@ namespace DCI.WebApp.Controllers
 					model.CreatedBy = currentUser.UserId;
 					model.ModifiedBy = currentUser.UserId;
 
+					//model.DocNo = "xxx";
+					//model.CreatedName = "xx";
+			
+
 					_httpclient.BaseAddress = new Uri(_apiconfig.Value.apiConnection + "api/Document/SaveDocument");
 
 					var data = new MultipartFormDataContent();
@@ -108,6 +112,16 @@ namespace DCI.WebApp.Controllers
 					data.Add(new StringContent(model.DocName ?? ""), "DocName");
 					data.Add(new StringContent(model.DocTypeId.ToString() ?? ""), "DocTypeId");
 					data.Add(new StringContent(model.Version.ToString() ?? ""), "Version");
+
+					data.Add(new StringContent(model.DepartmentId.ToString() ?? ""), "DepartmentId");
+					data.Add(new StringContent(model.DocCategory.ToString() ?? ""), "DocCategory");
+					data.Add(new StringContent(model.Section.ToString() ?? ""), "Section");
+					data.Add(new StringContent(model.StatusId.ToString() ?? ""), "StatusId");
+					data.Add(new StringContent(model.Reviewer.ToString() ?? ""), "Reviewer");
+					data.Add(new StringContent(model.Approver.ToString() ?? ""), "Approver");
+
+
+					data.Add(new StringContent(model.CreatedName.ToString() ?? ""), "CreatedName");
 					data.Add(new StringContent(model.DateCreated.ToString() ?? ""), "DateCreated");
 					data.Add(new StringContent(model.CreatedBy.ToString() ?? ""), "CreatedBy");
 					data.Add(new StringContent(model.ModifiedBy.ToString() ?? ""), "ModifiedBy");
@@ -121,8 +135,7 @@ namespace DCI.WebApp.Controllers
 					}
 
 					var response = await _httpclient.PostAsync(_apiconfig.Value.apiConnection + "api/Document/SaveDocument", data);
-
-
+					
 					if (response.IsSuccessStatusCode)
 					{
 						return Json(new { success = true, message = "Document successfully created." });
@@ -196,21 +209,21 @@ namespace DCI.WebApp.Controllers
 					var responseBody = await response.Content.ReadAsStringAsync();
 					DocumentViewModel vm = JsonConvert.DeserializeObject<DocumentViewModel>(responseBody)!;
 
-					string filePath = vm.FileLocation  + vm.Filename;
+					string filePath = vm.FileLocation + vm.Filename;
 
 					//var pdfFilePath = _documentService.ConvertWordToPdf(filePath);
 
 					var pdfBytes = await System.IO.File.ReadAllBytesAsync(filePath);
 
 					// View PDF next tab
-					//Response.Headers.Add("Content-Disposition", "inline; filename=" + vm.Filename);
-					//return File(pdfBytes, "application/pdf");
+					Response.Headers.Add("Content-Disposition", "inline; filename=" + vm.Filename);
+					return File(pdfBytes, "application/pdf");
 
-					
+
 
 
 					// automatic download file
-					return File(pdfBytes, "application/pdf", vm.Filename, true);
+					//return File(pdfBytes, "application/pdf", vm.Filename, true);
 				}
 			}
 			catch (Exception ex)
@@ -230,5 +243,5 @@ namespace DCI.WebApp.Controllers
 			return View();
 		}
 
-		}
+	}
 }

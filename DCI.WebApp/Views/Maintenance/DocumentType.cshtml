@@ -1,5 +1,5 @@
-﻿@model IEnumerable<DCI.Models.Entities.DocumentType>
-
+﻿@model IEnumerable<DCI.Models.ViewModel.DocumentTypeViewModel>
+<link href="~/css/dcicustom.css" rel="stylesheet" />
 
 
 <div class="container-fluid">
@@ -8,7 +8,7 @@
 		<div class="upperRightDivBtn">
 			<a href="#" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#createmodal">
 				<span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
-				<span class="text"><small>Add Record</small></span>
+				<span class="text text-white"><small>Add Document Type</small></span>
 			</a>
 		</div>
 
@@ -17,7 +17,7 @@
 		<ul class="breadcrumb">
 			<li><a href="~/Home/Index">Home</a></li>
 			<li><a href="~/Maintenance/Index">Administration</a></li>
-			<li>Department</li>
+			<li>Document Type</li>
 		</ul>
 	</div>
 
@@ -38,6 +38,9 @@
 							</th>
 							<th>
 								<label>Document Type</label>
+							</th>
+							<th>
+								<label>Description</label>
 							</th>
 						
 							<th>
@@ -61,12 +64,14 @@
 								<td>
 									@item.Name
 								</td>
-							
+								<td>
+									@item.Description
+								</td>
 								<td>
 									@item.DateCreated.ToShortDateString()
 								</td>
 								<td>
-									@item.CreatedBy
+									@item.CreatedName
 								</td>
 
 								<td>
@@ -97,6 +102,10 @@
 								<div class="form-group">
 									<label for="DocumentType" class="col-form-label">Document Type:</label>
 									<input type="text" class="form-control" id="Name" name="Name" maxlength="25">
+								</div>
+								<div class="form-group">
+									<label for="Description" class="col-form-label">Document Type:</label>
+									<input type="text" class="form-control" id="Description" name="Description" maxlength="100">
 								</div>
 						
 							</div>
@@ -163,7 +172,8 @@
 							success: function (response) {
 								if (response.success) {
 									$('#DocTypeId').val(response.data.docTypeId);
-									$('#Name').val(response.data.name);						
+									$('#Name').val(response.data.name);
+									$('#Description').val(response.data.description);
 									js('#createmodal').modal('show');
 								} else {
 									bootbox.alert(response.message);

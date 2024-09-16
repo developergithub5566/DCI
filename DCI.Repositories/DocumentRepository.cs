@@ -14,6 +14,7 @@ using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Collections.Specialized.BitVector32;
 
 namespace DCI.Repositories
 {
@@ -128,7 +129,7 @@ namespace DCI.Repositories
 				{
 					Document entity = new Document();
 					entity.DocId = model.DocId;
-					entity.DocNo = model.DocNo;
+					entity.DocNo = await GenerateDocCode(model);
 					entity.DocName = model.DocName;
 					entity.DocTypeId = model.DocTypeId;
 					entity.DocCategory = model.DocCategory;
@@ -139,8 +140,8 @@ namespace DCI.Repositories
 					entity.ModifiedBy = null;
 					entity.DateModified = null;
 					entity.IsActive = true;
-					await _dbContext.Document.AddAsync(entity);
-					await _dbContext.SaveChangesAsync();
+					//await _dbContext.Document.AddAsync(entity);
+					//await _dbContext.SaveChangesAsync();
 					model.DocId = entity.DocId;
 
 					if (model.DocFile != null)
@@ -248,9 +249,9 @@ namespace DCI.Repositories
 		private async Task<string> GenerateDocCode(DocumentViewModel param)
 		{
 			string DOT = ".";
-
+			var _deptContext = await _dbContext.Department.AsQueryable().FirstOrDefaultAsync(x => x.DepartmentId == param.DepartmentId);
 			var _docContext = _dbContext.Document.AsQueryable();
-			var _docTypeContext = _dbContext.DocumentType.AsQueryable().Where(x => x.DocTypeId == param.DocTypeId);
+			var _docTypeContext = _dbContext.DocumentType.AsQueryable().FirstOrDefaultAsync(x => x.DocTypeId == param.DocTypeId);
 
 			int totalrecords = _docContext.Count() + 1;
 
@@ -259,25 +260,28 @@ namespace DCI.Repositories
 			//DCI.MOA.001.000
 			//string strFormat = String.Format("Hello {0}", name);
 
-			if (param.DocCategory == 0) //internal
+			if (param.DocCategory == 1) //internal
 			{
-				string deptcode = string.Empty; // TID,HRD, 
-				string section = string.Empty; //PM 
+				string deptcode =  _deptContext.DepartmentCode.Trim();
+				string section = _deptContext.DepartmentCode == "TID" ? "PM" : "HR";
 				string setNoFirst = totalrecords.ToString();
 				string setNoSecond = string.Empty;
 				string version = "0.0";
 
-				return string.Format(deptcode, DOT, section, DOT, setNoFirst, DOT, setNoSecond, "Ver.", version);
+				string code= deptcode + DOT + section + DOT + setNoFirst + DOT + setNoSecond + "Ver." + version;
+				return code;
 			}
-			else if (param.DocCategory == 1) //internal and external
+			else if (param.DocCategory == 2) //internal and external
 			{
 				string compcode = "DCI"; //DCI
-				string doctype = string.Empty; //MOA,NOA,IA //_docTypeContext.DocTypeCode
+				string doctype = _docTypeContext.Result.Name;
 				string setNoFirst = totalrecords.ToString();
 				string setNoSecond = string.Empty;
 				string version =  "0.0"; 
 
-				return string.Format(compcode, DOT, doctype, DOT, setNoFirst, DOT, setNoSecond, "Ver.", version);
+		
+				string code = compcode + DOT + doctype + DOT + setNoFirst + DOT + setNoSecond + "Ver." + version;
+				return code;
 			}
 			return string.Empty;
 		}
