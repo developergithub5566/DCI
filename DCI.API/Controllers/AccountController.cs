@@ -95,7 +95,7 @@ namespace DCI.API.Controllers
 
 		[HttpPost]
 		[Route("ValidateToken")]
-		public async Task<IActionResult> ValidateToken([FromBody] ValidatePasswordTokenViewModel model)
+		public async Task<IActionResult> ValidateToken([FromBody] ValidateTokenViewModel model)
 		{
 			try
 			{

@@ -4,5 +4,6 @@
 	{
 		Task<bool> IsExistsEmail(string email);
 		Task SendPasswordReset(string email);
+		Task SendUploadFile(string email, string docno);
 	}
 }

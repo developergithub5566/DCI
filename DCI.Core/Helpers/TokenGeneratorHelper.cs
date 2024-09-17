@@ -5,7 +5,7 @@ namespace DCI.Core.Helpers
 {
     public static class TokenGeneratorHelper
     {
-        public static string ResetPasswordToken()
+        public static string GetToken()
         {
             using (var rng = new RNGCryptoServiceProvider())
             {

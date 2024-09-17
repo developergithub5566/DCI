@@ -24,38 +24,26 @@ namespace DCI.API.Controllers
 		IAuditLogRepository _auditLogRepository;
 		public MaintenanceController(IModulePageRepository modulePageRepository, IModuleInRoleRepository moduleInRoleRepository,
 			IRoleRepository roleRepository, IUserRepository userRepository, IDepartmentRepository DepartmentRepository, IEmploymentTypeRepository employmentTypeRepository,
-            IUserRoleRepository userRoleRepository,IDocumentTypeRepository documentTypeRepository,IAuditLogRepository auditLogRepository)	
+			IUserRoleRepository userRoleRepository, IDocumentTypeRepository documentTypeRepository, IAuditLogRepository auditLogRepository)
 		{
 			this._userRepository = userRepository;
 			this._moduleInRoleRepository = moduleInRoleRepository;
 			this._modulePageRepository = modulePageRepository;
 			this._roleRepository = roleRepository;
-			this._departmentRepository = DepartmentRepository;		
+			this._departmentRepository = DepartmentRepository;
 			this._employmentTypeRepository = employmentTypeRepository;
 			this._userRoleRepository = userRoleRepository;
 			this._documentTypeRepository = documentTypeRepository;
 			this._auditLogRepository = auditLogRepository;
 		}
-		
+
 
 		#region User
 		[HttpGet]
 		[Route("GetAllUsers")]
 		public async Task<IActionResult> GetAllUsers()
 		{
-			try
-			{
-				return Ok(await _userRepository.GetAllUsers());
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex.ToString());
-			}
-			finally
-			{
-				Log.CloseAndFlush();
-			}
-			return BadRequest();
+			return Ok(await _userRepository.GetAllUsers());
 		}
 
 
@@ -68,37 +56,37 @@ namespace DCI.API.Controllers
 		}
 
 		[HttpPost]
-        [Route("UpdateUser")]
-        public async Task<IActionResult> UpdateUser([FromBody] UserViewModel model)
-        {
+		[Route("UpdateUser")]
+		public async Task<IActionResult> UpdateUser([FromBody] UserViewModel model)
+		{
 			var userIdexist = await _userRepository.GetUserById(model.UserId);
-            if (userIdexist == null)
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, "User Id does not exist");
-            }          
-            if (!await _roleRepository.IsExistsRole(model.RoleId))
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, "Role Id does not exist");
-            }
+			if (userIdexist == null)
+			{
+				return StatusCode(StatusCodes.Status403Forbidden, "User Id does not exist");
+			}
+			if (!await _roleRepository.IsExistsRole(model.RoleId))
+			{
+				return StatusCode(StatusCodes.Status403Forbidden, "Role Id does not exist");
+			}
 
-            var result = await _userRepository.UpdateUser(model);
-            return StatusCode(result.statuscode, result.message);
-        }
+			var result = await _userRepository.UpdateUser(model);
+			return StatusCode(result.statuscode, result.message);
+		}
 
-        [HttpPost]
-        [Route("DeleteUser")]
-        public async Task<IActionResult> DeleteUser([FromBody] UserViewModel model)
-        {
+		[HttpPost]
+		[Route("DeleteUser")]
+		public async Task<IActionResult> DeleteUser([FromBody] UserViewModel model)
+		{
 
-            var result = await _userRepository.Delete(model.UserId);
-            return StatusCode(result.statuscode, result.message);
-        }
+			var result = await _userRepository.Delete(model.UserId);
+			return StatusCode(result.statuscode, result.message);
+		}
 
-        #endregion
+		#endregion
 
-        #region Roles
+		#region Roles
 
-        [HttpGet]
+		[HttpGet]
 		[Route("GetAllRoles")]
 		public async Task<IActionResult> GetAllRoles()
 		{
@@ -280,13 +268,13 @@ namespace DCI.API.Controllers
 		#endregion
 
 		#region Role Module
-				
+
 		[HttpPost]
 		[Route("GetModuleAccessRoleByRoleId")]
 		public async Task<IActionResult> GetModuleAccessRoleByRoleId(SystemManagementViewModel model)
 		{
-            return Ok(await _userRoleRepository.GetModuleAccessRoleByRoleId(model.RoleId));          
-        }
+			return Ok(await _userRoleRepository.GetModuleAccessRoleByRoleId(model.RoleId));
+		}
 
 		[HttpPost]
 		[Route("SaveRoleModule")]
@@ -294,27 +282,27 @@ namespace DCI.API.Controllers
 		public async Task<IActionResult> SaveRoleModule([FromBody] RoleInModuleViewModel model)
 		{
 			var result = await _userRoleRepository.Save(model);
-			return StatusCode(result.statuscode, result.message);	
+			return StatusCode(result.statuscode, result.message);
 		}
 
-        #endregion
+		#endregion
 
-        #region User Role
+		#region User Role
 
-        [HttpGet]
-        [Route("GetUserRole")]
-        public async Task<IActionResult> GetUserRole()
-        {
-            return Ok(await _userRoleRepository.GetUserRole());
-        }
+		[HttpGet]
+		[Route("GetUserRole")]
+		public async Task<IActionResult> GetUserRole()
+		{
+			return Ok(await _userRoleRepository.GetUserRole());
+		}
 
-        [HttpPost]
-        [Route("DeleteUserRole")]
-        public async Task<IActionResult> DeleteUserRole([FromBody] UserInRoleViewModel model)
-        {
-            var result = await _userRoleRepository.Delete(model);
-            return StatusCode(result.statuscode, result.message);
-        }
+		[HttpPost]
+		[Route("DeleteUserRole")]
+		public async Task<IActionResult> DeleteUserRole([FromBody] UserInRoleViewModel model)
+		{
+			var result = await _userRoleRepository.Delete(model);
+			return StatusCode(result.statuscode, result.message);
+		}
 		#endregion
 
 		#region Document Type

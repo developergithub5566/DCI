@@ -11,7 +11,7 @@ namespace DCI.Data
 	{
 		public DCIdbContext(DbContextOptions<DCIdbContext> options) : base(options)
 		{
-		
+
 		}
 		public DbSet<User> User { get; set; }
 		public DbSet<UserAccess> UserAccess { get; set; }
@@ -66,7 +66,12 @@ namespace DCI.Data
 					}
 					else
 					{
-						_createdBy = entry.Properties.FirstOrDefault(p => p.Metadata.Name == "ModifiedBy").CurrentValue.ToString();
+						var xmodule = entry.CurrentValues.EntityType.Name;
+						if (xmodule != "DCI.Models.Entities.UserAccess")
+						{
+							_createdBy = entry.Properties.FirstOrDefault(p => p.Metadata.Name == "ModifiedBy").CurrentValue.ToString();
+						}
+
 					}
 				}
 				catch (Exception ex)

@@ -10,6 +10,7 @@ namespace DCI.Repositories.Interface
 		Task<bool> IsExistsDocument(int docId);
 		Task<(int statuscode, string message)> Save(DocumentViewModel model);
 		Task<(int statuscode, string message)> Delete(DocumentViewModel model);
+		Task<DocumentViewModel> ValidateToken(ValidateTokenViewModel model);
 
 	}
 }

@@ -4,6 +4,7 @@ using DCI.Models.ViewModel;
 using DCI.Repositories;
 using DCI.Repositories.Interface;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace DCI.API.Controllers
 {
@@ -50,6 +51,28 @@ namespace DCI.API.Controllers
 
 			var result = await _documentRepository.Delete(model);
 			return StatusCode(result.statuscode, result.message);
+		}
+
+
+		[HttpPost]
+		[Route("ValidateToken")]
+		public async Task<IActionResult> ValidateToken([FromBody] ValidateTokenViewModel model)
+		{
+			try
+			{
+				//var result = await _documentRepository.ValidateToken(model.Token);
+				//return StatusCode(result.statuscode, result.message);
+				return Ok( await _documentRepository.ValidateToken(model));
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+			return BadRequest();
 		}
 	}
 }

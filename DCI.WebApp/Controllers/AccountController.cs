@@ -139,7 +139,7 @@ namespace DCI.WebApp.Controllers
 		}
 
 
-		public async Task<IActionResult> ValidateToken(ValidatePasswordTokenViewModel model)
+		public async Task<IActionResult> ValidateToken(ValidateTokenViewModel model)
 		{
 			try
 			{

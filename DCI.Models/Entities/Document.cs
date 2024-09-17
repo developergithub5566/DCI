@@ -23,6 +23,7 @@ namespace DCI.Models.Entities
 		public int Approver { get; set; } = 0;
 		public int DepartmentId { get; set; } = 0;
 		public int? DocCategory { get; set; } = 0;
+		public string Token { get; set; } = string.Empty;
 
 	}
 }

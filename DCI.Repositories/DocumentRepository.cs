@@ -1,4 +1,5 @@
 ﻿using DCI.Data;
+using DCI.Core.Common;
 using DCI.Models.Configuration;
 using DCI.Models.Entities;
 using DCI.Models.ViewModel;
@@ -14,7 +15,8 @@ using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Collections.Specialized.BitVector32;
+
+using System.Data;
 
 namespace DCI.Repositories
 {
@@ -22,10 +24,12 @@ namespace DCI.Repositories
 	{
 		private DCIdbContext _dbContext;
 		private readonly IOptions<FileModel> _filelocation;
-		public DocumentRepository(DCIdbContext context, IOptions<FileModel> filelocation)
+		private IEmailRepository _emailRepository;
+		public DocumentRepository(DCIdbContext context, IOptions<FileModel> filelocation, IEmailRepository emailRepository)
 		{
 			this._dbContext = context;
 			this._filelocation = filelocation;
+			this._emailRepository = emailRepository;
 		}
 		public void Dispose()
 		{
@@ -54,8 +58,8 @@ namespace DCI.Repositories
 							DocTypeId = doc.DocTypeId,
 							DocumentTypeList = null,
 							DocTypeName = doctype.Name,
-							CreatedName = user.Email,						
-							DateCreated = doc.DateCreated,							
+							CreatedName = user.Email,
+							DateCreated = doc.DateCreated,
 						};
 
 
@@ -133,6 +137,7 @@ namespace DCI.Repositories
 					entity.DocName = model.DocName;
 					entity.DocTypeId = model.DocTypeId;
 					entity.DocCategory = model.DocCategory;
+					entity.DepartmentId = model.DepartmentId;
 					entity.Version = model.Version;
 					entity.Filename = model.DocFile != null ? model.DocFile.FileName : string.Empty;
 					entity.CreatedBy = model.CreatedBy;
@@ -140,24 +145,29 @@ namespace DCI.Repositories
 					entity.ModifiedBy = null;
 					entity.DateModified = null;
 					entity.IsActive = true;
-					//await _dbContext.Document.AddAsync(entity);
-					//await _dbContext.SaveChangesAsync();
+					await _dbContext.Document.AddAsync(entity);
+					await _dbContext.SaveChangesAsync();
 					model.DocId = entity.DocId;
 
 					if (model.DocFile != null)
 					{
 						await SaveFile(model);
 					}
-					return (StatusCodes.Status200OK, "Successfully saved");
+					else
+					{
+						await _emailRepository.SendUploadFile("email", entity.DocNo);
+					}
+					return (StatusCodes.Status200OK, String.Format("Document {0} has been created successfully.", entity.DocNo));
 				}
 				else
 				{
 					var entity = await _dbContext.Document.FirstOrDefaultAsync(x => x.DocId == model.DocId);
 					entity.DocId = model.DocId;
-					entity.DocNo = model.DocNo;
+					entity.DocNo = entity.DocNo;
 					entity.DocName = model.DocName;
 					entity.DocTypeId = model.DocTypeId;
 					entity.DocCategory = model.DocCategory;
+					entity.DepartmentId = model.DepartmentId;
 					entity.Version = model.Version;
 					entity.Filename = model.DocFile != null ? model.DocFile.FileName : entity.Filename;
 					entity.DateCreated = entity.DateCreated;
@@ -168,6 +178,7 @@ namespace DCI.Repositories
 
 					_dbContext.Document.Entry(entity).State = EntityState.Modified;
 					await _dbContext.SaveChangesAsync();
+
 					model.DocId = entity.DocId;
 
 					if (model.DocFile != null)
@@ -203,7 +214,7 @@ namespace DCI.Repositories
 				entity.DateModified = DateTime.Now;
 				_dbContext.Document.Entry(entity).State = EntityState.Modified;
 				await _dbContext.SaveChangesAsync();
-				return (StatusCodes.Status200OK, "Successfully deleted");
+				return (StatusCodes.Status200OK, "Successfully deleted repository");
 			}
 			catch (Exception ex)
 			{
@@ -215,7 +226,6 @@ namespace DCI.Repositories
 				Log.CloseAndFlush();
 			}
 		}
-
 		private async Task SaveFile(DocumentViewModel model)
 		{
 			try
@@ -248,42 +258,107 @@ namespace DCI.Repositories
 		}
 		private async Task<string> GenerateDocCode(DocumentViewModel param)
 		{
-			string DOT = ".";
-			var _deptContext = await _dbContext.Department.AsQueryable().FirstOrDefaultAsync(x => x.DepartmentId == param.DepartmentId);
-			var _docContext = _dbContext.Document.AsQueryable();
-			var _docTypeContext = _dbContext.DocumentType.AsQueryable().FirstOrDefaultAsync(x => x.DocTypeId == param.DocTypeId);
-
-			int totalrecords = _docContext.Count() + 1;
-
 			//CD.DCC.002.000 Ver. 0.1
 			//TID.PM.001.000
 			//DCI.MOA.001.000
-			//string strFormat = String.Format("Hello {0}", name);
+			//string strFormat = String.Format("Hello {0}", param.DocName);
+			//string setA = String.Format("{0:D3}", totalrecords.ToString());
 
-			if (param.DocCategory == 1) //internal
+			try
 			{
-				string deptcode =  _deptContext.DepartmentCode.Trim();
-				string section = _deptContext.DepartmentCode == "TID" ? "PM" : "HR";
-				string setNoFirst = totalrecords.ToString();
-				string setNoSecond = string.Empty;
+
+
+				var _docContext = await _dbContext.Document.AsQueryable().ToListAsync();
+				var _deptContext = await _dbContext.Department.AsQueryable().FirstOrDefaultAsync(x => x.DepartmentId == param.DepartmentId);
+				var _docTypeContext = _dbContext.DocumentType.AsQueryable().FirstOrDefaultAsync(x => x.DocTypeId == param.DocTypeId);
+
+				int totalrecords = _docContext.Count() + 1;
 				string version = "0.0";
+				string finalSetRecords = GetFormattedRecord(totalrecords);
 
-				string code= deptcode + DOT + section + DOT + setNoFirst + DOT + setNoSecond + "Ver." + version;
-				return code;
+				if (param.DocCategory == (int)EnumDocumentCategory.Internal)
+				{
+					string deptcode = _deptContext?.DepartmentCode?.Trim() ?? string.Empty;
+					string section = deptcode == EnumCategoryCode.TID.ToString() ? EnumSectionCode.PM.ToString() : EnumSectionCode.HR.ToString();
+
+					return $"{deptcode}.{section}.{finalSetRecords} Ver.{version}"; //	string code= deptcode + DOT + section + DOT + setNoFirst + DOT + setNoSecond + "Ver." + version;
+				}
+				else if (param.DocCategory == (int)EnumDocumentCategory.BothInExternal)
+				{
+					string compcode = Constants.CompanyCode;
+					string doctype = _docTypeContext?.Result?.Name ?? string.Empty;
+
+					return $"{compcode}.{doctype}.{finalSetRecords} Ver.{version}"; //string code = compcode + DOT + doctype + DOT + setNoFirst + DOT + setNoSecond + "Ver." + version;
+				}
+
 			}
-			else if (param.DocCategory == 2) //internal and external
+			catch (Exception ex)
 			{
-				string compcode = "DCI"; //DCI
-				string doctype = _docTypeContext.Result.Name;
-				string setNoFirst = totalrecords.ToString();
-				string setNoSecond = string.Empty;
-				string version =  "0.0"; 
-
-		
-				string code = compcode + DOT + doctype + DOT + setNoFirst + DOT + setNoSecond + "Ver." + version;
-				return code;
+				Log.Error(ex.ToString());
+			}
+			finally
+			{
+				Log.CloseAndFlush();
 			}
 			return string.Empty;
+		}
+
+		private string GetFormattedRecord(int totalRecords)
+		{
+			//format 000.000
+			//if 1000 then 000.001
+			//if 1001 then 001.001
+			//if 1002 then 002.001
+			//if 2000 then 000.002
+			//if 2001 then 001.002
+
+			int setA = totalRecords % 1000;
+			int setB = totalRecords / 1000;
+			string formattedA = setA.ToString("D3");
+			string formattedB = setB.ToString("D3");
+			return $"{formattedA}.{formattedB}";
+		}
+		public async Task<DocumentViewModel> ValidateToken(ValidateTokenViewModel param)
+		{
+			DocumentViewModel vm = new DocumentViewModel();
+			try
+			{
+				var result =  _dbContext.Document.Where(x => x.Token == param.Token && x.IsActive == true);
+
+				if (result.Count() > 0)
+				{
+					return await result.Select(doc => new DocumentViewModel
+					{
+						DocId = doc.DocId,
+						DocName = doc.DocName,
+						DocNo = doc.DocNo,
+						Version = doc.Version,
+						Filename = doc.Filename,
+						FileLocation = doc.FileLocation,
+						DocTypeId = doc.DocTypeId,
+						DocumentTypeList = null,
+						DocTypeName = string.Empty,
+						StatusId = doc.StatusId,
+						Reviewer = doc.Reviewer,
+						Approver = doc.Approver,
+						DepartmentId = doc.DepartmentId,
+						DocCategory = doc.DocCategory
+					}).FirstAsync();
+				}
+				else
+				{
+					return vm;
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
+				return vm;
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}		
 		}
 	}
 }

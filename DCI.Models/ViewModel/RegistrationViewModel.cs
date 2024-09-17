@@ -15,7 +15,7 @@ namespace DCI.Models.ViewModel
 		public string Email { get; set; }
 	}
 		
-	public class ValidatePasswordTokenViewModel
+	public class ValidateTokenViewModel
 	{
 		public string Token { get; set; }
 	}

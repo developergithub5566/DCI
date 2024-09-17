@@ -5,7 +5,6 @@ using DCI.Models.Entities;
 using DCI.Models.ViewModel;
 using DCI.WebApp.Configuration;
 using DCI.WebApp.Services;
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
@@ -14,6 +13,8 @@ using Serilog;
 using System.Text;
 using System.Diagnostics;
 using System.Reflection;
+using System.Reflection.Metadata;
+
 
 namespace DCI.WebApp.Controllers
 {
@@ -71,11 +72,12 @@ namespace DCI.WebApp.Controllers
 										   Value = x.DepartmentId.ToString(),
 										   Text = x.DepartmentName
 									   }).ToList();
-
+				
 					if (response.IsSuccessStatusCode)
 					{
 						return Json(new { success = true, data = vm });
 					}
+					return Json(new { success = false, message = responseBody });
 				}
 			}
 			catch (Exception ex)
@@ -87,7 +89,7 @@ namespace DCI.WebApp.Controllers
 			{
 				Log.CloseAndFlush();
 			}
-			return Json(new { success = false, message = "An error occurred. Please try again." });
+			
 		}
 
 		public async Task<IActionResult> SaveDocument(DocumentViewModel model)
@@ -100,9 +102,6 @@ namespace DCI.WebApp.Controllers
 					model.CreatedBy = currentUser.UserId;
 					model.ModifiedBy = currentUser.UserId;
 
-					//model.DocNo = "xxx";
-					//model.CreatedName = "xx";
-			
 
 					_httpclient.BaseAddress = new Uri(_apiconfig.Value.apiConnection + "api/Document/SaveDocument");
 
@@ -135,13 +134,13 @@ namespace DCI.WebApp.Controllers
 					}
 
 					var response = await _httpclient.PostAsync(_apiconfig.Value.apiConnection + "api/Document/SaveDocument", data);
-					
+					var responseBody = await response.Content.ReadAsStringAsync();
 					if (response.IsSuccessStatusCode)
 					{
-						return Json(new { success = true, message = "Document successfully created." });
+						return Json(new { success = true, message = responseBody });
 					}
+					return Json(new { success = false, message = responseBody });
 				}
-				return Json(new { success = false, message = "An error occurred. Please try again." });
 			}
 			catch (Exception ex)
 			{
@@ -168,13 +167,13 @@ namespace DCI.WebApp.Controllers
 
 					request.Content = stringContent;
 					var response = await _httpclient.SendAsync(request);
-
+					var responseBody = await response.Content.ReadAsStringAsync();
 					if (response.IsSuccessStatusCode)
 					{
-						return Json(new { success = true, message = "Document Type successfully deleted." });
+						return Json(new { success = true, message = responseBody });
 					}
-				}
-				return Json(new { success = false, message = "An error occurred. Please try again." });
+					return Json(new { success = false, message = responseBody });
+				}		
 			}
 			catch (Exception ex)
 			{
@@ -236,6 +235,37 @@ namespace DCI.WebApp.Controllers
 				Log.CloseAndFlush();
 			}
 			return Json(new { success = false, message = "An error occurred. Please try again." });
+		}
+
+		public async Task<IActionResult> ValidateToken(ValidateTokenViewModel model)
+		{
+			try
+			{
+				using (var _httpclient = new HttpClient())
+				{
+					var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+					var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Document/ValidateToken");
+
+					request.Content = stringContent;
+					var response = await _httpclient.SendAsync(request);
+					string responseBody = await response.Content.ReadAsStringAsync();
+					if (response.IsSuccessStatusCode)
+					{
+					
+					}
+					return RedirectToAction("VerifyToken");
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
+				return View();
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+
 		}
 
 		public async Task<IActionResult> Workflow()

@@ -175,13 +175,14 @@ namespace DCI.WebApp.Controllers
 
 					request.Content = stringContent;
 					var response = await _httpclient.SendAsync(request);
-
+					var responseBody = await response.Content.ReadAsStringAsync();
 					if (response.IsSuccessStatusCode)
 					{
-						return Json(new { success = true, message = "User successfully deleted." });
+						return Json(new { success = true, message = responseBody });
 					}
+					return Json(new { success = false, message = responseBody });
 				}
-				return Json(new { success = false, message = "An error occurred. Please try again." });
+
 			}
 			catch (Exception ex)
 			{
@@ -231,6 +232,7 @@ namespace DCI.WebApp.Controllers
 					{
 						return Json(new { success = true, data = vm });
 					}
+
 				}
 			}
 			catch (Exception ex)
@@ -260,13 +262,13 @@ namespace DCI.WebApp.Controllers
 
 					request.Content = stringContent;
 					var response = await _httpclient.SendAsync(request);
-
+					var responseBody = await response.Content.ReadAsStringAsync();
 					if (response.IsSuccessStatusCode)
 					{
-						return Json(new { success = true, message = "Role successfully created." });
+						return Json(new { success = true, message = responseBody });
 					}
+					return Json(new { success = false, message = responseBody });
 				}
-				return Json(new { success = false, message = "An error occurred. Please try again." });
 			}
 			catch (Exception ex)
 			{
@@ -294,13 +296,13 @@ namespace DCI.WebApp.Controllers
 
 					request.Content = stringContent;
 					var response = await _httpclient.SendAsync(request);
-
+					var responseBody = await response.Content.ReadAsStringAsync();
 					if (response.IsSuccessStatusCode)
 					{
-						return Json(new { success = true, message = "Role successfully deleted." });
+						return Json(new { success = true, message = responseBody });
 					}
+					return Json(new { success = false, message = responseBody });
 				}
-				return Json(new { success = false, message = "An error occurred. Please try again." });
 			}
 			catch (Exception ex)
 			{
@@ -497,13 +499,14 @@ namespace DCI.WebApp.Controllers
 
 					request.Content = stringContent;
 					var response = await _httpclient.SendAsync(request);
-
+					string responseBody = await response.Content.ReadAsStringAsync();
 					if (response.IsSuccessStatusCode)
 					{
-						return Json(new { success = true, message = "Department successfully created." });
+						return Json(new { success = true, message = responseBody });
 					}
+					return Json(new { success = false, message = responseBody });
 				}
-				return Json(new { success = false, message = "An error occurred. Please try again." });
+
 			}
 			catch (Exception ex)
 			{
@@ -531,13 +534,14 @@ namespace DCI.WebApp.Controllers
 
 					request.Content = stringContent;
 					var response = await _httpclient.SendAsync(request);
-
+					string responseBody = await response.Content.ReadAsStringAsync();
 					if (response.IsSuccessStatusCode)
 					{
-						return Json(new { success = true, message = "Department successfully deleted." });
+						return Json(new { success = true, message = responseBody });
 					}
+					return Json(new { success = false, message = responseBody });
 				}
-				return Json(new { success = false, message = "An error occurred. Please try again." });
+
 			}
 			catch (Exception ex)
 			{
@@ -615,13 +619,13 @@ namespace DCI.WebApp.Controllers
 
 					request.Content = stringContent;
 					var response = await _httpclient.SendAsync(request);
-
+					string responseBody = await response.Content.ReadAsStringAsync();
 					if (response.IsSuccessStatusCode)
 					{
-						return Json(new { success = true, message = "Employment Type successfully created." });
+						return Json(new { success = true, message = responseBody });
 					}
+					return Json(new { success = false, message = responseBody });
 				}
-				return Json(new { success = false, message = "An error occurred. Please try again." });
 			}
 			catch (Exception ex)
 			{
@@ -648,13 +652,14 @@ namespace DCI.WebApp.Controllers
 
 					request.Content = stringContent;
 					var response = await _httpclient.SendAsync(request);
-
+					string responseBody = await response.Content.ReadAsStringAsync();
 					if (response.IsSuccessStatusCode)
 					{
-						return Json(new { success = true, message = "Employment Type successfully deleted." });
+						return Json(new { success = true, message = responseBody });
 					}
+					return Json(new { success = false, message = responseBody });
 				}
-				return Json(new { success = false, message = "An error occurred. Please try again." });
+
 			}
 			catch (Exception ex)
 			{
@@ -733,13 +738,14 @@ namespace DCI.WebApp.Controllers
 
 					request.Content = stringContent;
 					var response = await _httpclient.SendAsync(request);
-
+					var responseBody = await response.Content.ReadAsStringAsync();
 					if (response.IsSuccessStatusCode)
 					{
-						return Json(new { success = true, message = "Successfully created." });
+						return Json(new { success = true, message = responseBody });
 					}
+					return Json(new { success = false, message = responseBody });
 				}
-				return Json(new { success = false, message = "An error occurred. Please try again." });
+
 			}
 			catch (Exception ex)
 			{
@@ -872,13 +878,13 @@ namespace DCI.WebApp.Controllers
 
 					request.Content = stringContent;
 					var response = await _httpclient.SendAsync(request);
-
+					string responseBody = await response.Content.ReadAsStringAsync();
 					if (response.IsSuccessStatusCode)
 					{
-						return Json(new { success = true, message = "Document Type successfully created." });
+						return Json(new { success = true, message = responseBody });
 					}
+					return Json(new { success = false, message = responseBody });
 				}
-				return Json(new { success = false, message = "An error occurred. Please try again." });
 			}
 			catch (Exception ex)
 			{
@@ -902,16 +908,16 @@ namespace DCI.WebApp.Controllers
 
 					var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
 					var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/DeleteDocumentType");
-
+	
 					request.Content = stringContent;
 					var response = await _httpclient.SendAsync(request);
-
+					string responseBody = await response.Content.ReadAsStringAsync();
 					if (response.IsSuccessStatusCode)
 					{
-						return Json(new { success = true, message = "Document Type successfully deleted." });
+						return Json(new { success = true, message = responseBody });
 					}
-				}
-				return Json(new { success = false, message = "An error occurred. Please try again." });
+					return Json(new { success = false, message = responseBody });
+				}			
 			}
 			catch (Exception ex)
 			{
@@ -926,7 +932,7 @@ namespace DCI.WebApp.Controllers
 		#endregion
 
 		#region Audit Logs
-	
+
 
 		public async Task<IActionResult> ActivityLog(AuditLogViewModel param)
 		{
@@ -953,8 +959,8 @@ namespace DCI.WebApp.Controllers
 			{
 				using (var _httpclient = new HttpClient())
 				{
-					var currentUser = _userSessionHelper.GetCurrentUser();	
-					param.Username = currentUser.UserId.ToString();				
+					var currentUser = _userSessionHelper.GetCurrentUser();
+					param.Username = currentUser.UserId.ToString();
 
 					var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
 					var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/GetAuditLogById");

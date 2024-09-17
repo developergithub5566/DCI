@@ -64,9 +64,9 @@ namespace DCI.Core.Common
 	public enum EnumDocumentCategory
 	{
 		[Description("Internal")]
-		Internal = 0,
+		Internal = 1,
 		[Description("Internal/External")] 
-		BothInExternal = 1
+		BothInExternal = 2
 	}
 	public enum EnumDocumentSection
 	{ 	
@@ -74,5 +74,17 @@ namespace DCI.Core.Common
 		PM = 0,
 		[Description("HR")]
 		HR = 1
+	}
+
+	public enum EnumCategoryCode
+	{
+		TID = 1,
+		HR = 2,
+		Finance = 3
+	}
+	public enum EnumSectionCode
+	{
+		PM =1,
+		HR = 2,
 	}
 }

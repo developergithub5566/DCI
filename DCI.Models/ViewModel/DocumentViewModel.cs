@@ -34,7 +34,7 @@ namespace DCI.Models.ViewModel
 		public int? StatusId { get; set; } = 0;
 		public int? Reviewer { get; set; } = 0;
 		public int? Approver { get; set; } = 0;
-		public int? DepartmentId { get; set; } = 0;
+		public int DepartmentId { get; set; } = 0;
 
 	}
 	public class DocumentCodeViewModel
