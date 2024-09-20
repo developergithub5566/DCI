@@ -908,7 +908,7 @@ namespace DCI.WebApp.Controllers
 
 					var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
 					var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/DeleteDocumentType");
-	
+
 					request.Content = stringContent;
 					var response = await _httpclient.SendAsync(request);
 					string responseBody = await response.Content.ReadAsStringAsync();
@@ -917,7 +917,7 @@ namespace DCI.WebApp.Controllers
 						return Json(new { success = true, message = responseBody });
 					}
 					return Json(new { success = false, message = responseBody });
-				}			
+				}
 			}
 			catch (Exception ex)
 			{
@@ -977,6 +977,132 @@ namespace DCI.WebApp.Controllers
 				}
 			}
 			return View(auditmodel);
+		}
+		#endregion
+
+		#region Section
+
+		public async Task<IActionResult> Section()
+		{
+			List<SectionViewModel> model = new List<SectionViewModel>();
+
+			using (var _httpclient = new HttpClient())
+			{
+				HttpResponseMessage response = await _httpclient.GetAsync(_apiconfig.Value.apiConnection + "api/Maintenance/GetAllSection");
+				string responseBody = await response.Content.ReadAsStringAsync();
+
+				if (response.IsSuccessStatusCode)
+				{
+					model = JsonConvert.DeserializeObject<List<SectionViewModel>>(responseBody)!;
+				}
+			}
+			return View(model);
+		}
+		public async Task<IActionResult> EditSection(SectionViewModel model)
+		{
+			try
+			{
+				using (var _httpclient = new HttpClient())
+				{
+					var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+					var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/GetSectionById");
+					request.Content = stringContent;
+					var response = await _httpclient.SendAsync(request);
+					var responseBody = await response.Content.ReadAsStringAsync();
+					SectionViewModel vm = JsonConvert.DeserializeObject<SectionViewModel>(responseBody)!;
+
+					vm.OptionsDepartment = vm.DepartmentList.Select(x =>
+								   new SelectListItem
+								   {
+									   Value = x.DepartmentId.ToString(),
+									   Text = x.DepartmentName
+								   }).ToList();
+
+					if (response.IsSuccessStatusCode)
+					{
+						return Json(new { success = true, data = vm });
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
+				return Json(new { success = false, message = ex.Message });
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+			return Json(new { success = false, message = "An error occurred. Please try again." });
+		}
+
+		public async Task<IActionResult> SaveSection(SectionViewModel model)
+		{
+			try
+			{
+				using (var _httpclient = new HttpClient())
+				{
+					var currentUser = _userSessionHelper.GetCurrentUser();
+					model.CreatedBy = currentUser.UserId;
+					model.ModifiedBy = currentUser.UserId;
+
+					var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+					var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/SaveSection");
+
+					request.Content = stringContent;
+					var response = await _httpclient.SendAsync(request);
+					string responseBody = await response.Content.ReadAsStringAsync();
+					if (response.IsSuccessStatusCode)
+					{
+						return Json(new { success = true, message = responseBody });
+					}
+					return Json(new { success = false, message = responseBody });
+				}
+
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
+				return Json(new { success = false, message = ex.Message });
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+		}
+
+		public async Task<IActionResult> DeleteSection(SectionViewModel model)
+		{
+			try
+			{
+				using (var _httpclient = new HttpClient())
+				{
+					var currentUser = _userSessionHelper.GetCurrentUser();
+					model.ModifiedBy = currentUser.UserId;
+
+					var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+					var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/DeleteSection");
+
+					request.Content = stringContent;
+					var response = await _httpclient.SendAsync(request);
+					string responseBody = await response.Content.ReadAsStringAsync();
+					if (response.IsSuccessStatusCode)
+					{
+						return Json(new { success = true, message = responseBody });
+					}
+					return Json(new { success = false, message = responseBody });
+				}
+
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
+				return Json(new { success = false, message = ex.Message });
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
 		}
 		#endregion
 

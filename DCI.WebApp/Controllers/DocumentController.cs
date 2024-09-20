@@ -72,7 +72,7 @@ namespace DCI.WebApp.Controllers
 										   Value = x.DepartmentId.ToString(),
 										   Text = x.DepartmentName
 									   }).ToList();
-				
+
 					if (response.IsSuccessStatusCode)
 					{
 						return Json(new { success = true, data = vm });
@@ -89,7 +89,7 @@ namespace DCI.WebApp.Controllers
 			{
 				Log.CloseAndFlush();
 			}
-			
+
 		}
 
 		public async Task<IActionResult> SaveDocument(DocumentViewModel model)
@@ -103,7 +103,7 @@ namespace DCI.WebApp.Controllers
 					model.ModifiedBy = currentUser.UserId;
 
 
-					_httpclient.BaseAddress = new Uri(_apiconfig.Value.apiConnection + "api/Document/SaveDocument");
+					//_httpclient.BaseAddress = new Uri(_apiconfig.Value.apiConnection + "api/Document/SaveDocument");
 
 					var data = new MultipartFormDataContent();
 					data.Add(new StringContent(model.DocId.ToString() ?? ""), "DocId");
@@ -173,7 +173,7 @@ namespace DCI.WebApp.Controllers
 						return Json(new { success = true, message = responseBody });
 					}
 					return Json(new { success = false, message = responseBody });
-				}		
+				}
 			}
 			catch (Exception ex)
 			{
@@ -237,10 +237,11 @@ namespace DCI.WebApp.Controllers
 			return Json(new { success = false, message = "An error occurred. Please try again." });
 		}
 
-		public async Task<IActionResult> ValidateToken(ValidateTokenViewModel model)
+		public async Task<IActionResult> Upload(ValidateTokenViewModel model)
 		{
 			try
 			{
+				DocumentViewModel vm = new DocumentViewModel();
 				using (var _httpclient = new HttpClient())
 				{
 					var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -251,9 +252,9 @@ namespace DCI.WebApp.Controllers
 					string responseBody = await response.Content.ReadAsStringAsync();
 					if (response.IsSuccessStatusCode)
 					{
-					
+						vm = JsonConvert.DeserializeObject<DocumentViewModel>(responseBody)!;
 					}
-					return RedirectToAction("VerifyToken");
+					return View(vm);
 				}
 			}
 			catch (Exception ex)
@@ -267,11 +268,44 @@ namespace DCI.WebApp.Controllers
 			}
 
 		}
-
-		public async Task<IActionResult> Workflow()
+		public async Task<IActionResult> UploadFile(DocumentViewModel model)
 		{
-			return View();
-		}
+			try
+			{
+				using (var _httpclient = new HttpClient())
+				{
+					
 
+
+					//_httpclient.BaseAddress = new Uri(_apiconfig.Value.apiConnection + "api/Document/UploadFile");
+
+					var data = new MultipartFormDataContent();
+					data.Add(new StringContent(model.DocId.ToString() ?? ""), "DocId");					
+
+					if (model.DocFile != null)
+					{
+						var fileContent = new StreamContent(model.DocFile!.OpenReadStream());
+						data.Add(fileContent, "DocFile", model.DocFile.FileName);
+					}
+
+					var response = await _httpclient.PostAsync(_apiconfig.Value.apiConnection + "api/Document/UploadFile", data);
+					var responseBody = await response.Content.ReadAsStringAsync();
+					if (response.IsSuccessStatusCode)
+					{
+						return Json(new { success = true, message = responseBody });
+					}
+					return Json(new { success = false, message = responseBody });
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.Message.ToString());
+				return Json(new { success = false, message = ex.Message });
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+		}
 	}
 }

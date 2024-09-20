@@ -1,1 +1,117 @@
-﻿
+﻿@model DCI.Models.ViewModel.DocumentViewModel
+
+
+<style>
+	/* input[type=file]::file-selector-button {
+			border: 2px solid #6c5ce7;
+			padding: .2em .4em;
+			border-radius: .2em;
+			background-color: #a29bfe;
+			transition: 1s;
+		}
+
+			input[type=file]::file-selector-button:hover {
+				background-color: #81ecec;
+				border: 2px solid #00cec9;
+			} */
+</style>
+
+<div class="container">
+	<form id="createForm">
+		<input type="hidden" id="DocId" name="DocId" value="@Model.DocId" >
+		<div class="row">
+			<div class="col-md-4">
+				<label for="DocNo" class="col-form-label">Document No:</label>
+				<input type="text" class="form-control" id="DocNo" name="DocNo" value="@Model.DocNo" disabled>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4">
+				<label for="DocName" class="col-form-label">Document Name:</label>
+				<input type="text" class="form-control" id="DocName" name="DocName" value="@Model.DocName" disabled>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4">
+				<label for="DocName" class="col-form-label">Upload:</label>
+				<input type="file" class="form-control" id="fileUpload" name="fileUpload" />
+			</div>
+		</div>
+		<br />
+		<div class="row">
+			<div class="col-md-4">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				<button type="submit" class="btn btn-primary">Submit</button>
+			</div>
+		</div>
+	</form>
+</div>
+
+
+@section scripts {
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
+	@* <script src="~/js/file-upload.js"></script> *@
+
+	<script type="text/javascript">
+		// var js = jQuery.noConflict(true);
+
+		$(document).ready(function () {
+
+
+			// $('#fileUpload').on('change', function () {
+			// 	var fileName = this.files[0] ? this.files[0].name : 'No file chosen';
+			// 	document.querySelector('.file-name').textContent = '';
+
+			// 	const newrecord = $('#DocId').val();
+
+			// 	if (newrecord != 0) {
+			// 		$('.file-name').text(fileName);
+			// 	}
+
+			// });
+
+			$('#createForm').submit(function (event) {
+				event.preventDefault();
+		
+
+				const fileInput = document.getElementById('fileUpload');
+				const file = fileInput.files[0]; 
+				const docId = $('#DocId').val();				
+		
+				const formData = new FormData();
+				formData.append('DocId', docId);			
+				formData.append('DocFile', file);
+
+				bootbox.confirm('Are you sure you want to submit this record?', function (result) {
+					if (result) {
+
+						$.ajax({
+							type: 'POST',
+							url: '@Url.Action("UploadFile", "Document")',
+							data: formData,
+							processData: false,
+							contentType: false,
+							success: function (response) {
+								if (response.success) {
+									$('#createForm')[0].reset();
+									js('#createmodal').modal('hide');
+									bootbox.alert(response.message, function () {
+										location.reload();
+									});
+								} else {
+									bootbox.alert(response.message);
+								}
+							},
+							error: function () {
+								bootbox.alert('An error occurred. Please try again.');
+							}
+						});
+					}
+				});
+			});
+
+		});
+
+
+	</script>
+}

@@ -115,7 +115,7 @@ namespace DCI.Repositories
 
 			var userAccessEntity = await _userAccessRepository.GetUserAccessByUserId(userEntity.UserId);
 
-			string link = "https://localhost:7236/Document/ValidateToken?token=";
+			string link = "https://localhost:7236/Document/Upload?token=";
 			string emailBody = $@"
             <html>
             <body>              

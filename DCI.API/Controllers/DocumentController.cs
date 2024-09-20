@@ -74,5 +74,13 @@ namespace DCI.API.Controllers
 			}
 			return BadRequest();
 		}
+
+		[HttpPost]
+		[Route("UploadFile")]
+		public async Task<IActionResult> UploadFile(DocumentViewModel model)
+		{
+			var result = await _documentRepository.UploadFile(model);
+			return StatusCode(result.statuscode, result.message);
+		}
 	}
 }

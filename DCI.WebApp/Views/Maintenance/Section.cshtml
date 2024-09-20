@@ -1,15 +1,14 @@
-﻿@model IEnumerable<DCI.Models.ViewModel.DepartmentViewModel>
+﻿@model IEnumerable<DCI.Models.ViewModel.SectionViewModel>
 
-<link href="~/css/dcicustom.css" rel="stylesheet" />
-
+<link href="~/css/dcicustom.css" rel="stylesheet" /> 
 
 <div class="container-fluid">
 	<div class="d-sm-flex align-items-center justify-content-between mb-3">
 		<h6 class="m-0 font-weight-bold text-gray-800">Administration</h6>
 		<div class="upperRightDivBtn">
-			<a href="#" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#createmodal">
+			<a href="#" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#" onclick="newForm()">
 				<span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
-				<span class="text text-white"><small>Add Department</small></span>
+				<span class="text text-white"><small>Add Section</small></span>
 			</a>
 		</div>
 
@@ -18,14 +17,10 @@
 		<ul class="breadcrumb">
 			<li><a href="~/Home/Index">Home</a></li>
 			<li><a href="~/Maintenance/Index">Administration</a></li>
-			<li>Department</li>
+			<li>Section</li>
 		</ul>
 	</div>
 
-
-	<p>
-		@* 	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createmodal">Add Department</button> *@
-	</p>
 
 	<div class="card shadow mb-4">
 		<div class="card-header">
@@ -33,17 +28,17 @@
 		</div>
 		<div class="card-body">
 			<div class="table-responsive mt20">
-				<table class="table table-bordered" id="tblDepartment">
+				<table class="table table-bordered" id="tblSection">
 					<thead>
 						<tr>
 							<th>
 								<label>Id</label>
 							</th>
 							<th>
-								<label>Department Code</label>
+								<label>Section Code</label>
 							</th>
 							<th>
-								<label>Department</label>
+								<label>Section</label>
 							</th>
 							<th>
 								<label>Description</label>
@@ -64,13 +59,13 @@
 						{
 							<tr>
 								<td>
-									@item.DepartmentId
+									@item.SectionId
 								</td>
 								<td>
-									@item.DepartmentCode
+									@item.SectionCode
 								</td>
 								<td>
-									@item.DepartmentName
+									@item.SectionName
 								</td>
 								<td>
 									@item.Description
@@ -84,8 +79,8 @@
 
 								<td>
 									<a href="#" class="btn btn-primary"><i class="fas fa-search"></i></a> |
-									<a href="#" id="editForm" onclick="editForm(@item.DepartmentId)" class="btn btn-info"><i class="fa fa-edit"></i></a> |
-									<a href="#" id="deleteform" class="btn btn-danger" onclick="deleteform(@item.DepartmentId)"><i class="far fa-trash-alt"></i></a>
+									<a href="#" id="editForm" onclick="editForm(@item.SectionId)" class="btn btn-info"><i class="fa fa-edit"></i></a> |
+									<a href="#" id="deleteform" class="btn btn-danger" onclick="deleteform(@item.SectionId)"><i class="far fa-trash-alt"></i></a>
 								</td>
 							</tr>
 						}
@@ -99,21 +94,31 @@
 				<div class="modal-dialog" role="document">
 					<div class="modal-content">
 						<div class="modal-header">
-							<h5 class="modal-title" id="exampleModalLabel">New Department</h5>
+							<h5 class="modal-title" id="exampleModalLabel">New Section</h5>
 							@* 			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 							</button> *@
 						</div>
 						<form id="createForm">
 							<div class="modal-body">
-								<input type="hidden" id="DepartmentId" name="DepartmentId" value="0">
-								<div class="form-group">
-									<label for="DepartmentCode" class="col-form-label">Department Code:</label>
-									<input type="text" class="form-control" id="DepartmentCode" name="DepartmentCode" maxlength="3">
-								</div>	
+								<input type="hidden" id="SectionId" name="SectionId" value="0">
+
 								<div class="form-group">
 									<label for="Department" class="col-form-label">Department:</label>
-									<input type="text" class="form-control" id="DepartmentName" name="DepartmentName" maxlength="25">
+									<input type="hidden" id="DepartmentId" name="DepartmentId" value="0">
+									<select id="departmentSelect" class="form-select">
+										<option value="">select department</option>
+									</select>
+								</div>
+
+
+								<div class="form-group">
+									<label for="SectionCode" class="col-form-label">Section Code:</label>
+									<input type="text" class="form-control" id="SectionCode" name="SectionCode" maxlength="3">
+								</div>
+								<div class="form-group">
+									<label for="Section" class="col-form-label">Section:</label>
+									<input type="text" class="form-control" id="SectionName" name="SectionName" maxlength="25">
 								</div>
 								<div class="form-group">
 									<label for="Description" class="col-form-label">Description:</label>
@@ -140,19 +145,20 @@
 					var js = jQuery.noConflict(true);
 
 					$(document).ready(function () {
-						js('#tblDepartment').DataTable({
+						js('#tblSection').DataTable({
 						});
 
 						$('#createForm').submit(function (event) {
 							event.preventDefault();
+							
+							document.getElementById("DepartmentId").value = $('#departmentSelect').val();
 							var formData = $(this).serialize();
-
-							bootbox.confirm('Are you sure you want to save this record?', function (result) {
-								if (result) {
-
+							console.log(formData);
+							bootbox.confirm('Are you sure you want to submit this record?', function (result) {
+								if (result) {			
 									$.ajax({
 										type: 'POST',
-										url: '@Url.Action("SaveDepartment", "Maintenance")',
+										url: '@Url.Action("SaveSection", "Maintenance")',
 										data: formData,
 										success: function (response) {
 											if (response.success) {
@@ -169,23 +175,70 @@
 											bootbox.alert('An error occurred. Please try again.');
 										}
 									});
-
 								}
 							});
 						});
 
 					});
 
+					function newForm() {
+						$.ajax({
+							type: 'POST',
+							url: '@Url.Action("EditSection", "Maintenance")',
+							success: function (response) {						
+								if (response.success) {
+									$('#SectionId').val("0");
+									$('#SectionCode').val("");
+									$('#SectionName').val("");
+									$('#Description').val("");
+
+									var $select = $('#departmentSelect');
+									$select.empty();
+									$select.append('<option value="">Select type</option>');
+
+									$.each(response.data.optionsDepartment, function (index, item) {
+										if (item.value == response.data.departmentId) {
+											$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+										} else {
+											$select.append('<option value="' + item.value + '">' + item.text + '</option>');
+										}
+									});
+
+									js('#createmodal').modal('show');
+								} else {
+									bootbox.alert(response.message);
+								}
+							},
+							error: function () {
+								bootbox.alert('An error occurred. Please try again.');
+							}
+						});
+					}
+
 					function editForm(id) {
 						$.ajax({
 							type: 'POST',
-							url: '@Url.Action("EditDepartment", "Maintenance")',
-							data: { DepartmentId: id },
+							url: '@Url.Action("EditSection", "Maintenance")',
+							data: { SectionId: id },
 							success: function (response) {
 								if (response.success) {
-									$('#DepartmentId').val(response.data.departmentId);
-									$('#DepartmentName').val(response.data.departmentName);
+									$('#SectionId').val(response.data.sectionId);
+									$('#SectionCode').val(response.data.sectionCode);
+									$('#SectionName').val(response.data.sectionName);
 									$('#Description').val(response.data.description);
+
+									var $select = $('#departmentSelect');
+									$select.empty();
+									$select.append('<option value="">Select type</option>');
+
+									$.each(response.data.optionsDepartment, function (index, item) {
+										if (item.value == response.data.departmentId) {
+											$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+										} else {
+											$select.append('<option value="' + item.value + '">' + item.text + '</option>');
+										}
+									});
+
 									js('#createmodal').modal('show');
 								} else {
 									bootbox.alert(response.message);
@@ -203,8 +256,8 @@
 							if (result) {
 								$.ajax({
 									type: 'POST',
-									url: '@Url.Action("DeleteDepartment", "Maintenance")',
-									data: { DepartmentId: id },
+									url: '@Url.Action("DeleteSection", "Maintenance")',
+									data: { SectionId: id },
 									success: function (response) {
 										if (response.success) {
 											bootbox.alert(response.message, function () {

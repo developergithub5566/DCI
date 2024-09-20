@@ -323,7 +323,7 @@ namespace DCI.Repositories
 			DocumentViewModel vm = new DocumentViewModel();
 			try
 			{
-				var result =  _dbContext.Document.Where(x => x.Token == param.Token && x.IsActive == true);
+				var result = _dbContext.Document.Where(x => x.UploadLink == param.Token && x.IsActive == true);
 
 				if (result.Count() > 0)
 				{
@@ -358,7 +358,12 @@ namespace DCI.Repositories
 			finally
 			{
 				Log.CloseAndFlush();
-			}		
+			}
+		}
+		public async Task<(int statuscode, string message)> UploadFile(DocumentViewModel model)
+		{
+			await SaveFile(model);
+			return (StatusCodes.Status200OK, "Successfully");
 		}
 	}
 }

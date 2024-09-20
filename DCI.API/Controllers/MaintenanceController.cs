@@ -22,9 +22,10 @@ namespace DCI.API.Controllers
 		IUserRoleRepository _userRoleRepository;
 		IDocumentTypeRepository _documentTypeRepository;
 		IAuditLogRepository _auditLogRepository;
+		ISectionRepository _sectionRepository;
 		public MaintenanceController(IModulePageRepository modulePageRepository, IModuleInRoleRepository moduleInRoleRepository,
 			IRoleRepository roleRepository, IUserRepository userRepository, IDepartmentRepository DepartmentRepository, IEmploymentTypeRepository employmentTypeRepository,
-			IUserRoleRepository userRoleRepository, IDocumentTypeRepository documentTypeRepository, IAuditLogRepository auditLogRepository)
+			IUserRoleRepository userRoleRepository, IDocumentTypeRepository documentTypeRepository, IAuditLogRepository auditLogRepository,ISectionRepository sectionRepository)
 		{
 			this._userRepository = userRepository;
 			this._moduleInRoleRepository = moduleInRoleRepository;
@@ -35,6 +36,7 @@ namespace DCI.API.Controllers
 			this._userRoleRepository = userRoleRepository;
 			this._documentTypeRepository = documentTypeRepository;
 			this._auditLogRepository = auditLogRepository;
+			this._sectionRepository = sectionRepository;
 		}
 
 
@@ -354,6 +356,42 @@ namespace DCI.API.Controllers
 		public async Task<IActionResult> GetAllAuditLogs()
 		{
 			return Ok(await _auditLogRepository.GetAllAuditLogs());
+		}
+		#endregion
+
+		#region Section
+
+		[HttpGet]
+		[Route("GetAllSection")]
+		public async Task<IActionResult> GetAllSection()
+		{
+			return Ok(await _sectionRepository.GetAllSection());
+		}
+
+		[HttpPost]
+		[Route("GetSectionById")]
+		public async Task<IActionResult> GetSectionById(SectionViewModel model)
+		{
+			//if (!await _sectionRepository.IsExistsSection(model.SectionId))
+			//{
+			//	return NotFound("Section Id invalid");
+			//}
+			return Ok(await _sectionRepository.GetSectiontById(model.SectionId));
+		}
+
+		[HttpPost]
+		[Route("SaveSection")]
+		public async Task<IActionResult> SaveSection([FromBody] SectionViewModel model)
+		{
+			var result = await _sectionRepository.Save(model);
+			return StatusCode(result.statuscode, result.message);
+		}
+		[HttpPost]
+		[Route("DeleteSection")]
+		public async Task<IActionResult> DeleteSection([FromBody] SectionViewModel model)
+		{
+			var result = await _sectionRepository.Delete(model);
+			return StatusCode(result.statuscode, result.message);
 		}
 		#endregion
 	}

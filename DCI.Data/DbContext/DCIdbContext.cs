@@ -25,8 +25,7 @@ namespace DCI.Data
 		public DbSet<JobApplicant> JobApplicant { get; set; }
 		public DbSet<Document> Document { get; set; }
 		public DbSet<DocumentType> DocumentType { get; set; }
-
-
+		public DbSet<Section> Section { get; set; }
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<AuditLog>().Property(ae => ae.Changes).HasConversion(

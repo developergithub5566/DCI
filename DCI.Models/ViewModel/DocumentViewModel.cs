@@ -35,14 +35,14 @@ namespace DCI.Models.ViewModel
 		public int? Reviewer { get; set; } = 0;
 		public int? Approver { get; set; } = 0;
 		public int DepartmentId { get; set; } = 0;
-
+		public string? UploadLink { get; set; } = string.Empty;
 	}
-	public class DocumentCodeViewModel
-	{
-	    public int DocumentCategory { get; set; } = 0; //internal or internal/external
-		public int DepartmentId { get; set; } = 0;
-		public int DocumentTypeId { get; set; } = 0;
-		public int VersionNo { get; set; } = 0;
-	}
+	//public class DocumentCodeViewModel
+	//{
+	//    public int DocumentCategory { get; set; } = 0; //internal or internal/external
+	//	public int DepartmentId { get; set; } = 0;
+	//	public int DocumentTypeId { get; set; } = 0;
+	//	public int VersionNo { get; set; } = 0;
+	//}
 
 }
