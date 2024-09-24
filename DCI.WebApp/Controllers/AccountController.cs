@@ -138,7 +138,7 @@ namespace DCI.WebApp.Controllers
 			return View();
 		}
 
-
+	
 		public async Task<IActionResult> ValidateToken(ValidateTokenViewModel model)
 		{
 			try

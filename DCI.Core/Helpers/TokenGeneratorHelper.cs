@@ -11,7 +11,10 @@ namespace DCI.Core.Helpers
             {
                 var data = new byte[32];
                 rng.GetBytes(data);
-                return Convert.ToBase64String(data);
+                return Convert.ToBase64String(data)
+                    .Replace('+', '-');
+                  //  .Replace('/', '_');
+		            //.Replace("=", "");
             }
         }
     }

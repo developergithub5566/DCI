@@ -1,14 +1,8 @@
-﻿@* @{
-    ViewData["Title"] = "Home Page";
-}
- *@
+﻿@model IEnumerable<DCI.Models.ViewModel.HomePageViewModel>
 
 
-<div class="text-center">
-@*     <h1 class="display-4">Welcome</h1> *@
-   @*  <a asp-controller="Home" asp-action="GoogleLogin">Login with Google</a>
-    <a asp-controller="Home" asp-action="FacebookLogin">Login with Facebook</a> *@
-</div>
+
+
 
 <head>
     <meta charset="UTF-8">
@@ -24,129 +18,27 @@
 			<hr>
 		</div>
 
-
-		<div class="col-xl-3 col-lg-4 col-md-4 col-sm-6 mb-4">
-			<div class="card shadow h-100 py-2">
-				<div class="card-body">
-					<div class="row no-gutters align-items-center">
-						<div class="col mr-2">
-							<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-								Memorandum of Agreement
+		@foreach(var x in Model)
+		{
+			<div class="col-xl-3 col-lg-4 col-md-4 col-sm-6 mb-4">
+				<div class="card shadow h-100 py-2">
+					<div class="card-body">
+						<div class="row no-gutters align-items-center">
+							<div class="col mr-2">
+								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+									@x.DocumentType
+								</div>
+								<div class="h5 mb-0 font-weight-bold text-gray-800">@x.TotalCount</div>
 							</div>
-							<div class="h5 mb-0 font-weight-bold text-gray-800">1</div>
-						</div>
-						<div class="col-auto">
-							<i class="fa-solid fa-file fa-2x text-gray-500"></i>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="col-xl-3 col-lg-4 col-md-4 col-sm-6 mb-4">
-			<div class="card shadow h-100 py-2">
-				<div class="card-body">
-					<div class="row no-gutters align-items-center">
-						<div class="col mr-2">
-							<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Letter of Intent</div>
-							<div class="h5 mb-0 font-weight-bold text-gray-800">1</div>
-						</div>
-						<div class="col-auto">
-							<i class="fa-solid fa-file fa-2x text-gray-500"></i>
+							<div class="col-auto">
+								<i class="fa-solid fa-file fa-2x text-gray-500"></i>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-		<div class="col-xl-3 col-lg-4 col-md-4 col-sm-6 mb-4">
-			<div class="card shadow h-100 py-2">
-				<div class="card-body">
-					<div class="row no-gutters align-items-center">
-						<div class="col mr-2">
-							<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Proposal</div>
-							<div class="h5 mb-0 font-weight-bold text-gray-800">2</div>
-						</div>
-						<div class="col-auto">
-							<i class="fa-solid fa-file fa-2x text-gray-500"></i>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="col-xl-3 col-lg-4 col-md-4 col-sm-6 mb-4">
-			<div class="card shadow h-100 py-2">
-				<div class="card-body">
-					<div class="row no-gutters align-items-center">
-						<div class="col mr-2">
-							<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Certification</div>
-							<div class="h5 mb-0 font-weight-bold text-gray-800">1</div>
-						</div>
-						<div class="col-auto">
-							<i class="fa-solid fa-file fa-2x text-gray-500"></i>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="col-xl-3 col-lg-4 col-md-4 col-sm-6 mb-4">
-			<div class="card shadow h-100 py-2">
-				<div class="card-body">
-					<div class="row no-gutters align-items-center">
-						<div class="col mr-2">
-							<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Notice of Award</div>
-							<div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
-						</div>
-						<div class="col-auto">
-							<i class="fa-solid fa-file fa-2x text-gray-500"></i>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="col-xl-3 col-lg-4 col-md-4 col-sm-6 mb-4">
-			<div class="card shadow h-100 py-2">
-				<div class="card-body">
-					<div class="row no-gutters align-items-center">
-						<div class="col mr-2">
-							<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Implementing Agreements</div>
-							<div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
-						</div>
-						<div class="col-auto">
-							<i class="fa-solid fa-file fa-2x text-gray-500"></i>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="col-xl-3 col-lg-4 col-md-4 col-sm-6 mb-4">
-			<div class="card shadow h-100 py-2">
-				<div class="card-body">
-					<div class="row no-gutters align-items-center">
-						<div class="col mr-2">
-							<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Memo</div>
-							<div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
-						</div>
-						<div class="col-auto">
-							<i class="fa-solid fa-file fa-2x text-gray-500"></i>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="col-xl-3 col-lg-4 col-md-4 col-sm-6 mb-4">
-			<div class="card shadow h-100 py-2">
-				<div class="card-body">
-					<div class="row no-gutters align-items-center">
-						<div class="col mr-2">
-							<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Bids and Awards Committee</div>
-							<div class="h5 mb-0 font-weight-bold text-gray-800">0</div>
-						</div>
-						<div class="col-auto">
-							<i class="fa-solid fa-file fa-2x text-gray-500"></i>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+		}		
+		
 	</div>
 
 </div>

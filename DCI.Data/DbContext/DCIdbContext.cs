@@ -65,10 +65,14 @@ namespace DCI.Data
 					}
 					else
 					{
-						var xmodule = entry.CurrentValues.EntityType.Name;
+						var xmodule = entry.CurrentValues.EntityType.Name;			
 						if (xmodule != "DCI.Models.Entities.UserAccess")
 						{
-							_createdBy = entry.Properties.FirstOrDefault(p => p.Metadata.Name == "ModifiedBy").CurrentValue.ToString();
+							var modifiedByProperty = entry.Properties.FirstOrDefault(p => p.Metadata.Name == "ModifiedBy");
+							if (modifiedByProperty != null && modifiedByProperty.CurrentValue != null)
+							{
+								_createdBy = modifiedByProperty.CurrentValue.ToString();
+							}
 						}
 
 					}

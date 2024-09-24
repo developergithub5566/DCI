@@ -76,15 +76,15 @@ namespace DCI.Core.Common
 		HR = 1
 	}
 
-	public enum EnumCategoryCode
-	{
-		TID = 1,
-		HR = 2,
-		Finance = 3
-	}
-	public enum EnumSectionCode
-	{
-		PM =1,
-		HR = 2,
-	}
+	//public enum EnumCategoryCode
+	//{
+	//	TID = 1,
+	//	HR = 2,
+	//	Finance = 3
+	//}
+	//public enum EnumSectionCode
+	//{
+	//	PM =1,
+	//	HR = 2,
+	//}
 }

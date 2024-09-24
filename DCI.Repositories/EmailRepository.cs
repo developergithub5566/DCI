@@ -1,6 +1,7 @@
 ﻿using DCI.Core.Helpers;
 using DCI.Data;
 using DCI.Models.Configuration;
+using DCI.Models.Entities;
 using DCI.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -8,6 +9,8 @@ using System.Net;
 using System.Net.Mail;
 using Serilog;
 using static System.Net.WebRequestMethods;
+using DCI.Models.ViewModel;
+//using System.Reflection.Metadata;
 
 namespace DCI.Repositories
 {
@@ -96,43 +99,46 @@ namespace DCI.Repositories
 			_dbContext.Dispose();
 		}
 
-		public async Task SendUploadFile(string email, string docno)
+		public async Task SendUploadFile(DocumentViewModel model)
 		{
+			model = await SendUploadFileBodyMessage(model);
+
 			MailMessage mail = new MailMessage();
 			mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-			mail.Subject = "Action Required: Please Upload Your Document No " + docno;
-			mail.Body = await SendUploadFileBodyMessage(email, docno);
+			mail.Subject = "Action Required: Please Upload Your Document No " + model.DocNo;
+			mail.Body = model.EmailBody;
 			mail.IsBodyHtml = true;
-			mail.To.Add(email);
+			mail.To.Add(model.RequestByEmail);
 			await SendMessage(mail);
 		}
 
-		async Task<string> SendUploadFileBodyMessage(string email, string docno)
+		async Task<DocumentViewModel> SendUploadFileBodyMessage(DocumentViewModel model)
 		{
-			var token = TokenGeneratorHelper.GetToken();
 
-			var userEntity = await _userRepository.GetUserByEmail(email);
 
-			var userAccessEntity = await _userAccessRepository.GetUserAccessByUserId(userEntity.UserId);
+			//var userEntity = await _userRepository.GetUserByEmail("email");
+			//int requestId = model.RequestBy ?? default(int);
+
+			var userEntity = await _userRepository.GetUserById(model.RequestById ?? default(int));
+			//var _user = userEntity.
 
 			string link = "https://localhost:7236/Document/Upload?token=";
-			string emailBody = $@"
+			model.RequestByEmail = userEntity.Email;
+			model.EmailBody = $@"
             <html>
             <body>              
                 <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
                 
                  <p>This is an automated message from DCI Application.</p>
-                 <p> Please upload the required document (Document No: {docno}) by following the link below:  </p>   
-                 <a href='{link + token}'> Upload file</a>
+                 <p> Please upload the required document (Document No: {model.DocNo}) by following the link below:  </p>   
+                 <a href='{link + model.UploadLink}'> Upload file</a>
                 <p>If you encounter any issues, please contact our support team at [DCI Application Support].</p>            
                 <p>Thank you,<br />Your DCI</p>
             </body>
             </html>";
+		
 
-			userAccessEntity.PasswordResetToken = token;
-			userAccessEntity.PasswordResetTokenExpiry = DateTime.UtcNow.AddDays(1);
-			await _userAccessRepository.UpdateUserAccess(userAccessEntity);
-			return emailBody;
+			return model;
 		}
 	}
 }

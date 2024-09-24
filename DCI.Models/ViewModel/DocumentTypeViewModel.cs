@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DCI.Models.ViewModel
+﻿namespace DCI.Models.ViewModel
 {
 	public class DocumentTypeViewModel
 	{

@@ -1104,6 +1104,47 @@ namespace DCI.WebApp.Controllers
 				Log.CloseAndFlush();
 			}
 		}
+
+		public async Task<JsonResult> GetSectionByDepartmentId(SectionViewModel model)
+		{
+			try
+			{
+				using (var _httpclient = new HttpClient())
+				{
+					
+					var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+					var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/GetSectionByDepartmentId");
+
+					request.Content = stringContent;
+					var response = await _httpclient.SendAsync(request);
+					string responseBody = await response.Content.ReadAsStringAsync();
+					SectionViewModel vm = JsonConvert.DeserializeObject<SectionViewModel>(responseBody)!;
+
+					vm.OptionsSection = vm.SectionList.Select(x =>
+									   new SelectListItem
+									   {
+										   Value = x.SectionId.ToString(),
+										   Text = x.SectionName
+									   }).ToList();
+
+					if (response.IsSuccessStatusCode)
+					{
+						return Json(new { success = true, data = vm });
+					}
+					return Json(new { success = false, message = responseBody });
+				}
+
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
+				return Json(new { success = false, message = ex.Message });
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+		}
 		#endregion
 
 	}

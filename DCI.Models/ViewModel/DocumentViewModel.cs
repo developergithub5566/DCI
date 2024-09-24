@@ -28,21 +28,23 @@ namespace DCI.Models.ViewModel
 
 		public IList<Department>? DepartmentList { get; set; }
 		public List<SelectListItem>? OptionsDepartment { get; set; }
+		public IList<Section>? SectionList { get; set; }
+		public List<SelectListItem>? OptionsSection { get; set; }
+		public IList<User>? UserList { get; set; }
+		public List<SelectListItem>? OptionsRequestBy { get; set; }
 
 		public int? DocCategory { get; set; } = 0; //internal or internal/external 
-		public int? Section { get; set; } = 0;
+		//public int? Section { get; set; } = 0;
 		public int? StatusId { get; set; } = 0;
 		public int? Reviewer { get; set; } = 0;
 		public int? Approver { get; set; } = 0;
+		public int? RequestById { get; set; } = 0;
+		public int? SectionId { get; set; } = 0;
+		public string RequestByEmail { get; set; } = string.Empty;
+		public string? EmailBody { get; set; } = string.Empty;
 		public int DepartmentId { get; set; } = 0;
 		public string? UploadLink { get; set; } = string.Empty;
 	}
-	//public class DocumentCodeViewModel
-	//{
-	//    public int DocumentCategory { get; set; } = 0; //internal or internal/external
-	//	public int DepartmentId { get; set; } = 0;
-	//	public int DocumentTypeId { get; set; } = 0;
-	//	public int VersionNo { get; set; } = 0;
-	//}
+	
 
 }

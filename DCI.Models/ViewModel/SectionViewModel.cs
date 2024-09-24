@@ -10,6 +10,7 @@ namespace DCI.Models.ViewModel
 
 		public string SectionName { get; set; } = string.Empty;
 		public int DepartmentId { get; set; } = 0;
+		public string DepartmentName { get; set; } = string.Empty;
 
 		public string? Description { get; set; } = string.Empty;
 
@@ -23,8 +24,11 @@ namespace DCI.Models.ViewModel
 
 		public bool IsActive { get; set; } = true;
 		public string CreatedName { get; set; } = string.Empty;
+		public IList<Section>? SectionList { get; set; } 
+		public List<SelectListItem>? OptionsSection { get; set; }
 		public IList<Department>? DepartmentList { get; set; }
 		public List<SelectListItem>? OptionsDepartment { get; set; }
+
 
 	}
 }

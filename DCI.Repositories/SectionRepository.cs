@@ -5,11 +5,7 @@ using DCI.Repositories.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace DCI.Repositories
 {
@@ -28,12 +24,12 @@ namespace DCI.Repositories
 
 		public async Task<SectionViewModel> GetSectiontById(int sectionId)
 		{
-		
+
 			SectionViewModel model = new SectionViewModel();
 			try
-			{				
+			{
 				var departmentList = _dbContext.Department.AsQueryable().ToList();
-				
+
 				var context = _dbContext.Section.Where(x => x.IsActive == true && x.SectionId == sectionId);
 
 				var result = await context.Select(sec => new SectionViewModel
@@ -41,7 +37,7 @@ namespace DCI.Repositories
 					SectionId = sec.SectionId,
 					SectionCode = sec.SectionCode,
 					SectionName = sec.SectionName,
-					Description = sec.Description,					
+					Description = sec.Description,
 					CreatedBy = sec.CreatedBy,
 					DateCreated = sec.DateCreated,
 					DepartmentId = sec.DepartmentId,
@@ -53,12 +49,12 @@ namespace DCI.Repositories
 					SectionViewModel sec = new SectionViewModel();
 					sec.DepartmentList = departmentList.Count() > 0 ? departmentList : null;
 					return sec;
-				}				
+				}
 				return result;
 			}
 			catch (Exception ex)
 			{
-				Log.Error(ex.ToString());			
+				Log.Error(ex.ToString());
 			}
 			finally
 			{
@@ -66,15 +62,56 @@ namespace DCI.Repositories
 			}
 			return model;
 		}
+		public async Task<SectionViewModel> GetSectionByDepartmentId(SectionViewModel model)
+		{
+			SectionViewModel sectionmodel = new SectionViewModel();
+			
+			try
+			{
+				var sectionList =  _dbContext.Section.AsQueryable().ToList();
+				var context =  sectionList.Where(x => x.IsActive == true && x.DepartmentId == model.DepartmentId);
+
+				//var result = await context.Select(sec => new SectionViewModel
+				//{
+				//	SectionId = sec.SectionId,
+				//	SectionCode = sec.SectionCode,
+				//	SectionName = sec.SectionName,
+				//	Description = sec.Description,
+				//	CreatedBy = sec.CreatedBy,
+				//	DateCreated = sec.DateCreated,
+				//	DepartmentId = sec.DepartmentId,
+				//	DepartmentList = null,
+				//}).ToListAsync();
+
+				if (context.Count() == 0)
+				{
+					//SectionViewModel sec = new SectionViewModel();	
+					sectionmodel.SectionList = new List<Section>();//new SectionViewModel();
+					return sectionmodel;
+				}
+				sectionmodel.SectionList = context.ToList();
+				return sectionmodel;
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+			return sectionmodel;
+		}
 		public async Task<IList<SectionViewModel>> GetAllSection()
 		{
-		
+
 			var context = _dbContext.Section.AsQueryable().ToList();
 			var userList = _dbContext.User.AsQueryable().ToList();
-
+			var deptList = _dbContext.Department.AsQueryable().ToList();
 
 			var query = from sec in context
 						join user in userList on sec.CreatedBy equals user.UserId
+						join dept in deptList on sec.DepartmentId equals dept.DepartmentId
 						where sec.IsActive == true
 						select new SectionViewModel
 						{
@@ -85,6 +122,7 @@ namespace DCI.Repositories
 							CreatedName = user.Email,
 							CreatedBy = sec.CreatedBy,
 							DateCreated = sec.DateCreated,
+							DepartmentName = dept.DepartmentName,
 						};
 
 			return query.ToList();
@@ -107,7 +145,7 @@ namespace DCI.Repositories
 					entity.Description = model.Description;
 					entity.DepartmentId = model.DepartmentId;
 					entity.CreatedBy = model.CreatedBy;
-					entity.DateCreated = DateTime.Now;				
+					entity.DateCreated = DateTime.Now;
 					entity.ModifiedBy = null;
 					entity.DateModified = null;
 					entity.IsActive = true;

@@ -130,6 +130,6 @@ namespace DCI.Repositories
 			{
 				Log.CloseAndFlush();
 			}
-		}
+		}	
 	}
 }

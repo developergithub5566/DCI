@@ -4,12 +4,12 @@
 <style>
 	/* Hide the default file input */
 	/* 	#fileUpload {
-									display: none;
-								} */
+										display: none;
+									} */
 
 	/* Style the custom button */
 
-.custom-file-label {
+	.custom-file-label {
 		padding: 8px 16px;
 		background-color: #007bff;
 		color: white;
@@ -22,17 +22,16 @@
 		font-style: italic;
 	}
 
-
 </style>
 <div class="container-fluid">
 	<div class="d-sm-flex align-items-center justify-content-between mb-3">
 		<h6 class="m-0 font-weight-bold text-gray-800">Document</h6>
 		<div class="upperRightDivBtn">
-			<a href="#" class="btn btnPrimary btn-icon-split"  data-toggle="modal" data-target="#" onclick="newForm()">
+			<a href="#" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#" onclick="newForm()">
 				<span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
 				<span class="text text-white"><small>Add Document</small></span>
-			</a>	
-	
+			</a>
+
 		</div>
 
 	</div>
@@ -55,8 +54,8 @@
 				<table class="table table-bordered nowrap" id="tblDocument" width="100%" cellspacing="0">
 					<thead>
 						<tr>
-						@* 	<th>
-								<label>Id</label>
+							@* 	<th>
+							<label>Id</label>
 							</th> *@
 							<th>
 								<label>Document No</label>
@@ -83,8 +82,8 @@
 						{
 							<tr>
 								@* <td>
-									@item.DocId
-								</td> *@
+							@item.DocId
+							</td> *@
 								<td>
 									@item.DocNo
 								</td>
@@ -144,59 +143,72 @@
 										</select>
 									</div>
 									<div class="col">
-										<div class="col">
+								
 											<label for="DocCategory" class="col-form-label">Document Category:</label>
 											<select id="docCategorySelect" class="form-select">
 												<option value="0">select type</option>
 												<option value="1">Internal</option>
 												<option value="2">Internal/External</option>
 											</select>
-										</div>	
+									
 									</div>
 								</div>
 								<div class="row">
 									<div class="col">
 										<label for="Department" class="col-form-label">Department:</label>
-										<select id="departmentSelect" class="form-select">
-											<option value="">select department</option>									
+										<select id="departmentSelect" class="form-select" onchange="getSectionOnChange()">
+											<option value="">select department</option>
 										</select>
 									</div>
+									<div class="col">
+										<label for="Section" class="col-form-label">Section:</label>
+										<select id="sectionSelect" class="form-select">
+											<option value="">select section</option>
+										</select>
+									</div>
+								</div>
+								<div class="row">
 									<div class="col">
 										<label for="fileUpload" class="col-form-label">File Upload:</label>
 										<br id="nextline" />
 										<input type="file" class="form-control" id="fileUpload" name="fileUpload" />
 
 										<span class="file-name">No file chosen</span>
-
-
+				
 										<a asp-controller="Document" asp-action="ViewDocument" asp-route-id="0" id="viewFile" target="_blank" class="btn btn-primary" title="View">  <i class="fa fa-download"></i></a>
 										<a href="#" id="deleteFile" onclick="removefile()" class="btn btn-danger" title="remove"> <i class="far fa-trash-alt"></i></a>
 									</div>
-								</div>
-								<hr />
-								<div class="row">
-											<div class="col">
-										<label for="Reviewer" class="col-form-label">Reviewer:</label>
-												<select id="reviewerSelect" class="form-select">
-													<option value="">select reviewer</option>
-													<option value="0">User 1</option>
-													<option value="1">User 2</option>
-												</select>
-											</div>
 									<div class="col">
-										<label for="Approver" class="col-form-label">Approver:</label>
-										<select id="approverSelect" class="form-select">
-											<option value="">select approver</option>
-											<option value="0">User 1</option>
-											<option value="1">User 2</option>
+										<label for="RequestById" class="col-form-label">Request By:</label>
+										<select id="requestBySelect" class="form-select">
+											<option value="">select requestor</option>
 										</select>
 									</div>
-									</div>
-								<div class="row">
-									
-									<div class="col">
-									</div>
 								</div>
+								@* 	<hr />
+								<div class="row">
+								<div class="col">
+								<label for="Reviewer" class="col-form-label">Reviewer:</label>
+								<select id="reviewerSelect" class="form-select">
+								<option value="">select reviewer</option>
+								<option value="0">User 1</option>
+								<option value="1">User 2</option>
+								</select>
+								</div>
+								<div class="col">
+								<label for="Approver" class="col-form-label">Approver:</label>
+								<select id="approverSelect" class="form-select">
+								<option value="">select approver</option>
+								<option value="0">User 1</option>
+								<option value="1">User 2</option>
+								</select>
+								</div>
+								</div>
+								<div class="row">
+
+								<div class="col">
+								</div>
+								</div> *@
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -239,7 +251,6 @@
 						if (newrecord != 0) {
 							$('.file-name').text(fileName);
 						}
-
 					});
 
 					$('#createForm').submit(function (event) {
@@ -252,6 +263,8 @@
 						const doctypeId = $('#documentSelect').val();
 						const deptId = $('#departmentSelect').val();
 						const docCatId = $('#docCategorySelect').val();
+						const sectionId = $('#sectionSelect').val();
+						const requestById = $('#requestBySelect').val();
 
 						// var formData = $(this).serialize();
 						const formData = new FormData();
@@ -261,6 +274,8 @@
 						formData.append('DocTypeId', doctypeId);
 						formData.append('DepartmentId', deptId);
 						formData.append('DocCategory', docCatId);
+						formData.append('RequestById', requestById);
+						formData.append('SectionId', sectionId);
 						formData.append('DocFile', file);
 
 						bootbox.confirm('Are you sure you want to submit this record?', function (result) {
@@ -327,8 +342,21 @@
 									} else {
 										$select.append('<option value="' + item.value + '">' + item.text + '</option>');
 									}
-								});					
-								
+								});
+
+								var $select = $('#requestBySelect');
+								$select.empty();
+								$select.append('<option value="">select requestor</option>');
+
+								$.each(response.data.optionsRequestBy, function (index, item) {
+									if (item.value == response.data.requestBy) {
+										$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+									} else {
+										$select.append('<option value="' + item.value + '">' + item.text + '</option>');
+									}
+								});
+
+
 
 								document.querySelector('.file-name').textContent = '';
 								$('#fileUpload').show();
@@ -356,16 +384,16 @@
 						url: '@Url.Action("EditDocument", "Document")',
 						data: { DocId: id },
 						success: function (response) {
-							console.log(response.data);
+							//	console.log(response.data);
 							if (response.success) {
 								$('#DocId').val(response.data.docId);
 								$('#DocNo').val(response.data.docNo);
 								$('#DocName').val(response.data.docName);
 								$('#DocTypeId').val(response.data.docTypeId);
-								$('#docCategorySelect').val(response.data.docCategory)
-
-								// $('#departmentSelect').val(response.data.departmentId)
-								// $('#docCategorySelect').val(response.data.docCategory)
+								$('#docCategorySelect').val(response.data.docCategory)	
+								$('#sectionSelect').val(response.data.sectionId)
+								// $('#RequestById').val(response.data.requestById)
+								// $('#SectionId').val(response.data.sectionId)
 
 								var $select = $('#documentSelect');
 								$select.empty();
@@ -380,7 +408,7 @@
 
 								var $select = $('#departmentSelect');
 								$select.empty();
-								$select.append('<option value="">Select type</option>');
+								$select.append('<option value="">Select department</option>');
 								$.each(response.data.optionsDepartment, function (index, item) {
 									if (item.value == response.data.departmentId) {
 										$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
@@ -389,29 +417,67 @@
 									}
 								});
 
-							
-							
-								
+								var $select = $('#sectionSelect');
+								$select.empty();
+								$select.append('<option value="">Select section</option>');
+								$.each(response.data.optionsSection, function (index, item) {
+									if (item.value == response.data.sectionId) {
+										$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+									} else {
+										$select.append('<option value="' + item.value + '">' + item.text + '</option>');
+									}
+								});
+
+
+								var $select = $('#requestBySelect');
+								$select.empty();
+								$select.append('<option value="">Select requestor</option>');
+
+								$.each(response.data.optionsRequestBy, function (index, item) {
+									if (item.value == response.data.requestById) {
+										$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+									} else {
+										$select.append('<option value="' + item.value + '">' + item.text + '</option>');
+									}
+								});
+
 
 								var linkElement = document.getElementById("viewFile");
 								linkElement.setAttribute('href', '/Document/ViewDocument?DocId=' + response.data.docId);
 
-								document.querySelector('.file-name').textContent = response.data.filename;
-								$('#fileUpload').hide();
-								$('#viewFile').show();
+								document.querySelector('.file-name').textContent = response.data.filename;																				
 
 
 								if (view == 1) {	//VIEW button
 									$('#DocName').prop('disabled', true);
 									$('#documentSelect').prop('disabled', true);
-									$('#fileUpload').prop('disabled', true);
+									$('#docCategorySelect').prop('disabled', true);
+									$('#departmentSelect').prop('disabled', true);
+									$('#sectionSelect').prop('disabled', true);
+									$('#sectionSelect').prop('disabled', true);
+									$('#requestBySelect').prop('disabled', true);
 									$('#deleteFile').hide();
 								}
 								else {  //Edit button
 									$('#DocName').prop('disabled', false);
 									$('#documentSelect').prop('disabled', false);
+									$('#docCategorySelect').prop('disabled', false);
+									$('#departmentSelect').prop('disabled', false);
+									$('#sectionSelect').prop('disabled', false);
+									$('#sectionSelect').prop('disabled', false);
+									$('#requestBySelect').prop('disabled', false);
 									$('#fileUpload').prop('disabled', false);
 									$('#deleteFile').show();
+								}
+
+
+								if (response.data.filename != '') { //if file exist
+									$('#fileUpload').hide();
+									$('#viewFile').show();
+								} else {
+									$('#fileUpload').show();
+									$('#viewFile').hide();
+									$('#deleteFile').hide();
 								}
 
 								js('#createmodal').modal('show');
@@ -461,6 +527,38 @@
 							// 	var fileName = this.files[0] ? this.files[0].name : 'No file chosen';
 							// 	$('.file-name').text(fileName);
 							// });
+						}
+					});
+				}
+
+				function getSectionOnChange() {
+					let deptId = document.getElementById("departmentSelect").value;
+
+					$.ajax({
+						type: 'POST',
+						url: '@Url.Action("GetSectionByDepartmentId", "Maintenance")',
+						data: { DepartmentId: deptId },
+						success: function (response) {
+							if (response.success) {
+								console.log(response.data);
+
+								var $select = $('#sectionSelect');
+								$select.empty();
+								$select.append('<option value="">Select type</option>');
+								$.each(response.data.optionsSection, function (index, item) {
+									if (item.value == response.data.sectionId) {
+										$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+									} else {
+										$select.append('<option value="' + item.value + '">' + item.text + '</option>');
+									}
+								});
+
+							} else {
+								bootbox.alert(response.message);
+							}
+						},
+						error: function () {
+							bootbox.alert('An error occurred. Please try again.');
 						}
 					});
 				}

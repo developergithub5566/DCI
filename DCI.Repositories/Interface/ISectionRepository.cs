@@ -10,5 +10,6 @@ namespace DCI.Repositories.Interface
 		Task<SectionViewModel> GetSectiontById(int sectionId);
 		Task<IList<SectionViewModel>> GetAllSection();
 		Task<bool> IsExistsSection(int sectionId);
+		Task<SectionViewModel> GetSectionByDepartmentId(SectionViewModel model);
 	}
 }

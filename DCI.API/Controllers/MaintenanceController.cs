@@ -380,6 +380,13 @@ namespace DCI.API.Controllers
 		}
 
 		[HttpPost]
+		[Route("GetSectionByDepartmentId")]
+		public async Task<IActionResult> GetSectionByDepartmentId(SectionViewModel model)
+		{			
+			return Ok(await _sectionRepository.GetSectionByDepartmentId(model));
+		}
+
+		[HttpPost]
 		[Route("SaveSection")]
 		public async Task<IActionResult> SaveSection([FromBody] SectionViewModel model)
 		{

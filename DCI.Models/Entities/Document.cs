@@ -21,6 +21,8 @@ namespace DCI.Models.Entities
 		public int StatusId { get; set; } = 0;
 		public int Reviewer { get; set; } = 0;
 		public int Approver { get; set; } = 0;
+		public int? RequestById { get; set; } = 0;
+		public int? SectionId { get; set; } = 0;
 		public int DepartmentId { get; set; } = 0;
 		public int? DocCategory { get; set; } = 0;
 		public string? UploadLink { get; set; } = string.Empty;

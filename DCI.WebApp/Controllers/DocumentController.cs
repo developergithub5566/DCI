@@ -73,6 +73,20 @@ namespace DCI.WebApp.Controllers
 										   Text = x.DepartmentName
 									   }).ToList();
 
+					vm.OptionsSection = vm.SectionList.Select(x =>
+									   new SelectListItem
+									   {
+										   Value = x.SectionId.ToString(),
+										   Text = x.SectionName
+									   }).ToList();
+
+					vm.OptionsRequestBy = vm.UserList.Select(x =>
+					   new SelectListItem
+					   {
+						   Value = x.UserId.ToString(),
+						   Text = x.Lastname + ", " + x.Firstname
+					   }).ToList();
+
 					if (response.IsSuccessStatusCode)
 					{
 						return Json(new { success = true, data = vm });
@@ -114,11 +128,12 @@ namespace DCI.WebApp.Controllers
 
 					data.Add(new StringContent(model.DepartmentId.ToString() ?? ""), "DepartmentId");
 					data.Add(new StringContent(model.DocCategory.ToString() ?? ""), "DocCategory");
-					data.Add(new StringContent(model.Section.ToString() ?? ""), "Section");
+					//data.Add(new StringContent(model.Section.ToString() ?? ""), "Section");
 					data.Add(new StringContent(model.StatusId.ToString() ?? ""), "StatusId");
 					data.Add(new StringContent(model.Reviewer.ToString() ?? ""), "Reviewer");
 					data.Add(new StringContent(model.Approver.ToString() ?? ""), "Approver");
-
+					data.Add(new StringContent(model.RequestById.ToString() ?? ""), "RequestById");
+					data.Add(new StringContent(model.SectionId.ToString() ?? ""), "SectionId");
 
 					data.Add(new StringContent(model.CreatedName.ToString() ?? ""), "CreatedName");
 					data.Add(new StringContent(model.DateCreated.ToString() ?? ""), "DateCreated");
@@ -274,13 +289,12 @@ namespace DCI.WebApp.Controllers
 			{
 				using (var _httpclient = new HttpClient())
 				{
-					
-
-
-					//_httpclient.BaseAddress = new Uri(_apiconfig.Value.apiConnection + "api/Document/UploadFile");
+										
 
 					var data = new MultipartFormDataContent();
-					data.Add(new StringContent(model.DocId.ToString() ?? ""), "DocId");					
+					data.Add(new StringContent(model.DocId.ToString() ?? ""), "DocId");
+					data.Add(new StringContent(model.RequestById.ToString() ?? ""), "ModifiedBy");
+					data.Add(new StringContent(DateTime.Now.ToString() ?? ""), "DateModified");
 
 					if (model.DocFile != null)
 					{

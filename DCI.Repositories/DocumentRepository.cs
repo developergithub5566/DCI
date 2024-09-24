@@ -17,6 +17,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using System.Data;
+using DCI.Core.Helpers;
 
 namespace DCI.Repositories
 {
@@ -75,11 +76,14 @@ namespace DCI.Repositories
 				//DocumentViewModel usermodel = new DocumentViewModel();
 
 				var context = _dbContext.Document.AsQueryable();
-				var doctypeList = _dbContext.DocumentType.AsQueryable().ToList();
-				var departmentList = _dbContext.Department.AsQueryable().ToList();
+				var doctypeList = _dbContext.DocumentType.Where(x => x.IsActive == true).AsQueryable().ToList();
+				var departmentList = _dbContext.Department.Where(x => x.IsActive == true).AsQueryable().ToList();
+				var sectionList = _dbContext.Section.Where(x => x.IsActive == true).AsQueryable().ToList();
+				var userList = _dbContext.User.Where(x => x.IsActive == true).AsQueryable().ToList();
 
 				var query = from doc in context
-							where doc.DocId == docId
+							where doc.DocId == docId &&
+							doc.IsActive == true
 							select new DocumentViewModel
 							{
 								DocId = doc.DocId,
@@ -96,6 +100,9 @@ namespace DCI.Repositories
 								Approver = doc.Approver,
 								DepartmentId = doc.DepartmentId,
 								DocCategory = doc.DocCategory,
+								RequestById = doc.RequestById,
+								SectionId = doc.SectionId,
+
 							};
 
 				var result = query.FirstOrDefault();
@@ -106,6 +113,8 @@ namespace DCI.Repositories
 				}
 				result.DocumentTypeList = doctypeList.Count() > 0 ? doctypeList : null;
 				result.DepartmentList = departmentList.Count() > 0 ? departmentList : null;
+				result.SectionList = sectionList.Count() > 0 ? sectionList : null;
+				result.UserList = userList.Count() > 0 ? userList : null;
 				result.DocumentList = null;
 				return result;
 			}
@@ -138,16 +147,21 @@ namespace DCI.Repositories
 					entity.DocTypeId = model.DocTypeId;
 					entity.DocCategory = model.DocCategory;
 					entity.DepartmentId = model.DepartmentId;
+					entity.SectionId = model.SectionId;
 					entity.Version = model.Version;
 					entity.Filename = model.DocFile != null ? model.DocFile.FileName : string.Empty;
 					entity.CreatedBy = model.CreatedBy;
 					entity.DateCreated = DateTime.Now;
+					entity.UploadLink = TokenGeneratorHelper.GetToken();
 					entity.ModifiedBy = null;
 					entity.DateModified = null;
 					entity.IsActive = true;
+					entity.RequestById = model.RequestById;
 					await _dbContext.Document.AddAsync(entity);
 					await _dbContext.SaveChangesAsync();
 					model.DocId = entity.DocId;
+					model.DocNo = entity.DocNo;
+					model.UploadLink = entity.UploadLink;
 
 					if (model.DocFile != null)
 					{
@@ -155,7 +169,7 @@ namespace DCI.Repositories
 					}
 					else
 					{
-						await _emailRepository.SendUploadFile("email", entity.DocNo);
+						await _emailRepository.SendUploadFile(model);
 					}
 					return (StatusCodes.Status200OK, String.Format("Document {0} has been created successfully.", entity.DocNo));
 				}
@@ -168,6 +182,8 @@ namespace DCI.Repositories
 					entity.DocTypeId = model.DocTypeId;
 					entity.DocCategory = model.DocCategory;
 					entity.DepartmentId = model.DepartmentId;
+					entity.SectionId = model.SectionId;
+					entity.RequestById = model.RequestById;
 					entity.Version = model.Version;
 					entity.Filename = model.DocFile != null ? model.DocFile.FileName : entity.Filename;
 					entity.DateCreated = entity.DateCreated;
@@ -185,7 +201,7 @@ namespace DCI.Repositories
 					{
 						await SaveFile(model);
 					}
-					return (StatusCodes.Status200OK, "Successfully updated");
+					return (StatusCodes.Status200OK, String.Format("Document {0} has been updated successfully.", entity.DocNo));
 				}
 			}
 			catch (Exception ex)
@@ -241,9 +257,12 @@ namespace DCI.Repositories
 				{
 					model.DocFile.CopyTo(stream);
 				}
+
 				var entity = await _dbContext.Document.FirstOrDefaultAsync(x => x.DocId == model.DocId && x.IsActive == true);
 				entity.FileLocation = fileloc;
 				entity.Filename = model.DocFile.FileName;
+				entity.ModifiedBy = model.ModifiedBy != null ? model.ModifiedBy : null;
+				entity.DateModified = model.DateModified != null ? model.DateModified : null;
 				_dbContext.Document.Entry(entity).State = EntityState.Modified;
 				await _dbContext.SaveChangesAsync();
 			}
@@ -263,14 +282,24 @@ namespace DCI.Repositories
 			//DCI.MOA.001.000
 			//string strFormat = String.Format("Hello {0}", param.DocName);
 			//string setA = String.Format("{0:D3}", totalrecords.ToString());
-
 			try
 			{
+				var _docContext = await _dbContext.Document
+												.Where(x => x.DepartmentId == param.DepartmentId && x.SectionId == param.SectionId && x.IsActive == true)
+												.AsQueryable()
+												.ToListAsync();
 
+				var _deptContext = await _dbContext.Department
+												.AsQueryable()
+												.FirstOrDefaultAsync(x => x.DepartmentId == param.DepartmentId && x.IsActive == true);
 
-				var _docContext = await _dbContext.Document.AsQueryable().ToListAsync();
-				var _deptContext = await _dbContext.Department.AsQueryable().FirstOrDefaultAsync(x => x.DepartmentId == param.DepartmentId);
-				var _docTypeContext = _dbContext.DocumentType.AsQueryable().FirstOrDefaultAsync(x => x.DocTypeId == param.DocTypeId);
+				var _docTypeContext = await _dbContext.DocumentType
+												.AsQueryable()
+												.FirstOrDefaultAsync(x => x.DocTypeId == param.DocTypeId && x.IsActive == true);
+
+				var _section = await _dbContext.Section
+												.AsQueryable()
+												.FirstOrDefaultAsync(x => x.DepartmentId == param.DepartmentId && x.IsActive == true);
 
 				int totalrecords = _docContext.Count() + 1;
 				string version = "0.0";
@@ -279,16 +308,16 @@ namespace DCI.Repositories
 				if (param.DocCategory == (int)EnumDocumentCategory.Internal)
 				{
 					string deptcode = _deptContext?.DepartmentCode?.Trim() ?? string.Empty;
-					string section = deptcode == EnumCategoryCode.TID.ToString() ? EnumSectionCode.PM.ToString() : EnumSectionCode.HR.ToString();
+					string section = _section?.SectionCode?.Trim() ?? string.Empty;
 
-					return $"{deptcode}.{section}.{finalSetRecords} Ver.{version}"; //	string code= deptcode + DOT + section + DOT + setNoFirst + DOT + setNoSecond + "Ver." + version;
+					return $"{deptcode}.{section}.{finalSetRecords} Ver.{version}";
 				}
 				else if (param.DocCategory == (int)EnumDocumentCategory.BothInExternal)
 				{
 					string compcode = Constants.CompanyCode;
-					string doctype = _docTypeContext?.Result?.Name ?? string.Empty;
+					string doctype = _docTypeContext.Name ?? string.Empty;
 
-					return $"{compcode}.{doctype}.{finalSetRecords} Ver.{version}"; //string code = compcode + DOT + doctype + DOT + setNoFirst + DOT + setNoSecond + "Ver." + version;
+					return $"{compcode}.{doctype}.{finalSetRecords} Ver.{version}";
 				}
 
 			}
@@ -332,17 +361,18 @@ namespace DCI.Repositories
 						DocId = doc.DocId,
 						DocName = doc.DocName,
 						DocNo = doc.DocNo,
-						Version = doc.Version,
-						Filename = doc.Filename,
-						FileLocation = doc.FileLocation,
-						DocTypeId = doc.DocTypeId,
-						DocumentTypeList = null,
-						DocTypeName = string.Empty,
-						StatusId = doc.StatusId,
-						Reviewer = doc.Reviewer,
-						Approver = doc.Approver,
-						DepartmentId = doc.DepartmentId,
-						DocCategory = doc.DocCategory
+						RequestById = doc.RequestById
+						//Version = doc.Version,
+						//Filename = doc.Filename,
+						//FileLocation = doc.FileLocation,
+						//DocTypeId = doc.DocTypeId,
+						//DocumentTypeList = null,
+						//DocTypeName = string.Empty,
+						//StatusId = doc.StatusId,
+						//Reviewer = doc.Reviewer,
+						//Approver = doc.Approver,
+						//DepartmentId = doc.DepartmentId,
+						//DocCategory = doc.DocCategory
 					}).FirstAsync();
 				}
 				else
@@ -364,6 +394,26 @@ namespace DCI.Repositories
 		{
 			await SaveFile(model);
 			return (StatusCodes.Status200OK, "Successfully");
+		}
+		public async Task<IList<HomePageViewModel>> HomePage()
+		{
+			var doctypeList = _dbContext.DocumentType.Where(x => x.IsActive == true);
+			var docContext = _dbContext.Document.Where(x => x.IsActive == true);
+
+			var result = await doctypeList
+			   .GroupJoin(
+				   docContext, // join with documents
+				   doctype => doctype.DocTypeId, // key from DocumentType
+				   doc => doc.DocTypeId, // key from Document
+				   (doctype, docs) => new HomePageViewModel
+				   {
+					   DocumentType = doctype.Name,
+					   TotalCount = docs.Count() // count the associated documents or 0 if no documents exist
+				   }
+			   )
+			   .ToListAsync();
+
+			return result;
 		}
 	}
 }

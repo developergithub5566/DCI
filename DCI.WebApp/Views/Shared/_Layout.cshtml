@@ -32,15 +32,21 @@
 	@{
 		var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
 		var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+
+		var accountActions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+		{
+		"Login",
+		"ForgotPassword",
+		"VerifyToken",
+		"ChangePassword",
+	"Upload"
+		};
+
+		bool isNonAccountAction = !accountActions.Contains(currentAction);
+		bool isNonAccountController = !string.Equals(currentController, "Account", StringComparison.OrdinalIgnoreCase);
 	}
 
-	@if (
-			(!string.Equals(currentAction, "Login", StringComparison.OrdinalIgnoreCase)) &&
-			(!string.Equals(currentAction, "ForgotPassword", StringComparison.OrdinalIgnoreCase)) &&
-			(!string.Equals(currentAction, "VerifyToken", StringComparison.OrdinalIgnoreCase)) &&
-			(!string.Equals(currentAction, "ChangePassword", StringComparison.OrdinalIgnoreCase)) ||
-			(!string.Equals(currentController, "Account", StringComparison.OrdinalIgnoreCase))
-			)
+	@if (isNonAccountAction && isNonAccountController)
 	{
 		<div id="wrapper">
 			<ul class="navbar-nav bgGradientPrimary sidebar sidebar-dark accordion" id="accordionSidebar">
@@ -83,10 +89,10 @@
 				<!-- Divider -->
 				<hr class="sidebar-divider">
 
-				<!-- Sidebar Toggler (Sidebar) -->
+		@* 		<!-- Sidebar Toggler (Sidebar) -->
 				<div class="text-center d-none d-md-inline mt20">
 					<button class="rounded-circle border-0" id="sidebarToggle"></button>
-				</div>
+				</div> *@
 			</ul>
 			<!-- Content Wrapper -->
 			<div id="content-wrapper" class="d-flex flex-column">
@@ -147,11 +153,16 @@
 
 								<!-- Dropdown - User Information -->
 								<div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-									<a class="dropdown-item" href="http://202.57.47.34/DCI-ESS-STG/account/profile/">
+								@* 	<a class="dropdown-item" href="http://202.57.47.34/DCI-ESS-STG/account/profile/">
+										<i class="fa fa-user-cog fa-sm fa-fw mr-2 text-gray-800"></i>
+										Profile
+									</a> *@
+									<a asp-controller="Home" asp-action="Profile" class="dropdown-item">
+										@* // asp-route-id="-1" *@
 										<i class="fa fa-user-cog fa-sm fa-fw mr-2 text-gray-800"></i>
 										Profile
 									</a>
-							@* 		<a class="dropdown-item" href="http://202.57.47.34/DCI-ESS-STG/account/activity-log/"> *@
+									@* 		<a class="dropdown-item" href="http://202.57.47.34/DCI-ESS-STG/account/activity-log/"> *@
 									<a asp-controller="Maintenance" asp-action="ActivityLog" asp-route-id="-1" class="dropdown-item">
 										<i class="fas fa-list fa-sm fa-fw mr-2 text-gray-800"></i>
 										Activity Log
@@ -234,11 +245,7 @@
 
 	}
 	@RenderBody()
-	@if (!string.Equals(currentAction, "Login", StringComparison.OrdinalIgnoreCase) &&
-			(!string.Equals(currentAction, "ForgotPassword", StringComparison.OrdinalIgnoreCase)) &&
-			(!string.Equals(currentAction, "VerifyToken", StringComparison.OrdinalIgnoreCase)) &&
-			(!string.Equals(currentAction, "ChangePassword", StringComparison.OrdinalIgnoreCase)) ||
-			!string.Equals(currentController, "Account", StringComparison.OrdinalIgnoreCase))
+	@if (isNonAccountAction && isNonAccountController)
 	{
 		<footer class="border-top footer text-muted">
 			<div class="container">

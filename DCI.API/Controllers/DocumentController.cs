@@ -82,5 +82,12 @@ namespace DCI.API.Controllers
 			var result = await _documentRepository.UploadFile(model);
 			return StatusCode(result.statuscode, result.message);
 		}
+
+		[HttpGet]
+		[Route("HomePage")]
+		public async Task<IActionResult> HomePage()
+		{			
+			return Ok(await _documentRepository.HomePage());
+		}
 	}
 }

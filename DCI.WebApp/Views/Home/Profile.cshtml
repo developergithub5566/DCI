@@ -1,0 +1,49 @@
+﻿@model DCI.Models.Configuration.UserManager
+
+<div class="card shadow">
+	<div class="card-header py-3">
+		<h5 class="text-gray-800 mb0"></h5>
+	</div>
+	<div class="card-body">
+		<div class="cardTitle">
+			<label>My Profile</label>
+			<p>Manage and protect your account</p>
+		</div>
+		<form id="frmUpdateProfile" method="POST">
+			<div class="form-group">
+				<label class="frmText">Email Address:</label>
+				<input type="text" class="form-control frmField" name="EMAIL_ADDRESS" value="@Model.Email" readonly>
+				<!--<a href="http://202.57.47.34/DCI-ESS-STG/account/profile/change-email" class="btnChangeEmail">Change Email Address?</a>-->
+			</div>
+
+			<div class="form-group">
+
+
+				<label class="frmText">First Name:</label>
+				<input type="text" class="form-control frmField" name="FIRSTNAME" value="@Model.Firstname">
+			</div>
+
+			<div class="form-group">
+				<label class="frmText">Middle Name:</label>
+				<input type="text" class="form-control frmField" name="MIDDLENAME" value="">
+			</div>
+
+			<div class="form-group">
+				<label class="frmText">Last Name:</label>
+				<input type="text" class="form-control frmField" name="LASTNAME" value="@Model.Lastname">
+			</div>
+
+			<div class="form-group">
+				<label class="frmText">Gender:</label>
+				<select class="form-control frmField" name="GENDER">
+					<option value="MALE" selected>Male</option>
+					<option value="FEMALE">Female</option>
+				</select>
+			</div>
+			<div class="form-group mt30">
+				<button type="button" class="btn btnPrimary pr30 pl30 pt10 pb10" onclick="validateProfile()"><small>Update</small></button>
+			@* 	<a href="~/Home/" class="btn btnSecondary pr30 pl30 pt10 pb10"><small>Back</small></a> *@
+				<a asp-controller="Home" asp-action="Index" class="btn btnSecondary pr30 pl30 pt10 pb10"><small>Back</small></a>
+			</div>
+		</form>
+	</div>
