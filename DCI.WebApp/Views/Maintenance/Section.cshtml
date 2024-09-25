@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<DCI.Models.ViewModel.SectionViewModel>
 
-<link href="~/css/dcicustom.css" rel="stylesheet" /> 
+<link href="~/css/dcicustom.css" rel="stylesheet" />
 
 <div class="container-fluid">
 	<div class="d-sm-flex align-items-center justify-content-between mb-3">
@@ -32,7 +32,7 @@
 					<thead>
 						<tr>
 							@* <th>
-								<label>Id</label>
+							<label>Id</label>
 							</th> *@
 							<th>
 								<label>Section Code</label>
@@ -62,8 +62,8 @@
 						{
 							<tr>
 								@* <td>
-									@item.SectionId
-								</td> *@
+							@item.SectionId
+							</td> *@
 								<td>
 									@item.SectionCode
 								</td>
@@ -84,8 +84,8 @@
 								</td>
 
 								<td>
-									<a href="#" class="btn btn-primary"><i class="fas fa-search"></i></a> |
-									<a href="#" id="editForm" onclick="editForm(@item.SectionId)" class="btn btn-info"><i class="fa fa-edit"></i></a> |
+									<a href="#" onclick="editForm(@item.SectionId,1)" class="btn btn-primary"><i class="fas fa-search"></i></a> |
+									<a href="#" id="editForm" onclick="editForm(@item.SectionId,0)" class="btn btn-info"><i class="fa fa-edit"></i></a> |
 									<a href="#" id="deleteform" class="btn btn-danger" onclick="deleteform(@item.SectionId)"><i class="far fa-trash-alt"></i></a>
 								</td>
 							</tr>
@@ -100,31 +100,31 @@
 				<div class="modal-dialog" role="document">
 					<div class="modal-content">
 						<div class="modal-header">
-							<h5 class="modal-title" id="exampleModalLabel">New Section</h5>
-							@* 			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-							</button> *@
+							<h5 class="modal-title" id="exampleModalLabel">Section</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
 						</div>
 						<form id="createForm">
 							<div class="modal-body">
 								<input type="hidden" id="SectionId" name="SectionId" value="0">
 
 								<div class="form-group">
-									<label for="Department" class="col-form-label">Department:</label>
-									<input type="hidden" id="DepartmentId" name="DepartmentId" value="0">
-									<select id="departmentSelect" class="form-select">
+									<label for="Department" class="col-form-label required">Department:</label>
+									<input type="hidden" id="DepartmentId" name="DepartmentId" value="0" required>
+									<select id="departmentSelect" class="form-select" required>
 										<option value="">select department</option>
 									</select>
 								</div>
 
 
 								<div class="form-group">
-									<label for="SectionCode" class="col-form-label">Section Code:</label>
-									<input type="text" class="form-control" id="SectionCode" name="SectionCode" maxlength="3">
+									<label for="SectionCode" class="col-form-label required">Section Code:</label>
+									<input type="text" class="form-control" id="SectionCode" name="SectionCode" maxlength="3" onkeypress="return alphaNumericOnly(event);" required>
 								</div>
 								<div class="form-group">
-									<label for="Section" class="col-form-label">Section:</label>
-									<input type="text" class="form-control" id="SectionName" name="SectionName" maxlength="25">
+									<label for="Section" class="col-form-label required">Section:</label>
+									<input type="text" class="form-control" id="SectionName" name="SectionName" maxlength="25" onkeypress="return alphaNumericOnly(event);" required>
 								</div>
 								<div class="form-group">
 									<label for="Description" class="col-form-label">Description:</label>
@@ -133,7 +133,7 @@
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-								<button type="submit" class="btn btn-primary">Save</button>
+								<button type="submit" class="btn btn-primary" id="btnSave">Save</button>
 							</div>
 						</form>
 
@@ -156,12 +156,12 @@
 
 						$('#createForm').submit(function (event) {
 							event.preventDefault();
-							
+
 							document.getElementById("DepartmentId").value = $('#departmentSelect').val();
 							var formData = $(this).serialize();
 							console.log(formData);
 							bootbox.confirm('Are you sure you want to submit this record?', function (result) {
-								if (result) {			
+								if (result) {
 									$.ajax({
 										type: 'POST',
 										url: '@Url.Action("SaveSection", "Maintenance")',
@@ -191,7 +191,7 @@
 						$.ajax({
 							type: 'POST',
 							url: '@Url.Action("EditSection", "Maintenance")',
-							success: function (response) {						
+							success: function (response) {
 								if (response.success) {
 									$('#SectionId').val("0");
 									$('#SectionCode').val("");
@@ -209,6 +209,8 @@
 											$select.append('<option value="' + item.value + '">' + item.text + '</option>');
 										}
 									});
+									$('#btnSave').show();
+									$('#createForm').find('input, select, textarea').prop('disabled', false);
 
 									js('#createmodal').modal('show');
 								} else {
@@ -221,7 +223,7 @@
 						});
 					}
 
-					function editForm(id) {
+					function editForm(id, view) {
 						$.ajax({
 							type: 'POST',
 							url: '@Url.Action("EditSection", "Maintenance")',
@@ -244,6 +246,15 @@
 											$select.append('<option value="' + item.value + '">' + item.text + '</option>');
 										}
 									});
+
+									if (view == 1) {	//View button
+										$('#createForm').find('input, select, textarea').prop('disabled', true);
+										$('#btnSave').hide();
+									}
+									else {  //Edit button
+										$('#createForm').find('input, select, textarea').prop('disabled', false);
+										$('#btnSave').show();
+									}
 
 									js('#createmodal').modal('show');
 								} else {

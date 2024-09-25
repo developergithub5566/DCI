@@ -4,8 +4,8 @@
 <style>
 	/* Hide the default file input */
 	/* 	#fileUpload {
-										display: none;
-									} */
+											display: none;
+										} */
 
 	/* Style the custom button */
 
@@ -117,10 +117,10 @@
 				<div class="modal-dialog modal-lg" role="document">
 					<div class="modal-content">
 						<div class="modal-header">
-							<h5 class="modal-title" id="exampleModalLabel">New Document</h5>
-							@* 			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-							</button> *@
+							<h5 class="modal-title" id="exampleModalLabel">Document</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
 						</div>
 						<form id="createForm">
 							<div class="modal-body">
@@ -143,14 +143,14 @@
 										</select>
 									</div>
 									<div class="col">
-								
-											<label for="DocCategory" class="col-form-label">Document Category:</label>
-											<select id="docCategorySelect" class="form-select">
-												<option value="0">select type</option>
-												<option value="1">Internal</option>
-												<option value="2">Internal/External</option>
-											</select>
-									
+
+										<label for="DocCategory" class="col-form-label">Document Category:</label>
+										<select id="docCategorySelect" class="form-select">
+											<option value="0">select type</option>
+											<option value="1">Internal</option>
+											<option value="2">Internal/External</option>
+										</select>
+
 									</div>
 								</div>
 								<div class="row">
@@ -174,7 +174,7 @@
 										<input type="file" class="form-control" id="fileUpload" name="fileUpload" />
 
 										<span class="file-name">No file chosen</span>
-				
+
 										<a asp-controller="Document" asp-action="ViewDocument" asp-route-id="0" id="viewFile" target="_blank" class="btn btn-primary" title="View">  <i class="fa fa-download"></i></a>
 										<a href="#" id="deleteFile" onclick="removefile()" class="btn btn-danger" title="remove"> <i class="far fa-trash-alt"></i></a>
 									</div>
@@ -212,25 +212,19 @@
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-								<button type="submit" class="btn btn-primary">Submit</button>
+								<button type="submit" class="btn btn-primary" id="btnSubmit">Submit</button>
 							</div>
 						</form>
 
 					</div>
 				</div>
 			</div>
-
-
-
-
 		</div>
 
 
 		@section scripts {
 			<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
 			<script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
-
-
 
 			<script src="~/js/file-upload.js"></script>
 
@@ -315,9 +309,12 @@
 						success: function (response) {
 							console.log(response.data);
 							if (response.success) {
-								$('#DocId').val("0");
+								$('#DocId').val("0"); 
 								$('#DocNo').val("");
 								$('#DocName').val("");
+								$('#docCategorySelect').val(0);
+								$('#sectionSelect').val(0);
+								$('#RequestById').val(0);
 								$('#DocTypeId').val(0);
 
 								var $select = $('#documentSelect');
@@ -362,9 +359,8 @@
 								$('#fileUpload').show();
 								$('#viewFile').hide();
 								$('#deleteFile').hide();
-
-								$('#DocName').prop('disabled', false);
-								$('#documentSelect').prop('disabled', false);
+								$('#btnSubmit').show();
+								$('#createForm').find('input, select, textarea').prop('disabled', false);;
 								$('#fileUpload').prop('disabled', false);
 								js('#createmodal').modal('show');
 							} else {
@@ -390,7 +386,7 @@
 								$('#DocNo').val(response.data.docNo);
 								$('#DocName').val(response.data.docName);
 								$('#DocTypeId').val(response.data.docTypeId);
-								$('#docCategorySelect').val(response.data.docCategory)	
+								$('#docCategorySelect').val(response.data.docCategory)
 								$('#sectionSelect').val(response.data.sectionId)
 								// $('#RequestById').val(response.data.requestById)
 								// $('#SectionId').val(response.data.sectionId)
@@ -445,28 +441,20 @@
 								var linkElement = document.getElementById("viewFile");
 								linkElement.setAttribute('href', '/Document/ViewDocument?DocId=' + response.data.docId);
 
-								document.querySelector('.file-name').textContent = response.data.filename;																				
+								document.querySelector('.file-name').textContent = response.data.filename;
 
 
-								if (view == 1) {	//VIEW button
-									$('#DocName').prop('disabled', true);
-									$('#documentSelect').prop('disabled', true);
-									$('#docCategorySelect').prop('disabled', true);
-									$('#departmentSelect').prop('disabled', true);
-									$('#sectionSelect').prop('disabled', true);
-									$('#sectionSelect').prop('disabled', true);
-									$('#requestBySelect').prop('disabled', true);
+								if (view == 1) {	//View button
+
+									$('#createForm').find('input, select, textarea').prop('disabled', true);
+									js('#createmodal').modal('show');
+									$('#btnSubmit').hide();
 									$('#deleteFile').hide();
 								}
 								else {  //Edit button
-									$('#DocName').prop('disabled', false);
-									$('#documentSelect').prop('disabled', false);
-									$('#docCategorySelect').prop('disabled', false);
-									$('#departmentSelect').prop('disabled', false);
-									$('#sectionSelect').prop('disabled', false);
-									$('#sectionSelect').prop('disabled', false);
-									$('#requestBySelect').prop('disabled', false);
+									$('#createForm').find('input, select, textarea').prop('disabled', false);;
 									$('#fileUpload').prop('disabled', false);
+									$('#btnSubmit').show();
 									$('#deleteFile').show();
 								}
 

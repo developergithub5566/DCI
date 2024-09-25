@@ -6,7 +6,7 @@
 	<div class="d-sm-flex align-items-center justify-content-between mb-3">
 		<h6 class="m-0 font-weight-bold text-gray-800">Administration</h6>
 		<div class="upperRightDivBtn">
-			<a href="#" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#createmodal">
+			<a href="#" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#" onclick="newForm()">
 				<span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
 				<span class="text text-white"><small>Add Document Type</small></span>
 			</a>
@@ -42,7 +42,7 @@
 							<th>
 								<label>Description</label>
 							</th>
-						
+
 							<th>
 								<label>Date Created</label>
 							</th>
@@ -75,8 +75,8 @@
 								</td>
 
 								<td>
-									<a href="#" class="btn btn-primary"><i class="fas fa-search"></i></a> |
-									<a href="#" id="editForm" onclick="editForm(@item.DocTypeId)" class="btn btn-info"><i class="fa fa-edit"></i></a> |
+									<a href="#" onclick="editForm(@item.DocTypeId,1)" class="btn btn-primary"><i class="fas fa-search"></i></a> |
+									<a href="#" id="editForm" onclick="editForm(@item.DocTypeId,0)" class="btn btn-info"><i class="fa fa-edit"></i></a> |
 									<a href="#" id="deleteform" class="btn btn-danger" onclick="deleteform(@item.DocTypeId)"><i class="far fa-trash-alt"></i></a>
 								</td>
 							</tr>
@@ -91,27 +91,27 @@
 				<div class="modal-dialog" role="document">
 					<div class="modal-content">
 						<div class="modal-header">
-							<h5 class="modal-title" id="exampleModalLabel">New Document Type</h5>
-							@* 			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-							</button> *@
+							<h5 class="modal-title" id="exampleModalLabel">Document Type</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
 						</div>
 						<form id="createForm">
 							<div class="modal-body">
 								<input type="hidden" id="DocTypeId" name="DocTypeId" value="0">
 								<div class="form-group">
-									<label for="DocumentType" class="col-form-label">Document Type:</label>
-									<input type="text" class="form-control" id="Name" name="Name" maxlength="25">
+									<label for="DocumentType" class="col-form-label required">Document Type:</label>
+									<input type="text" class="form-control" id="Name" name="Name" maxlength="25" onkeypress="return alphaNumericOnly(event);" required>
 								</div>
 								<div class="form-group">
-									<label for="Description" class="col-form-label">Document Type:</label>
-									<input type="text" class="form-control" id="Description" name="Description" maxlength="100">
+									<label for="Description" class="col-form-label">Description:</label>
+									<input type="text" class="form-control" id="Description" name="Description" maxlength="255">
 								</div>
-						
+
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-								<button type="submit" class="btn btn-primary">Save</button>
+								<button type="submit" class="btn btn-primary" id="btnSave">Save</button>
 							</div>
 						</form>
 
@@ -164,7 +164,18 @@
 
 					});
 
-					function editForm(id) {
+
+
+					function newForm() {
+						$('#DocTypeId').val("0");
+						$('#Name').val("");
+						$('#Description').val("");
+						$('#btnSave').show();
+						$('#createForm').find('input, select, textarea').prop('disabled', false);
+						js('#createmodal').modal('show');
+					}
+
+					function editForm(id, view) {
 						$.ajax({
 							type: 'POST',
 							url: '@Url.Action("EditDocumentType", "Maintenance")',
@@ -174,6 +185,16 @@
 									$('#DocTypeId').val(response.data.docTypeId);
 									$('#Name').val(response.data.name);
 									$('#Description').val(response.data.description);
+
+									if (view == 1) {	//View button
+										$('#createForm').find('input, select, textarea').prop('disabled', true);
+										$('#btnSave').hide();
+									}
+									else {  //Edit button
+										$('#createForm').find('input, select, textarea').prop('disabled', false);
+										$('#btnSave').show();
+									}
+
 									js('#createmodal').modal('show');
 								} else {
 									bootbox.alert(response.message);

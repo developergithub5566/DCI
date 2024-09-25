@@ -98,3 +98,10 @@ body {
         display: inline-block;
         padding: .375rem .75rem
     }
+
+
+.col-form-label.required::after {
+    content: " *";
+    color: red;
+    margin-left: 5px;
+}

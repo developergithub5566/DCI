@@ -7,7 +7,7 @@
 	<div class="d-sm-flex align-items-center justify-content-between mb-3">
 		<h6 class="m-0 font-weight-bold text-gray-800">Administration</h6>
 		<div class="upperRightDivBtn">
-			<a href="#" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#createmodal">
+			<a href="#" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#" onclick="newForm()">
 				<span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
 				<span class="text text-white"><small>Add Department</small></span>
 			</a>
@@ -83,8 +83,8 @@
 								</td>
 
 								<td>
-									<a href="#" class="btn btn-primary"><i class="fas fa-search"></i></a> |
-									<a href="#" id="editForm" onclick="editForm(@item.DepartmentId)" class="btn btn-info"><i class="fa fa-edit"></i></a> |
+									<a href="#" onclick="editForm(@item.DepartmentId,1)" class="btn btn-primary"><i class="fas fa-search"></i></a> |
+									<a href="#" id="editForm" onclick="editForm(@item.DepartmentId,0)" class="btn btn-info"><i class="fa fa-edit"></i></a> |
 									<a href="#" id="deleteform" class="btn btn-danger" onclick="deleteform(@item.DepartmentId)"><i class="far fa-trash-alt"></i></a>
 								</td>
 							</tr>
@@ -99,21 +99,21 @@
 				<div class="modal-dialog" role="document">
 					<div class="modal-content">
 						<div class="modal-header">
-							<h5 class="modal-title" id="exampleModalLabel">New Department</h5>
-							@* 			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-							</button> *@
+							<h5 class="modal-title" id="exampleModalLabel">Department</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
 						</div>
 						<form id="createForm">
 							<div class="modal-body">
 								<input type="hidden" id="DepartmentId" name="DepartmentId" value="0">
 								<div class="form-group">
-									<label for="DepartmentCode" class="col-form-label">Department Code:</label>
-									<input type="text" class="form-control" id="DepartmentCode" name="DepartmentCode" maxlength="3">
-								</div>	
+									<label for="DepartmentCode" class="col-form-label required">Department Code:</label>
+									<input type="text" class="form-control" id="DepartmentCode" name="DepartmentCode" maxlength="3" onkeypress="return alphaNumericOnly(event);" required>							
+								</div>
 								<div class="form-group">
-									<label for="Department" class="col-form-label">Department:</label>
-									<input type="text" class="form-control" id="DepartmentName" name="DepartmentName" maxlength="25">
+									<label for="Department" class="col-form-label required">Department:</label>
+									<input type="text" class="form-control" id="DepartmentName" name="DepartmentName" maxlength="50" onkeypress="return alphaNumericOnly(event);" required>
 								</div>
 								<div class="form-group">
 									<label for="Description" class="col-form-label">Description:</label>
@@ -122,7 +122,7 @@
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-								<button type="submit" class="btn btn-primary">Save</button>
+								<button type="submit" class="btn btn-primary" id="btnSave">Save</button>
 							</div>
 						</form>
 
@@ -135,6 +135,7 @@
 			@section scripts {
 				<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
 				<script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
+				<script src="~/js/dci-validation.js"></script>
 
 				<script type="text/javascript">
 					var js = jQuery.noConflict(true);
@@ -146,7 +147,6 @@
 						$('#createForm').submit(function (event) {
 							event.preventDefault();
 							var formData = $(this).serialize();
-
 							bootbox.confirm('Are you sure you want to save this record?', function (result) {
 								if (result) {
 
@@ -169,14 +169,23 @@
 											bootbox.alert('An error occurred. Please try again.');
 										}
 									});
-
 								}
-							});
-						});
+							}); //bootbox
+						}); //submit
 
 					});
 
-					function editForm(id) {
+					function newForm() {
+						$('#DepartmentId').val("0");
+						$('#DepartmentCode').val("");
+						$('#DepartmentName').val("");
+						$('#Description').val("");
+						$('#btnSave').show();
+						$('#createForm').find('input, select, textarea').prop('disabled', false);
+						js('#createmodal').modal('show');
+					}
+
+					function editForm(id, view) {
 						$.ajax({
 							type: 'POST',
 							url: '@Url.Action("EditDepartment", "Maintenance")',
@@ -184,8 +193,19 @@
 							success: function (response) {
 								if (response.success) {
 									$('#DepartmentId').val(response.data.departmentId);
+									$('#DepartmentCode').val(response.data.departmentCode);
 									$('#DepartmentName').val(response.data.departmentName);
 									$('#Description').val(response.data.description);
+
+									if (view == 1) {	//View button
+										$('#createForm').find('input, select, textarea').prop('disabled', true);
+										$('#btnSave').hide();
+									}
+									else {  //Edit button
+										$('#createForm').find('input, select, textarea').prop('disabled', false);
+										$('#btnSave').show();
+									}
+
 									js('#createmodal').modal('show');
 								} else {
 									bootbox.alert(response.message);
