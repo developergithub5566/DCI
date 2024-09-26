@@ -7,7 +7,7 @@
 
 <div class="container-fluid">
 	<div class="d-sm-flex align-items-center justify-content-between mb-3">
-		<h6 class="m-0 font-weight-bold text-gray-800">Administration</h6>
+		<h6 class="m-0 font-weight-bold text-gray-800">User Management</h6>
 		<div class="upperRightDivBtn">
 			<a href="#" class="btn btnPrimary btn-icon-split" onclick="newForm()">
 				<span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
@@ -18,7 +18,7 @@
 	</div>
 	<div class="col-12 p0">
 		<ul class="breadcrumb">
-			<li><a href="~/Home/Index">Home</a></li>
+			<li><a href="~/Home/Index">Dashboard</a></li>
 			<li><a href="~/Maintenance/Index">Administration</a></li>
 			<li>User Management</li>
 		</ul>
@@ -51,6 +51,9 @@
 								<label>Firstname</label>
 							</th>
 							<th>
+								<label>Middlename</label>
+							</th>
+							<th>
 								<label>Lastname</label>
 							</th>
 							<th>
@@ -76,14 +79,17 @@
 									@item.Firstname
 								</td>
 								<td>
+									@item.Middlename
+								</td>
+								<td>
 									@item.Lastname
 								</td>
 								<td>
 									@item.ContactNo
 								</td>
 								<td>
-									<a href="#" class="btn btn-primary"><i class="fas fa-search"></i></a> |
-									<a href="#" id="editForm" onclick="editForm(@item.UserId)" class="btn btn-info"><i class="fa fa-edit"></i></a> |
+									<a href="#" class="btn btn-primary" onclick="editForm(@item.UserId,1)"><i class="fas fa-search"></i></a> |
+									<a href="#" id="editForm" onclick="editForm(@item.UserId,0)" class="btn btn-info"><i class="fa fa-edit"></i></a> |
 
 									<a href="#" id="deleteform" class="btn btn-danger" onclick="deleteform(@item.UserId)"><i class="far fa-trash-alt"></i></a>
 								</td>
@@ -99,7 +105,7 @@
 				<div class="modal-dialog modal-lg" role="document">
 					<div class="modal-content">
 						<div class="modal-header">
-							<h5 class="modal-title" id="exampleModalLabel">New User</h5>
+							<h5 class="modal-title" id="exampleModalLabel">User</h5>
 							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 								<span aria-hidden="true">&times;</span>
 							</button>
@@ -112,33 +118,35 @@
 									<div class="col-md-6">
 										@* <label for="Username" class="col-form-label">Username:</label>
 										<input type="text" class="form-control" id="Username" name="Username" maxlength="25"> *@
-										<label for="Email" class="col-form-label">Email:</label>
-										<input class="form-control" id="Email" name="Email" maxlength="50"></input>
+										<label for="Email" class="col-form-label required">Email:</label>
+										<input class="form-control" id="Email" name="Email" maxlength="25" required></input>
 									</div>
 									<div class="col-md-6">
-										<label for="Firstname" class="col-form-label">Firstname:</label>
-										<input class="form-control" id="Firstname" name="Firstname" maxlength="25"></input>
+										<label for="Firstname" class="col-form-label required">Firstname:</label>
+										<input class="form-control" id="Firstname" name="Firstname" maxlength="25" required></input>
 									</div>
 								</div>
 
 								<div class="row mb-3">
 									<div class="col-md-6">
-										<label for="Lastname" class="col-form-label">Lastname:</label>
-										<input class="form-control" id="Lastname" name="Lastname" maxlength="25"></input>
+										<label for="Middlename" class="col-form-label">Middlename:</label>
+										<input class="form-control" id="Middlename" name="Middlename" maxlength="25"></input>
 									</div>
+
+									<div class="col-md-6">
+										<label for="Lastname" class="col-form-label required">Lastname:</label>
+										<input class="form-control" id="Lastname" name="Lastname" maxlength="25" required></input>
+									</div>
+
+								</div>
+
+								<div class="row mb-3">								
 									<div class="col-md-6">
 										<label for="ContactNo" class="col-form-label">ContactNo:</label>
-										<input class="form-control" id="ContactNo" name="ContactNo" maxlength="15"></input>
+										<input class="form-control" id="ContactNo" name="ContactNo" maxlength="15" type="number"></input>
 									</div>
-								</div>
-
-								<div class="row mb-3">
-									@* 	<div class="col-md-6">
-									<label for="Email" class="col-form-label">Email:</label>
-									<input class="form-control" id="Email" name="Email" maxlength="25"></input>
-									</div> *@
 									<div class="col-md-6">
-										<label for="RoleId" class="col-form-label">Role:</label>
+										<label for="RoleId" class="col-form-label required">Role:</label>
 										<input type="hidden" id="RoleId" name="RoleId" value="0">
 										<select id="roleSelect" class="form-select">
 											<option value="">Select Role</option>
@@ -147,11 +155,10 @@
 									</div>
 								</div>
 
-
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-								<button type="submit" class="btn btn-primary">Save</button>
+								<button type="submit" class="btn btn-primary" id="btnSave">Save</button>
 							</div>
 						</form>
 
@@ -221,6 +228,7 @@
 								$('#UserId').val("");
 								// $('#Username').val("");
 								$('#Firstname').val("");
+								$('#Middlename').val("");
 								$('#Lastname').val("");
 								$('#ContactNo').val("");
 								$('#Email').val("");
@@ -239,6 +247,8 @@
 									}
 								});
 
+								$('#createForm').find('input, select, textarea').prop('disabled', false);
+								$('#btnSave').show();
 
 								js('#createmodal').modal('show');
 							} else {
@@ -251,7 +261,7 @@
 					});
 				}
 
-				function editForm(id) {
+				function editForm(id,view) {
 					$.ajax({
 						type: 'POST',
 						url: '@Url.Action("EditUser", "Maintenance")',
@@ -262,6 +272,7 @@
 								$('#UserId').val(response.data.userId);
 								$('#Username').val(response.data.username);
 								$('#Firstname').val(response.data.firstname);
+								$('#Middlename').val(response.data.middlename);
 								$('#Lastname').val(response.data.lastname);
 								$('#ContactNo').val(response.data.contactNo);
 								$('#Email').val(response.data.email);
@@ -280,7 +291,14 @@
 									}
 								});
 
-
+								if (view == 1) {	//View button
+									$('#createForm').find('input, select, textarea').prop('disabled', true);
+									$('#btnSave').hide();
+								}
+								else {  //Edit button
+									$('#createForm').find('input, select, textarea').prop('disabled', false);
+									$('#btnSave').show();
+								}
 
 								js('#createmodal').modal('show');
 							} else {

@@ -57,24 +57,32 @@ namespace DCI.Data
 					continue;
 
 				var _createdBy = string.Empty;
+				var xmodule = entry.CurrentValues.EntityType.Name;
 				try
 				{
-					if (entry.State == EntityState.Added)
+					if (xmodule != "DCI.Models.Entities.UserAccess")
 					{
-						_createdBy = entry.Properties.FirstOrDefault(p => p.Metadata.Name == "CreatedBy").CurrentValue.ToString();
-					}
-					else
-					{
-						var xmodule = entry.CurrentValues.EntityType.Name;			
-						if (xmodule != "DCI.Models.Entities.UserAccess")
+						if (entry.State == EntityState.Added)
 						{
+							var createdByProperty = entry.Properties.FirstOrDefault(p => p.Metadata.Name == "CreatedBy");
+							if (createdByProperty != null && createdByProperty.CurrentValue != null)
+							{
+								_createdBy = createdByProperty.CurrentValue.ToString();
+							}
+							//_createdBy = entry.Properties.FirstOrDefault(p => p.Metadata.Name == "CreatedBy").CurrentValue.ToString();
+						}
+						else
+						{
+
+
 							var modifiedByProperty = entry.Properties.FirstOrDefault(p => p.Metadata.Name == "ModifiedBy");
 							if (modifiedByProperty != null && modifiedByProperty.CurrentValue != null)
 							{
 								_createdBy = modifiedByProperty.CurrentValue.ToString();
 							}
-						}
 
+
+						}
 					}
 				}
 				catch (Exception ex)

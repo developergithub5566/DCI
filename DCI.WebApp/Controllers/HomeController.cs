@@ -11,6 +11,9 @@ using DCI.Models.ViewModel;
 using Newtonsoft.Json;
 using DCI.Models.Configuration;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Serilog;
+using System.Text;
 
 
 namespace DCI.WebApp.Controllers
@@ -65,8 +68,45 @@ namespace DCI.WebApp.Controllers
 
 		public async Task<IActionResult> Profile()
 		{
-			var model = _userSessionHelper.GetCurrentUser();
-			return View(model);
+			UserViewModel model = new UserViewModel();
+			try
+			{
+				using (var _httpclient = new HttpClient())
+				{
+					var currentUser = _userSessionHelper.GetCurrentUser();
+					model.UserId = currentUser.UserId;
+
+					var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+					var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/GetUserRoleListById");
+					request.Content = stringContent;
+					var response = await _httpclient.SendAsync(request);
+					var responseBody = await response.Content.ReadAsStringAsync();
+					UserViewModel vm = JsonConvert.DeserializeObject<UserViewModel>(responseBody)!;
+
+					//vm.Options = vm.RoleList?.Select(x =>
+					//							   new SelectListItem
+					//							   {
+					//								   Value = x.RoleId.ToString(),
+					//								   Text = x.RoleName
+					//							   }).ToList();
+
+					if (response.IsSuccessStatusCode)
+					{
+						return View(vm);
+					}
+					return Json(new { success = false, message = responseBody });
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
+				return Json(new { success = false, message = ex.Message });
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+		
 		}
 
 	}

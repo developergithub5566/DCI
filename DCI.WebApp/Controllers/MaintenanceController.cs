@@ -147,8 +147,9 @@ namespace DCI.WebApp.Controllers
 
 					if (response.IsSuccessStatusCode)
 					{
-						return Json(new { success = true, message = "User successfully created." });
+						return Json(new { success = true, message = responseBody });
 					}
+					return Json(new { success = false, message = responseBody });
 				}
 			}
 			catch (Exception ex)

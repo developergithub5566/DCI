@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using Serilog;
 using DCI.API.Service;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 
 namespace DCI.API.Controllers
 {
@@ -74,8 +75,8 @@ namespace DCI.API.Controllers
 
 				if (await _emailRepository.IsExistsEmail(vm.Email))
 				{
-					await _emailRepository.SendPasswordReset(vm.Email);             
-                    return Ok("Email sent successfully.");
+					await _emailRepository.SendPasswordReset(vm.Email);
+					return Ok("Email sent successfully.");
 				}
 				else
 				{
@@ -145,7 +146,7 @@ namespace DCI.API.Controllers
 			finally
 			{
 			}
-				Log.CloseAndFlush();
+			Log.CloseAndFlush();
 			return BadRequest("Invalid account");
 		}
 
@@ -175,7 +176,7 @@ namespace DCI.API.Controllers
 			return BadRequest();
 		}
 
-		
+
 
 		[HttpPost]
 		[Route("SaveExternalUser")]
@@ -184,5 +185,23 @@ namespace DCI.API.Controllers
 			var result = await _userRepository.SaveExternalUser(model);
 			return StatusCode(result.statuscode, result.message);
 		}
+		[HttpPost]
+		[Route("GetSaveExternalUser")]
+		public async Task<IActionResult> GetSaveExternalUser([FromBody] ExternalUserModel model)
+		{
+			var result = await _userRepository.GetExternalUser(model);
+			if (result.isExists)
+			{
+				var userContext = await _userContextService.GetUserContext(result.email);
+				return Ok(userContext);
+			}
+			else
+			{
+				await _userRepository.SaveExternalUser(model);
+				var userContext = await _userContextService.GetUserContext(model.Email);
+				return Ok(userContext);
+			}	
+		}
+
 	}
 }

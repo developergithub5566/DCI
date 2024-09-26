@@ -69,6 +69,7 @@ namespace DCI.API.Service
 				UserId = usermodel.UserId,			
 				Email = usermodel.Email,
 				Lastname = usermodel.Lastname,
+				Middlename = usermodel.Middlename,
 				Firstname = usermodel.Firstname,
 				RoleId = usermodel.RoleId,
 			};

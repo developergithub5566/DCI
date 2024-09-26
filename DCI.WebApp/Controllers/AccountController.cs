@@ -138,7 +138,7 @@ namespace DCI.WebApp.Controllers
 			return View();
 		}
 
-	
+
 		public async Task<IActionResult> ValidateToken(ValidateTokenViewModel model)
 		{
 			try
@@ -223,39 +223,90 @@ namespace DCI.WebApp.Controllers
 			var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 			if (!result.Succeeded) return BadRequest();
 
-			var claims = result.Principal.Identities
+			var externalClaims = result.Principal.Identities
 								.FirstOrDefault()?.Claims
 								.Select(claim => new
 								{
 									claim.Type,
 									claim.Value
 								});
-			return Ok(claims);
+
+			var externalUser = new ExternalUserModel
+			{
+				Identifier = externalClaims?.FirstOrDefault(c => c.Type.Contains("nameidentifier"))?.Value ?? string.Empty,
+				Firstname = externalClaims?.FirstOrDefault(c => c.Type.Contains("givenname"))?.Value ?? string.Empty,
+				Lastname = externalClaims?.FirstOrDefault(c => c.Type.Contains("surname"))?.Value ?? string.Empty,
+				Email = externalClaims?.FirstOrDefault(c => c.Type.Contains("emailaddress"))?.Value ?? string.Empty,
+				Provider = "Google"
+			};
+
+			using (var clienthttp = new HttpClient())
+			{
+				var stringContent = new StringContent(JsonConvert.SerializeObject(externalUser), Encoding.UTF8, "application/json");
+				var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Account/GetSaveExternalUser");
+
+				request.Content = stringContent;
+				var response = await Task.FromResult(clienthttp.Send(request));
+				string responseBody = await response.Content.ReadAsStringAsync();
+
+				if (response.IsSuccessStatusCode == true)
+				{
+					//var result = _userContextService.GetUserContext();
+					UserManager um = JsonConvert.DeserializeObject<UserManager>(responseBody);
+					_httpContextAccessor.HttpContext.Session.SetString("UserManager", JsonConvert.SerializeObject(um));
+
+					var claims = new List<Claim>
+						{
+							new Claim(ClaimTypes.NameIdentifier, um.Identifier.ToString()),
+							new Claim("UserId", um.UserId.ToString()),
+							new Claim(ClaimTypes.Email, um.Email),
+							new Claim("FullName", $"{um.Firstname} {um.Lastname}")
+						};
+
+					// Create a ClaimsIdentity and ClaimsPrincipal
+					var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+					var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+					// Sign in the user
+					await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+
+					return RedirectToAction("Index", "Home");
+				}
+				else
+				{
+					return View();
+				}
+
+				//return Ok(claims);
+			}
 		}
 
-		[HttpGet("FacebookLogin")]
-		public IActionResult FacebookLogin()
-		{
-			var redirectUrl = Url.Action(nameof(FacebookResponse));
-			var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
-			return Challenge(properties, FacebookDefaults.AuthenticationScheme);
-		}
+			[HttpGet("FacebookLogin")]
+			public IActionResult FacebookLogin()
+			{
+				var redirectUrl = Url.Action(nameof(FacebookResponse));
+				var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+				return Challenge(properties, FacebookDefaults.AuthenticationScheme);
+			}
 
-		[HttpGet("FacebookResponse")]
-		public async Task<IActionResult> FacebookResponse()
-		{
-			var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-			if (!result.Succeeded) return BadRequest();
+			[HttpGet("FacebookResponse")]
+			public async Task<IActionResult> FacebookResponse()
+			{
+				var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+				if (!result.Succeeded) return BadRequest();
 
-			var claims = result.Principal.Identities
-								.FirstOrDefault()?.Claims
-								.Select(claim => new
-								{
-									claim.Type,
-									claim.Value
-								});
-			return Ok(claims);
-		}
+				var claims = result.Principal.Identities
+									.FirstOrDefault()?.Claims
+									.Select(claim => new
+									{
+										claim.Type,
+										claim.Value
+									});
+
+
+				return Ok(claims);
+			}
+		
 
 		//public async Task<IActionResult> Registration(RegistrationViewModel model)
 		//{

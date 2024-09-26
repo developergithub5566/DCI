@@ -38,17 +38,18 @@ namespace DCI.Repositories
 		public async Task<UserModel> GetUserRoleListById(int userid)
 		{
 			try
-			{	
+			{
 				UserModel usermodel = new UserModel();
 
-				var context = _dbContext.User.AsQueryable();			
+				var context = _dbContext.User.AsQueryable();
 
 				var query = from usr in context
 							where usr.UserId == userid
 							select new UserModel
 							{
-								UserId = usr.UserId,						
+								UserId = usr.UserId,
 								Lastname = usr.Lastname,
+								Middlename = usr.Middlename,
 								Firstname = usr.Firstname,
 								Email = usr.Email,
 								ContactNo = usr.ContactNo,
@@ -61,9 +62,9 @@ namespace DCI.Repositories
 
 				var rolexList = _dbContext.Role.AsQueryable().ToList();
 
-				if(result == null)
+				if (result == null)
 				{
-					result = new UserModel(); 
+					result = new UserModel();
 				}
 				result.RoleList = rolexList.Count() > 0 ? rolexList : null;
 				result.EmployeeList = context.ToList(); //_dbContext.User.AsQueryable().ToList();
@@ -95,7 +96,7 @@ namespace DCI.Repositories
 					user.Email = model.Email;
 					user.Firstname = model.Firstname;
 					user.Lastname = model.Lastname;
-					user.ContactNo = model.ContactNo;		
+					user.ContactNo = model.ContactNo;
 					user.RoleId = model.RoleId;
 					user.DateCreated = DateTime.Now;
 					user.CreatedBy = model.CreatedBy;
@@ -150,8 +151,9 @@ namespace DCI.Repositories
 			{
 				var entities = await _dbContext.User.FirstOrDefaultAsync(x => x.UserId == model.UserId);
 
-		
+
 				entities.Firstname = model.Firstname;
+				entities.Middlename = model.Middlename;
 				entities.Lastname = model.Lastname;
 				entities.ContactNo = model.ContactNo;
 				entities.Email = model.Email;
@@ -232,6 +234,28 @@ namespace DCI.Repositories
 			}
 		}
 
+		public async Task<(bool isExists, string email)> GetExternalUser(ExternalUserModel model)
+		{
+			try
+			{
+				var entity = await _dbContext.User.FirstOrDefaultAsync(x => x.Email == model.Email && x.IsActive == true);
+				if (entity == null)
+				{
+					return (false, string.Empty);
+				}
+				return (true, entity.Email);
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
+				return (false, ex.Message);
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+		}
+
 		public async Task<(int statuscode, string message)> SaveExternalUser(ExternalUserModel model)
 		{
 			try
@@ -243,14 +267,20 @@ namespace DCI.Repositories
 					user.Email = model.Email;
 					user.Firstname = model.Firstname;
 					user.Lastname = model.Lastname;
-					user.ContactNo = string.Empty;					
+					user.ContactNo = string.Empty;
 					user.RoleId = (int)EnumRole.User;
 					user.DateCreated = DateTime.Now;
-					user.CreatedBy = 1;
-					user.DateModified = DateTime.Now;
-					user.ModifiedBy = 1;
+					user.CreatedBy = 0;
+					user.DateModified = null;
+					user.ModifiedBy = null;
 					user.IsActive = true;
 					await _dbContext.User.AddAsync(user);
+					await _dbContext.SaveChangesAsync();
+
+
+					var entity = await _dbContext.User.FirstOrDefaultAsync(x => x.UserId == user.UserId);
+					entity.CreatedBy = user.UserId;
+					_dbContext.User.Entry(entity).State = EntityState.Modified;
 					await _dbContext.SaveChangesAsync();
 
 					await _useraccessrepository.SaveExternalUserAccess(user.UserId);
@@ -271,6 +301,6 @@ namespace DCI.Repositories
 		public async Task<User> GetUserByUsername(string username)
 		{
 			return _dbContext.User.FirstOrDefault(x => x.Email == username);
-		}		
+		}
 	}
 }

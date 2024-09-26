@@ -21,5 +21,6 @@ namespace DCI.Repositories.Interface
 
         Task<(int statuscode, string message)> UpdateUser(UserViewModel model);
         Task<UserModel> GetUserRoleListById(int userid);
+        Task<(bool isExists, string email)> GetExternalUser(ExternalUserModel model);
 	}
 }

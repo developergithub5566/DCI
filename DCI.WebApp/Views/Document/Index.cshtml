@@ -37,7 +37,7 @@
 	</div>
 	<div class="col-12 p0">
 		<ul class="breadcrumb">
-			<li><a href="~/Home/Index">Home</a></li>
+			<li><a href="~/Home/Index">Dashboard</a></li>
 			<li>Document</li>
 		</ul>
 	</div>
@@ -132,20 +132,20 @@
 									</div>
 									<div class="col">
 										<label for="DocName" class="col-form-label">Document Name:</label>
-										<input type="text" class="form-control" id="DocName" name="DocName" maxlength="100">
+										<input type="text" class="form-control" id="DocName" name="DocName" maxlength="100" required>
 									</div>
 								</div>
 								<div class="row">
 									<div class="col">
-										<label for="DocTypeId" class="col-form-label">Document Type:</label>
-										<select id="documentSelect" class="form-select">
+										<label for="DocTypeId" class="col-form-label required">Document Type:</label>
+										<select id="documentSelect" class="form-select" required>
 											<option value="">select type</option>
 										</select>
 									</div>
 									<div class="col">
 
-										<label for="DocCategory" class="col-form-label">Document Category:</label>
-										<select id="docCategorySelect" class="form-select">
+										<label for="DocCategory" class="col-form-label required">Document Category:</label>
+										<select id="docCategorySelect" class="form-select" required>
 											<option value="0">select type</option>
 											<option value="1">Internal</option>
 											<option value="2">Internal/External</option>
@@ -155,14 +155,14 @@
 								</div>
 								<div class="row">
 									<div class="col">
-										<label for="Department" class="col-form-label">Department:</label>
-										<select id="departmentSelect" class="form-select" onchange="getSectionOnChange()">
+										<label for="Department" class="col-form-label required">Department:</label>
+										<select id="departmentSelect" class="form-select" onchange="getSectionOnChange()" required>
 											<option value="">select department</option>
 										</select>
 									</div>
 									<div class="col">
-										<label for="Section" class="col-form-label">Section:</label>
-										<select id="sectionSelect" class="form-select">
+										<label for="Section" class="col-form-label required">Section:</label>
+										<select id="sectionSelect" class="form-select" required>
 											<option value="">select section</option>
 										</select>
 									</div>
@@ -179,8 +179,8 @@
 										<a href="#" id="deleteFile" onclick="removefile()" class="btn btn-danger" title="remove"> <i class="far fa-trash-alt"></i></a>
 									</div>
 									<div class="col">
-										<label for="RequestById" class="col-form-label">Request By:</label>
-										<select id="requestBySelect" class="form-select">
+										<label for="RequestById" class="col-form-labe required">Request By:</label>
+										<select id="requestBySelect" class="form-select" required>
 											<option value="">select requestor</option>
 										</select>
 									</div>
@@ -312,8 +312,13 @@
 								$('#DocId').val("0"); 
 								$('#DocNo').val("");
 								$('#DocName').val("");
-								$('#docCategorySelect').val(0);
-								$('#sectionSelect').val(0);
+								//js('#docCategorySelect').val('0');
+								//document.getElementById('docCategorySelect').value = '0'
+								// var leaveCode = document.querySelector('#docCategorySelect');
+								// leaveCode[i].selected = true;
+								document.getElementById("docCategorySelect").selectedIndex = "0";
+								document.getElementById("sectionSelect").selectedIndex = "0";
+								//$('#sectionSelect').val(0);
 								$('#RequestById').val(0);
 								$('#DocTypeId').val(0);
 

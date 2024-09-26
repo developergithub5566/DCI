@@ -31,7 +31,7 @@ namespace DCI.Repositories
 
 			var query = from log in audit
 						join u in user				
-						on Convert.ToInt32(log.Username) equals u.UserId
+						on Convert.ToInt32(string.IsNullOrEmpty(log.Username) ? (int?)null : Convert.ToInt32(log.Username)) equals u.UserId
 						where log.Username == model.Username
 						select new AuditLogViewModel
 						{
@@ -54,7 +54,7 @@ namespace DCI.Repositories
 
 			var query = from log in audit
 						join u in user
-						on Convert.ToInt32(log.Username) equals u.UserId					
+							on Convert.ToInt32(string.IsNullOrEmpty(log.Username) ? (int?)null : Convert.ToInt32(log.Username)) equals u.UserId
 						select new AuditLogViewModel
 						{
 							Id = log.Id,
