@@ -4,8 +4,8 @@
 <style>
 	/* Hide the default file input */
 	/* 	#fileUpload {
-											display: none;
-										} */
+												display: none;
+											} */
 
 	/* Style the custom button */
 
@@ -171,7 +171,7 @@
 									<div class="col">
 										<label for="fileUpload" class="col-form-label">File Upload:</label>
 										<br id="nextline" />
-										<input type="file" class="form-control" id="fileUpload" name="fileUpload" />
+										<input type="file" class="form-control" id="fileUpload" name="fileUpload" accept="application/pdf" onchange="validateFileType()" />
 
 										<span class="file-name">No file chosen</span>
 
@@ -309,7 +309,7 @@
 						success: function (response) {
 							console.log(response.data);
 							if (response.success) {
-								$('#DocId').val("0"); 
+								$('#DocId').val("0");
 								$('#DocNo').val("");
 								$('#DocName').val("");
 								//js('#docCategorySelect').val('0');
@@ -321,6 +321,9 @@
 								//$('#sectionSelect').val(0);
 								$('#RequestById').val(0);
 								$('#DocTypeId').val(0);
+
+								const input = document.querySelector('#fileUpload')
+								input.value = '';
 
 								var $select = $('#documentSelect');
 								$select.empty();
@@ -554,6 +557,18 @@
 							bootbox.alert('An error occurred. Please try again.');
 						}
 					});
+				}
+
+				function validateFileType() {
+					const input = document.getElementById('fileUpload');
+					const file = input.files[0];
+
+					if (file) {
+						if (file.type !== "application/pdf") {
+							alert("Invalid file type. Please select a PDF file.");
+							input.value = '';
+						}
+					}
 				}
 			</script>
 		}
