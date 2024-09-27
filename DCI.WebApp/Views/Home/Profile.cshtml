@@ -1,5 +1,25 @@
 ﻿@model DCI.Models.ViewModel.UserViewModel
 
+<link href="~/css/dcicustom.css" rel="stylesheet" />
+
+<div class="d-sm-flex align-items-center justify-content-between mb-3">
+	<h6 class="m-0 font-weight-bold text-gray-800">Profile</h6>
+
+	<div class="upperRightDivBtn">	
+		<a asp-controller="Home" asp-action="ChangePass" class="btn btn-secondary btn-icon-split">
+			<span class="icon"><i class="fas fa-lock text-xs"></i></span>
+			<span class="text"><small>Change Password</small></span>
+		</a>
+	</div>
+</div>
+<div class="col-12 p0">
+	<ul class="breadcrumb">
+		<li><a href="~/Home/Index">Dashboard</a></li>
+		<li>Profile</li>
+	</ul>
+</div>
+
+
 <div class="card shadow">
 	<div class="card-header py-3">
 		<h5 class="text-gray-800 mb0"></h5>
@@ -14,13 +34,10 @@
 			<input type="hidden" id="RoleId" name="RoleId" value="@Model.RoleId">
 			<div class="form-group">
 				<label class="frmText">Email Address:</label>
-				<input type="text" class="form-control frmField" id="Email" name="Email" value="@Model.Email" readonly>
-				<!--<a href="http://202.57.47.34/DCI-ESS-STG/account/profile/change-email" class="btnChangeEmail">Change Email Address?</a>-->
+				<input type="text" class="form-control frmField" id="Email" name="Email" value="@Model.Email" readonly>			
 			</div>
 
 			<div class="form-group">
-
-
 				<label class="frmText">First Name:</label>
 				<input type="text" class="form-control frmField" id="Firstname" name="Firstname" value="@Model.Firstname">
 			</div>
@@ -62,7 +79,7 @@
 
 			js(document).ready(function () {
 
-		
+
 			});
 
 			function Save() {
@@ -76,7 +93,7 @@
 				formData.Middlename = $('#Middlename').val();
 				formData.Lastname = $('#Lastname').val();
 
-		
+
 				bootbox.confirm('Are you sure you want to save this record?', function (result) {
 					if (result) {
 

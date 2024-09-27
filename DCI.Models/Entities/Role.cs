@@ -14,9 +14,9 @@ namespace DCI.Models.Entities
 
 		public int CreatedBy { get; set; }
 
-        public DateTime? DateModified { get; set; }
+        public DateTime? DateModified { get; set; } = null;
 
-        public int? ModifiedBy { get; set; }
+		public int? ModifiedBy { get; set; } = null;
 
 		public bool IsActive { get; set; } = true;
 	}

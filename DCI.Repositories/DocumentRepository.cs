@@ -302,7 +302,7 @@ namespace DCI.Repositories
 												.FirstOrDefaultAsync(x => x.DepartmentId == param.DepartmentId && x.IsActive == true);
 
 				int totalrecords = _docContext.Count() + 1;
-				string version = "0.0";
+				string version = "0";
 				string finalSetRecords = GetFormattedRecord(totalrecords);
 
 				if (param.DocCategory == (int)EnumDocumentCategory.Internal)
@@ -310,14 +310,14 @@ namespace DCI.Repositories
 					string deptcode = _deptContext?.DepartmentCode?.Trim() ?? string.Empty;
 					string section = _section?.SectionCode?.Trim() ?? string.Empty;
 
-					return $"{deptcode}.{section}.{finalSetRecords} Ver.{version}";
+					return $"{deptcode}.{section}.{finalSetRecords} Ver. {version}";
 				}
 				else if (param.DocCategory == (int)EnumDocumentCategory.BothInExternal)
 				{
 					string compcode = Constants.CompanyCode;
 					string doctype = _docTypeContext.Name ?? string.Empty;
 
-					return $"{compcode}.{doctype}.{finalSetRecords} Ver.{version}";
+					return $"{compcode}.{doctype}.{finalSetRecords} Ver. {version}";
 				}
 
 			}
@@ -393,7 +393,7 @@ namespace DCI.Repositories
 		public async Task<(int statuscode, string message)> UploadFile(DocumentViewModel model)
 		{
 			await SaveFile(model);
-			return (StatusCodes.Status200OK, "Successfully");
+			return (StatusCodes.Status200OK, "Your file has been successfully uploaded.");
 		}
 		public async Task<IList<HomePageViewModel>> HomePage()
 		{

@@ -28,9 +28,29 @@ namespace DCI.Repositories
 			return await _dbContext.Role.AnyAsync(x => x.RoleId == roleId && x.IsActive == true);
 		}
 
-		public async Task<IList<Role>> GetAllRoles()
+		public async Task<IList<RoleViewModel>> GetAllRoles()
 		{
-			return await _dbContext.Role.AsNoTracking().Where(x => x.IsActive == true).ToListAsync();
+			//return await _dbContext.Role.AsNoTracking().Where(x => x.IsActive == true).ToListAsync();
+
+			//return await _dbContext.Role.AnyAsync(x => x.RoleId == roleId && x.IsActive == true);
+			var context = _dbContext.Role.AsQueryable().ToList();
+			var userList = _dbContext.User.AsQueryable().ToList();
+
+
+			var query = from role in context
+						join user in userList on role.CreatedBy equals user.UserId
+						where role.IsActive == true
+						select new RoleViewModel
+						{
+							RoleId = role.RoleId,
+							RoleName = role.RoleName,
+							Description = role.Description,
+							CreatedName = user.Email,
+							CreatedBy = role.CreatedBy,
+							DateCreated = role.DateCreated,
+						};
+
+			return query.ToList();
 		}
 		public async Task<(int statuscode, string message, Role entity)> Save(RoleViewModel model)
 		{

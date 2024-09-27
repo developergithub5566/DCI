@@ -109,7 +109,7 @@
 								<input type="hidden" id="DepartmentId" name="DepartmentId" value="0">
 								<div class="form-group">
 									<label for="DepartmentCode" class="col-form-label required">Department Code:</label>
-									<input type="text" class="form-control" id="DepartmentCode" name="DepartmentCode" maxlength="3" onkeypress="return alphaNumericOnly(event);" required>							
+									<input type="text" class="form-control" id="DepartmentCode" name="DepartmentCode" maxlength="3" onkeypress="return alphaNumericOnly(event);" required>
 								</div>
 								<div class="form-group">
 									<label for="Department" class="col-form-label required">Department:</label>
@@ -120,20 +120,21 @@
 									<textarea class="form-control" id="Description" name="Description" maxlength="255"></textarea>
 								</div>
 							</div>
-							<div class="modal-footer">
-								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+							<div class="modal-footer">								
 								<button type="submit" class="btn btn-primary" id="btnSave">Save</button>
+								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 							</div>
 						</form>
 
 					</div>
 				</div>
+
 			</div>
 
 
 
 			@section scripts {
-				<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
+
 				<script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
 				<script src="~/js/dci-validation.js"></script>
 
@@ -147,9 +148,14 @@
 						$('#createForm').submit(function (event) {
 							event.preventDefault();
 							var formData = $(this).serialize();
-							bootbox.confirm('Are you sure you want to save this record?', function (result) {
-								if (result) {
 
+							Swal.fire({
+								text: "Are you sure you want to save this record?",
+								icon: "question",
+								showCancelButton: true,
+								confirmButtonText: "Ok"
+							}).then((result) => {
+								if (result.isConfirmed) {
 									$.ajax({
 										type: 'POST',
 										url: '@Url.Action("SaveDepartment", "Maintenance")',
@@ -158,19 +164,31 @@
 											if (response.success) {
 												$('#createForm')[0].reset();
 												js('#createmodal').modal('hide');
-												bootbox.alert(response.message, function () {
+
+												Swal.fire({
+													text: response.message,
+													icon: "success",
+													confirmButtonText: "Ok"
+												}).then((result) => {
 													location.reload();
 												});
+
 											} else {
-												bootbox.alert(response.message);
+												Swal.fire({
+													text: response.message,
+													icon: "error"
+												});
 											}
 										},
 										error: function () {
-											bootbox.alert('An error occurred. Please try again.');
+											Swal.fire({
+												text: "An error occurred. Please try again.",
+												icon: "error"
+											});
 										}
 									});
 								}
-							}); //bootbox
+							});
 						}); //submit
 
 					});
@@ -208,38 +226,60 @@
 
 									js('#createmodal').modal('show');
 								} else {
-									bootbox.alert(response.message);
+									Swal.fire({
+										text: response.message,
+										icon: "error"
+									});
 								}
 							},
 							error: function () {
-								bootbox.alert('An error occurred. Please try again.');
+								Swal.fire({
+									text: "An error occurred. Please try again.",
+									icon: "error"
+								});
 							}
 						});
 					}
 
 					function deleteform(id) {
-
-						bootbox.confirm('Are you sure you want to delete this record?', function (result) {
-							if (result) {
+						
+						Swal.fire({
+							text: "Are you sure you want to delete this record?",
+							icon: "warning",
+							showCancelButton: true,
+							confirmButtonText: "Yes, delete it!"
+						}).then((result) => {
+							if (result.isConfirmed) {
 								$.ajax({
 									type: 'POST',
 									url: '@Url.Action("DeleteDepartment", "Maintenance")',
 									data: { DepartmentId: id },
 									success: function (response) {
 										if (response.success) {
-											bootbox.alert(response.message, function () {
+											Swal.fire({
+												text: response.message,
+												icon: "success",
+												confirmButtonText: "Ok"
+											}).then((result) => {
 												location.reload();
 											});
 										} else {
-											bootbox.alert(response.message);
+											Swal.fire({
+												text: response.message,
+												icon: "error"
+											});
 										}
 									},
 									error: function () {
-										bootbox.alert('An error occurred. Please try again.');
+										Swal.fire({
+											text: "An error occurred. Please try again.",
+											icon: "error"
+										});
 									}
 								});
 							}
 						});
+
 					}
 				</script>
 			}

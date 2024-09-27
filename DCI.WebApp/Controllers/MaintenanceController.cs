@@ -201,7 +201,7 @@ namespace DCI.WebApp.Controllers
 		#region Role
 		public async Task<IActionResult> Role()
 		{
-			List<Role> model = new List<Role>();
+			List<RoleViewModel> model = new List<RoleViewModel>();
 
 			using (var _httpclient = new HttpClient())
 			{
@@ -210,7 +210,7 @@ namespace DCI.WebApp.Controllers
 
 				if (response.IsSuccessStatusCode)
 				{
-					model = JsonConvert.DeserializeObject<List<Role>>(responseBody)!;
+					model = JsonConvert.DeserializeObject<List<RoleViewModel>>(responseBody)!;
 				}
 			}
 			return View(model);

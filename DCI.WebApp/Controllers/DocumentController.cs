@@ -268,8 +268,9 @@ namespace DCI.WebApp.Controllers
 					if (response.IsSuccessStatusCode)
 					{
 						vm = JsonConvert.DeserializeObject<DocumentViewModel>(responseBody)!;
+						return View(vm);
 					}
-					return View(vm);
+					return RedirectToAction("VerifyToken");
 				}
 			}
 			catch (Exception ex)
@@ -293,6 +294,7 @@ namespace DCI.WebApp.Controllers
 
 					var data = new MultipartFormDataContent();
 					data.Add(new StringContent(model.DocId.ToString() ?? ""), "DocId");
+					data.Add(new StringContent(model.DocNo.ToString() ?? ""), "DocNo");
 					data.Add(new StringContent(model.RequestById.ToString() ?? ""), "ModifiedBy");
 					data.Add(new StringContent(DateTime.Now.ToString() ?? ""), "DateModified");
 
@@ -320,6 +322,11 @@ namespace DCI.WebApp.Controllers
 			{
 				Log.CloseAndFlush();
 			}
+		}
+
+		public async Task<IActionResult> VerifyToken()
+		{
+			return View();
 		}
 	}
 }

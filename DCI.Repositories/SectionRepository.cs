@@ -28,7 +28,7 @@ namespace DCI.Repositories
 			SectionViewModel model = new SectionViewModel();
 			try
 			{
-				var departmentList = _dbContext.Department.AsQueryable().ToList();
+				var departmentList = _dbContext.Department.Where(x => x.IsActive == true).AsQueryable().ToList();
 
 				var context = _dbContext.Section.Where(x => x.IsActive == true && x.SectionId == sectionId);
 

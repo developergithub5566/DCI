@@ -148,10 +148,10 @@ namespace DCI.Repositories
 
 				var useraccessEntity = query.Count() > 0 ? query.FirstOrDefault() : null;
 
-				//if (!PasswordHashingHelper.VerifyPassword(pass.CurrentPassword, useraccessEntity.Password))
-				//{
-				//	return ((int)StatusCodes.Status401Unauthorized, "Invalid Current Password");
-				//}
+				if (pass.IsResetPassword == false && !PasswordHashingHelper.VerifyPassword(pass.CurrentPassword, useraccessEntity.Password))
+				{
+					return ((int)StatusCodes.Status401Unauthorized, "Invalid Current Password");
+				}
 				if (pass.NewPassword != pass.ConfirmPassword)
 				{
 					return (StatusCodes.Status401Unauthorized, "Passwords do not match.");
@@ -168,7 +168,7 @@ namespace DCI.Repositories
 				_dbContext.UserAccess.Entry(useraccess).State = EntityState.Modified;
 				await _dbContext.SaveChangesAsync();
 
-				return (StatusCodes.Status200OK, "Success");
+				return (StatusCodes.Status200OK, "Password has been successfully changed");
 			}
 			catch (Exception ex)
 			{

@@ -112,7 +112,7 @@ namespace DCI.API.Controllers
 				Log.CloseAndFlush();
 			}
 			return BadRequest();
-		}
+		}		
 
 		[HttpPost]
 		[Route("Login")]

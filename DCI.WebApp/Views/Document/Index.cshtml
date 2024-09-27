@@ -4,8 +4,8 @@
 <style>
 	/* Hide the default file input */
 	/* 	#fileUpload {
-												display: none;
-											} */
+													display: none;
+												} */
 
 	/* Style the custom button */
 
@@ -211,8 +211,9 @@
 								</div> *@
 							</div>
 							<div class="modal-footer">
-								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 								<button type="submit" class="btn btn-primary" id="btnSubmit">Submit</button>
+								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
 							</div>
 						</form>
 
@@ -223,7 +224,7 @@
 
 
 		@section scripts {
-			<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
+			@* <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script> *@
 			<script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
 
 			<script src="~/js/file-upload.js"></script>
@@ -272,9 +273,13 @@
 						formData.append('SectionId', sectionId);
 						formData.append('DocFile', file);
 
-						bootbox.confirm('Are you sure you want to submit this record?', function (result) {
-							if (result) {
-
+						Swal.fire({
+							text: "Are you sure you want to save this record?",
+							icon: "question",
+							showCancelButton: true,
+							confirmButtonText: "Ok"
+						}).then((result) => {
+							if (result.isConfirmed) {
 								$.ajax({
 									type: 'POST',
 									url: '@Url.Action("SaveDocument", "Document")',
@@ -285,20 +290,32 @@
 										if (response.success) {
 											$('#createForm')[0].reset();
 											js('#createmodal').modal('hide');
-											bootbox.alert(response.message, function () {
+
+											Swal.fire({
+												text: response.message,
+												icon: "success",
+												confirmButtonText: "Ok"
+											}).then((result) => {
 												location.reload();
 											});
+
 										} else {
-											bootbox.alert(response.message);
+											Swal.fire({
+												text: response.message,
+												icon: "error"
+											});
 										}
 									},
 									error: function () {
-										bootbox.alert('An error occurred. Please try again.');
+										Swal.fire({
+											text: "An error occurred. Please try again.",
+											icon: "error"
+										});
 									}
 								});
 							}
 						});
-					});
+					});// submit
 
 				});
 
@@ -372,11 +389,17 @@
 								$('#fileUpload').prop('disabled', false);
 								js('#createmodal').modal('show');
 							} else {
-								bootbox.alert(response.message);
+								Swal.fire({
+									text: response.message,
+									icon: "error"
+								});
 							}
 						},
 						error: function () {
-							bootbox.alert('An error occurred. Please try again.');
+							Swal.fire({
+								text: "An error occurred. Please try again.",
+								icon: "error"
+							});
 						}
 					});
 				}
@@ -478,33 +501,54 @@
 
 								js('#createmodal').modal('show');
 							} else {
-								bootbox.alert(response.message);
+								Swal.fire({
+									text: response.message,
+									icon: "error"
+								});
 							}
 						},
 						error: function () {
-							bootbox.alert('An error occurred. Please try again.');
+							Swal.fire({
+								text: "An error occurred. Please try again.",
+								icon: "error"
+							});
 						}
 					});
 				}
 
 				function deleteform(id) {
-					bootbox.confirm('Are you sure you want to delete this record?', function (result) {
-						if (result) {
+					Swal.fire({
+						text: "Are you sure you want to delete this record?",
+						icon: "warning",
+						showCancelButton: true,
+						confirmButtonText: "Yes, delete it!"
+					}).then((result) => {
+						if (result.isConfirmed) {
 							$.ajax({
 								type: 'POST',
 								url: '@Url.Action("DeleteDocument", "Document")',
 								data: { DocId: id },
 								success: function (response) {
 									if (response.success) {
-										bootbox.alert(response.message, function () {
+										Swal.fire({
+											text: response.message,
+											icon: "success",
+											confirmButtonText: "Ok"
+										}).then((result) => {
 											location.reload();
 										});
 									} else {
-										bootbox.alert(response.message);
+										Swal.fire({
+											text: response.message,
+											icon: "error"
+										});
 									}
 								},
 								error: function () {
-									bootbox.alert('An error occurred. Please try again.');
+									Swal.fire({
+										text: "An error occurred. Please try again.",
+										icon: "error"
+									});
 								}
 							});
 						}
@@ -512,8 +556,14 @@
 				}
 
 				function removefile() {
-					bootbox.confirm('Are you sure you want to delete this file?', function (result) {
-						if (result) {
+
+					Swal.fire({
+						text: "Are you sure you want to delete this file?",
+						icon: "warning",
+						showCancelButton: true,
+						confirmButtonText: "Yes, delete it!"
+					}).then((result) => {
+						if (result.isConfirmed) {
 							document.querySelector('.file-name').textContent = '';
 							$('#fileUpload').show();
 							$('#viewFile').hide();
@@ -550,11 +600,17 @@
 								});
 
 							} else {
-								bootbox.alert(response.message);
+								Swal.fire({
+									text: response.message,
+									icon: "error"
+								});
 							}
 						},
 						error: function () {
-							bootbox.alert('An error occurred. Please try again.');
+							Swal.fire({
+								text: "An error occurred. Please try again.",
+								icon: "error"
+							});
 						}
 					});
 				}

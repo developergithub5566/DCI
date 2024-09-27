@@ -24,7 +24,7 @@ namespace DCI.Models.ViewModel
 	{
 		public int UserId { get; set; } = 0;
 		public string Firstname { get; set; } = string.Empty;
-		public string Middlename { get; set; } = string.Empty;
+		public string? Middlename { get; set; } = string.Empty;
 		public string Lastname { get; set; } = string.Empty;
 		public string ContactNo { get; set; } = string.Empty;
 		public string Email { get; set; } = string.Empty;

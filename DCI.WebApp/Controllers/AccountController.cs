@@ -14,6 +14,7 @@ using static System.Net.WebRequestMethods;
 using Microsoft.AspNetCore.Authorization;
 using DCI.Models.Entities;
 using System.Security.Claims;
+using DCI.WebApp.Configuration;
 
 
 namespace DCI.WebApp.Controllers
@@ -23,11 +24,13 @@ namespace DCI.WebApp.Controllers
 		private readonly IOptions<APIConfigModel> _apiconfig;
 		//private readonly IUserContextService _userContextService;
 		private readonly IHttpContextAccessor _httpContextAccessor;
-		public AccountController(IOptions<APIConfigModel> apiconfig, IHttpContextAccessor httpContextAccessor)
+		private readonly UserSessionHelper _userSessionHelper;
+		public AccountController(IOptions<APIConfigModel> apiconfig, IHttpContextAccessor httpContextAccessor, UserSessionHelper userSessionHelper)
 		{
 			this._apiconfig = apiconfig;
 			//this._userContextService = userContextService;
 			this._httpContextAccessor = httpContextAccessor;
+			this._userSessionHelper = userSessionHelper;
 		}
 
 		[HttpGet]
@@ -174,9 +177,11 @@ namespace DCI.WebApp.Controllers
 
 		public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
 		{
-
 			try
 			{
+				var currentUser = _userSessionHelper.GetCurrentUser();
+				model.Email = currentUser.Email;
+
 				if (model.NewPassword != "" && model.ConfirmPassword != "")
 				{
 					using (var _httpclient = new HttpClient())
@@ -189,7 +194,7 @@ namespace DCI.WebApp.Controllers
 						string responseBody = await response.Content.ReadAsStringAsync();
 						if (response.IsSuccessStatusCode)
 						{
-							return Json(new { success = true, responseBody });
+							return Json(new { success = true, message = responseBody });
 						}
 						return Json(new { success = false, message = responseBody });
 					}

@@ -60,9 +60,13 @@ namespace DCI.API.Controllers
 		{
 			try
 			{
-				//var result = await _documentRepository.ValidateToken(model.Token);
+				var result = await _documentRepository.ValidateToken(model);
 				//return StatusCode(result.statuscode, result.message);
-				return Ok( await _documentRepository.ValidateToken(model));
+				if (result.DocId > 0)
+				{
+					return Ok(await _documentRepository.ValidateToken(model));
+				}
+				return BadRequest(await _documentRepository.ValidateToken(model));
 			}
 			catch (Exception ex)
 			{

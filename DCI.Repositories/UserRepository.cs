@@ -60,7 +60,7 @@ namespace DCI.Repositories
 
 				var result = query.FirstOrDefault();
 
-				var rolexList = _dbContext.Role.AsQueryable().ToList();
+				var rolexList = _dbContext.Role.Where(x => x.IsActive).AsQueryable().ToList();
 
 				if (result == null)
 				{

@@ -254,7 +254,7 @@ namespace DCI.Repositories
                 moduleinRoleVM.RoleId = _roleId;
                 moduleinRoleVM.View = true;
                 moduleinRoleVM.CreatedBy = model.RoleVM.CreatedBy;
-                moduleinRoleVM.ModifiedBy = model.RoleVM.ModifiedBy;
+               // moduleinRoleVM.ModifiedBy = model.RoleVM.ModifiedBy;
 
                 if (module.Value?.SubModules?.Any() == true)
                 {

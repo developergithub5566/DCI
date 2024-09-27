@@ -8,7 +8,7 @@ namespace DCI.Repositories.Interface
 		Task<(int statuscode, string message, Role entity)> Save(RoleViewModel model);
 		Task<(int statuscode, string message)> Delete(RoleViewModel model);
 		Task<Role> GetRoleById(int roleId);
-		Task<IList<Role>> GetAllRoles();
+		Task<IList<RoleViewModel>> GetAllRoles();
 		Task<bool> IsExistsRole(int roleId);
 
 	}

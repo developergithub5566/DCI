@@ -3,17 +3,17 @@
 
 <style>
 	/* input[type=file]::file-selector-button {
-			border: 2px solid #6c5ce7;
-			padding: .2em .4em;
-			border-radius: .2em;
-			background-color: #a29bfe;
-			transition: 1s;
-		}
+						border: 2px solid #6c5ce7;
+						padding: .2em .4em;
+						border-radius: .2em;
+						background-color: #a29bfe;
+						transition: 1s;
+					}
 
-			input[type=file]::file-selector-button:hover {
-				background-color: #81ecec;
-				border: 2px solid #00cec9;
-			} */
+						input[type=file]::file-selector-button:hover {
+							background-color: #81ecec;
+							border: 2px solid #00cec9;
+						} */
 
 </style>
 
@@ -55,36 +55,40 @@
 				<div class="loginDiv">
 					<label class="title">Please upload your file</label>
 					@* <p class="desc">Enter your email below to reset your password</p> *@
-				
+
 					<form id="createForm" method="post">
 						<input type="hidden" id="DocId" name="DocId" value="@Model.DocId">
 						<input type="hidden" id="RequestById" name="RequestById" value="@Model.RequestById">
+
 						<div class="form-group">
-							<label for="DocNo" class="col-form-label">Document No:</label> 
-							
+							<label for="DocNo" class="col-form-label">Document No:</label>
 							<input type="text" class="form-control" id="DocNo" name="DocNo" value="@Model.DocNo" readonly />
 						</div>
 						<div class="form-group">
-							<label for="DocName" class="col-form-label">Document Name:</label> 
+							<label for="DocName" class="col-form-label">Document Name:</label>
 							<input type="text" class="form-control" id="DocName" name="DocName" value="@Model.DocName" readonly />
 						</div>
-						
+
 						<div class="form-group">
-							<label for="DocName" class="col-form-label">Document File:</label>
-							<input type="file" class="form-control" id="fileUpload" name="fileUpload"  />
+							<label for="DocName" class="col-form-label required">Document File:</label>
+							<input type="file" class="form-control" id="fileUpload" name="fileUpload" accept="application/pdf" onchange="validateFileType()" required />
 						</div>
-					
-						<div class="form-group">				
+
+						<div class="form-group">
 							<button type="submit" class="btn btn-primary btn-block w-100">Submit</button>
 						</div>
 					</form>
 				</div>
-				<div class="copyrights">
-					<label>&copy; 2024 DBP Data Center Inc.</label>
-				</div>
+
+
+
+			</div>
+			<div class="copyrights">
+				<label>&copy; 2024 DBP Data Center Inc.</label>
 			</div>
 		</div>
 	</div>
+</div>
 </div>
 
 @section scripts {
@@ -111,15 +115,17 @@
 
 			$('#createForm').submit(function (event) {
 				event.preventDefault();
-		
+
 
 				const fileInput = document.getElementById('fileUpload');
-				const file = fileInput.files[0]; 
+				const file = fileInput.files[0];
 				const docId = $('#DocId').val();
+				const docNo = $('#DocNo').val();
 				const reqId = $('#RequestById').val();
 
 				const formData = new FormData();
 				formData.append('DocId', docId);
+				formData.append('DocNo', docNo);
 				formData.append('RequestById', reqId);
 				formData.append('DocFile', file);
 
@@ -134,10 +140,9 @@
 							contentType: false,
 							success: function (response) {
 								if (response.success) {
-									$('#createForm')[0].reset();
-									js('#createmodal').modal('hide');
+						
 									bootbox.alert(response.message, function () {
-										location.reload();
+										window.location = "/Account/Login";
 									});
 								} else {
 									bootbox.alert(response.message);
@@ -153,6 +158,16 @@
 
 		});
 
+		function validateFileType() {
+			const input = document.getElementById('fileUpload');
+			const file = input.files[0];
 
+			if (file) {
+				if (file.type !== "application/pdf") {
+					alert("Invalid file type. Please select a PDF file.");
+					input.value = '';
+				}
+			}
+		}
 	</script>
 }

@@ -109,5 +109,11 @@ namespace DCI.WebApp.Controllers
 		
 		}
 
+		public async Task<IActionResult> ChangePass()
+		{
+			return View();
+		}
+
+
 	}
 }
