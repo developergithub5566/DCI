@@ -103,7 +103,7 @@
 								<td>
 									<a href="#" onclick="editForm(@item.DocId,1)" class="btn btn-primary"><i class="fas fa-search"></i></a> |
 									<a href="#" id="editForm" onclick="editForm(@item.DocId,0)" class="btn btn-info"><i class="fa fa-edit"></i></a> |
-									<a href="#" id="deleteform" class="btn btn-danger" onclick="deleteform(@item.DocId)"><i class="far fa-trash-alt"></i></a>
+									<a href="#" id="deleteform" class="btn btn-danger" onclick="deleteform(@item.DocId,@item.DocNo)"><i class="far fa-trash-alt"></i></a>
 								</td>
 							</tr>
 						}
@@ -126,46 +126,56 @@
 							<div class="modal-body">
 								<input type="hidden" id="DocId" name="DocId">
 								<div class="row">
-									<div class="col">
+									<div class="col" id="DocNoDiv">
 										<label for="DocNo" class="col-form-label">Document No:</label>
-										<input type="text" class="form-control" id="DocNo" name="DocNo" value="" disabled maxlength="15">
+										<input type="text" class="form-control" id="DocNo" name="DocNo" readonly>
 									</div>
+									<div class="col"> 
+									</div>
+								</div>
+								<div class="row">
 									<div class="col">
 										<label for="DocName" class="col-form-label">Document Name:</label>
 										<input type="text" class="form-control" id="DocName" name="DocName" maxlength="100" required>
 									</div>
-								</div>
-								<div class="row">
 									<div class="col">
 										<label for="DocTypeId" class="col-form-label required">Document Type:</label>
 										<select id="documentSelect" class="form-select" required>
 											<option value="">select type</option>
 										</select>
 									</div>
+								
+								</div>
+								<div class="row">
 									<div class="col">
-
 										<label for="DocCategory" class="col-form-label required">Document Category:</label>
 										<select id="docCategorySelect" class="form-select" required>
 											<option value="0">select type</option>
 											<option value="1">Internal</option>
 											<option value="2">Internal/External</option>
 										</select>
-
 									</div>
-								</div>
-								<div class="row">
 									<div class="col">
 										<label for="Department" class="col-form-label required">Department:</label>
 										<select id="departmentSelect" class="form-select" onchange="getSectionOnChange()" required>
 											<option value="">select department</option>
 										</select>
 									</div>
+								
+								</div>
+								<div class="row">
 									<div class="col">
 										<label for="Section" class="col-form-label required">Section:</label>
 										<select id="sectionSelect" class="form-select" required>
 											<option value="">select section</option>
 										</select>
 									</div>
+									<div class="col">
+										<label for="RequestById" class="col-form-labe required">Request By:</label>
+										<select id="requestBySelect" class="form-select" required>
+											<option value="">select requestor</option>
+										</select>
+									</div>		
 								</div>
 								<div class="row">
 									<div class="col">
@@ -179,36 +189,9 @@
 										<a href="#" id="deleteFile" onclick="removefile()" class="btn btn-danger" title="remove"> <i class="far fa-trash-alt"></i></a>
 									</div>
 									<div class="col">
-										<label for="RequestById" class="col-form-labe required">Request By:</label>
-										<select id="requestBySelect" class="form-select" required>
-											<option value="">select requestor</option>
-										</select>
-									</div>
+										</div>
 								</div>
-								@* 	<hr />
-								<div class="row">
-								<div class="col">
-								<label for="Reviewer" class="col-form-label">Reviewer:</label>
-								<select id="reviewerSelect" class="form-select">
-								<option value="">select reviewer</option>
-								<option value="0">User 1</option>
-								<option value="1">User 2</option>
-								</select>
-								</div>
-								<div class="col">
-								<label for="Approver" class="col-form-label">Approver:</label>
-								<select id="approverSelect" class="form-select">
-								<option value="">select approver</option>
-								<option value="0">User 1</option>
-								<option value="1">User 2</option>
-								</select>
-								</div>
-								</div>
-								<div class="row">
-
-								<div class="col">
-								</div>
-								</div> *@
+						
 							</div>
 							<div class="modal-footer">
 								<button type="submit" class="btn btn-primary" id="btnSubmit">Submit</button>
@@ -379,7 +362,7 @@
 								});
 
 
-
+								$('#DocNoDiv').hide();
 								document.querySelector('.file-name').textContent = '';
 								$('#fileUpload').show();
 								$('#viewFile').hide();
@@ -474,7 +457,7 @@
 
 								document.querySelector('.file-name').textContent = response.data.filename;
 
-
+								$('#DocNoDiv').show();
 								if (view == 1) {	//View button
 
 									$('#createForm').find('input, select, textarea').prop('disabled', true);
@@ -517,6 +500,7 @@
 				}
 
 				function deleteform(id) {
+					
 					Swal.fire({
 						text: "Are you sure you want to delete this record?",
 						icon: "warning",
@@ -620,9 +604,12 @@
 					const file = input.files[0];
 
 					if (file) {
-						if (file.type !== "application/pdf") {
-							alert("Invalid file type. Please select a PDF file.");
+						if (file.type !== "application/pdf") {							
 							input.value = '';
+							Swal.fire({
+								text: "Invalid file type. Please select a PDF file.",
+								icon: "error"
+							});
 						}
 					}
 				}

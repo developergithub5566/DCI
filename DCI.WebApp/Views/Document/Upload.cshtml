@@ -92,7 +92,7 @@
 </div>
 
 @section scripts {
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
+@* 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script> *@
 	@* <script src="~/js/file-upload.js"></script> *@
 
 	<script type="text/javascript">
@@ -128,9 +128,14 @@
 				formData.append('DocNo', docNo);
 				formData.append('RequestById', reqId);
 				formData.append('DocFile', file);
-
-				bootbox.confirm('Are you sure you want to submit this record?', function (result) {
-					if (result) {
+				
+				Swal.fire({
+					text: "Are you sure you want to submit this record?",
+					icon: "question",
+					showCancelButton: true,
+					confirmButtonText: "Ok"
+				}).then((result) => {
+					if (result.isConfirmed) {
 
 						$.ajax({
 							type: 'POST',
@@ -140,16 +145,28 @@
 							contentType: false,
 							success: function (response) {
 								if (response.success) {
-						
-									bootbox.alert(response.message, function () {
+									
+
+									Swal.fire({
+										text: response.message,
+										icon: "success",
+										confirmButtonText: "Ok"
+									}).then((result) => {
 										window.location = "/Account/Login";
 									});
+
 								} else {
-									bootbox.alert(response.message);
+									Swal.fire({
+										text: response.message,
+										icon: "error"
+									});
 								}
 							},
 							error: function () {
-								bootbox.alert('An error occurred. Please try again.');
+								Swal.fire({
+									text: "An error occurred. Please try again.",
+									icon: "error"
+								});
 							}
 						});
 					}
@@ -163,9 +180,12 @@
 			const file = input.files[0];
 
 			if (file) {
-				if (file.type !== "application/pdf") {
-					alert("Invalid file type. Please select a PDF file.");
+				if (file.type !== "application/pdf") {	
 					input.value = '';
+					Swal.fire({
+						text: "Invalid file type. Please select a PDF file.",
+						icon: "error"
+					});
 				}
 			}
 		}
