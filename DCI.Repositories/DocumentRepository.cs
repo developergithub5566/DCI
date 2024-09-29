@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 
 using System.Data;
 using DCI.Core.Helpers;
+using System.Text.RegularExpressions;
 
 namespace DCI.Repositories
 {
@@ -260,10 +261,17 @@ namespace DCI.Repositories
 
 				var entity = await _dbContext.Document.FirstOrDefaultAsync(x => x.DocId == model.DocId && x.IsActive == true);
 				entity.FileLocation = fileloc;
-				entity.Filename = model.DocFile.FileName;
+			
 				entity.ModifiedBy = model.ModifiedBy != null ? model.ModifiedBy : null;
 				entity.DateModified = model.DateModified != null ? model.DateModified : null;
-				_dbContext.Document.Entry(entity).State = EntityState.Modified;
+
+				if(entity.Filename != null && entity.Filename !="")
+				{
+                    entity.Version = Convert.ToInt16(entity.Version) + 1;
+                    entity.DocNo = IncrementVersion(entity.DocNo);
+                }              
+                entity.Filename = model.DocFile.FileName;
+                _dbContext.Document.Entry(entity).State = EntityState.Modified;
 				await _dbContext.SaveChangesAsync();
 			}
 			catch (Exception ex)
@@ -347,7 +355,26 @@ namespace DCI.Repositories
 			string formattedB = setB.ToString("D3");
 			return $"{formattedA}.{formattedB}";
 		}
-		public async Task<DocumentViewModel> ValidateToken(ValidateTokenViewModel param)
+
+        public static string IncrementVersion(string versionString)
+        {
+            // Define a regex pattern to extract the current version number
+            string pattern = @"Ver\.\s*(\d+)";
+            var match = Regex.Match(versionString, pattern);
+
+            if (match.Success)
+            {             
+                int currentVersion = int.Parse(match.Groups[1].Value);
+				
+                int newVersion = currentVersion + 1;
+
+                string updatedVersionString = Regex.Replace(versionString, pattern, $"Ver. {newVersion}");
+
+                return updatedVersionString;
+            }
+            return versionString; 
+        }
+        public async Task<DocumentViewModel> ValidateToken(ValidateTokenViewModel param)
 		{
 			DocumentViewModel vm = new DocumentViewModel();
 			try
@@ -361,19 +388,19 @@ namespace DCI.Repositories
 						DocId = doc.DocId,
 						DocName = doc.DocName,
 						DocNo = doc.DocNo,
-						RequestById = doc.RequestById
-						//Version = doc.Version,
-						//Filename = doc.Filename,
-						//FileLocation = doc.FileLocation,
-						//DocTypeId = doc.DocTypeId,
-						//DocumentTypeList = null,
-						//DocTypeName = string.Empty,
-						//StatusId = doc.StatusId,
-						//Reviewer = doc.Reviewer,
-						//Approver = doc.Approver,
-						//DepartmentId = doc.DepartmentId,
-						//DocCategory = doc.DocCategory
-					}).FirstAsync();
+						RequestById = doc.RequestById,
+                        Filename = doc.Filename,
+                        //Version = doc.Version,
+                        //FileLocation = doc.FileLocation,
+                        //DocTypeId = doc.DocTypeId,
+                        //DocumentTypeList = null,
+                        //DocTypeName = string.Empty,
+                        //StatusId = doc.StatusId,
+                        //Reviewer = doc.Reviewer,
+                        //Approver = doc.Approver,
+                        //DepartmentId = doc.DepartmentId,
+                        //DocCategory = doc.DocCategory
+                    }).FirstAsync();
 				}
 				else
 				{
