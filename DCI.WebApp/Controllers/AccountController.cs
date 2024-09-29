@@ -180,7 +180,7 @@ namespace DCI.WebApp.Controllers
 			try
 			{
 				var currentUser = _userSessionHelper.GetCurrentUser();
-				model.Email = currentUser.Email;
+				model.Email = currentUser?.Email != null ? currentUser.Email : model.Email;
 
 				if (model.NewPassword != "" && model.ConfirmPassword != "")
 				{

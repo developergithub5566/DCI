@@ -50,7 +50,7 @@
 </div>
 
 @section Scripts {
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
+@* 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script> *@
 	@* 	@{
 			await Html.RenderPartialAsync("_ValidationScriptsPartial");
 		} *@
@@ -61,25 +61,60 @@
 				event.preventDefault();
 				var formData = $(this).serialize();
 
-				$.ajax({
-					type: 'POST',
-					url: '@Url.Action("ChangePassword", "Account")',
-					data: formData,
+				// $.ajax({
+				// 	type: 'POST',
+				// 	url: '@Url.Action("ChangePassword", "Account")',
+				// 	data: formData,
 
-					success: function (response) {
-						if (response.success) {
-							bootbox.alert(response.message, function () {
-								location.reload();
-							});
-						} else {
-							bootbox.alert(response.message);
-						}
-					},
-					error: function () {
-						bootbox.alert('An error occurred. Please try again.');
+				// 	success: function (response) {
+				// 		if (response.success) {
+				// 			bootbox.alert(response.message, function () {
+				// 				location.reload();
+				// 			});
+				// 		} else {
+				// 			bootbox.alert(response.message);
+				// 		}
+				// 	},
+				// 	error: function () {
+				// 		bootbox.alert('An error occurred. Please try again.');
+				// 	}
+				// });
+				Swal.fire({
+					text: "Are you sure you want to change your password?",
+					icon: "warning",
+					showCancelButton: true,
+					confirmButtonText: "Ok"
+				}).then((result) => {
+					if (result.isConfirmed) {
+						$.ajax({
+							type: 'POST',
+							url: '@Url.Action("ChangePassword", "Account")',
+							data: formData,
+							success: function (response) {
+								if (response.success) {
+									Swal.fire({
+										text: response.message,
+										icon: "success",
+										confirmButtonText: "Ok"
+									}).then((result) => {
+										location.reload();
+									});
+								} else {
+									Swal.fire({
+										text: response.message,
+										icon: "error"
+									});
+								}
+							},
+							error: function () {
+								Swal.fire({
+									text: "An error occurred. Please try again.",
+									icon: "error"
+								});
+							}
+						});
 					}
 				});
-
 			});
 		});
 	</script>
