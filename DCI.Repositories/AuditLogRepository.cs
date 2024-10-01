@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading.Channels;
+using Serilog;
 
 namespace DCI.Repositories
 {
@@ -26,48 +27,73 @@ namespace DCI.Repositories
 		}
 		public async Task<IList<AuditLogViewModel>> GetAuditLogById(AuditLogViewModel model)
 		{
-			var audit = await _dbContext.AuditLog.AsNoTracking().ToListAsync();
-			var user = await _dbContext.User.AsNoTracking().ToListAsync();
+			try
+			{
+				var audit = await _dbContext.AuditLog.AsNoTracking().ToListAsync();
+				var user = await _dbContext.User.AsNoTracking().ToListAsync();
 
-			var query = from log in audit
-						join u in user				
-						on Convert.ToInt32(string.IsNullOrEmpty(log.Username) ? (int?)null : Convert.ToInt32(log.Username)) equals u.UserId
-						where log.Username == model.Username
-						select new AuditLogViewModel
-						{
-							Id = log.Id,
-							EntityName = log.EntityName,
-							ActionType = log.ActionType,
-							Username = DCI.Core.Common.Utilities.GetUsernameByEmail(u.Email),
-							TimeStamp = log.TimeStamp,
-							EntityId = log.EntityId,
-							Changes = log.Changes,
-							ChangesSerialized = GetChangesAsFormattedString(log.Changes),
-						};
+				var query = from log in audit
+							join u in user
+							on Convert.ToInt32(string.IsNullOrEmpty(log.Username) ? (int?)null : Convert.ToInt32(log.Username)) equals u.UserId
+							where log.Username == model.Username
+							select new AuditLogViewModel
+							{
+								Id = log.Id,
+								EntityName = log.EntityName,
+								ActionType = log.ActionType,
+								Username = DCI.Core.Common.Utilities.GetUsernameByEmail(u.Email),
+								TimeStamp = log.TimeStamp,
+								EntityId = log.EntityId,
+								Changes = log.Changes,
+								ChangesSerialized = GetChangesAsFormattedString(log.Changes),
+							};
 
-			return query.ToList();
+				return query.ToList();
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+			return null;
 		}
 		public async Task<IList<AuditLogViewModel>> GetAllAuditLogs()
 		{
-			var audit = await _dbContext.AuditLog.AsNoTracking().ToListAsync();
-			var user = await _dbContext.User.AsNoTracking().ToListAsync();
+			try
+			{
+				var audit = await _dbContext.AuditLog.AsNoTracking().ToListAsync();
+				var user = await _dbContext.User.AsNoTracking().ToListAsync();
 
-			var query = from log in audit
-						join u in user
-							on Convert.ToInt32(string.IsNullOrEmpty(log.Username) ? (int?)null : Convert.ToInt32(log.Username)) equals u.UserId
-						select new AuditLogViewModel
-						{
-							Id = log.Id,
-							EntityName = log.EntityName,
-							ActionType = log.ActionType,
-							Username = DCI.Core.Common.Utilities.GetUsernameByEmail(u.Email),
-							TimeStamp = log.TimeStamp,
-							EntityId = log.EntityId,
-							Changes = log.Changes,
-							ChangesSerialized = GetChangesAsFormattedString(log.Changes),					
-						};
+				var query = from log in audit
+							join u in user
+								on Convert.ToInt32(string.IsNullOrEmpty(log.Username) ? (int?)null : Convert.ToInt32(log.Username)) equals u.UserId
+							select new AuditLogViewModel
+							{
+								Id = log.Id,
+								EntityName = log.EntityName,
+								ActionType = log.ActionType,
+								Username = DCI.Core.Common.Utilities.GetUsernameByEmail(u.Email),
+								TimeStamp = log.TimeStamp,
+								EntityId = log.EntityId,
+								Changes = log.Changes,
+								ChangesSerialized = GetChangesAsFormattedString(log.Changes),
+							};
 
-			return  query.ToList();
+				return query.ToList();
+			}
+
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+			return null;
 		}
 		public string GetChangesAsFormattedString(Dictionary<string, object> changeData)
 		{

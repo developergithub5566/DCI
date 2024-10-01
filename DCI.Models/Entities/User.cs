@@ -14,7 +14,7 @@ namespace DCI.Models.Entities
 		public string Firstname { get; set; } = string.Empty;
 		public string? Middlename { get; set; } = string.Empty;
 		public string Lastname { get; set; } = string.Empty;
-		public string ContactNo { get; set; } = string.Empty;
+		public string? ContactNo { get; set; } = string.Empty;
 		public int RoleId { get; set; }
 		//public virtual Role RoleList { get; set; }
 		public DateTime? DateCreated { get; set; } = DateTime.Now;

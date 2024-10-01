@@ -30,19 +30,29 @@ namespace DCI.WebApp.Controllers
 			this._apiconfig = apiconfig;
 			//this._userContextService = userContextService;
 			this._httpContextAccessor = httpContextAccessor;
-			this._userSessionHelper = userSessionHelper;
+			this._userSessionHelper = userSessionHelper;		
 		}
 
 		[HttpGet]
 		public IActionResult Login()
 		{
+			ViewBag.Message = null;
 			return View();
 		}
 
 		[Authorize]
 		public async Task<IActionResult> Logout()
 		{
-			await HttpContext.SignOutAsync("Cookies");
+			//await HttpContext.SignOutAsync("Cookies");
+			//await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+			//await HttpContext.SignOutAsync(GoogleDefaults.AuthenticationScheme);
+			//HttpContext.Session.Clear();
+			// Optionally, clear any other cookies
+			//foreach (var cookie in HttpContext.Request.Cookies.Keys)
+			//{
+			//	Response.Cookies.Delete(cookie);
+			//}
+
 			return RedirectToAction("Login", "Account");
 		}
 
@@ -84,12 +94,15 @@ namespace DCI.WebApp.Controllers
 					}
 					else
 					{
+
+						ViewBag.Message = "Invalid account! Please check your username and password.";
 						return View();
 					}
 				}
 			}
 			catch (Exception ex)
 			{
+				ViewBag.Message = ex.ToString();
 				Log.Error(ex.ToString());
 			}
 			finally

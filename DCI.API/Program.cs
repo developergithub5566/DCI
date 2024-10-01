@@ -64,6 +64,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-//app.UseDeveloperExceptionPage();
+app.UseDeveloperExceptionPage();
 
 app.Run();

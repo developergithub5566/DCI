@@ -51,7 +51,7 @@ namespace DCI.Repositories
 
 			var userAccessEntity = await _userAccessRepository.GetUserAccessByUserId(userEntity.UserId);
 
-			string link = "https://localhost:7236/Account/ValidateToken?token=";
+			string link = "http://192.168.1.78:83/Account/ValidateToken?token=";
 			string emailBody = $@"
             <html>
             <body>
@@ -122,7 +122,7 @@ namespace DCI.Repositories
 			var userEntity = await _userRepository.GetUserById(model.RequestById ?? default(int));
 			//var _user = userEntity.
 
-			string link = "https://localhost:7236/Document/Upload?token=";
+			string link = "http://192.168.1.78:83/Document/Upload?token=";
 			model.RequestByEmail = userEntity.Email;
 			model.EmailBody = $@"
             <html>

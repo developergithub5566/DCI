@@ -26,25 +26,37 @@ namespace DCI.Repositories
 		public async Task<IList<DepartmentViewModel>> GetAllDepartment()
 		{
 			//return await _dbContext.Department.AsNoTracking().Where(x => x.IsActive == true).ToListAsync();
-			var context = _dbContext.Department.AsQueryable().ToList();
-			var userList = _dbContext.User.AsQueryable().ToList();
+			try
+			{
+				var context = _dbContext.Department.AsQueryable().ToList();
+				var userList = _dbContext.User.AsQueryable().ToList();
 
 
-			var query = from dept in context
-						join user in userList on dept.CreatedBy equals user.UserId
-						where dept.IsActive == true
-						select new DepartmentViewModel
-						{
-							DepartmentId = dept.DepartmentId,
-							DepartmentCode = dept.DepartmentCode,
-							DepartmentName = dept.DepartmentName,
-							Description = dept.Description,
-							CreatedName = user.Email,
-							CreatedBy = dept.CreatedBy,
-							DateCreated = dept.DateCreated,
-						};
+				var query = from dept in context
+							join user in userList on dept.CreatedBy equals user.UserId
+							where dept.IsActive == true
+							select new DepartmentViewModel
+							{
+								DepartmentId = dept.DepartmentId,
+								DepartmentCode = dept.DepartmentCode,
+								DepartmentName = dept.DepartmentName,
+								Description = dept.Description,
+								CreatedName = user.Email,
+								CreatedBy = dept.CreatedBy,
+								DateCreated = dept.DateCreated,
+							};
 
-			return query.ToList();
+				return query.ToList();
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());	
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+			return null;
 		}
 		public async Task<bool> IsExistsDepartment(int DepartmentId)
 		{
