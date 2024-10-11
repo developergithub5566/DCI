@@ -1,8 +1,21 @@
-﻿
-
-@if (User.Identity.IsAuthenticated)
+﻿@* @if (User.Identity.IsAuthenticated)
 {
     <div class="user-info">
     @User.FindFirst("FullName").Value
     </div>
+} *@
+
+
+
+@* @{
+    var fullname =  User.Identity.Name  ?? "Guest";   //User.FindFirst("Name").Value ?? "Guest";//.Claims.FirstOrDefault(c => c.Type == "FullName")?.Value ?? "Guest"; //
+        
+ 
 }
+
+
+
+<div class="user-info">
+ @fullname
+
+</div> *@

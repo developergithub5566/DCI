@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using DCI.Models.Configuration;
@@ -17,6 +18,7 @@ using System.Security.Claims;
 using DCI.WebApp.Configuration;
 
 
+
 namespace DCI.WebApp.Controllers
 {
 	public class AccountController : Controller
@@ -30,7 +32,7 @@ namespace DCI.WebApp.Controllers
 			this._apiconfig = apiconfig;
 			//this._userContextService = userContextService;
 			this._httpContextAccessor = httpContextAccessor;
-			this._userSessionHelper = userSessionHelper;		
+			this._userSessionHelper = userSessionHelper;
 		}
 
 		[HttpGet]
@@ -40,19 +42,69 @@ namespace DCI.WebApp.Controllers
 			return View();
 		}
 
-		[Authorize]
-		public async Task<IActionResult> Logout()
+		public async Task<IActionResult> Logoutx()
 		{
-			//await HttpContext.SignOutAsync("Cookies");
-			//await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-			//await HttpContext.SignOutAsync(GoogleDefaults.AuthenticationScheme);
-			//HttpContext.Session.Clear();
-			// Optionally, clear any other cookies
-			//foreach (var cookie in HttpContext.Request.Cookies.Keys)
-			//{
-			//	Response.Cookies.Delete(cookie);
-			//}
+			try
+			{
 
+
+				//await HttpContext.SignOutAsync("Cookies");
+				//await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+				//await HttpContext.SignOutAsync(GoogleDefaults.AuthenticationScheme);
+				//HttpContext.Session.Clear();
+				// Optionally, clear any other cookies
+
+				//  _httpContextAccessor.HttpContext.Session.Clear();
+				//Log.Information("Logout-");
+
+				//Log.Information("httpcontext-" + HttpContext.User.Identity.Name.ToString());
+
+				//Log.Information("HttpContext.Session-" + HttpContext.Session.IsAvailable);
+				//if (HttpContext.Session.IsAvailable)
+				//{
+
+				//	HttpContext.Session.Clear();
+				//}
+				//Log.Information("Request.Cookies-" + Request.Cookies.Count().ToString());
+				//if (Request.Cookies.Count > 0)
+				//{
+
+				//	foreach (var cookie in HttpContext.Request.Cookies.Keys)
+				//	{
+				//		Response.Cookies.Delete(cookie);
+				//	}
+				//}
+
+
+				_httpContextAccessor.HttpContext.Session.Clear();
+
+
+
+
+				if (_httpContextAccessor.HttpContext.Request.Cookies.Count > 0)
+				{
+
+					foreach (var cookie in _httpContextAccessor.HttpContext.Request.Cookies.Keys)
+					{
+						_httpContextAccessor.HttpContext.Response.Cookies.Delete(cookie);
+					}
+				}
+
+				await _httpContextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+				await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+
+				return RedirectToAction("Login", "Account");
+			}
+			catch (Exception ex)
+			{
+				ViewBag.Message = ex.ToString();
+				Log.Error(ex.ToString());
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
 			return RedirectToAction("Login", "Account");
 		}
 
@@ -75,21 +127,51 @@ namespace DCI.WebApp.Controllers
 						UserManager um = JsonConvert.DeserializeObject<UserManager>(responseBody);
 						_httpContextAccessor.HttpContext.Session.SetString("UserManager", JsonConvert.SerializeObject(um));
 
+						var _fullname = $"{um.Firstname} {um.Lastname}";
+
 						var claims = new List<Claim>
 						{
 							new Claim(ClaimTypes.NameIdentifier, um.Identifier.ToString()),
 							new Claim("UserId", um.UserId.ToString()),
 							new Claim(ClaimTypes.Email, um.Email),
-							new Claim("FullName", $"{um.Firstname} {um.Lastname}")
+							new Claim("FullName", _fullname),
+							new Claim(ClaimTypes.Name,_fullname)
 						};
 
+
 						// Create a ClaimsIdentity and ClaimsPrincipal
-						var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-						var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+						//var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+						//var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+						var claimsIdentity = new ClaimsIdentity(claims,CookieAuthenticationDefaults.AuthenticationScheme);
+
+						await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,new ClaimsPrincipal(claimsIdentity));
+
+
 
 						// Sign in the user
-						await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+						//await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+						//await _httpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+						//_httpContextAccessor.HttpContext.User = claimsPrincipal;
+						//	_httpContextAccessor.HttpContext.SignInAsync("Cookies", claimsPrincipal).Wait();
 
+						//_httpContextAccessor.HttpContext.Session.SetString("FullName", _fullname);
+
+						//Log.Information("Login-" + User.Identity.Name.ToString());
+
+
+						//_httpContextAccessor.HttpContext.Response.Cookies.Append("FullName", _fullname, new CookieOptions
+						//{
+						//	Domain = "http://192.168.1.78/",
+						//	Path = "/",
+						//	Expires = DateTimeOffset.UtcNow.AddHours(1),
+						//	HttpOnly = true,
+						//	Secure = false,
+						//	SameSite = SameSiteMode.Lax
+						//});
+
+
+						//  Log.Information("login-" + _httpContextAccessor.HttpContext);
 						return RedirectToAction("Index", "Home");
 					}
 					else
@@ -299,32 +381,32 @@ namespace DCI.WebApp.Controllers
 			}
 		}
 
-			[HttpGet("FacebookLogin")]
-			public IActionResult FacebookLogin()
-			{
-				var redirectUrl = Url.Action(nameof(FacebookResponse));
-				var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
-				return Challenge(properties, FacebookDefaults.AuthenticationScheme);
-			}
+		[HttpGet("FacebookLogin")]
+		public IActionResult FacebookLogin()
+		{
+			var redirectUrl = Url.Action(nameof(FacebookResponse));
+			var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+			return Challenge(properties, FacebookDefaults.AuthenticationScheme);
+		}
 
-			[HttpGet("FacebookResponse")]
-			public async Task<IActionResult> FacebookResponse()
-			{
-				var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-				if (!result.Succeeded) return BadRequest();
+		[HttpGet("FacebookResponse")]
+		public async Task<IActionResult> FacebookResponse()
+		{
+			var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+			if (!result.Succeeded) return BadRequest();
 
-				var claims = result.Principal.Identities
-									.FirstOrDefault()?.Claims
-									.Select(claim => new
-									{
-										claim.Type,
-										claim.Value
-									});
+			var claims = result.Principal.Identities
+								.FirstOrDefault()?.Claims
+								.Select(claim => new
+								{
+									claim.Type,
+									claim.Value
+								});
 
 
-				return Ok(claims);
-			}
-		
+			return Ok(claims);
+		}
+
 
 		//public async Task<IActionResult> Registration(RegistrationViewModel model)
 		//{

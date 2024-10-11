@@ -106,28 +106,28 @@
 						<ul class="navbar-nav ml-auto">
 
 
-				@* 			<li class="nav-item dropdown no-arrow mx-1">
-								<a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-									<i class="fas fa-bell fa-fw"></i>
-									<!-- Counter - Alerts -->
-									<span class="badge badge-danger badge-counter">0</span>
-								</a>
-								<!-- Dropdown - Alerts -->
-								<div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
-									<h6 class="dropdown-header">
-										Notifications
-									</h6>
+							@* 			<li class="nav-item dropdown no-arrow mx-1">
+						<a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<i class="fas fa-bell fa-fw"></i>
+						<!-- Counter - Alerts -->
+						<span class="badge badge-danger badge-counter">0</span>
+						</a>
+						<!-- Dropdown - Alerts -->
+						<div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
+						<h6 class="dropdown-header">
+						Notifications
+						</h6>
 
-									<div class='dropdown-item d-flex align-items-center'>
-										<div class='text-center full-width p10'>
-											<div class='small'>
-												No notification available
-											</div>
-										</div>
-									</div>
-									<a class="dropdown-item text-center small text-gray-500" href="http://202.57.47.34/DCI-ESS-STG/account/notifications/">Show All Notifications</a>
-								</div>
-							</li> *@
+						<div class='dropdown-item d-flex align-items-center'>
+						<div class='text-center full-width p10'>
+						<div class='small'>
+						No notification available
+						</div>
+						</div>
+						</div>
+						<a class="dropdown-item text-center small text-gray-500" href="http://202.57.47.34/DCI-ESS-STG/account/notifications/">Show All Notifications</a>
+						</div>
+						</li> *@
 
 
 							<div class="topbar-divider d-none d-sm-block"></div>
@@ -143,10 +143,7 @@
 
 								<!-- Dropdown - User Information -->
 								<div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-									@* 	<a class="dropdown-item" href="http://202.57.47.34/DCI-ESS-STG/account/profile/">
-								<i class="fa fa-user-cog fa-sm fa-fw mr-2 text-gray-800"></i>
-								Profile
-								</a> *@
+
 									<a asp-controller="Home" asp-action="Profile" class="dropdown-item">
 										@* // asp-route-id="-1" *@
 										<i class="fa fa-user-cog fa-sm fa-fw mr-2 text-gray-800"></i>
@@ -158,10 +155,7 @@
 										Activity Log
 									</a>
 									<div class="dropdown-divider"></div>
-									@* 	<a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-								<i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-800"></i>
-								Logout
-								</a> *@
+
 									<a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
 										<i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-800"></i>
 										Logout
@@ -224,9 +218,15 @@
 
 					<!-- Modal footer -->
 					<div class="modal-footer">
-						<a asp-controller="Account" asp-action="Logout" class="btn btn-primary">
+						<a asp-controller="Account" asp-action="Logoutx" class="btn btn-primary">
+					<small>Logout</small>
+					</a>
+					@* 	<button type="submit" class="btn btn-primary" id="btnLogout" onclick="Logout()">
 							<small>Logout</small>
-						</a>
+						</button> *@
+
+	
+
 						<button type="button" class="btn btn-secondary" data-dismiss="modal"><small>Cancel</small></button>
 					</div>
 				</div>
@@ -258,3 +258,39 @@
 	@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
+
+
+@section scripts {
+	<script type="text/javascript">
+		//var js = jQuery.noConflict(true);
+
+		$(document).ready(function () {
+
+		
+		});
+
+		function Logout() {
+
+			$.ajax({
+				type: 'POST',
+				url: '@Url.Action("Logout", "Account")',
+				//data: JSON.stringify(data),
+				//contentType: "application/json; charset=utf-8",
+				success: function (response) {
+					if (response.success) {
+						// bootbox.alert(response.message, function () {
+						// 	location.reload();
+						// });
+					} else {
+						//bootbox.alert(response.message);
+					}
+				},
+				error: function () {
+					//bootbox.alert('An error occurred. Please try again.');
+				}
+			});
+		}
+
+	</script>
+}

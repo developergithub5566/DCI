@@ -1,7 +1,6 @@
 ﻿@model IEnumerable<DCI.Models.ViewModel.HomePageViewModel>
 
-
-
+	<link href="~/css/DCIcustom.css" rel="stylesheet" />
 
 
 <head>
@@ -11,6 +10,14 @@
 </head>
 
 <div class="container-fluid">
+	
+<div class="spinner-overlay">
+    <div class="spinner-border text-light" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+
 	<!-- Content Row -->
 	<div class="row">
 		<div class="col-12">
@@ -42,3 +49,13 @@
 	</div>
 
 </div>
+	@section scripts {
+			<script type="text/javascript">				 
+								$('.spinner-overlay').show();
+
+								setTimeout(() => {
+									 $('.spinner-overlay').hide();
+								}, 200);
+						 
+			</script>
+		}

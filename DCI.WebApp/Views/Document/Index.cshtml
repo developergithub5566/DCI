@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<DCI.Models.ViewModel.DocumentViewModel>
 
-<link href="~/css/dcicustom.css" rel="stylesheet" />
+<link href="~/css/DCIcustom.css" rel="stylesheet" />
 <style>
 	/* Hide the default file input */
 	/* 	#fileUpload {
@@ -24,6 +24,14 @@
 
 </style>
 <div class="container-fluid">
+		<div class="spinner-overlay">
+		<div class="spinner-border text-light" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</div>
+	</div>
+
+
+
 	<div class="d-sm-flex align-items-center justify-content-between mb-3">
 		<h6 class="m-0 font-weight-bold text-gray-800">Document</h6>
 		<div class="upperRightDivBtn">
@@ -214,6 +222,12 @@
 
 			<script type="text/javascript">
 				var js = jQuery.noConflict(true);
+
+				$('.spinner-overlay').show();
+
+				setTimeout(() => {
+					$('.spinner-overlay').hide();
+				}, 200);
 
 				$(document).ready(function () {
 					js('#tblDocument').DataTable({

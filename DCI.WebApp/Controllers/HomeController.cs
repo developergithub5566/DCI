@@ -14,11 +14,13 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Serilog;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace DCI.WebApp.Controllers
 {
-	public class HomeController : Controller
+
+    public class HomeController : Controller
 	{
 		private readonly IOptions<APIConfigModel> _apiconfig;
 		private readonly UserSessionHelper _userSessionHelper;
@@ -31,7 +33,7 @@ namespace DCI.WebApp.Controllers
 
 		public async Task<IActionResult> Index()
 		{
-			//var currentUser = _userSessionHelper.GetCurrentUser();
+		//	var currentUser = _userSessionHelper.GetCurrentUser();
 
 			List<HomePageViewModel> model = new List<HomePageViewModel>();
 
@@ -44,8 +46,8 @@ namespace DCI.WebApp.Controllers
 				{
 					model = JsonConvert.DeserializeObject<List<HomePageViewModel>>(responseBody)!;
 				}
-			}
-			return View(model);
+			}   
+            return View(model);
 		}
 
 		public IActionResult Privacy()
