@@ -83,14 +83,7 @@ namespace DCI.WebApp.Controllers
 					request.Content = stringContent;
 					var response = await _httpclient.SendAsync(request);
 					var responseBody = await response.Content.ReadAsStringAsync();
-					UserViewModel vm = JsonConvert.DeserializeObject<UserViewModel>(responseBody)!;
-
-					//vm.Options = vm.RoleList?.Select(x =>
-					//							   new SelectListItem
-					//							   {
-					//								   Value = x.RoleId.ToString(),
-					//								   Text = x.RoleName
-					//							   }).ToList();
+					UserViewModel vm = JsonConvert.DeserializeObject<UserViewModel>(responseBody)!;	
 
 					if (response.IsSuccessStatusCode)
 					{

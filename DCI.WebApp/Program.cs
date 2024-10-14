@@ -4,7 +4,7 @@ using DCI.Models.Configuration;
 using Serilog;
 using DCI.WebApp.Configuration;
 using DCI.WebApp.Services;
-using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+
 
 //using DCI.Repositories.Interface;
 //using DCI.Repositories;
@@ -34,7 +34,7 @@ builder.Services.AddAuthentication(options =>
 		  options.Cookie.Name = CookieAuthenticationDefaults.AuthenticationScheme;
 		  options.Cookie.HttpOnly = builder.Configuration.GetValue<bool>("Authentication:Cookie:HttpOnly");
 		  options.Cookie.SecurePolicy = builder.Configuration.GetValue<CookieSecurePolicy>("Authentication:Cookie:SecurePolicy");
-		  options.Cookie.SameSite = SameSiteMode.None; // // builder.Configuration.GetValue<SameSiteMode>("Authentication:Cookie:SameSite");
+		  options.Cookie.SameSite =  builder.Configuration.GetValue<SameSiteMode>("Authentication:Cookie:SameSite");
 		  options.Cookie.MaxAge = TimeSpan.FromDays(builder.Configuration.GetValue<int>("Authentication:Cookie:MaxAge"));
 		  options.SlidingExpiration = builder.Configuration.GetValue<bool>("Authentication:Cookie:SlidingExpiration");
 		  options.ExpireTimeSpan = TimeSpan.FromDays(builder.Configuration.GetValue<int>("Authentication:Cookie:ExpireTimeSpan"));
@@ -85,11 +85,10 @@ var app = builder.Build();
 //if (!app.Environment.IsDevelopment())
 //{
 //	app.UseExceptionHandler("/Home/Error");
-//	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 //	app.UseHsts();
 //}
 
-app.UseSession(); // Ensure session is used
+app.UseSession(); 
 
 
 app.UseHttpsRedirection();

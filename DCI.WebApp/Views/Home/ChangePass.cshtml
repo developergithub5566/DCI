@@ -1,8 +1,13 @@
 ﻿
-<link href="~/css/dcicustom.css" rel="stylesheet" />
 
+<link href="~/css/DCIcustom.css" rel="stylesheet" />
 
 <div class="container-fluid">
+	<div class="spinner-overlay">
+		<div class="spinner-border text-light" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</div>
+	</div>
 
 	<!-- Page Heading -->
 	<div class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -55,6 +60,13 @@
 			await Html.RenderPartialAsync("_ValidationScriptsPartial");
 		} *@
 	<script type="text/javascript">
+		$('.spinner-overlay').show();
+
+		setTimeout(() => {
+			$('.spinner-overlay').hide();
+		}, 200);
+
+
 		$(document).ready(function () {
 
 			$('#ChangePasswordForm').submit(function (event) {

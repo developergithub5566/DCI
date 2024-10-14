@@ -1,6 +1,6 @@
 ﻿@model DCI.Models.ViewModel.UserViewModel
 
-<link href="~/css/dcicustom.css" rel="stylesheet" />
+<link href="~/css/DCIcustom.css" rel="stylesheet" />
 
 <div class="d-sm-flex align-items-center justify-content-between mb-3">
 	<h6 class="m-0 font-weight-bold text-gray-800">Profile</h6>
@@ -25,6 +25,12 @@
 		<h5 class="text-gray-800 mb0"></h5>
 	</div>
 	<div class="card-body">
+		<div class="spinner-overlay">
+		<div class="spinner-border text-light" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</div>
+	</div>
+
 		<div class="cardTitle">
 			<label>My Profile</label>
 			<p>Manage and protect your account</p>
@@ -76,6 +82,13 @@
 		<script type="text/javascript">
 
 			var js = jQuery.noConflict(true);
+
+				$('.spinner-overlay').show();
+
+				setTimeout(() => {
+					$('.spinner-overlay').hide();
+				}, 200);
+
 
 			js(document).ready(function () {
 
