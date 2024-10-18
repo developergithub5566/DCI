@@ -113,27 +113,7 @@ namespace DCI.Repositories
 				else
 				{
 					return (StatusCodes.Status406NotAcceptable, "Invalid User Id");
-				}
-				//else
-				//{
-				//	var entities = await _dbContext.User.FirstOrDefaultAsync(x => x.UserId == model.UserId);
-
-				//	entities.Username = model.Username;
-				//	entities.Firstname = model.Firstname;
-				//	entities.Lastname = model.Lastname;
-				//	entities.ContactNo = model.ContactNo;
-				//	entities.Email = model.Email;
-				//	entities.RoleId = model.RoleId;
-				//	entities.DateCreated = entities.DateCreated;
-				//	entities.CreatedBy = entities.CreatedBy;
-				//	entities.DateModified = DateTime.Now;
-				//	entities.ModifiedBy = "Admin";
-				//	entities.IsActive = true;
-
-				//	_dbContext.User.Entry(entities).State = EntityState.Modified;
-				//	await _dbContext.SaveChangesAsync();
-				//	return (StatusCodes.Status200OK, "Registration updated successfully");
-				//}
+				}		
 			}
 			catch (Exception ex)
 			{

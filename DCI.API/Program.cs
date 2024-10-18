@@ -39,7 +39,7 @@ builder.Services.Configure<FileModel>(builder.Configuration.GetSection("Document
 builder.Services.AddScoped<IUserContextService, UserContextService>();
 builder.Services.AddHttpContextAccessor();
 
-
+builder.Services.Configure<APIConfigModel>(builder.Configuration.GetSection("WebAPI"));
 //builder.Services.AddSingleton<IUserContextService, UserContextService>();
 
 

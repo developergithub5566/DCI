@@ -48,11 +48,13 @@ namespace DCI.API.Service
 	{
 		private readonly IHttpContextAccessor _httpContextAccessor;
 		private readonly IUserRepository _userRepository;
+		private readonly IModuleInRoleRepository _moduleInRoleRepository;
 
-		public UserContextService(IHttpContextAccessor httpContextAccessor, IUserRepository userRepository)
+		public UserContextService(IHttpContextAccessor httpContextAccessor, IUserRepository userRepository, IModuleInRoleRepository moduleInRoleRepository)
 		{
 			_httpContextAccessor = httpContextAccessor;
 			_userRepository = userRepository;
+			_moduleInRoleRepository = moduleInRoleRepository;
 		}
 
 		public async Task<UserManager> GetUserContext(string email)
@@ -62,7 +64,9 @@ namespace DCI.API.Service
 			if (user == null || !user.Identity.IsAuthenticated)
 			{
 				 usermodel = await _userRepository.GetUserByEmail(email);
-			}			
+			}
+
+			var moduleList = _moduleInRoleRepository.GetModuleInRoleByRoleId(usermodel.RoleId);
 
 			return new UserManager
 			{
@@ -72,6 +76,7 @@ namespace DCI.API.Service
 				Middlename = usermodel.Middlename,
 				Firstname = usermodel.Firstname,
 				RoleId = usermodel.RoleId,
+			//	ModulePageList = moduleList,
 			};
 			//return new UserManager
 			//{

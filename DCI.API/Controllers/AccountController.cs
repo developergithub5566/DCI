@@ -62,6 +62,9 @@ namespace DCI.API.Controllers
 			}
 
 			var result = await _userRepository.Registration(model);
+
+			await _emailRepository.SendSetPassword(model.Email); // Send email for password reset 
+
 			return StatusCode(result.statuscode, result.message);
 		}
 
@@ -75,7 +78,7 @@ namespace DCI.API.Controllers
 
 				if (await _emailRepository.IsExistsEmail(vm.Email))
 				{
-					await _emailRepository.SendPasswordReset(vm.Email);
+					await _emailRepository.SendResetPassword(vm.Email);
 					return Ok("Email sent successfully.");
 				}
 				else

@@ -1,4 +1,13 @@
 ﻿// Check All checkboxes
+
+let checkAllBox_Document = document.getElementById('chkAllDocument');
+checkAllBox_Document.addEventListener('change', function () {
+	let checkboxes = document.querySelectorAll('.chk_auditTrail');
+	checkboxes.forEach((checkbox) => {
+		checkbox.checked = checkAllBox_Document.checked;
+	});
+});
+
 let checkAllBox_UserManagement = document.getElementById('chkAllUserManagement');
 checkAllBox_UserManagement.addEventListener('change', function () {
 	let checkboxes = document.querySelectorAll('.user_management');
@@ -15,21 +24,29 @@ checkAllBox_Department.addEventListener('change', function () {
 	});
 });
 
-let checkAllBox_Employmenttype = document.getElementById('chkAllEmploymenttype');
-checkAllBox_Employmenttype.addEventListener('change', function () {
-	let checkboxes = document.querySelectorAll('.chk_employmenttype');
+let checkAllBox_Section = document.getElementById('chkAllSection');
+checkAllBox_Section.addEventListener('change', function () {
+	let checkboxes = document.querySelectorAll('.chk_section');
 	checkboxes.forEach((checkbox) => {
-		checkbox.checked = checkAllBox_Employmenttype.checked;
+		checkbox.checked = checkAllBox_Section.checked;
 	});
 });
 
-let checkAllBox_Announcement = document.getElementById('chkAllAnnouncement');
-checkAllBox_Announcement.addEventListener('change', function () {
-	let checkboxes = document.querySelectorAll('.chk_announcement');
+let checkAllBox_Documenttype = document.getElementById('chkAllDocumenttype');
+checkAllBox_Documenttype.addEventListener('change', function () {
+	let checkboxes = document.querySelectorAll('.chk_documenttype');
 	checkboxes.forEach((checkbox) => {
-		checkbox.checked = checkAllBox_Announcement.checked;
+		checkbox.checked = checkAllBox_Documenttype.checked;
 	});
 });
+
+//let checkAllBox_Announcement = document.getElementById('chkAllAnnouncement');
+//checkAllBox_Announcement.addEventListener('change', function () {
+//	let checkboxes = document.querySelectorAll('.chk_announcement');
+//	checkboxes.forEach((checkbox) => {
+//		checkbox.checked = checkAllBox_Announcement.checked;
+//	});
+//});
 
 let checkAllBox_AuditTrail = document.getElementById('chkAllAuditTrail');
 checkAllBox_AuditTrail.addEventListener('change', function () {

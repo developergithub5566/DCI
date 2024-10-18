@@ -51,150 +51,149 @@ namespace DCI.Repositories
 
                 foreach (var entity in moduleInRoleEntity)
                 {
-                    if (entity.ModulePageId == 3)
+					if (entity.ModulePageId == 2)
+					{
+						SysManageVM.Dashboard = true;
+					}
+					else if (entity.ModulePageId == 3)
                     {
-                        SysManageVM.File201 = true;
-                    }
+                        SysManageVM.Document = true;					
+						if (entity.View == true)
+							SysManageVM.DocumentView = true;
+						if (entity.Add == true)
+							SysManageVM.DocumentAdd = true;
+						if (entity.Update == true)
+							SysManageVM.DocumentUpdate = true;
+						if (entity.Delete == true)
+							SysManageVM.DocumentDelete = true;
+						if (entity.Import == true)
+							SysManageVM.DocumentImport = true;
+						if (entity.Export == true)
+							SysManageVM.DocumentExport = true;
+					}
                     else if (entity.ModulePageId == 4)
-                    {
-                        SysManageVM.Leave = true;
-                    }
-                    else if (entity.ModulePageId == 5)
-                    {
-                        SysManageVM.DailyTimeRecord = true;
-                    }
-                    else if (entity.ModulePageId == 6)
-                    {
-                        SysManageVM.DepartmentMain = true;
-                    }
-                    else if (entity.ModulePageId == 7)
-                    {
-                        SysManageVM.JobApplicants = true;
-                    }
-                    else if (entity.ModulePageId == 8)
-                    {
-                        SysManageVM.DTRManagement = true;
-                    }
-                    else if (entity.ModulePageId == 9)
-                    {
-                        SysManageVM.EmployeeManagement = true;
-                    }
-                    else if (entity.ModulePageId == 10)
                     {
                         SysManageVM.Administration = true;
                     }
-                    else if (entity.ModulePageId == 11)
+                    else if (entity.ModulePageId == 5)
                     {
                         SysManageVM.UserManagement = true;
-                        if (entity.View == true)
-                            SysManageVM.UserManagementView = true;
-                        if (entity.Add == true)
-                            SysManageVM.UserManagementAdd = true;
-                        if (entity.Update == true)
-                            SysManageVM.UserManagementUpdate = true;
-                        if (entity.Delete == true)
-                            SysManageVM.UserManagementDelete = true;
-                        if (entity.Import == true)
-                            SysManageVM.UserManagementImport = true;
-                        if (entity.Export == true)
-                            SysManageVM.UserManagementExport = true;
-                    }
-                    else if (entity.ModulePageId == 12)
+						if (entity.View == true)
+							SysManageVM.UserManagementView = true;
+						if (entity.Add == true)
+							SysManageVM.UserManagementAdd = true;
+						if (entity.Update == true)
+							SysManageVM.UserManagementUpdate = true;
+						if (entity.Delete == true)
+							SysManageVM.UserManagementDelete = true;
+						if (entity.Import == true)
+							SysManageVM.UserManagementImport = true;
+						if (entity.Export == true)
+							SysManageVM.UserManagementExport = true;
+					}
+                    else if (entity.ModulePageId == 6)
                     {
-                        SysManageVM.DepartmentSub = true;
+                        SysManageVM.Department = true;
                         if (entity.View == true)
-                            SysManageVM.DepartmentSubView = true;
+                            SysManageVM.DepartmentView = true;
                         if (entity.Add == true)
-                            SysManageVM.DepartmentSubAdd = true;
+                            SysManageVM.DepartmentAdd = true;
                         if (entity.Update == true)
-                            SysManageVM.DepartmentSubUpdate = true;
+                            SysManageVM.DepartmentUpdate = true;
                         if (entity.Delete == true)
-                            SysManageVM.DepartmentSubDelete = true;
+                            SysManageVM.DepartmentDelete = true;
                         if (entity.Import == true)
-                            SysManageVM.DepartmentSubImport = true;
+                            SysManageVM.DepartmentImport = true;
                         if (entity.Export == true)
-                            SysManageVM.DepartmentSubExport = true;
+                            SysManageVM.DepartmentExport = true;
                     }
-                    else if (entity.ModulePageId == 13)
+					else if (entity.ModulePageId == 7)
                     {
-                        SysManageVM.EmployeeType = true;
-                        if (entity.View == true)
-                            SysManageVM.EmployeeTypeView = true;
-                        if (entity.Add == true)
-                            SysManageVM.EmployeeTypeAdd = true;
-                        if (entity.Update == true)
-                            SysManageVM.EmployeeTypeUpdate = true;
-                        if (entity.Delete == true)
-                            SysManageVM.EmployeeTypeDelete = true;
-                        if (entity.Import == true)
-                            SysManageVM.EmployeeTypeImport = true;
-                        if (entity.Export == true)
-                            SysManageVM.EmployeeTypeExport = true;
-                    }
-                    else if (entity.ModulePageId == 14)
+                        SysManageVM.Section = true;
+						if (entity.View == true)
+							SysManageVM.SectionView = true;
+						if (entity.Add == true)
+							SysManageVM.SectionAdd = true;
+						if (entity.Update == true)
+							SysManageVM.SectionUpdate = true;
+						if (entity.Delete == true)
+							SysManageVM.SectionDelete = true;
+						if (entity.Import == true)
+							SysManageVM.SectionImport = true;
+						if (entity.Export == true)
+							SysManageVM.SectionExport = true;
+					}
+                    else if (entity.ModulePageId == 8)
                     {
-                        SysManageVM.Announcement = true;
-                        if (entity.View == true)
-                            SysManageVM.AnnouncementView = true;
-                        if (entity.Add == true)
-                            SysManageVM.AnnouncementAdd = true;
-                        if (entity.Update == true)
-                            SysManageVM.AnnouncementUpdate = true;
-                        if (entity.Delete == true)
-                            SysManageVM.AnnouncementDelete = true;
-                        if (entity.Import == true)
-                            SysManageVM.AnnouncementImport = true;
-                        if (entity.Export == true)
-                            SysManageVM.AnnouncementExport = true;
-                    }
-                    else if (entity.ModulePageId == 15)
-                    {
-                        SysManageVM.SystemManagement = true;
-                        if (entity.View == true)
-                            SysManageVM.SystemManagementView = true;
-                        if (entity.Add == true)
-                            SysManageVM.SystemManagementAdd = true;
-                        if (entity.Update == true)
-                            SysManageVM.SystemManagementUpdate = true;
-                        if (entity.Delete == true)
-                            SysManageVM.SystemManagementDelete = true;
-                        if (entity.Import == true)
-                            SysManageVM.SystemManagementImport = true;
-                        if (entity.Export == true)
-                            SysManageVM.SystemManagementExport = true;
-                    }
-                    else if (entity.ModulePageId == 16)
-                    {
-                        SysManageVM.AuditTrail = true;
-                        if (entity.View == true)
-                            SysManageVM.AuditTrailView = true;
-                        if (entity.Add == true)
-                            SysManageVM.AuditTrailAdd = true;
-                        if (entity.Update == true)
-                            SysManageVM.AuditTrailUpdate = true;
-                        if (entity.Delete == true)
-                            SysManageVM.AuditTrailDelete = true;
-                        if (entity.Import == true)
-                            SysManageVM.AuditTrailImport = true;
-                        if (entity.Export == true)
-                            SysManageVM.AuditTrailExport = true;
-                    }
-                    else if (entity.ModulePageId == 17)
+                        SysManageVM.DocumentType = true;
+						if (entity.View == true)
+							SysManageVM.DocumentTypeView = true;
+						if (entity.Add == true)
+							SysManageVM.DocumentTypeAdd = true;
+						if (entity.Update == true)
+							SysManageVM.DocumentTypeUpdate = true;
+						if (entity.Delete == true)
+							SysManageVM.DocumentTypeDelete = true;
+						if (entity.Import == true)
+							SysManageVM.DocumentTypeImport = true;
+						if (entity.Export == true)
+							SysManageVM.DocumentTypeExport = true;
+					}
+                    else if (entity.ModulePageId == 9)
                     {
                         SysManageVM.UserRoleManagement = true;
-                        if (entity.View == true)
-                            SysManageVM.UserRoleManagementView = true;
-                        if (entity.Add == true)
-                            SysManageVM.UserRoleManagementAdd = true;
-                        if (entity.Update == true)
-                            SysManageVM.UserRoleManagementUpdate = true;
-                        if (entity.Delete == true)
-                            SysManageVM.UserRoleManagementDelete = true;
-                        if (entity.Import == true)
-                            SysManageVM.UserRoleManagementImport = true;
-                        if (entity.Export == true)
-                            SysManageVM.UserRoleManagementExport = true;
+						if (entity.View == true)
+							SysManageVM.UserRoleManagementView = true;
+						if (entity.Add == true)
+							SysManageVM.UserRoleManagementAdd = true;
+						if (entity.Update == true)
+							SysManageVM.UserRoleManagementUpdate = true;
+						if (entity.Delete == true)
+							SysManageVM.UserRoleManagementDelete = true;
+						if (entity.Import == true)
+							SysManageVM.UserRoleManagementImport = true;
+						if (entity.Export == true)
+							SysManageVM.UserRoleManagementExport = true;
+					}
+                    else if (entity.ModulePageId == 10)
+                    {
+                        SysManageVM.SystemManagement = true;
                     }
+                    else if (entity.ModulePageId == 11)
+                    {
+                        SysManageVM.AuditTrail = true;
+						if (entity.View == true)
+							SysManageVM.AuditTrailView = true;
+						if (entity.Add == true)
+							SysManageVM.AuditTrailAdd = true;
+						if (entity.Update == true)
+							SysManageVM.AuditTrailUpdate = true;
+						if (entity.Delete == true)
+							SysManageVM.AuditTrailDelete = true;
+						if (entity.Import == true)
+							SysManageVM.AuditTrailImport = true;
+						if (entity.Export == true)
+							SysManageVM.AuditTrailExport = true;
+					}
+                  
+            
+                    //else if (entity.ModulePageId == 12)
+                    //{
+                    //    SysManageVM.Announcement = true;
+                    //    if (entity.View == true)
+                    //        SysManageVM.AnnouncementView = true;
+                    //    if (entity.Add == true)
+                    //        SysManageVM.AnnouncementAdd = true;
+                    //    if (entity.Update == true)
+                    //        SysManageVM.AnnouncementUpdate = true;
+                    //    if (entity.Delete == true)
+                    //        SysManageVM.AnnouncementDelete = true;
+                    //    if (entity.Import == true)
+                    //        SysManageVM.AnnouncementImport = true;
+                    //    if (entity.Export == true)
+                    //        SysManageVM.AnnouncementExport = true;
+                    //}
+                
                 }
                 SysManageVM.RoleId = roleEntity.RoleId;
                 SysManageVM.RoleName = roleEntity.RoleName;
@@ -225,6 +224,7 @@ namespace DCI.Repositories
         public async Task<(int statuscode, string message)> Save(RoleInModuleViewModel model)
         {
             // New ROLE
+            
 
             RoleViewModel rolevm = new RoleViewModel();
             rolevm.RoleId = model.RoleVM.RoleId;
@@ -291,8 +291,18 @@ namespace DCI.Repositories
                 }
                 await _moduleInRoleRepository.Save(moduleinRoleVM);
             }
-
-            return (StatusCodes.Status200OK, "Successfully saved");
+			//		return (StatusCodes.Status200OK, String.Format("Document {0} has been created successfully.", entity.DocNo));
+			//				return (StatusCodes.Status200OK, String.Format("Document {0} has been updated successfully.", entity.DocNo));
+   //         if(model.RoleVM.RoleId ==0)
+   //         {
+   //             message_box = String.Format("User Role {0} has been created successfully.", rolevm.RoleName);
+			//}
+   //         else
+   //         {
+			//	message_box = String.Format("User Role {0} has been updated successfully.", rolevm.RoleName);
+			//}
+			string message_box = model.RoleVM.RoleId == 0 ? String.Format("User Role {0} has been created successfully.", rolevm.RoleName) : String.Format("User Role {0} has been updated successfully.", rolevm.RoleName);
+			return (StatusCodes.Status200OK, message_box);
         }
 
         public async Task<IList<UserInRoleViewModel>> GetUserRole()

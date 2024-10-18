@@ -26,12 +26,17 @@
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet" />
 
 </head>
+@{
+	var module = 0;
+}
 <body>
 	@{
 		var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
 		var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
 
 		var accountActions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+
+	   	
 	{
 	"Login",
 	"ForgotPassword",
@@ -53,34 +58,53 @@
 						DMS <sup>0.0.1</sup>
 					</div>
 				</a>
-				<hr class='sidebar-divider'>
-				<a class='mainModule' href='~/Home/Index'>
-					<div class='sidebar-heading mainModuleActive'>
-						<i class='fa-solid fa-gauge-high'></i>
-						<span>Dashboard</span>
-						<i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
-					</div>
-				</a>
-				<hr class='sidebar-divider'>
-				@* 		<a class='mainModule' href='http://202.57.47.34/DCI-ESS-STG/administration/'> *@
-				<a href="/Maintenance/Index/" class='mainModule'>
-					<div class='sidebar-heading mainModuleActive'>
-						<i class='fa-solid fa-user-gear'></i>
-						<span>Administration</span>
-						<i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
-					</div>
-				</a>
-				<hr class='sidebar-divider'>
-				<a href="/Document/Index/" class='mainModule'>
-					<div class='sidebar-heading mainModuleActive'>
+
+				@if(module == 2)
+				{
+					<hr class='sidebar-divider'>
+					<a class='mainModule' href='~/Home/Index'>
+						<div class='sidebar-heading mainModuleActive'>
+							<i class='fa-solid fa-gauge-high'></i>
+							<span>Dashboard</span>
+							<i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
+						</div>
+					</a>
+				}
+
+				@if (module == 3)
+				{
+					<hr class='sidebar-divider'>
+					<a href="/Document/Index/" class='mainModule'>
+						<div class='sidebar-heading mainModuleActive'>
 						<i class='fa-regular fa-folder-open'></i>
 						<span>Document</span>
 						<i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
 					</div>
 				</a>
+				}
+
+				@if (module == 4)
+				{
+					<hr class='sidebar-divider'>
+					<a href="/Maintenance/Index/" class='mainModule'>
+						<div class='sidebar-heading mainModuleActive'>
+						<i class='fa-solid fa-user-gear'></i>
+						<span>Administration</span>
+						<i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
+					</div>
+				</a>
+				}
 				<!-- Divider -->
 				<hr class="sidebar-divider">
+			@* 	<a href="/Maintenance/Index/" class='mainModule'>
+					<div class='sidebar-heading mainModuleActive'>
+						<i class='fa-solid fa-gear'></i>
+						<span>System Management</span>
+						<i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
+					</div>
+				</a>
 
+				<hr class="sidebar-divider"> *@
 				@* 		<!-- Sidebar Toggler (Sidebar) -->
 			<div class="text-center d-none d-md-inline mt20">
 			<button class="rounded-circle border-0" id="sidebarToggle"></button>

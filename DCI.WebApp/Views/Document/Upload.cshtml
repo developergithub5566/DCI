@@ -48,6 +48,11 @@
 	</form>
 </div> *@
 <div class="loginBG">
+    <div class="spinner-overlay">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
     <div class="gap gap-lg"></div>
     <div class="container">
         <div class="row">
@@ -93,11 +98,15 @@
 </div>
 
 @section scripts {
-    @* 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script> *@
-    @* <script src="~/js/file-upload.js"></script> *@
+
 
     <script type="text/javascript">
         // var js = jQuery.noConflict(true);
+        $('.spinner-overlay').show();
+
+        setTimeout(() => {
+            $('.spinner-overlay').hide();
+        }, 200);
 
         $(document).ready(function () {
 
@@ -115,6 +124,8 @@
             // });
 
             $('#createForm').submit(function (event) {
+                $('.spinner-overlay').hide();
+
                 event.preventDefault();
 
                 const filename = $('#Filename').val();
@@ -142,6 +153,7 @@
                     confirmButtonText: "Ok"
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        $('.spinner-overlay').show();
 
                         $.ajax({
                             type: 'POST',
@@ -167,8 +179,10 @@
                                         icon: "error"
                                     });
                                 }
+                                $('.spinner-overlay').hide();
                             },
                             error: function () {
+                                $('.spinner-overlay').hide();
                                 Swal.fire({
                                     text: "An error occurred. Please try again.",
                                     icon: "error"

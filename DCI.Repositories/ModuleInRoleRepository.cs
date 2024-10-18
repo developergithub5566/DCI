@@ -23,8 +23,8 @@ namespace DCI.Repositories
         public async Task<ModuleInRole> GetModuleInRoleById(int moduleinroleid)
         {
             return await _dbContext.ModuleInRole.FindAsync(moduleinroleid);
-        }
-        public async Task<bool> IsExistsModuleInRole(int moduleinroleid)
+        }	
+		public async Task<bool> IsExistsModuleInRole(int moduleinroleid)
         {
             return await _dbContext.ModuleInRole.AnyAsync(x => x.ModuleInRoleId == moduleinroleid && x.IsActive == true);
         }
@@ -32,7 +32,12 @@ namespace DCI.Repositories
         {
             return await _dbContext.ModuleInRole.AsNoTracking().Where(x => x.IsActive == true).ToListAsync();
         }
-        public async Task<(int statuscode, string message)> Save(ModuleInRoleViewModel model)
+		public async Task<IList<int>> GetModuleInRoleByRoleId(int roleId)
+		{
+			var result =   _dbContext.ModuleInRole.AsNoTracking().Where(x => x.IsActive == true && x.RoleId == roleId);
+            return result.Select(x => x.ModulePageId).ToList();
+		}
+		public async Task<(int statuscode, string message)> Save(ModuleInRoleViewModel model)
         {
             try
             {

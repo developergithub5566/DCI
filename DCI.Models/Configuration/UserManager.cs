@@ -25,5 +25,7 @@ namespace DCI.Models.Configuration
 		{
 			return $"{Firstname} {Lastname}";
 		}
+
+		public IList<int> ModulePageList { get; set; }
 	}
 }

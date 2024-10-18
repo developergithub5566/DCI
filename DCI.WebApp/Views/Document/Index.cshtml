@@ -197,7 +197,7 @@
 										<a href="#" id="deleteFile" onclick="removefile()" class="btn btn-danger" title="remove"> <i class="far fa-trash-alt"></i></a>
 									</div>
 									<div class="col">
-										</div>
+									</div>
 								</div>
 						
 							</div>
@@ -277,6 +277,8 @@
 							confirmButtonText: "Ok"
 						}).then((result) => {
 							if (result.isConfirmed) {
+								$('.spinner-overlay').show();
+
 								$.ajax({
 									type: 'POST',
 									url: '@Url.Action("SaveDocument", "Document")',
@@ -302,8 +304,10 @@
 												icon: "error"
 											});
 										}
+										$('.spinner-overlay').hide();
 									},
 									error: function () {
+										$('.spinner-overlay').hide();
 										Swal.fire({
 											text: "An error occurred. Please try again.",
 											icon: "error"

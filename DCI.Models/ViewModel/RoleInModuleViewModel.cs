@@ -32,13 +32,14 @@ namespace DCI.Models.ViewModel
 		public int RoleId { get; set; } = 0;
 		public string RoleName { get; set; } = string.Empty;
 		public string Description { get; set; } = string.Empty;
-		public bool File201 { get; set; } = false;
-		public bool Leave { get; set; } = false;
-		public bool DailyTimeRecord { get; set; } = false;
-		public bool DepartmentMain { get; set; } = false;
-		public bool JobApplicants { get; set; } = false;
-		public bool DTRManagement { get; set; } = false;
-		public bool EmployeeManagement { get; set; } = false;
+        public bool Dashboard { get; set; } = false;
+		public bool Document { get; set; } = false;
+		public bool DocumentView { get; set; } = false;
+		public bool DocumentAdd { get; set; } = false;
+		public bool DocumentUpdate { get; set; } = false;
+		public bool DocumentDelete { get; set; } = false;
+		public bool DocumentImport { get; set; } = false;
+		public bool DocumentExport { get; set; } = false;
 		public bool Administration { get; set; } = false;
 		public bool UserManagement { get; set; } = false;
 		public bool UserManagementView { get; set; } = false;
@@ -47,27 +48,30 @@ namespace DCI.Models.ViewModel
 		public bool UserManagementDelete { get; set; } = false;
 		public bool UserManagementImport { get; set; } = false;
 		public bool UserManagementExport { get; set; } = false;
-		public bool DepartmentSub { get; set; } = false;
-		public bool DepartmentSubView { get; set; } = false;
-		public bool DepartmentSubAdd { get; set; } = false;
-		public bool DepartmentSubUpdate { get; set; } = false;
-		public bool DepartmentSubDelete { get; set; } = false;
-		public bool DepartmentSubImport { get; set; } = false;
-		public bool DepartmentSubExport { get; set; } = false;
-		public bool EmployeeType { get; set; } = false;
-		public bool EmployeeTypeView { get; set; } = false;
-		public bool EmployeeTypeAdd { get; set; } = false;
-		public bool EmployeeTypeUpdate { get; set; } = false;
-		public bool EmployeeTypeDelete { get; set; } = false;
-		public bool EmployeeTypeImport { get; set; } = false;
-		public bool EmployeeTypeExport { get; set; } = false;
-		public bool Announcement { get; set; } = false;
-		public bool AnnouncementView { get; set; } = false;
-		public bool AnnouncementAdd { get; set; } = false;
-		public bool AnnouncementUpdate { get; set; } = false;
-		public bool AnnouncementDelete { get; set; } = false;
-		public bool AnnouncementImport { get; set; } = false;
-		public bool AnnouncementExport { get; set; } = false;
+
+		public bool Department { get; set; } = false;
+		public bool DepartmentView { get; set; } = false;
+		public bool DepartmentAdd { get; set; } = false;
+		public bool DepartmentUpdate { get; set; } = false;
+		public bool DepartmentDelete { get; set; } = false;
+		public bool DepartmentImport { get; set; } = false;
+		public bool DepartmentExport { get; set; } = false;
+
+		public bool Section { get; set; } = false;
+		public bool SectionView { get; set; } = false;
+		public bool SectionAdd { get; set; } = false;
+		public bool SectionUpdate { get; set; } = false;
+		public bool SectionDelete { get; set; } = false;
+		public bool SectionImport { get; set; } = false;
+		public bool SectionExport { get; set; } = false;
+		public bool DocumentType { get; set; } = false;
+		public bool DocumentTypeView { get; set; } = false;
+		public bool DocumentTypeAdd { get; set; } = false;
+		public bool DocumentTypeUpdate { get; set; } = false;
+		public bool DocumentTypeDelete { get; set; } = false;
+		public bool DocumentTypeImport { get; set; } = false;
+		public bool DocumentTypeExport { get; set; } = false;
+
 		public bool SystemManagement { get; set; } = false;
 		public bool SystemManagementView { get; set; } = false;
 		public bool SystemManagementAdd { get; set; } = false;
@@ -82,6 +86,7 @@ namespace DCI.Models.ViewModel
 		public bool AuditTrailDelete { get; set; } = false;
 		public bool AuditTrailImport { get; set; } = false;
 		public bool AuditTrailExport { get; set; } = false;
+
 		public bool UserRoleManagement { get; set; } = false;
 		public bool UserRoleManagementView { get; set; } = false;
 		public bool UserRoleManagementAdd { get; set; } = false;
@@ -89,6 +94,16 @@ namespace DCI.Models.ViewModel
 		public bool UserRoleManagementDelete { get; set; } = false;
 		public bool UserRoleManagementImport { get; set; } = false;
 		public bool UserRoleManagementExport { get; set; } = false;
+
+
+		public bool Announcement { get; set; } = false;
+		public bool AnnouncementView { get; set; } = false;
+		public bool AnnouncementAdd { get; set; } = false;
+		public bool AnnouncementUpdate { get; set; } = false;
+		public bool AnnouncementDelete { get; set; } = false;
+		public bool AnnouncementImport { get; set; } = false;
+		public bool AnnouncementExport { get; set; } = false;
+
 	}
 
 	public class UserInRoleViewModel

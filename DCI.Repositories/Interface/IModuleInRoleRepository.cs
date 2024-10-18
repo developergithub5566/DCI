@@ -16,7 +16,8 @@ namespace DCI.Repositories.Interface
         Task<ModuleInRole> GetModuleInRoleById(int moduleinroleid);
 		Task<bool> IsExistsModuleInRole(int moduleinroleid);
         Task DeletebyRoleId(int roleId);
+		Task<IList<int>> GetModuleInRoleByRoleId(int roleId);
 
 
-    }
+	}
 }

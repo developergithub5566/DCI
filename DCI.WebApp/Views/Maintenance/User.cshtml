@@ -208,6 +208,8 @@
 							confirmButtonText: "Ok"
 						}).then((result) => {
 							if (result.isConfirmed) {
+								$('.spinner-overlay').show();
+
 								$.ajax({
 									type: 'POST',
 									url: '@Url.Action("SaveUser", "Maintenance")',
@@ -231,8 +233,10 @@
 												icon: "error"
 											});
 										}
+										$('.spinner-overlay').hide();
 									},
 									error: function () {
+										$('.spinner-overlay').hide();
 										Swal.fire({
 											text: "An error occurred. Please try again.",
 											icon: "error"

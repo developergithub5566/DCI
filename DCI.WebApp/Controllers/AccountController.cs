@@ -139,6 +139,8 @@ namespace DCI.WebApp.Controllers
 						};
 
 
+
+
 						// Create a ClaimsIdentity and ClaimsPrincipal
 						//var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 						//var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
