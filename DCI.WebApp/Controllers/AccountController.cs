@@ -127,53 +127,23 @@ namespace DCI.WebApp.Controllers
 						UserManager um = JsonConvert.DeserializeObject<UserManager>(responseBody);
 						_httpContextAccessor.HttpContext.Session.SetString("UserManager", JsonConvert.SerializeObject(um));
 
-						var _fullname = $"{um.Firstname} {um.Lastname}";
+						//var _fullname = um.GetFullname(); //$"{um.Firstname} {um.Lastname}";
 
 						var claims = new List<Claim>
 						{
 							new Claim(ClaimTypes.NameIdentifier, um.Identifier.ToString()),
 							new Claim("UserId", um.UserId.ToString()),
 							new Claim(ClaimTypes.Email, um.Email),
-							new Claim("FullName", _fullname),
-							new Claim(ClaimTypes.Name,_fullname)
+							new Claim("FullName", um.GetFullname()),
+							new Claim(ClaimTypes.Name,um.GetFullname())
 						};
 
+						HttpContext.Session.SetString("ModuleList", JsonConvert.SerializeObject(um.ModulePageList));
+						HttpContext.Session.SetString("currentFullname", um.GetFullname());
 
+						var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+						await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
-
-						// Create a ClaimsIdentity and ClaimsPrincipal
-						//var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-						//var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
-						var claimsIdentity = new ClaimsIdentity(claims,CookieAuthenticationDefaults.AuthenticationScheme);
-
-						await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,new ClaimsPrincipal(claimsIdentity));
-
-
-
-						// Sign in the user
-						//await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
-						//await _httpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
-						//_httpContextAccessor.HttpContext.User = claimsPrincipal;
-						//	_httpContextAccessor.HttpContext.SignInAsync("Cookies", claimsPrincipal).Wait();
-
-						//_httpContextAccessor.HttpContext.Session.SetString("FullName", _fullname);
-
-						//Log.Information("Login-" + User.Identity.Name.ToString());
-
-
-						//_httpContextAccessor.HttpContext.Response.Cookies.Append("FullName", _fullname, new CookieOptions
-						//{
-						//	Domain = "http://192.168.1.78/",
-						//	Path = "/",
-						//	Expires = DateTimeOffset.UtcNow.AddHours(1),
-						//	HttpOnly = true,
-						//	Secure = false,
-						//	SameSite = SameSiteMode.Lax
-						//});
-
-
-						//  Log.Information("login-" + _httpContextAccessor.HttpContext);
 						return RedirectToAction("Index", "Home");
 					}
 					else

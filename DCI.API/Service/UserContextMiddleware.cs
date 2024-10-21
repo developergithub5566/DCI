@@ -66,7 +66,7 @@ namespace DCI.API.Service
 				 usermodel = await _userRepository.GetUserByEmail(email);
 			}
 
-			var moduleList = _moduleInRoleRepository.GetModuleInRoleByRoleId(usermodel.RoleId);
+			var moduleList = await _moduleInRoleRepository.GetModuleInRoleByRoleId(usermodel.RoleId);
 
 			return new UserManager
 			{
@@ -76,7 +76,7 @@ namespace DCI.API.Service
 				Middlename = usermodel.Middlename,
 				Firstname = usermodel.Firstname,
 				RoleId = usermodel.RoleId,
-			//	ModulePageList = moduleList,
+				ModulePageList = moduleList,
 			};
 			//return new UserManager
 			//{

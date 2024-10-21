@@ -12,10 +12,14 @@
         
  
 }
+*@
 
 
+@{
+    var fullname = Context.Session.GetString("currentFullname") ?? "Guest"; 
+}
 
 <div class="user-info">
  @fullname
 
-</div> *@
+</div> 
