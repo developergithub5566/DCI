@@ -47,16 +47,16 @@
 
 								<div class="accordion-header">
 									<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="true" aria-controls="collapse3">
-										<input type="checkbox" name="mainModule[]" value="3" id="module3" class="form-check-input" @(Model.Document == true ? "checked" : "")>
-										<label for="module3" class="text-dark">Document Management</label>
+										<input type="checkbox" name="mainModule[]" value="3" id="chkAllDocument" class="form-check-input" @(Model.Document == true ? "checked" : "")>
+										<label for="module3" class="text-dark">Document</label>
 									</button>
 								</div>
 
 								<div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
 									<div class="accordion-body">
 
-										<input type="checkbox" name="mainModule[]" id="chkAllDocument" value="3" @(Model.Document == true ? "checked" : "")>
-										<label for="module3" class="subLabel">Document</label>
+										@* <input type="checkbox" name="mainModule[]" id="chkAllDocument" value="3" @(Model.Document == true ? "checked" : "")>
+										<label for="module3" class="subLabel">Document</label> *@
 										<ul class="ulPermission">
 										@* 	<li>
 												<input type="checkbox" name="subModule3[]" id="view3_3" value="1" class="chk_auditTrail" @(Model.DocumentView == true ? "checked" : "")>

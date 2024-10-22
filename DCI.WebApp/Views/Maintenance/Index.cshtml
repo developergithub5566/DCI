@@ -1,4 +1,6 @@
-﻿@using Newtonsoft.Json;
+﻿@using DCI.Core.Common
+@using Newtonsoft.Json;
+
 
 <link href="~/css/DCIcustom.css" rel="stylesheet" />
 
@@ -33,7 +35,7 @@
 	<div class="row">
 		@foreach (var module in moduleList)
 		{
-			@if (module == 5)
+			@if (module == (int)EnumModulePage.UserManagement)
 			{
 				<div class="col-xl-3 col-sm-6 mb-4">
 					<a href="~/Maintenance/User/">
@@ -52,7 +54,7 @@
 					</a>
 				</div>
 			}
-			@if (module == 6)
+			@if (module == (int)EnumModulePage.Department)
 			{
 				<div class="col-xl-3 col-sm-6 mb-4">
 					<a href="~/Maintenance/Department/">
@@ -71,7 +73,7 @@
 					</a>
 				</div>
 			}
-			@if (module == 7)
+			@if (module == (int)EnumModulePage.Section)
 			{
 				<div class="col-xl-3 col-sm-6 mb-4">
 					<a href="~/Maintenance/Section/">
@@ -106,7 +108,7 @@
 		</div>
 		</a>
 		</div> *@
-			@if (module == 8)
+			@if (module == (int)EnumModulePage.DocumentType)
 			{
 				<div class="col-xl-3 col-sm-6 mb-4">
 					<a href="~/Maintenance/DocumentType/">
@@ -125,7 +127,7 @@
 					</a>
 				</div>
 			}
-			@if (module == 9)
+			@if (module == (int)EnumModulePage.UserRole)
 			{
 				<div class="col-xl-3 col-sm-6 mb-4">
 					<a href="~/Maintenance/UserRole/">
@@ -144,7 +146,7 @@
 					</a>
 				</div>
 			}
-			@if (module == 11)
+			@if (module == (int)EnumModulePage.AuditTrail)
 			{
 				<div class="col-xl-3 col-sm-6 mb-4">
 					<a href="~/Maintenance/ActivityLog/">

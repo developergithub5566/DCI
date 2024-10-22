@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Serilog;
 using System.Security.Cryptography.X509Certificates;
+using System.Data;
 
 namespace DCI.Repositories
 {
@@ -313,12 +314,15 @@ namespace DCI.Repositories
         public async Task<IList<UserInRoleViewModel>> GetUserRole()
         {
             var role_entity = await _dbContext.Role.Where(x => x.IsActive == true).ToListAsync();
-            var result = role_entity.Select(x => new UserInRoleViewModel
+            var user_entity = await _dbContext.User.Where(x => x.IsActive == true).ToListAsync();
+            var moduleInRole_entity = await _dbContext.ModuleInRole.Where(x => x.IsActive == true).ToListAsync();
+
+			var result = role_entity.Select(role => new UserInRoleViewModel
             {
-                RoleId = x.RoleId,
-                RoleName = x.RoleName,
-                UserCount = 0,
-                ModuleCount = 0,
+                RoleId = role.RoleId,
+                RoleName = role.RoleName,
+				UserCount = user_entity.Count(user => user.RoleId == role.RoleId),
+				ModuleCount = moduleInRole_entity.Count(module => module.RoleId == role.RoleId),
                 SubModuleCount = 0
             }).ToList();
 
