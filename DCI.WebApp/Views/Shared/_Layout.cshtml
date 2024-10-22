@@ -31,12 +31,12 @@
 
 <body>
 	@{
-		var modulePageIdsJson = Context.Session.GetString("ModuleList");
+		var modulePageListId = Context.Session.GetString("ModuleList");
 		var moduleList = new List<int>();
-	
-		if (modulePageIdsJson != null)
+
+		if (modulePageListId != null)
 		{
-			moduleList = JsonConvert.DeserializeObject<List<int>>(modulePageIdsJson);
+			moduleList = JsonConvert.DeserializeObject<List<int>>(modulePageListId);
 		}
 
 		var currentAction = ViewContext.RouteData.Values["action"]?.ToString();

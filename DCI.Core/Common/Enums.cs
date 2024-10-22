@@ -24,8 +24,18 @@ namespace DCI.Core.Common
 
 	public enum EnumModulePage
 	{
-		Login = 0,
-		Home = 1
+		Login = 1,
+		Dashboard = 2,
+		Document = 3,
+		Administration = 4,
+		UserManagement = 5,
+		Department = 6,
+		Section = 7,
+		DocumentType = 8,
+		UserRole = 9,
+		SystemManagement = 10,
+		AuditTrail = 11,
+		Announcement = 12 
 	}
 	public enum EnumRole
 	{

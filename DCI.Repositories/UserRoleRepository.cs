@@ -252,11 +252,16 @@ namespace DCI.Repositories
             {
                 moduleinRoleVM.ModulePageId = module.Value?.MainModule != null ? Int32.Parse(module.Value.MainModule) : 0;
                 moduleinRoleVM.RoleId = _roleId;
-                moduleinRoleVM.View = true;
+       
                 moduleinRoleVM.CreatedBy = model.RoleVM.CreatedBy;
-               // moduleinRoleVM.ModifiedBy = model.RoleVM.ModifiedBy;
+				moduleinRoleVM.View = false;
+				moduleinRoleVM.Add = false;
+				moduleinRoleVM.Update = false;
+				moduleinRoleVM.Delete = false;
+				moduleinRoleVM.Import = false;
+				moduleinRoleVM.Export = false;
 
-                if (module.Value?.SubModules?.Any() == true)
+				if (module.Value?.SubModules?.Any() == true)
                 {
 
                     foreach (var sub in module.Value.SubModules)

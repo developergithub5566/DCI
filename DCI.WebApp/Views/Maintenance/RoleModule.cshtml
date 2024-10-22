@@ -47,7 +47,7 @@
 
 								<div class="accordion-header">
 									<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="true" aria-controls="collapse3">
-										<input type="checkbox" name="mainModule[]" value="3" id="module3" class="form-check-input" @(Model.DocumentView == true ? "checked" : "")>
+										<input type="checkbox" name="mainModule[]" value="3" id="module3" class="form-check-input" @(Model.Document == true ? "checked" : "")>
 										<label for="module3" class="text-dark">Document Management</label>
 									</button>
 								</div>
@@ -55,31 +55,31 @@
 								<div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
 									<div class="accordion-body">
 
-										<input type="checkbox" name="mainModule[]" id="chkAllDocument" value="3">
+										<input type="checkbox" name="mainModule[]" id="chkAllDocument" value="3" @(Model.Document == true ? "checked" : "")>
 										<label for="module3" class="subLabel">Document</label>
 										<ul class="ulPermission">
-											<li>
+										@* 	<li>
 												<input type="checkbox" name="subModule3[]" id="view3_3" value="1" class="chk_auditTrail" @(Model.DocumentView == true ? "checked" : "")>
 												<label for="view3_3"> View</label>
-											</li>
+											</li> *@
 											<li>
-												<input type="checkbox" name="subModule3[]" id="add3_3" value="2" class="chk_auditTrail" @(Model.DocumentAdd == true ? "checked" : "")>
+												<input type="checkbox" name="subModule3[]" id="add3_3" value="2" class="chk_auditTrail" @(Model.DocumentAdd == true ? "checked" : "") @(Model.Document ? "" : "disabled") />
 												<label for="add3_3"> Add</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule3[]" id="update3_3" value="3" class="chk_auditTrail" @(Model.DocumentUpdate == true ? "checked" : "")>
+												<input type="checkbox" name="subModule3[]" id="update3_3" value="3" class="chk_auditTrail" @(Model.DocumentUpdate == true ? "checked" : "") @(Model.Document ? "" : "disabled") />
 												<label for="update3_3"> Update</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule3[]" id="delete3_3" value="4" class="chk_auditTrail" @(Model.DocumentDelete == true ? "checked" : "")>
+												<input type="checkbox" name="subModule3[]" id="delete3_3" value="4" class="chk_auditTrail" @(Model.DocumentDelete == true ? "checked" : "") @(Model.Document ? "" : "disabled") />
 												<label for="delete3_3"> Delete</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule3[]" id="import3_3" value="5" class="chk_auditTrail" @(Model.DocumentImport == true ? "checked" : "")>
+												<input type="checkbox" name="subModule3[]" id="import3_3" value="5" class="chk_auditTrail" @(Model.DocumentImport == true ? "checked" : "") @(Model.Document ? "" : "disabled") />
 												<label for="import3_3"> Import</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule3[]" id="export3_3" value="6" class="chk_auditTrail" @(Model.DocumentImport == true ? "checked" : "")>
+												<input type="checkbox" name="subModule3[]" id="export3_3" value="6" class="chk_auditTrail" @(Model.DocumentImport == true ? "checked" : "") @(Model.Document ? "" : "disabled") />
 												<label for="export3_3"> Export</label>
 											</li>
 										</ul>
@@ -100,185 +100,185 @@
 								<div class="accordion-header">
 									<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="true" aria-controls="collapse4">
 										<input type="checkbox" name="mainModule[]" value="4" id="module4" class="form-check-input" @(Model.Administration == true ? "checked" : "")>
-										<label for="module10" class="text-dark">Administration</label>
+										<label for="module4" class="text-dark">Administration</label>
 									</button>
 								</div>
 
 								<div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#accordionExample8">
 									<div class="accordion-body">
 
-										<input type="checkbox" name="mainModule[]" id="chkAllUserManagement" value="5">
+										<input type="checkbox" name="mainModule[]" id="chkAllUserManagement" value="5" @(Model.UserManagement == true ? "checked" : "")>
 										<label class="subLabel">User Management</label>
 										<ul class="ulPermission">
-											<li>
-												<input type="checkbox" name="subModule5[]" id="view4_2" value="1" class="user_management" @(Model.UserManagementView == true ? "checked" : "") />
+											@* <li>
+												<input type="checkbox" name="subModule5[]" id="view4_2" value="1" class="user_management" @(Model.UserManagementView == true ? "checked" : "") @(Model.UserManagementView ? "" : "disabled") />
 												<label for="view4_5"> View</label>
-											</li>
+											</li> *@
 											<li>
-												<input type="checkbox" name="subModule5[]" id="add4_5" value="2" class="user_management" @(Model.UserManagementAdd == true ? "checked" : "")>
+												<input type="checkbox" name="subModule5[]" id="add4_5" value="2" class="user_management" @(Model.UserManagementAdd == true ? "checked" : "") @(Model.UserManagement ? "" : "disabled") />
 												<label for="add4_5"> Add</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule5[]" id="update4_5" value="3" class="user_management" @(Model.UserManagementUpdate == true ? "checked" : "")>
+												<input type="checkbox" name="subModule5[]" id="update4_5" value="3" class="user_management" @(Model.UserManagementUpdate == true ? "checked" : "") @(Model.UserManagement ? "" : "disabled") />
 												<label for="update4_5"> Update</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule5[]" id="delete4_5" value="4" class="user_management" @(Model.UserManagementDelete == true ? "checked" : "")>
+												<input type="checkbox" name="subModule5[]" id="delete4_5" value="4" class="user_management" @(Model.UserManagementDelete == true ? "checked" : "") @(Model.UserManagement ? "" : "disabled") />
 												<label for="delete4_5"> Delete</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule5[]" id="import4_5" value="5" class="user_management" @(Model.UserManagementImport == true ? "checked" : "")>
+												<input type="checkbox" name="subModule5[]" id="import4_5" value="5" class="user_management" @(Model.UserManagementImport == true ? "checked" : "") @(Model.UserManagement ? "" : "disabled") />
 												<label for="import4_5"> Import</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule5[]" id="export4_5" value="6" class="user_management" @(Model.UserManagementExport == true ? "checked" : "")>
+												<input type="checkbox" name="subModule5[]" id="export4_5" value="6" class="user_management" @(Model.UserManagementExport == true ? "checked" : "") @(Model.UserManagement ? "" : "disabled") />
 												<label for="export4_5"> Export</label>
 											</li>
 										</ul>
 
 
-										<input type="checkbox" name="mainModule[]" id="chkAllDepartment" value="6">
+										<input type="checkbox" name="mainModule[]" id="chkAllDepartment" value="6" @(Model.Department == true ? "checked" : "")>
 										<label class="subLabel">Departments</label>
 										<ul class="ulPermission">
-											<li>
-												<input type="checkbox" name="subModule6[]" id="view4_6" value="1" class="chk_departments" @(Model.DepartmentView == true ? "checked" : "")>
+											@* <li>
+												<input type="checkbox" name="subModule6[]" id="view4_6" value="1" class="chk_departments" @(Model.DepartmentView == true ? "checked" : "") @(Model.DepartmentView ? "" : "disabled") />
 												<label for="view4_6"> View</label>
-											</li>
+											</li> *@
 											<li>
-												<input type="checkbox" name="subModule6[]" id="add4_6" value="2" class="chk_departments" @(Model.DepartmentAdd == true ? "checked" : "")>
+												<input type="checkbox" name="subModule6[]" id="add4_6" value="2" class="chk_departments" @(Model.DepartmentAdd == true ? "checked" : "") @(Model.Department ? "" : "disabled") />
 												<label for="add4_6"> Add</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule6[]" id="update4_6" value="3" class="chk_departments" @(Model.DepartmentUpdate == true ? "checked" : "")>
+												<input type="checkbox" name="subModule6[]" id="update4_6" value="3" class="chk_departments" @(Model.DepartmentUpdate == true ? "checked" : "") @(Model.Department ? "" : "disabled") />
 												<label for="update4_6"> Update</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule6[]" id="delete4_6" value="4" class="chk_departments" @(Model.DepartmentDelete == true ? "checked" : "")>
+												<input type="checkbox" name="subModule6[]" id="delete4_6" value="4" class="chk_departments" @(Model.DepartmentDelete == true ? "checked" : "") @(Model.Department ? "" : "disabled") />
 												<label for="delete4_6"> Delete</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule6[]" id="import4_6" value="5" class="chk_departments" @(Model.DepartmentImport == true ? "checked" : "")>
+												<input type="checkbox" name="subModule6[]" id="import4_6" value="5" class="chk_departments" @(Model.DepartmentImport == true ? "checked" : "") @(Model.Department ? "" : "disabled") />
 												<label for="import4_6"> Import</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule6[]" id="export4_6" value="6" class="chk_departments" @(Model.DepartmentExport == true ? "checked" : "")>
+												<input type="checkbox" name="subModule6[]" id="export4_6" value="6" class="chk_departments" @(Model.DepartmentExport == true ? "checked" : "") @(Model.Department ? "" : "disabled") />
 												<label for="export4_6"> Export</label>
 											</li>
 										</ul>
 
-										<input type="checkbox" name="mainModule[]" id="chkAllSection" value="7">
+										<input type="checkbox" name="mainModule[]" id="chkAllSection" value="7" @(Model.Section == true ? "checked" : "")>
 										<label class="subLabel">Section</label>
 										<ul class="ulPermission">
-											<li>
-												<input type="checkbox" name="subModule7[]" id="view4_7" value="1" class="chk_section" @(Model.SectionView == true ? "checked" : "")>
+											@* <li>
+												<input type="checkbox" name="subModule7[]" id="view4_7" value="1" class="chk_section" @(Model.SectionView == true ? "checked" : "") @(Model.SectionView ? "" : "disabled") />
 												<label for="view4_7"> View</label>
-											</li>
+											</li> *@
 											<li>
-												<input type="checkbox" name="subModule7[]" id="add4_7" value="2" class="chk_section" @(Model.SectionAdd == true ? "checked" : "")>
+												<input type="checkbox" name="subModule7[]" id="add4_7" value="2" class="chk_section" @(Model.SectionAdd == true ? "checked" : "") @(Model.Section ? "" : "disabled") />
 												<label for="add4_7"> Add</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule7[]" id="update4_7" value="3" class="chk_section" @(Model.SectionUpdate == true ? "checked" : "")>
+												<input type="checkbox" name="subModule7[]" id="update4_7" value="3" class="chk_section" @(Model.SectionUpdate == true ? "checked" : "") @(Model.Section ? "" : "disabled") />
 												<label for="update4_7"> Update</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule7[]" id="delete4_7" value="4" class="chk_section" @(Model.SectionDelete == true ? "checked" : "")>
+												<input type="checkbox" name="subModule7[]" id="delete4_7" value="4" class="chk_section" @(Model.SectionDelete == true ? "checked" : "") @(Model.Section ? "" : "disabled") />
 												<label for="delete4_7"> Delete</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule7[]" id="import4_7" value="5" class="chk_section" @(Model.SectionImport == true ? "checked" : "")>
+												<input type="checkbox" name="subModule7[]" id="import4_7" value="5" class="chk_section" @(Model.SectionImport == true ? "checked" : "") @(Model.Section ? "" : "disabled") />
 												<label for="import4_7"> Import</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule7[]" id="export4_7" value="6" class="chk_section" @(Model.SectionExport == true ? "checked" : "")>
+												<input type="checkbox" name="subModule7[]" id="export4_7" value="6" class="chk_section" @(Model.SectionExport == true ? "checked" : "") @(Model.Section ? "" : "disabled") />
 												<label for="export4_7"> Export</label>
 											</li>
 										</ul>
 
 
-										<input type="checkbox" name="mainModule[]" id="chkAllDocumenttype" value="8">
+										<input type="checkbox" name="mainModule[]" id="chkAllDocumenttype" value="8" @(Model.DocumentType == true ? "checked" : "")>
 										<label class="subLabel">Document Type</label>
 										<ul class="ulPermission">
-											<li>
-												<input type="checkbox" name="subModule8[]" id="view4_8" value="1" class="chk_documenttype" @(Model.DocumentTypeView == true ? "checked" : "")>
+											@* <li>
+												<input type="checkbox" name="subModule8[]" id="view4_8" value="1" class="chk_documenttype" @(Model.DocumentTypeView == true ? "checked" : "") @(Model.DocumentTypeView ? "" : "disabled") />
 												<label for="view4_8"> View</label>
-											</li>
+											</li> *@
 											<li>
-												<input type="checkbox" name="subModule8[]" id="add4_8" value="2" class="chk_documenttype" @(Model.DocumentTypeAdd == true ? "checked" : "")>
+												<input type="checkbox" name="subModule8[]" id="add4_8" value="2" class="chk_documenttype" @(Model.DocumentTypeAdd == true ? "checked" : "") @(Model.DocumentType ? "" : "disabled") />
 												<label for="add4_8"> Add</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule8[]" id="update4_8" value="3" class="chk_documenttype" @(Model.DocumentTypeUpdate == true ? "checked" : "")>
+												<input type="checkbox" name="subModule8[]" id="update4_8" value="3" class="chk_documenttype" @(Model.DocumentTypeUpdate == true ? "checked" : "") @(Model.DocumentType ? "" : "disabled") />
 												<label for="update4_8"> Update</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule8[]" id="delete4_8" value="4" class="chk_documenttype" @(Model.DocumentTypeDelete == true ? "checked" : "")>
+												<input type="checkbox" name="subModule8[]" id="delete4_8" value="4" class="chk_documenttype" @(Model.DocumentTypeDelete == true ? "checked" : "") @(Model.DocumentType ? "" : "disabled") />
 												<label for="delete4_8"> Delete</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule8[]" id="import4_8" value="5" class="chk_documenttype" @(Model.DocumentTypeImport == true ? "checked" : "")>
+												<input type="checkbox" name="subModule8[]" id="import4_8" value="5" class="chk_documenttype" @(Model.DocumentTypeImport == true ? "checked" : "") @(Model.DocumentType ? "" : "disabled") />
 												<label for="import4_8"> Import</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule8[]" id="export4_8" value="6" class="chk_documenttype" @(Model.DocumentTypeExport == true ? "checked" : "")>
+												<input type="checkbox" name="subModule8[]" id="export4_8" value="6" class="chk_documenttype" @(Model.DocumentTypeExport == true ? "checked" : "") @(Model.DocumentType ? "" : "disabled") />
 												<label for="export4_8"> Export</label>
 											</li>
 										</ul>
 
-										<input type="checkbox" name="mainModule[]" id="chkAllAuditTrail" value="11">
+										<input type="checkbox" name="mainModule[]" id="chkAllAuditTrail" value="11" @(Model.AuditTrail == true ? "checked" : "")>
 										<label for="module11" class="subLabel">Audit Trail</label>
 										<ul class="ulPermission">
-											<li>
-												<input type="checkbox" name="subModule16[]" id="view10_11" value="1" class="chk_auditTrail" @(Model.AuditTrailView == true ? "checked" : "")>
+											@* <li>
+												<input type="checkbox" name="subModule11[]" id="view10_11" value="1" class="chk_auditTrail" @(Model.AuditTrailView == true ? "checked" : "") @(Model.AuditTrailView ? "" : "disabled") />
 												<label for="view10_11"> View</label>
-											</li>
+											</li> *@
 											<li>
-												<input type="checkbox" name="subModule16[]" id="add10_11" value="2" class="chk_auditTrail" @(Model.AuditTrailAdd == true ? "checked" : "")>
+												<input type="checkbox" name="subModule11[]" id="add10_11" value="2" class="chk_auditTrail" @(Model.AuditTrailAdd == true ? "checked" : "") @(Model.AuditTrail ? "" : "disabled") />
 												<label for="add10_11"> Add</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule16[]" id="update10_11" value="3" class="chk_auditTrail" @(Model.AuditTrailUpdate == true ? "checked" : "")>
+												<input type="checkbox" name="subModule11[]" id="update10_11" value="3" class="chk_auditTrail" @(Model.AuditTrailUpdate == true ? "checked" : "") @(Model.AuditTrail ? "" : "disabled") />
 												<label for="update10_11"> Update</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule16[]" id="delete10_11" value="4" class="chk_auditTrail" @(Model.AuditTrailDelete == true ? "checked" : "")>
+												<input type="checkbox" name="subModule11[]" id="delete10_11" value="4" class="chk_auditTrail" @(Model.AuditTrailDelete == true ? "checked" : "") @(Model.AuditTrail ? "" : "disabled") />
 												<label for="delete10_11"> Delete</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule16[]" id="import10_11" value="5" class="chk_auditTrail" @(Model.AuditTrailImport == true ? "checked" : "")>
+												<input type="checkbox" name="subModule11[]" id="import10_11" value="5" class="chk_auditTrail" @(Model.AuditTrailImport == true ? "checked" : "") @(Model.AuditTrail ? "" : "disabled") />
 												<label for="import10_11"> Import</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule16[]" id="export10_11" value="6" class="chk_auditTrail" @(Model.AuditTrailExport == true ? "checked" : "")>
+												<input type="checkbox" name="subModule11[]" id="export10_11" value="6" class="chk_auditTrail" @(Model.AuditTrailExport == true ? "checked" : "") @(Model.AuditTrail ? "" : "disabled") />
 												<label for="export10_11"> Export</label>
 											</li>
 										</ul>
 
-										<input type="checkbox" name="mainModule[]" id="chkAllUserRoleManagement" value="9">
+										<input type="checkbox" name="mainModule[]" id="chkAllUserRoleManagement" value="9" @(Model.UserRoleManagement == true ? "checked" : "")>
 										<label for="module9" class="subLabel">User Role</label>
 										<ul class="ulPermission">
-											<li>
-												<input type="checkbox" name="subModule9[]" id="view10_9" value="1" class="chk_userRoleManagement" @(Model.UserRoleManagementView == true ? "checked" : "")>
+											@* <li>
+												<input type="checkbox" name="subModule9[]" id="view10_9" value="1" class="chk_userRoleManagement" @(Model.UserRoleManagementView == true ? "checked" : "") @(Model.UserRoleManagementView ? "" : "disabled") />
 												<label for="view10_9"> View</label>
-											</li>
+											</li> *@
 											<li>
-												<input type="checkbox" name="subModule9[]" id="add10_9" value="2" class="chk_userRoleManagement" @(Model.UserRoleManagementAdd == true ? "checked" : "")>
+												<input type="checkbox" name="subModule9[]" id="add10_9" value="2" class="chk_userRoleManagement" @(Model.UserRoleManagementAdd == true ? "checked" : "") @(Model.UserRoleManagement ? "" : "disabled") />
 												<label for="add10_9"> Add</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule9[]" id="update10_9" value="3" class="chk_userRoleManagement" @(Model.UserRoleManagementUpdate == true ? "checked" : "")>
+												<input type="checkbox" name="subModule9[]" id="update10_9" value="3" class="chk_userRoleManagement" @(Model.UserRoleManagementUpdate == true ? "checked" : "") @(Model.UserRoleManagement ? "" : "disabled") />
 												<label for="update10_9"> Update</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule9[]" id="delete10_9" value="4" class="chk_userRoleManagement" @(Model.UserRoleManagementDelete == true ? "checked" : "")>
+												<input type="checkbox" name="subModule9[]" id="delete10_9" value="4" class="chk_userRoleManagement" @(Model.UserRoleManagementDelete == true ? "checked" : "") @(Model.UserRoleManagement ? "" : "disabled") />
 												<label for="delete10_9"> Delete</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule9[]" id="import10_9" value="5" class="chk_userRoleManagement" @(Model.UserRoleManagementImport == true ? "checked" : "")>
+												<input type="checkbox" name="subModule9[]" id="import10_9" value="5" class="chk_userRoleManagement" @(Model.UserRoleManagementImport == true ? "checked" : "") @(Model.UserRoleManagement ? "" : "disabled") />
 												<label for="import10_9"> Import</label>
 											</li>
 											<li>
-												<input type="checkbox" name="subModule9[]" id="export10_9" value="6" class="chk_userRoleManagement" @(Model.UserRoleManagementExport == true ? "checked" : "")>
+												<input type="checkbox" name="subModule9[]" id="export10_9" value="6" class="chk_userRoleManagement" @(Model.UserRoleManagementExport == true ? "checked" : "") @(Model.UserRoleManagement ? "" : "disabled") />
 												<label for="export10_9"> Export</label>
 											</li>
 										</ul>

@@ -5,6 +5,7 @@ checkAllBox_Document.addEventListener('change', function () {
 	let checkboxes = document.querySelectorAll('.chk_auditTrail');
 	checkboxes.forEach((checkbox) => {
 		checkbox.checked = checkAllBox_Document.checked;
+		checkbox.disabled = !checkAllBox_Document.checked;
 	});
 });
 
@@ -13,6 +14,7 @@ checkAllBox_UserManagement.addEventListener('change', function () {
 	let checkboxes = document.querySelectorAll('.user_management');
 	checkboxes.forEach((checkbox) => {
 		checkbox.checked = checkAllBox_UserManagement.checked;
+		checkbox.disabled = !checkAllBox_UserManagement.checked;
 	});
 });
 
@@ -21,6 +23,7 @@ checkAllBox_Department.addEventListener('change', function () {
 	let checkboxes = document.querySelectorAll('.chk_departments');
 	checkboxes.forEach((checkbox) => {
 		checkbox.checked = checkAllBox_Department.checked;
+		checkbox.disabled = !checkAllBox_Department.checked;
 	});
 });
 
@@ -29,6 +32,7 @@ checkAllBox_Section.addEventListener('change', function () {
 	let checkboxes = document.querySelectorAll('.chk_section');
 	checkboxes.forEach((checkbox) => {
 		checkbox.checked = checkAllBox_Section.checked;
+		checkbox.disabled = !checkAllBox_Section.checked;
 	});
 });
 
@@ -37,6 +41,7 @@ checkAllBox_Documenttype.addEventListener('change', function () {
 	let checkboxes = document.querySelectorAll('.chk_documenttype');
 	checkboxes.forEach((checkbox) => {
 		checkbox.checked = checkAllBox_Documenttype.checked;
+		checkbox.disabled = !checkAllBox_Documenttype.checked;
 	});
 });
 
@@ -53,6 +58,7 @@ checkAllBox_AuditTrail.addEventListener('change', function () {
 	let checkboxes = document.querySelectorAll('.chk_auditTrail');
 	checkboxes.forEach((checkbox) => {
 		checkbox.checked = checkAllBox_AuditTrail.checked;
+		checkbox.disabled = !checkAllBox_AuditTrail.checked;
 	});
 });
 
@@ -61,6 +67,7 @@ checkAllBox_UserRoleManagement.addEventListener('change', function () {
 	let checkboxes = document.querySelectorAll('.chk_userRoleManagement');
 	checkboxes.forEach((checkbox) => {
 		checkbox.checked = checkAllBox_UserRoleManagement.checked;
+		checkbox.disabled = !checkAllBox_UserRoleManagement.checked;
 	});
 });
 

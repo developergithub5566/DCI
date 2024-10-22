@@ -1,4 +1,16 @@
-﻿<link href="~/css/DCIcustom.css" rel="stylesheet" />
+﻿@using Newtonsoft.Json;
+
+<link href="~/css/DCIcustom.css" rel="stylesheet" />
+
+@{
+	var modulePageListId = Context.Session.GetString("ModuleList");
+	var moduleList = new List<int>();
+
+	if (modulePageListId != null)
+	{
+		moduleList = JsonConvert.DeserializeObject<List<int>>(modulePageListId);
+	}
+}
 
 <div class="container-fluid">
 	<div class="spinner-overlay">
@@ -19,128 +31,140 @@
 	</div>
 	<!-- Content Row -->
 	<div class="row">
-
-		<div class="col-xl-3 col-sm-6 mb-4">
-			<a href="~/Maintenance/User/">
-				<div class="card cardHover shadow h-100 py-2">
-					<div class="card-body" style="padding: 1.25rem;">
-						<div class="row no-gutters align-items-center">
-							<div class="col mr-2">
-								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">User Management</div>
-							</div>
-							<div class="col-2">
-								<i class="fa-solid fa-users fa-2x text-gray-300"></i>
+		@foreach (var module in moduleList)
+		{
+			@if (module == 5)
+			{
+				<div class="col-xl-3 col-sm-6 mb-4">
+					<a href="~/Maintenance/User/">
+						<div class="card cardHover shadow h-100 py-2">
+							<div class="card-body" style="padding: 1.25rem;">
+								<div class="row no-gutters align-items-center">
+									<div class="col mr-2">
+										<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">User Management</div>
+									</div>
+									<div class="col-2">
+										<i class="fa-solid fa-users fa-2x text-gray-300"></i>
+									</div>
+								</div>
 							</div>
 						</div>
-					</div>
+					</a>
 				</div>
-			</a>
+			}
+			@if (module == 6)
+			{
+				<div class="col-xl-3 col-sm-6 mb-4">
+					<a href="~/Maintenance/Department/">
+						<div class="card cardHover shadow h-100 py-2">
+							<div class="card-body" style="padding: 1.25rem;">
+								<div class="row no-gutters align-items-center">
+									<div class="col mr-2">
+										<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Departments</div>
+									</div>
+									<div class="col-2">
+										<i class="fa-solid fa-network-wired fa-2x text-gray-300"></i>
+									</div>
+								</div>
+							</div>
+						</div>
+					</a>
+				</div>
+			}
+			@if (module == 7)
+			{
+				<div class="col-xl-3 col-sm-6 mb-4">
+					<a href="~/Maintenance/Section/">
+						<div class="card cardHover shadow h-100 py-2">
+							<div class="card-body" style="padding: 1.25rem;">
+								<div class="row no-gutters align-items-center">
+									<div class="col mr-2">
+										<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Section</div>
+									</div>
+									<div class="col-2">
+										<i class="fa-solid fa-newspaper fa-2x text-gray-300"></i>
+									</div>
+								</div>
+							</div>
+						</div>
+					</a>
+				</div>
+			}
+			@* 		<div class="col-xl-3 col-sm-6 mb-4">
+		<a href="~/Maintenance/Role/">
+		<div class="card cardHover shadow h-100 py-2">
+		<div class="card-body" style="padding: 1.25rem;">
+		<div class="row no-gutters align-items-center">
+		<div class="col mr-2">
+		<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Role</div>
 		</div>
-
-		<div class="col-xl-3 col-sm-6 mb-4">
-			<a href="~/Maintenance/Department/">
-				<div class="card cardHover shadow h-100 py-2">
-					<div class="card-body" style="padding: 1.25rem;">
-						<div class="row no-gutters align-items-center">
-							<div class="col mr-2">
-								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Departments</div>
-							</div>
-							<div class="col-2">
-								<i class="fa-solid fa-network-wired fa-2x text-gray-300"></i>
-							</div>
-						</div>
-					</div>
-				</div>
-			</a>
+		<div class="col-2">
+		<i class="fa-solid fa-folder-tree fa-2x text-gray-300"></i>
 		</div>
-
-		<div class="col-xl-3 col-sm-6 mb-4">
-			<a href="~/Maintenance/Section/">
-				<div class="card cardHover shadow h-100 py-2">
-					<div class="card-body" style="padding: 1.25rem;">
-						<div class="row no-gutters align-items-center">
-							<div class="col mr-2">
-								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Section</div>
-							</div>
-							<div class="col-2">
-								<i class="fa-solid fa-newspaper fa-2x text-gray-300"></i>
-							</div>
-						</div>
-					</div>
-				</div>
-			</a>
 		</div>
-
-@* 		<div class="col-xl-3 col-sm-6 mb-4">
-			<a href="~/Maintenance/Role/">
-				<div class="card cardHover shadow h-100 py-2">
-					<div class="card-body" style="padding: 1.25rem;">
-						<div class="row no-gutters align-items-center">
-							<div class="col mr-2">
-								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Role</div>
-							</div>
-							<div class="col-2">
-								<i class="fa-solid fa-folder-tree fa-2x text-gray-300"></i>
-							</div>
-						</div>
-					</div>
-				</div>
-			</a>
+		</div>
+		</div>
+		</a>
 		</div> *@
-
-		<div class="col-xl-3 col-sm-6 mb-4">
-			<a href="~/Maintenance/DocumentType/">
-				<div class="card cardHover shadow h-100 py-2">
-					<div class="card-body" style="padding: 1.25rem;">
-						<div class="row no-gutters align-items-center">
-							<div class="col mr-2">
-								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Document Type</div>
-							</div>
-							<div class="col-2">
-								<i class="fa-solid fa-newspaper fa-2x text-gray-300"></i>
-							</div>
-						</div>
-					</div>
-				</div>
-			</a>
-		</div>
-
-		<div class="col-xl-3 col-sm-6 mb-4">
-			<a href="~/Maintenance/UserRole/">
-				<div class="card cardHover shadow h-100 py-2">
-					<div class="card-body" style="padding: 1.25rem;">
-						<div class="row no-gutters align-items-center">
-							<div class="col mr-2">
-								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">User Role</div>
-							</div>
-							<div class="col-2">
-								<i class="fa-solid fa-newspaper fa-2x text-gray-300"></i>
+			@if (module == 8)
+			{
+				<div class="col-xl-3 col-sm-6 mb-4">
+					<a href="~/Maintenance/DocumentType/">
+						<div class="card cardHover shadow h-100 py-2">
+							<div class="card-body" style="padding: 1.25rem;">
+								<div class="row no-gutters align-items-center">
+									<div class="col mr-2">
+										<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Document Type</div>
+									</div>
+									<div class="col-2">
+										<i class="fa-solid fa-tags fa-2x text-gray-300"></i>
+									</div>
+								</div>
 							</div>
 						</div>
-					</div>
+					</a>
 				</div>
-			</a>
-		</div>
-
-		<div class="col-xl-3 col-sm-6 mb-4">
-			<a href="~/Maintenance/ActivityLog/">
-				<div class="card cardHover shadow h-100 py-2">
-					<div class="card-body" style="padding: 1.25rem;">
-						<div class="row no-gutters align-items-center">
-							<div class="col mr-2">
-								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Audit Trail</div>
-							</div>
-							<div class="col-2">
-								<i class="fa-solid fa-newspaper fa-2x text-gray-300"></i>
+			}
+			@if (module == 9)
+			{
+				<div class="col-xl-3 col-sm-6 mb-4">
+					<a href="~/Maintenance/UserRole/">
+						<div class="card cardHover shadow h-100 py-2">
+							<div class="card-body" style="padding: 1.25rem;">
+								<div class="row no-gutters align-items-center">
+									<div class="col mr-2">
+										<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">User Role</div>
+									</div>
+									<div class="col-2">
+										<i class="fa-solid fa-sitemap fa-2x text-gray-300"></i>
+									</div>
+								</div>
 							</div>
 						</div>
-					</div>
+					</a>
 				</div>
-			</a>
-		</div>
+			}
+			@if (module == 11)
+			{
+				<div class="col-xl-3 col-sm-6 mb-4">
+					<a href="~/Maintenance/ActivityLog/">
+						<div class="card cardHover shadow h-100 py-2">
+							<div class="card-body" style="padding: 1.25rem;">
+								<div class="row no-gutters align-items-center">
+									<div class="col mr-2">
+										<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Audit Trail</div>
+									</div>
+									<div class="col-2">
+										<i class="fa-solid fa-gears fa-2x text-gray-300"></i>
+									</div>
+								</div>
+							</div>
+						</div>
+					</a>
+				</div>
+			}
 
-
-	
+		}
 	</div>
 </div>
 @section scripts {
