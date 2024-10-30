@@ -279,8 +279,7 @@ namespace DCI.API.Controllers
 		}
 
 		[HttpPost]
-		[Route("SaveRoleModule")]
-		//public async Task<IActionResult> SaveSystemManagement([FromBody] Dictionary<string, ModuleJson> inputJson)
+		[Route("SaveRoleModule")]	
 		public async Task<IActionResult> SaveRoleModule([FromBody] RoleInModuleViewModel model)
 		{
 			var result = await _userRoleRepository.Save(model);

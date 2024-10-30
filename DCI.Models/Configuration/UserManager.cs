@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DCI.Models.Entities;
+using DCI.Models.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -27,5 +29,6 @@ namespace DCI.Models.Configuration
 		}
 
 		public IList<int> ModulePageList { get; set; }
+		public IList<ModuleInRoleViewModel> ModulePageAccess { get; set; }
 	}
 }

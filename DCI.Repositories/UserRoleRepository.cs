@@ -307,7 +307,7 @@ namespace DCI.Repositories
    //         {
 			//	message_box = String.Format("User Role {0} has been updated successfully.", rolevm.RoleName);
 			//}
-			string message_box = model.RoleVM.RoleId == 0 ? String.Format("User Role {0} has been created successfully.", rolevm.RoleName) : String.Format("User Role {0} has been updated successfully.", rolevm.RoleName);
+			string message_box = model.RoleVM.RoleId == 0 ? String.Format("{0} has been created successfully.", rolevm.RoleName) : String.Format("{0} has been updated successfully.", rolevm.RoleName);
 			return (StatusCodes.Status200OK, message_box);
         }
 

@@ -42,44 +42,11 @@ namespace DCI.WebApp.Controllers
 			return View();
 		}
 
-		public async Task<IActionResult> Logoutx()
+		public async Task<IActionResult> Logout()
 		{
 			try
-			{
-
-
-				//await HttpContext.SignOutAsync("Cookies");
-				//await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-				//await HttpContext.SignOutAsync(GoogleDefaults.AuthenticationScheme);
-				//HttpContext.Session.Clear();
-				// Optionally, clear any other cookies
-
-				//  _httpContextAccessor.HttpContext.Session.Clear();
-				//Log.Information("Logout-");
-
-				//Log.Information("httpcontext-" + HttpContext.User.Identity.Name.ToString());
-
-				//Log.Information("HttpContext.Session-" + HttpContext.Session.IsAvailable);
-				//if (HttpContext.Session.IsAvailable)
-				//{
-
-				//	HttpContext.Session.Clear();
-				//}
-				//Log.Information("Request.Cookies-" + Request.Cookies.Count().ToString());
-				//if (Request.Cookies.Count > 0)
-				//{
-
-				//	foreach (var cookie in HttpContext.Request.Cookies.Keys)
-				//	{
-				//		Response.Cookies.Delete(cookie);
-				//	}
-				//}
-
-
+			{		
 				_httpContextAccessor.HttpContext.Session.Clear();
-
-
-
 
 				if (_httpContextAccessor.HttpContext.Request.Cookies.Count > 0)
 				{
@@ -90,8 +57,7 @@ namespace DCI.WebApp.Controllers
 					}
 				}
 
-				await _httpContextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-				await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+				await _httpContextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);		
 
 
 				return RedirectToAction("Login", "Account");
@@ -140,6 +106,7 @@ namespace DCI.WebApp.Controllers
 
 						HttpContext.Session.SetString("ModuleList", JsonConvert.SerializeObject(um.ModulePageList));
 						HttpContext.Session.SetString("currentFullname", um.GetFullname());
+						HttpContext.Session.SetString("ModulePageAccess", JsonConvert.SerializeObject(um.ModulePageAccess));
 
 						var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 						await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));

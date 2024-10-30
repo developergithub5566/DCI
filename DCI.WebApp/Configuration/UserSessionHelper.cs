@@ -1,5 +1,7 @@
 ﻿using DCI.Models.Configuration;
 using DCI.Models.ViewModel;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
 using Serilog;
@@ -19,14 +21,15 @@ namespace DCI.WebApp.Configuration
 		{
 			var userJson = _httpContextAccessor.HttpContext.Session.GetString("UserManager");
 
-			Log.Information(userJson);
-			Console.WriteLine($"UserManager session value: {userJson}");
-
 			if (userJson != null)
 			{
 				return JsonConvert.DeserializeObject<UserManager>(userJson);
 			}
-			return null;
+
+			_httpContextAccessor.HttpContext.Session.Clear();
+			_httpContextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+			return null;		
 		}
 	}
 }

@@ -34,12 +34,7 @@
 <body>
 	@{
 		var modulePageListId = Context.Session.GetString("ModuleList");
-		var moduleList = new List<int>();
-
-		if (modulePageListId != null)
-		{
-			moduleList = JsonConvert.DeserializeObject<List<int>>(modulePageListId);
-		}
+		var moduleList = JsonConvert.DeserializeObject<List<int>>(modulePageListId ?? "[]") ?? new List<int>();
 
 		var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
 		var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
@@ -253,7 +248,7 @@
 
 					<!-- Modal footer -->
 					<div class="modal-footer">
-						<a asp-controller="Account" asp-action="Logoutx" class="btn btn-primary">
+						<a asp-controller="Account" asp-action="Logout" class="btn btn-primary">
 					<small>Logout</small>
 					</a>
 					@* 	<button type="submit" class="btn btn-primary" id="btnLogout" onclick="Logout()">

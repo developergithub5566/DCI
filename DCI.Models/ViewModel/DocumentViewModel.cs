@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DCI.Models.ViewModel
 {
-	public class DocumentViewModel
+	public class DocumentViewModel : PermissionViewModel
 	{
 		public int DocId { get; set; }
 		public string? DocNo { get; set; } = string.Empty;

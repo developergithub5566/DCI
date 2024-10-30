@@ -14,6 +14,7 @@ using System.Text;
 using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Metadata;
+using DocumentFormat.OpenXml.InkML;
 
 
 namespace DCI.WebApp.Controllers
@@ -40,7 +41,7 @@ namespace DCI.WebApp.Controllers
 
 				if (response.IsSuccessStatusCode)
 				{
-					model = JsonConvert.DeserializeObject<List<DocumentViewModel>>(responseBody)!;
+					model = JsonConvert.DeserializeObject<List<DocumentViewModel>>(responseBody)!;					
 				}
 			}
 			return View(model);
@@ -112,7 +113,7 @@ namespace DCI.WebApp.Controllers
 			{
 				using (var _httpclient = new HttpClient())
 				{
-					var currentUser = _userSessionHelper.GetCurrentUser();
+					var currentUser =  _userSessionHelper.GetCurrentUser();
 					model.CreatedBy = currentUser.UserId;
 					model.ModifiedBy = currentUser.UserId;
 

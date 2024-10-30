@@ -676,12 +676,13 @@ namespace DCI.WebApp.Controllers
 
 		#region Role Module
 
-		public async Task<IActionResult> RoleModule(int id)
+		public async Task<IActionResult> RoleModule(int id, string type)
 		{
 			SystemManagementViewModel model = new SystemManagementViewModel();
 			model.RoleId = id;
 			if (model.RoleId == 0)
 			{
+				model.ViewEdit = Convert.ToInt16(type);
 				return View(model);
 			}
 			else
@@ -696,6 +697,7 @@ namespace DCI.WebApp.Controllers
 					var response = await _httpclient.SendAsync(request);
 					var responseBody = await response.Content.ReadAsStringAsync();
 					SystemManagementViewModel vm = JsonConvert.DeserializeObject<SystemManagementViewModel>(responseBody)!;
+					vm.ViewEdit = Convert.ToInt16(type);
 					return View(vm);
 				}
 			}

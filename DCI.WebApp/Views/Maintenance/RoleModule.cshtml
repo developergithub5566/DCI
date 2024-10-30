@@ -18,6 +18,16 @@
 					<p>Add new user role</p>
 				</div>
 				<form id="frmAdd" method="POST">
+					@if(Model.ViewEdit == 1)
+					{
+						<script>
+							document.addEventListener("DOMContentLoaded", function () {
+								document.querySelectorAll("#frmAdd input, #frmAdd select, #frmAdd textarea").forEach(function (el) {
+									el.disabled = true;										
+								});
+							});
+						</script>
+					}
 
 					<input type="text" class="form-control" name="RoleId" id="RoleId" value="@Model.RoleId" hidden>
 					<div class="form-group">
@@ -58,10 +68,10 @@
 										@* <input type="checkbox" name="mainModule[]" id="chkAllDocument" value="3" @(Model.Document == true ? "checked" : "")>
 										<label for="module3" class="subLabel">Document</label> *@
 										<ul class="ulPermission">
-										@* 	<li>
-												<input type="checkbox" name="subModule3[]" id="view3_3" value="1" class="chk_auditTrail" @(Model.DocumentView == true ? "checked" : "")>
+											<li>
+												<input type="checkbox" name="subModule3[]" id="view3_3" value="1" class="chk_auditTrail" @(Model.DocumentView == true ? "checked" : "") @(Model.Document ? "" : "disabled") />
 												<label for="view3_3"> View</label>
-											</li> *@
+											</li>
 											<li>
 												<input type="checkbox" name="subModule3[]" id="add3_3" value="2" class="chk_auditTrail" @(Model.DocumentAdd == true ? "checked" : "") @(Model.Document ? "" : "disabled") />
 												<label for="add3_3"> Add</label>
@@ -110,10 +120,10 @@
 										<input type="checkbox" name="mainModule[]" id="chkAllUserManagement" value="5" @(Model.UserManagement == true ? "checked" : "")>
 										<label class="subLabel">User Management</label>
 										<ul class="ulPermission">
-											@* <li>
-												<input type="checkbox" name="subModule5[]" id="view4_2" value="1" class="user_management" @(Model.UserManagementView == true ? "checked" : "") @(Model.UserManagementView ? "" : "disabled") />
+											<li>
+												<input type="checkbox" name="subModule5[]" id="view4_2" value="1" class="user_management" @(Model.UserManagementView == true ? "checked" : "") @(Model.UserManagement ? "" : "disabled") />
 												<label for="view4_5"> View</label>
-											</li> *@
+											</li>
 											<li>
 												<input type="checkbox" name="subModule5[]" id="add4_5" value="2" class="user_management" @(Model.UserManagementAdd == true ? "checked" : "") @(Model.UserManagement ? "" : "disabled") />
 												<label for="add4_5"> Add</label>
@@ -140,10 +150,10 @@
 										<input type="checkbox" name="mainModule[]" id="chkAllDepartment" value="6" @(Model.Department == true ? "checked" : "")>
 										<label class="subLabel">Departments</label>
 										<ul class="ulPermission">
-											@* <li>
-												<input type="checkbox" name="subModule6[]" id="view4_6" value="1" class="chk_departments" @(Model.DepartmentView == true ? "checked" : "") @(Model.DepartmentView ? "" : "disabled") />
+											<li>
+											<input type="checkbox" name="subModule6[]" id="view4_6" value="1" class="chk_departments" @(Model.DepartmentView == true ? "checked" : "") @(Model.Department ? "" : "disabled") />
 												<label for="view4_6"> View</label>
-											</li> *@
+											</li>
 											<li>
 												<input type="checkbox" name="subModule6[]" id="add4_6" value="2" class="chk_departments" @(Model.DepartmentAdd == true ? "checked" : "") @(Model.Department ? "" : "disabled") />
 												<label for="add4_6"> Add</label>
@@ -169,10 +179,10 @@
 										<input type="checkbox" name="mainModule[]" id="chkAllSection" value="7" @(Model.Section == true ? "checked" : "")>
 										<label class="subLabel">Section</label>
 										<ul class="ulPermission">
-											@* <li>
-												<input type="checkbox" name="subModule7[]" id="view4_7" value="1" class="chk_section" @(Model.SectionView == true ? "checked" : "") @(Model.SectionView ? "" : "disabled") />
+											<li>
+												<input type="checkbox" name="subModule7[]" id="view4_7" value="1" class="chk_section" @(Model.SectionView == true ? "checked" : "") @(Model.Section ? "" : "disabled") />
 												<label for="view4_7"> View</label>
-											</li> *@
+											</li>
 											<li>
 												<input type="checkbox" name="subModule7[]" id="add4_7" value="2" class="chk_section" @(Model.SectionAdd == true ? "checked" : "") @(Model.Section ? "" : "disabled") />
 												<label for="add4_7"> Add</label>
@@ -199,10 +209,10 @@
 										<input type="checkbox" name="mainModule[]" id="chkAllDocumenttype" value="8" @(Model.DocumentType == true ? "checked" : "")>
 										<label class="subLabel">Document Type</label>
 										<ul class="ulPermission">
-											@* <li>
-												<input type="checkbox" name="subModule8[]" id="view4_8" value="1" class="chk_documenttype" @(Model.DocumentTypeView == true ? "checked" : "") @(Model.DocumentTypeView ? "" : "disabled") />
+											<li>
+												<input type="checkbox" name="subModule8[]" id="view4_8" value="1" class="chk_documenttype" @(Model.DocumentTypeView == true ? "checked" : "") @(Model.DocumentType ? "" : "disabled") />
 												<label for="view4_8"> View</label>
-											</li> *@
+											</li>
 											<li>
 												<input type="checkbox" name="subModule8[]" id="add4_8" value="2" class="chk_documenttype" @(Model.DocumentTypeAdd == true ? "checked" : "") @(Model.DocumentType ? "" : "disabled") />
 												<label for="add4_8"> Add</label>
@@ -228,10 +238,10 @@
 										<input type="checkbox" name="mainModule[]" id="chkAllAuditTrail" value="11" @(Model.AuditTrail == true ? "checked" : "")>
 										<label for="module11" class="subLabel">Audit Trail</label>
 										<ul class="ulPermission">
-											@* <li>
-												<input type="checkbox" name="subModule11[]" id="view10_11" value="1" class="chk_auditTrail" @(Model.AuditTrailView == true ? "checked" : "") @(Model.AuditTrailView ? "" : "disabled") />
+											<li>
+												<input type="checkbox" name="subModule11[]" id="view10_11" value="1" class="chk_auditTrail" @(Model.AuditTrailView == true ? "checked" : "") @(Model.AuditTrail ? "" : "disabled") />
 												<label for="view10_11"> View</label>
-											</li> *@
+											</li>
 											<li>
 												<input type="checkbox" name="subModule11[]" id="add10_11" value="2" class="chk_auditTrail" @(Model.AuditTrailAdd == true ? "checked" : "") @(Model.AuditTrail ? "" : "disabled") />
 												<label for="add10_11"> Add</label>
@@ -257,10 +267,10 @@
 										<input type="checkbox" name="mainModule[]" id="chkAllUserRoleManagement" value="9" @(Model.UserRoleManagement == true ? "checked" : "")>
 										<label for="module9" class="subLabel">User Role</label>
 										<ul class="ulPermission">
-											@* <li>
-												<input type="checkbox" name="subModule9[]" id="view10_9" value="1" class="chk_userRoleManagement" @(Model.UserRoleManagementView == true ? "checked" : "") @(Model.UserRoleManagementView ? "" : "disabled") />
+											<li>
+												<input type="checkbox" name="subModule9[]" id="view10_9" value="1" class="chk_userRoleManagement" @(Model.UserRoleManagementView == true ? "checked" : "") @(Model.UserRoleManagement ? "" : "disabled") />
 												<label for="view10_9"> View</label>
-											</li> *@
+											</li>
 											<li>
 												<input type="checkbox" name="subModule9[]" id="add10_9" value="2" class="chk_userRoleManagement" @(Model.UserRoleManagementAdd == true ? "checked" : "") @(Model.UserRoleManagement ? "" : "disabled") />
 												<label for="add10_9"> Add</label>
@@ -345,9 +355,12 @@
 						</div>
 					</div>
 					<div class="form-group">
+						@if (Model.ViewEdit == 0)	@*view only = 1: edit =0*@
+						{
 						<button class="btn btn-primary" type="submit" value="submit">
 							Save
 						</button>
+						}					
 
 						<a asp-controller="Maintenance" asp-action="UserRole" class="btn btn-secondary">
 							Cancel
@@ -376,77 +389,10 @@
 			$('.spinner-overlay').hide();
 		}, 200);
 
-		$(document).ready(function () {
+		$(document).ready(function () {	
+
 		});
 
-		// $('#frmAdd').submit(function (event) {
-		// 	event.preventDefault();
-		// 	bootbox.confirm('Are you sure you want to save this record?', function (result) {
-		// 		if (result) {
-
-		// 			let data = {}; // JSON object to hold the result
-
-		// 			// Get all checked main modules
-		// 			let mainModulesChecked = document.querySelectorAll('input[name="mainModule[]"]:checked');
-
-		// 			let roleId = document.getElementById("RoleId").value;
-		// 			let roleName = document.getElementById("RoleName").value;
-		// 			let description = document.getElementById("Description").value;
-
-
-		// 			mainModulesChecked.forEach((checkbox) => {
-		// 				let moduleId = checkbox.value; // Main module ID
-		// 				let subModulesChecked = document.querySelectorAll('input[name="subModule' + moduleId + '[]"]:checked');
-
-		// 				// Collect checked submodules
-		// 				let subModuleValues = [];
-		// 				subModulesChecked.forEach((subCheckbox) => {
-		// 					subModuleValues.push(subCheckbox.value);
-		// 				});
-
-		// 				// Add main module and its submodules to the data object
-		// 				data[moduleId] = {
-		// 					"roleId": roleId,
-		// 					"roleName": roleName,
-		// 					"description": description,
-		// 					"mainModule": moduleId,
-		// 					"subModules": subModuleValues
-		// 				};
-		// 			});
-
-
-		// 			$.ajax({
-		// 				type: 'POST',
-		// 				url: '@Url.Action("SaveRoleModule", "Maintenance")',
-		// 				data: JSON.stringify(data),
-		// 				contentType: "application/json; charset=utf-8",
-		// 				success: function (response) {
-		// 					if (response.success) {
-		// 						Swal.fire({
-		// 							text: response.message,
-		// 							icon: "success",
-		// 							confirmButtonText: "Ok"
-		// 						}).then((result) => {
-		// 							location.reload();
-		// 						});
-		// 					} else {
-		// 						Swal.fire({
-		// 							text: response.message,
-		// 							icon: "error"
-		// 						});
-		// 					}
-		// 				},
-		// 				error: function () {
-		// 					Swal.fire({
-		// 						text: "An error occurred. Please try again.",
-		// 						icon: "error"
-		// 					});
-		// 				}
-		// 			});
-
-		// 		}
-		// 	});
-		// });//submit
 
 		$('#frmAdd').submit(function (event) {
 			event.preventDefault();
@@ -554,10 +500,17 @@
 
 	.form-check-input {
 		margin-right: 10px; /* Adjust the value as needed */
+		background-color: #5f9fdf !important;
 	}
 
 	input:read-only {
-		background-color: #5f9fdf !important;
+	/* 	background-color: #5f9fdf !important; */
+		background-color: mediumaquamarine !important;
+		cursor: auto;
+	}
+
+	input:disabled {
+		background-color: #f8f8f8 !important;
 		cursor: auto;
 	}
 
@@ -565,6 +518,9 @@
 		display: inline-block;
 		margin-bottom: .1rem;
 	}
+
+
+
 
 	
 </style>

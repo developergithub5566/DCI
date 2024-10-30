@@ -37,6 +37,25 @@ namespace DCI.Repositories
 			var result =   _dbContext.ModuleInRole.AsNoTracking().Where(x => x.IsActive == true && x.RoleId == roleId);
             return result.Select(x => x.ModulePageId).ToList();
 		}
+		public async Task<IList<ModuleInRoleViewModel>> GetModuleAccessByRoleId(int roleId)
+		{
+			var result = _dbContext.ModuleInRole.AsNoTracking().Where(x => x.IsActive == true && x.RoleId == roleId);
+		
+			var query = from x in result					
+						select new ModuleInRoleViewModel
+						{
+							RoleId = x.RoleId,
+							ModulePageId = x.ModulePageId,
+							View = x.View,
+							Add = x.Add,
+							Update = x.Update,
+							Delete = x.Delete,
+							Import = x.Import,
+							Export = x.Export	
+						};
+
+            return query.ToList();
+		}
 		public async Task<(int statuscode, string message)> Save(ModuleInRoleViewModel model)
         {
             try

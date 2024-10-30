@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace DCI.Models.ViewModel
+﻿namespace DCI.Models.ViewModel
 {
 	public class AuditLogViewModel
 	{
@@ -12,12 +10,6 @@ namespace DCI.Models.ViewModel
 		public string EntityId { get; set; } = string.Empty;
 		public Dictionary<string, object> Changes { get; set; } = new Dictionary<string, object>();
 		public string ChangesSerialized { get; set; } = string.Empty;
-
-		//public IList<AuditlogDetail> auditlogDetails { get; set; }
+		
 	}
-	public class AuditLogByUsernameViewModel
-	{
-		public int Username { get; set; } = 0;
-	}
-
 }

@@ -6,12 +6,7 @@
 
 @{
 	var modulePageListId = Context.Session.GetString("ModuleList");
-	var moduleList = new List<int>();
-
-	if (modulePageListId != null)
-	{
-		moduleList = JsonConvert.DeserializeObject<List<int>>(modulePageListId);
-	}
+	var moduleList = JsonConvert.DeserializeObject<List<int>>(modulePageListId ?? "[]") ?? new List<int>();
 }
 
 <div class="container-fluid">
