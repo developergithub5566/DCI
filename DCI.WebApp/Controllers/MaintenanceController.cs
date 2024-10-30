@@ -680,15 +680,9 @@ namespace DCI.WebApp.Controllers
 		{
 			SystemManagementViewModel model = new SystemManagementViewModel();
 			model.RoleId = id;
-			if (model.RoleId == 0)
+			
+			if (model.RoleId != 0)
 			{
-				model.ViewEdit = Convert.ToInt16(type);
-				return View(model);
-			}
-			else
-			{
-				//	List<RoleInModuleViewModel> roleInModuleVM = new List<RoleInModuleViewModel>();
-
 				using (var _httpclient = new HttpClient())
 				{
 					var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -696,12 +690,14 @@ namespace DCI.WebApp.Controllers
 					request.Content = stringContent;
 					var response = await _httpclient.SendAsync(request);
 					var responseBody = await response.Content.ReadAsStringAsync();
-					SystemManagementViewModel vm = JsonConvert.DeserializeObject<SystemManagementViewModel>(responseBody)!;
-					vm.ViewEdit = Convert.ToInt16(type);
-					return View(vm);
+		
+					model = JsonConvert.DeserializeObject<SystemManagementViewModel>(responseBody)!;
+					model.ViewEdit = Convert.ToInt16(type);				
 				}
 			}
-
+			model.ViewEdit = Convert.ToInt16(type);
+			model.DashboardLabel = (id == 0 ? "Add" : (type == "1" ? "View" : "Update"));
+			return View(model);
 		}
 
 		public async Task<IActionResult> SaveRoleModule([FromBody] Dictionary<string, ModuleJson> inputJson)

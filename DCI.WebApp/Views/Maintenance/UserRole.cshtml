@@ -65,6 +65,7 @@
 </style>
 @{
 	var modulePageAccess = Context.Session.GetString("ModulePageAccess");
+
 	var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
 						.FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.UserRole);
 	var canView = module?.View ?? false;

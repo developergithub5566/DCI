@@ -78,5 +78,6 @@
 		public bool AnnouncementExport { get; set; } = false;
 
 		public int ViewEdit { get; set; } = 1;
+		public string DashboardLabel { get; set; } = string.Empty;
 	}
 }

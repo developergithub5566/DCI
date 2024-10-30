@@ -7,8 +7,8 @@
 <style>
 	/* Hide the default file input */
 	/* 	#fileUpload {
-															display: none;
-														} */
+																display: none;
+															} */
 
 	/* Style the custom button */
 
@@ -29,12 +29,27 @@
 
 @{
 	var modulePageAccess = Context.Session.GetString("ModulePageAccess");
-	var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
+
+	var canView  = false;
+	var canAdd = false;
+	var canEdit =  false;
+	var canDelete = false;
+
+	if (modulePageAccess == null)
+	{
+		<script>
+			window.location.href = '/Account/Logout';
+		</script>
+	}
+	else
+	{
+		var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
 						.FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Document);
-	var canView = module?.View ?? false;
-	var canAdd = module?.Add ?? false;
-	var canEdit = module?.Update ?? false;
-	var canDelete = module?.Delete ?? false;
+		 canView = module?.View ?? false;
+		 canAdd = module?.Add ?? false;
+		 canEdit = module?.Update ?? false;
+		 canDelete = module?.Delete ?? false;			
+	}
 }
 
 <div class="container-fluid">
@@ -121,7 +136,7 @@
 
 								<td>
 									<a href="#" onclick="editForm(@item.DocId,1)" title="View" class="btn btn-primary @(canView ? "" : "disabled") "><i class="fas fa-search"></i></a> |
-									<a href="#" id="editForm" onclick="editForm(@item.DocId,0)" title="Update"  class="btn btn-info @(canEdit ? "" : "disabled") "><i class="fa fa-edit"></i></a> |
+									<a href="#" id="editForm" onclick="editForm(@item.DocId,0)" title="Update" class="btn btn-info @(canEdit ? "" : "disabled") "><i class="fa fa-edit"></i></a> |
 									<a href="#" id="deleteform" onclick="deleteform(@item.DocId)" title="Delete" class="btn btn-danger @(canDelete ? "" : "disabled") "><i class="far fa-trash-alt"></i></a>
 								</td>
 							</tr>
