@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication;
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using DCI.Models.Configuration;
@@ -16,8 +15,6 @@ using Microsoft.AspNetCore.Authorization;
 using DCI.Models.Entities;
 using System.Security.Claims;
 using DCI.WebApp.Configuration;
-
-
 
 namespace DCI.WebApp.Controllers
 {
@@ -46,7 +43,7 @@ namespace DCI.WebApp.Controllers
 		{
 			try
 			{		
-				_httpContextAccessor.HttpContext.Session.Clear();
+				_httpContextAccessor.HttpContext!.Session.Clear();
 
 				if (_httpContextAccessor.HttpContext.Request.Cookies.Count > 0)
 				{
@@ -58,7 +55,6 @@ namespace DCI.WebApp.Controllers
 				}
 
 				await _httpContextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);		
-
 
 				return RedirectToAction("Login", "Account");
 			}
@@ -91,9 +87,7 @@ namespace DCI.WebApp.Controllers
 					{
 						//var result = _userContextService.GetUserContext();
 						UserManager um = JsonConvert.DeserializeObject<UserManager>(responseBody);
-						_httpContextAccessor.HttpContext.Session.SetString("UserManager", JsonConvert.SerializeObject(um));
-
-						//var _fullname = um.GetFullname(); //$"{um.Firstname} {um.Lastname}";
+						_httpContextAccessor.HttpContext!.Session.SetString("UserManager", JsonConvert.SerializeObject(um));						
 
 						var claims = new List<Claim>
 						{
@@ -115,7 +109,6 @@ namespace DCI.WebApp.Controllers
 					}
 					else
 					{
-
 						ViewBag.Message = "Invalid account! Please check your username and password.";
 						return View();
 					}
@@ -132,9 +125,7 @@ namespace DCI.WebApp.Controllers
 			}
 			return View();
 		}
-
-
-		// [HttpGet("ForgotPassword")]
+		
 		public IActionResult ForgotPassword()
 		{
 			return View();
