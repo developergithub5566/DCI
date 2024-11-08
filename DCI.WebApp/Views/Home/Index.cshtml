@@ -5,9 +5,38 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
 </head>
+
+@{
+	var modulePageAccess = Context.Session.GetString("ModulePageAccess");
+
+	if (modulePageAccess == null)
+	{
+		<script>
+			$.ajax({
+				type: 'POST',
+				url: '@Url.Action("Logout", "Account")',
+				success: function (response) {
+
+					Swal.fire({
+						text: "Your session has timed out. Please log in again.",
+						icon: "info",
+						confirmButtonText: "Ok"
+					}).then((result) => {
+						window.location.href = '/Account/Logout';
+					});
+				},
+				error: function () {
+					Swal.fire({
+						text: "An error occurred. Please try again.",
+						icon: "error"
+					});
+				}
+			})
+		</script>
+	}	
+}
 
 <div class="container-fluid">
 	

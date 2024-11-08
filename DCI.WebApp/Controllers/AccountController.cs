@@ -98,7 +98,7 @@ namespace DCI.WebApp.Controllers
 							new Claim(ClaimTypes.Name,um.GetFullname())
 						};
 
-						HttpContext.Session.SetString("ModuleList", JsonConvert.SerializeObject(um.ModulePageList));
+						//HttpContext.Session.SetString("ModuleList", JsonConvert.SerializeObject(um.ModulePageList));
 						HttpContext.Session.SetString("currentFullname", um.GetFullname());
 						HttpContext.Session.SetString("ModulePageAccess", JsonConvert.SerializeObject(um.ModulePageAccess));
 

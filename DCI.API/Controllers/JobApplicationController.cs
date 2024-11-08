@@ -6,8 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DCI.API.Controllers
 {
-	[ApiController]
-	[Route("api/[controller]")]
+	//[ApiController]
+	//[Route("api/[controller]")]
+	[ApiExplorerSettings(IgnoreApi = true)]
 	public class JobApplicationController : Controller
 	{
 		private readonly DCIdbContext _dcIdbContext;

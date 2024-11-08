@@ -7,12 +7,46 @@
 <link href="~/css/dcicustom.css" rel="stylesheet" />
 @{
 	var modulePageAccess = Context.Session.GetString("ModulePageAccess");
-	var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
-						.FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Section);
-	var canView = module?.View ?? false;
-	var canAdd = module?.Add ?? false;
-	var canEdit = module?.Update ?? false;
-	var canDelete = module?.Delete ?? false;
+
+	var canView = false;
+	var canAdd = false;
+	var canEdit = false;
+	var canDelete = false;
+
+	if (modulePageAccess == null)
+	{
+		<script>
+			$.ajax({
+				type: 'POST',
+				url: '@Url.Action("Logout", "Account")',
+				success: function (response) {
+
+					Swal.fire({
+						text: "Your session has timed out. Please log in again.",
+						icon: "info",
+						confirmButtonText: "Ok"
+					}).then((result) => {
+						window.location.href = '/Account/Logout';
+					});
+				},
+				error: function () {
+					Swal.fire({
+						text: "An error occurred. Please try again.",
+						icon: "error"
+					});
+				}
+			})
+		</script>
+	}
+	else
+	{		
+		var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
+							.FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Section);
+		 canView = module?.View ?? false;
+		 canAdd = module?.Add ?? false;
+		 canEdit = module?.Update ?? false;
+		 canDelete = module?.Delete ?? false;
+	}
 }
 <div class="container-fluid">
 	<div class="spinner-overlay">
@@ -102,9 +136,9 @@
 								</td>
 
 								<td>
-								@* 	<a href="#" onclick="editForm(@item.SectionId,1)" class="btn btn-primary"><i class="fas fa-search"></i></a> |
-									<a href="#" id="editForm" onclick="editForm(@item.SectionId,0)" class="btn btn-info"><i class="fa fa-edit"></i></a> |
-									<a href="#" id="deleteform" class="btn btn-danger" onclick="deleteform(@item.SectionId)"><i class="far fa-trash-alt"></i></a> *@
+									@* 	<a href="#" onclick="editForm(@item.SectionId,1)" class="btn btn-primary"><i class="fas fa-search"></i></a> |
+								<a href="#" id="editForm" onclick="editForm(@item.SectionId,0)" class="btn btn-info"><i class="fa fa-edit"></i></a> |
+								<a href="#" id="deleteform" class="btn btn-danger" onclick="deleteform(@item.SectionId)"><i class="far fa-trash-alt"></i></a> *@
 
 									<a href="#" onclick="editForm(@item.SectionId,1)" title="View" class="btn btn-primary @(canView ? "" : "disabled") "><i class="fas fa-search"></i></a> |
 									<a href="#" id="editForm" onclick="editForm(@item.SectionId,0)" title="Update" class="btn btn-info @(canEdit ? "" : "disabled") "><i class="fa fa-edit"></i></a> |
@@ -165,7 +199,7 @@
 
 
 
-			@section scripts {			
+			@section scripts {
 				<script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
 
 				<script type="text/javascript">
@@ -187,7 +221,7 @@
 
 							document.getElementById("DepartmentId").value = $('#departmentSelect').val();
 							var formData = $(this).serialize();
-						
+
 							Swal.fire({
 								text: "Are you sure you want to save this record?",
 								icon: "question",

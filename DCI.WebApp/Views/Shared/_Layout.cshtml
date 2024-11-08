@@ -1,6 +1,6 @@
 ﻿@using Newtonsoft.Json;
 @using DCI.Core.Common
-
+@using DCI.Models.ViewModel;
 
 <!DOCTYPE html>
 <html lang="en">
@@ -32,9 +32,9 @@
 </head>
 
 <body>
-	@{
-		var modulePageListId = Context.Session.GetString("ModuleList");
-		var moduleList = JsonConvert.DeserializeObject<List<int>>(modulePageListId ?? "[]") ?? new List<int>();
+	@{	
+		var modulePageAccess = Context.Session.GetString("ModulePageAccess");
+		var moduleList = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess ?? "[]") ?? new List<ModuleInRoleViewModel>();
 
 		var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
 		var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
@@ -64,7 +64,7 @@
 
 				@foreach (var module in moduleList)
 				{
-					@if (module == (int)EnumModulePage.Dashboard)
+					@if (module.ModulePageId == (int)EnumModulePage.Dashboard)
 					{
 					<hr class='sidebar-divider'>
 					<a class='mainModule' href='~/Home/Index'>
@@ -76,7 +76,7 @@
 					</a>
 					}
 
-					@if (module == (int)EnumModulePage.Document)
+					@if (module.ModulePageId == (int)EnumModulePage.Document)
 					{
 						<hr class='sidebar-divider'>
 						<a href="/Document/Index/" class='mainModule'>
@@ -88,7 +88,7 @@
 					</a>
 					}
 
-					@if (module == (int)EnumModulePage.Administration)
+					@if (module.ModulePageId == (int)EnumModulePage.Administration)
 					{
 						<hr class='sidebar-divider'>
 						<a href="/Maintenance/Index/" class='mainModule'>

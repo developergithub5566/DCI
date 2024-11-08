@@ -1,7 +1,36 @@
 ﻿@model IEnumerable<DCI.Models.ViewModel.AuditLogViewModel>
 
 <link href="~/css/DCIcustom.css" rel="stylesheet" />
+@{
+	var modulePageAccess = Context.Session.GetString("ModulePageAccess");
 
+	if (modulePageAccess == null)
+	{
+		<script>
+			$.ajax({
+				type: 'POST',
+				url: '@Url.Action("Logout", "Account")',
+				success: function (response) {
+
+					Swal.fire({
+						text: "Your session has timed out. Please log in again.",
+						icon: "info",
+						confirmButtonText: "Ok"
+					}).then((result) => {
+						window.location.href = '/Account/Logout';
+					});
+				},
+				error: function () {
+					Swal.fire({
+						text: "An error occurred. Please try again.",
+						icon: "error"
+					});
+				}
+			})
+		</script>
+	}
+
+}
 <div class="container-fluid">
 	<div class="spinner-overlay">
 		<div class="spinner-border text-light" role="status">
@@ -53,8 +82,8 @@
 							<th>
 								<label>Logs</label>
 							</th>
-						@* 	<th>
-								Action
+							@* 	<th>
+							Action
 							</th> *@
 						</tr>
 					</thead>
@@ -81,11 +110,11 @@
 									@item.ChangesSerialized
 								</td>
 
-							@* 	<td>
-									<a href="#" class="btn btn-primary"><i class="fas fa-search"></i></a> |
-										<a href="#" id="editForm" onclick="editForm(@item.Id)" class="btn btn-info"><i class="fa fa-edit"></i></a> | 
-									 <a href="#" id="deleteform" class="btn btn-danger" onclick="deleteform(@item.Id)"><i class="far fa-trash-alt"></i></a>
-								</td> *@
+								@* 	<td>
+							<a href="#" class="btn btn-primary"><i class="fas fa-search"></i></a> |
+							<a href="#" id="editForm" onclick="editForm(@item.Id)" class="btn btn-info"><i class="fa fa-edit"></i></a> |
+							<a href="#" id="deleteform" class="btn btn-danger" onclick="deleteform(@item.Id)"><i class="far fa-trash-alt"></i></a>
+							</td> *@
 							</tr>
 						}
 					</tbody>

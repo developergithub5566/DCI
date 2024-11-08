@@ -7,12 +7,46 @@
 
 @{
 	var modulePageAccess = Context.Session.GetString("ModulePageAccess");
-	var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
-						.FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.UserManagement);
-	var canView = module?.View ?? false;
-	var canAdd = module?.Add ?? false;
-	var canEdit = module?.Update ?? false;
-	var canDelete = module?.Delete ?? false;
+
+	var canView = false;
+	var canAdd = false;
+	var canEdit = false;
+	var canDelete = false;
+
+	if (modulePageAccess == null)
+	{
+		<script>
+			$.ajax({
+				type: 'POST',
+				url: '@Url.Action("Logout", "Account")',
+				success: function (response) {
+
+					Swal.fire({
+						text: "Your session has timed out. Please log in again.",
+						icon: "info",
+						confirmButtonText: "Ok"
+					}).then((result) => {
+						window.location.href = '/Account/Logout';
+					});
+				},
+				error: function () {
+					Swal.fire({
+						text: "An error occurred. Please try again.",
+						icon: "error"
+					});
+				}
+			})
+		</script>
+	}
+	else
+	{
+		var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
+							.FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.UserManagement);
+		canView = module?.View ?? false;
+		canAdd = module?.Add ?? false;
+		canEdit = module?.Update ?? false;
+		canDelete = module?.Delete ?? false;
+	}
 }
 
 <div class="container-fluid">

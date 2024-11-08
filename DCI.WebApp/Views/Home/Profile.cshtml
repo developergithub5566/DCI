@@ -1,7 +1,35 @@
 ﻿@model DCI.Models.ViewModel.UserViewModel
 
 <link href="~/css/DCIcustom.css" rel="stylesheet" />
+@{
+	var modulePageAccess = Context.Session.GetString("ModulePageAccess");
 
+	if (modulePageAccess == null)
+	{
+		<script>
+			$.ajax({
+				type: 'POST',
+				url: '@Url.Action("Logout", "Account")',
+				success: function (response) {
+
+					Swal.fire({
+						text: "Your session has timed out. Please log in again.",
+						icon: "info",
+						confirmButtonText: "Ok"
+					}).then((result) => {
+						window.location.href = '/Account/Logout';
+					});
+				},
+				error: function () {
+					Swal.fire({
+						text: "An error occurred. Please try again.",
+						icon: "error"
+					});
+				}
+			})
+		</script>
+	}	
+}
 <div class="d-sm-flex align-items-center justify-content-between mb-3">
 	<h6 class="m-0 font-weight-bold text-gray-800">Profile</h6>
 
