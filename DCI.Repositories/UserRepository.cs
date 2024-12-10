@@ -39,35 +39,22 @@ namespace DCI.Repositories
 		{
 			try
 			{
-				UserModel usermodel = new UserModel();
+				var result = _dbContext.User.Where(usr => usr.UserId == userid)
+								.Select(usr => new UserModel
+								{
+									UserId = usr.UserId,
+									Lastname = usr.Lastname,
+									Middlename = usr.Middlename,
+									Firstname = usr.Firstname,
+									Email = usr.Email,
+									ContactNo = usr.ContactNo,
+									RoleId = usr.RoleId,
+									RoleList = null,
+									EmployeeList = null
+								}).FirstOrDefault() ?? new UserModel();
 
-				var context = _dbContext.User.AsQueryable();
-
-				var query = from usr in context
-							where usr.UserId == userid
-							select new UserModel
-							{
-								UserId = usr.UserId,
-								Lastname = usr.Lastname,
-								Middlename = usr.Middlename,
-								Firstname = usr.Firstname,
-								Email = usr.Email,
-								ContactNo = usr.ContactNo,
-								RoleId = usr.RoleId,
-								RoleList = null
-
-							};
-
-				var result = query.FirstOrDefault();
-
-				var rolexList = _dbContext.Role.Where(x => x.IsActive).AsQueryable().ToList();
-
-				if (result == null)
-				{
-					result = new UserModel();
-				}
-				result.RoleList = rolexList.Count() > 0 ? rolexList : null;
-				result.EmployeeList = context.ToList(); //_dbContext.User.AsQueryable().ToList();
+				result.RoleList = _dbContext.Role.Where(x => x.IsActive).ToList();
+				result.EmployeeList = _dbContext.User.ToList();
 				return result;
 			}
 			catch (Exception ex)
