@@ -6,6 +6,7 @@
 		public const string DocNo = "172.16.1.39";
 		public const string CompanyCode = "DCI";
 		public const string AppCode = "DMS";
+		public const string DocControlNo = "CN";
 
 		public const string Msg_ErrorMessage = "An error occurred. Please try again.";	
 

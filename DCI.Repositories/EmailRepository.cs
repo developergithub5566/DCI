@@ -116,7 +116,7 @@ namespace DCI.Repositories
 
 			MailMessage mail = new MailMessage();
 			mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-			mail.Subject = "Action Required: Please Upload Your Document No " + model.DocNo;
+			mail.Subject = "Action Required: Please Upload Your Document No. " + model.DocNo;
 			mail.Body = model.EmailBody;
 			mail.IsBodyHtml = true;
 			mail.To.Add(model.RequestByEmail);

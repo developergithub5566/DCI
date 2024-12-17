@@ -103,7 +103,7 @@ namespace DCI.Repositories
 								DocCategory = doc.DocCategory,
 								RequestById = doc.RequestById,
 								SectionId = doc.SectionId,
-
+								LabelId =doc.LabelId,
 							};
 
 				var result = query.FirstOrDefault();
@@ -148,7 +148,8 @@ namespace DCI.Repositories
 					entity.DocTypeId = model.DocTypeId;
 					entity.DocCategory = model.DocCategory;
 					entity.DepartmentId = model.DepartmentId;
-					entity.SectionId = model.SectionId;
+					//entity.SectionId = model.SectionId;
+					entity.LabelId = model.LabelId;
 					entity.Version = model.Version;
 					entity.Filename = model.DocFile != null ? model.DocFile.FileName : string.Empty;
 					entity.CreatedBy = model.CreatedBy;
@@ -183,7 +184,8 @@ namespace DCI.Repositories
 					entity.DocTypeId = model.DocTypeId;
 					entity.DocCategory = model.DocCategory;
 					entity.DepartmentId = model.DepartmentId;
-					entity.SectionId = model.SectionId;
+					//entity.SectionId = model.SectionId;
+					entity.LabelId = model.LabelId;
 					entity.RequestById = model.RequestById;
 					entity.Version = model.Version;
 					entity.Filename = model.DocFile != null ? model.DocFile.FileName : entity.Filename;
@@ -231,7 +233,7 @@ namespace DCI.Repositories
 				entity.DateModified = DateTime.Now;
 				_dbContext.Document.Entry(entity).State = EntityState.Modified;
 				await _dbContext.SaveChangesAsync();
-				return (StatusCodes.Status200OK, "Successfully deleted repository");
+				return (StatusCodes.Status200OK, "Successfully deleted");
 			}
 			catch (Exception ex)
 			{
@@ -261,11 +263,14 @@ namespace DCI.Repositories
 
 				var entity = await _dbContext.Document.FirstOrDefaultAsync(x => x.DocId == model.DocId && x.IsActive == true);
 				entity.FileLocation = fileloc;
-			
-				entity.ModifiedBy = model.ModifiedBy != null ? model.ModifiedBy : null;
-				entity.DateModified = model.DateModified != null ? model.DateModified : null;
 
-				if(entity.Filename != null && entity.Filename !="")
+				//entity.ModifiedBy = model.ModifiedBy != null ? model.ModifiedBy : null;
+				//entity.DateModified = model.DateModified != null ? model.DateModified : null;
+
+				entity.ModifiedBy = model.ModifiedBy ?? null;
+				entity.DateModified = model.DateModified ?? null;
+
+				if (entity.Filename != null && entity.Filename !="")
 				{
                     entity.Version = Convert.ToInt16(entity.Version) + 1;
                     entity.DocNo = IncrementVersion(entity.DocNo);
@@ -285,22 +290,18 @@ namespace DCI.Repositories
 		}
 		private async Task<string> GenerateDocCode(DocumentViewModel param)
 		{
-			//CD.DCC.002.000 Ver. 0.1
-			//TID.PM.001.000
-			//DCI.MOA.001.000
-			//string strFormat = String.Format("Hello {0}", param.DocName);
-			//string setA = String.Format("{0:D3}", totalrecords.ToString());
+			
 			try
 			{
 				var _docContext = await _dbContext.Document
-												.Where(x => x.DepartmentId == param.DepartmentId && x.SectionId == param.SectionId && x.IsActive == true)
+												.Where(x => x.DepartmentId == param.DepartmentId && x.IsActive == true)
 												.AsQueryable()
 												.ToListAsync();
-
+				
 				var _deptContext = await _dbContext.Department
 												.AsQueryable()
 												.FirstOrDefaultAsync(x => x.DepartmentId == param.DepartmentId && x.IsActive == true);
-
+				/*
 				var _docTypeContext = await _dbContext.DocumentType
 												.AsQueryable()
 												.FirstOrDefaultAsync(x => x.DocTypeId == param.DocTypeId && x.IsActive == true);
@@ -308,26 +309,26 @@ namespace DCI.Repositories
 				var _section = await _dbContext.Section
 												.AsQueryable()
 												.FirstOrDefaultAsync(x => x.DepartmentId == param.DepartmentId && x.IsActive == true);
+				*/
 
 				int totalrecords = _docContext.Count() + 1;
-				string version = "0";
+				string version = "0.0";
 				string finalSetRecords = GetFormattedRecord(totalrecords);
-
+				string yearLastTwoDigit = DateTime.Now.Year.ToString().Substring(2,2);
+				string deptcode = _deptContext?.DepartmentCode?.Trim() ?? string.Empty;
+				string labelcode = param.LabelId == 1 ? EnumLabelCode.F.ToString() : EnumLabelCode.P.ToString();
+				
 				if (param.DocCategory == (int)EnumDocumentCategory.Internal)
-				{
-					string deptcode = _deptContext?.DepartmentCode?.Trim() ?? string.Empty;
-					string section = _section?.SectionCode?.Trim() ?? string.Empty;
-
-					return $"{deptcode}.{section}.{finalSetRecords} Ver. {version}";
+				{					
+					//string section = _section?.SectionCode?.Trim() ?? string.Empty;
+					return $"{Constants.DocControlNo}-{yearLastTwoDigit}-{deptcode}.{finalSetRecords} Ver.{version}";
 				}
 				else if (param.DocCategory == (int)EnumDocumentCategory.BothInExternal)
 				{
-					string compcode = Constants.CompanyCode;
-					string doctype = _docTypeContext.Name ?? string.Empty;
-
-					return $"{compcode}.{doctype}.{finalSetRecords} Ver. {version}";
+					//string compcode = Constants.CompanyCode;
+					//string doctype = _docTypeContext.Name ?? string.Empty;
+					return $"{Constants.CompanyCode}-{yearLastTwoDigit}-{deptcode}-{labelcode}{finalSetRecords} Ver.{version}";
 				}
-
 			}
 			catch (Exception ex)
 			{
@@ -353,7 +354,7 @@ namespace DCI.Repositories
 			int setB = totalRecords / 1000;
 			string formattedA = setA.ToString("D3");
 			string formattedB = setB.ToString("D3");
-			return $"{formattedA}.{formattedB}";
+			return $"{formattedA}";
 		}
 
         public static string IncrementVersion(string versionString)

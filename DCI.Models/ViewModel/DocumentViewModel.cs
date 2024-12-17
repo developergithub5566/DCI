@@ -44,6 +44,7 @@ namespace DCI.Models.ViewModel
 		public string? EmailBody { get; set; } = string.Empty;
 		public int DepartmentId { get; set; } = 0;
 		public string? UploadLink { get; set; } = string.Empty;
+		public int? LabelId { get; set; } = 0;
 	}
 	
 

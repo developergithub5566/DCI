@@ -74,12 +74,12 @@ namespace DCI.WebApp.Controllers
 										   Text = x.DepartmentName
 									   }).ToList();
 
-					vm.OptionsSection = vm.SectionList.Select(x =>
-									   new SelectListItem
-									   {
-										   Value = x.SectionId.ToString(),
-										   Text = x.SectionName
-									   }).ToList();
+					//vm.OptionsSection = vm.SectionList.Select(x =>
+					//				   new SelectListItem
+					//				   {
+					//					   Value = x.SectionId.ToString(),
+					//					   Text = x.SectionName
+					//				   }).ToList();
 
 					vm.OptionsRequestBy = vm.UserList.Select(x =>
 					   new SelectListItem
@@ -130,6 +130,7 @@ namespace DCI.WebApp.Controllers
 					data.Add(new StringContent(model.DepartmentId.ToString() ?? ""), "DepartmentId");
 					data.Add(new StringContent(model.DocCategory.ToString() ?? ""), "DocCategory");
 					//data.Add(new StringContent(model.Section.ToString() ?? ""), "Section");
+					data.Add(new StringContent(model.LabelId.ToString() ?? ""), "LabelId");
 					data.Add(new StringContent(model.StatusId.ToString() ?? ""), "StatusId");
 					data.Add(new StringContent(model.Reviewer.ToString() ?? ""), "Reviewer");
 					data.Add(new StringContent(model.Approver.ToString() ?? ""), "Approver");

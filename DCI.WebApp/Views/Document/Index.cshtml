@@ -37,28 +37,28 @@
 
 	if (modulePageAccess == null)
 	{
-		<script>
-			$.ajax({
-				type: 'POST',
-				url: '@Url.Action("Logout", "Account")',	
-				success: function (response) {
-					
-					Swal.fire({
-						text: "Your session has timed out. Please log in again.",
-						icon: "info",
-						confirmButtonText: "Ok"
-					}).then((result) => {
-						window.location.href = '/Account/Logout';
-					});
-				},
-				error: function () {
-					Swal.fire({
-						text: "An error occurred. Please try again.",
-						icon: "error"
-					});
-				}
-			})
-		</script>
+			<script>
+				$.ajax({
+					type: 'POST',
+					url: '@Url.Action("Logout", "Account")',	
+					success: function (response) {
+						
+						Swal.fire({
+							text: "Your session has timed out. Please log in again.",
+							icon: "info",
+							confirmButtonText: "Ok"
+						}).then((result) => {
+							window.location.href = '/Account/Logout';
+						});
+					},
+					error: function () {
+						Swal.fire({
+							text: "An error occurred. Please try again.",
+							icon: "error"
+						});
+					}
+				})
+			</script>
 	}
 	else
 	{
@@ -200,35 +200,45 @@
 
 								</div>
 								<div class="row">
+							
+									<div class="col">
+										<label for="Department" class="col-form-label required">Department:</label>
+										<select id="departmentSelect" class="form-select"  required> @*onchange="getSectionOnChange()"*@
+											<option value="">select department</option>
+										</select>
+									</div>
 									<div class="col">
 										<label for="DocCategory" class="col-form-label required">Document Category:</label>
-										<select id="docCategorySelect" class="form-select" required>
+										<select id="docCategorySelect" class="form-select" onchange="getCategoryOnChange()" required>
 											<option value="0">select type</option>
 											<option value="1">Internal</option>
 											<option value="2">Internal/External</option>
 										</select>
 									</div>
-									<div class="col">
-										<label for="Department" class="col-form-label required">Department:</label>
-										<select id="departmentSelect" class="form-select" onchange="getSectionOnChange()" required>
-											<option value="">select department</option>
-										</select>
-									</div>
-
 								</div>
 								<div class="row">
-									<div class="col">
+							@* 		<div class="col">
 										<label for="Section" class="col-form-label required">Section:</label>
 										<select id="sectionSelect" class="form-select" required>
 											<option value="">select section</option>
 										</select>
-									</div>
+									</div> *@
+
 									<div class="col">
 										<label for="RequestById" class="col-form-label required">Request By:</label>
 										<select id="requestBySelect" class="form-select" required>
 											<option value="">select requestor</option>
 										</select>
 									</div>
+									<div class="col">
+										<label for="DocLabel" id="DocLabel" class="col-form-label required">Form/Process:</label>
+										<select id="labelSelect" class="form-select" required>
+											<option value="0">select label</option>
+											<option value="1">Forms</option>
+											<option value="2">Process</option>
+										</select>
+									</div>
+							
 								</div>
 								<div class="row">
 									<div class="col">
@@ -279,6 +289,9 @@
 						order: [[4, 'desc']]
 					});
 
+					document.getElementById("labelSelect").style.display = 'none';
+					document.getElementById("DocLabel").style.display = 'none';
+
 					$('#fileUpload').on('change', function () {
 						var fileName = this.files[0] ? this.files[0].name : 'No file chosen';
 						document.querySelector('.file-name').textContent = '';
@@ -300,7 +313,8 @@
 						const doctypeId = $('#documentSelect').val();
 						const deptId = $('#departmentSelect').val();
 						const docCatId = $('#docCategorySelect').val();
-						const sectionId = $('#sectionSelect').val();
+						//const sectionId = $('#sectionSelect').val();
+						const labelId = $('#labelSelect').val();
 						const requestById = $('#requestBySelect').val();
 
 						// var formData = $(this).serialize();
@@ -312,7 +326,8 @@
 						formData.append('DepartmentId', deptId);
 						formData.append('DocCategory', docCatId);
 						formData.append('RequestById', requestById);
-						formData.append('SectionId', sectionId);
+						//formData.append('SectionId', sectionId);
+						formData.append('LabelId', labelId);
 						formData.append('DocFile', file);
 
 						Swal.fire({
@@ -380,7 +395,8 @@
 								// var leaveCode = document.querySelector('#docCategorySelect');
 								// leaveCode[i].selected = true;
 								document.getElementById("docCategorySelect").selectedIndex = "0";
-								document.getElementById("sectionSelect").selectedIndex = "0";
+								//document.getElementById("sectionSelect").selectedIndex = "0";
+								document.getElementById("labelSelect").selectedIndex = "0";
 								//$('#sectionSelect').val(0);
 								$('#RequestById').val(0);
 								$('#DocTypeId').val(0);
@@ -464,7 +480,8 @@
 								$('#DocName').val(response.data.docName);
 								$('#DocTypeId').val(response.data.docTypeId);
 								$('#docCategorySelect').val(response.data.docCategory)
-								$('#sectionSelect').val(response.data.sectionId)
+								//$('#sectionSelect').val(response.data.sectionId
+								$('#labelSelect').val(response.data.labelId)
 								// $('#RequestById').val(response.data.requestById)
 								// $('#SectionId').val(response.data.sectionId)
 
@@ -490,17 +507,27 @@
 									}
 								});
 
-								var $select = $('#sectionSelect');
+								// var $select = $('#sectionSelect');
+								// $select.empty();
+								// $select.append('<option value="">Select section</option>');
+								// $.each(response.data.optionsSection, function (index, item) {
+								// 	if (item.value == response.data.sectionId) {
+								// 		$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+								// 	} else {
+								// 		$select.append('<option value="' + item.value + '">' + item.text + '</option>');
+								// 	}
+								// });
+
+								var $select = $('#labelSelect');
 								$select.empty();
-								$select.append('<option value="">Select section</option>');
-								$.each(response.data.optionsSection, function (index, item) {
-									if (item.value == response.data.sectionId) {
+								$select.append('<option value="">Select label</option>');
+								$.each(response.data.optionsLabel, function (index, item) {
+									if (item.value == response.data.labelId) {
 										$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
 									} else {
 										$select.append('<option value="' + item.value + '">' + item.text + '</option>');
 									}
 								});
-
 
 								var $select = $('#requestBySelect');
 								$select.empty();
@@ -675,6 +702,20 @@
 							});
 						}
 					}
+				}
+
+				function getCategoryOnChange() {
+					let catId = document.getElementById("docCategorySelect").value;
+
+					if (catId == 1){
+					
+						document.getElementById("labelSelect").style.display = 'none';
+						document.getElementById("DocLabel").style.display = 'none';
+					}else{
+						document.getElementById("labelSelect").style.display = 'block';
+						document.getElementById("DocLabel").style.display = 'block';
+					}
+					
 				}
 			</script>
 		}

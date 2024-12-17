@@ -86,6 +86,18 @@ namespace DCI.Core.Common
 		HR = 1
 	}
 
+	public enum EnumLabel
+	{
+		Forms = 1,
+		Process = 2
+	}
+
+	public enum EnumLabelCode
+	{
+		F = 1, //Forms = 1,
+		P = 2 //Process = 2
+	}
+
 	//public enum EnumCategoryCode
 	//{
 	//	TID = 1,
