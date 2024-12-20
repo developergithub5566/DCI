@@ -37,28 +37,28 @@
 
 	if (modulePageAccess == null)
 	{
-			<script>
-				$.ajax({
-					type: 'POST',
-					url: '@Url.Action("Logout", "Account")',	
-					success: function (response) {
-						
-						Swal.fire({
-							text: "Your session has timed out. Please log in again.",
-							icon: "info",
-							confirmButtonText: "Ok"
-						}).then((result) => {
-							window.location.href = '/Account/Logout';
-						});
-					},
-					error: function () {
-						Swal.fire({
-							text: "An error occurred. Please try again.",
-							icon: "error"
-						});
-					}
-				})
-			</script>
+					<script>
+						$.ajax({
+							type: 'POST',
+							url: '@Url.Action("Logout", "Account")',	
+							success: function (response) {
+								
+								Swal.fire({
+									text: "Your session has timed out. Please log in again.",
+									icon: "info",
+									confirmButtonText: "Ok"
+								}).then((result) => {
+									window.location.href = '/Account/Logout';
+								});
+							},
+							error: function () {
+								Swal.fire({
+									text: "An error occurred. Please try again.",
+									icon: "error"
+								});
+							}
+						})
+					</script>
 	}
 	else
 	{
@@ -231,8 +231,8 @@
 										</select>
 									</div>
 									<div class="col">
-										<label for="DocLabel" id="DocLabel" class="col-form-label required">Form/Process:</label>
-										<select id="labelSelect" class="form-select" required>
+										<label for="DocLabel" id="DocLabel" class="col-form-label">Form/Process:</label>
+										<select id="labelSelect" class="form-select">
 											<option value="0">select label</option>
 											<option value="1">Forms</option>
 											<option value="2">Process</option>
@@ -289,7 +289,9 @@
 						order: [[4, 'desc']]
 					});
 
-					document.getElementById("labelSelect").style.display = 'none';
+					0
+					document.getElementById("labelSelect").style.display = 'none';			
+					
 					document.getElementById("DocLabel").style.display = 'none';
 
 					$('#fileUpload').on('change', function () {
@@ -315,6 +317,7 @@
 						const docCatId = $('#docCategorySelect').val();
 						//const sectionId = $('#sectionSelect').val();
 						const labelId = $('#labelSelect').val();
+						
 						const requestById = $('#requestBySelect').val();
 
 						// var formData = $(this).serialize();
@@ -327,7 +330,9 @@
 						formData.append('DocCategory', docCatId);
 						formData.append('RequestById', requestById);
 						//formData.append('SectionId', sectionId);
+						
 						formData.append('LabelId', labelId);
+					
 						formData.append('DocFile', file);
 
 						Swal.fire({
@@ -396,7 +401,10 @@
 								// leaveCode[i].selected = true;
 								document.getElementById("docCategorySelect").selectedIndex = "0";
 								//document.getElementById("sectionSelect").selectedIndex = "0";
+								
 								document.getElementById("labelSelect").selectedIndex = "0";
+							
+								
 								//$('#sectionSelect').val(0);
 								$('#RequestById').val(0);
 								$('#DocTypeId').val(0);
@@ -518,16 +526,7 @@
 								// 	}
 								// });
 
-								var $select = $('#labelSelect');
-								$select.empty();
-								$select.append('<option value="">Select label</option>');
-								$.each(response.data.optionsLabel, function (index, item) {
-									if (item.value == response.data.labelId) {
-										$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
-									} else {
-										$select.append('<option value="' + item.value + '">' + item.text + '</option>');
-									}
-								});
+							
 
 								var $select = $('#requestBySelect');
 								$select.empty();
@@ -570,6 +569,16 @@
 									$('#fileUpload').show();
 									$('#viewFile').hide();
 									$('#deleteFile').hide();
+								}
+
+
+								//
+								if (response.data.labelId < 2) {
+									document.getElementById("labelSelect").style.display = 'none';
+									document.getElementById("DocLabel").style.display = 'none';
+								} else {
+									document.getElementById("labelSelect").style.display = 'block';
+									document.getElementById("DocLabel").style.display = 'block';
 								}
 
 								js('#createmodal').modal('show');
@@ -707,15 +716,14 @@
 				function getCategoryOnChange() {
 					let catId = document.getElementById("docCategorySelect").value;
 
-					if (catId == 1){
+					if (catId < 2){
 					
 						document.getElementById("labelSelect").style.display = 'none';
-						document.getElementById("DocLabel").style.display = 'none';
+						document.getElementById("DocLabel").style.display = 'none';						
 					}else{
 						document.getElementById("labelSelect").style.display = 'block';
 						document.getElementById("DocLabel").style.display = 'block';
-					}
-					
+					}					
 				}
 			</script>
 		}
