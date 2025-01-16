@@ -123,6 +123,9 @@
 								<label>Date Created</label>
 							</th>
 							<th>
+								<label>Status</label>
+							</th>
+							<th>
 								<label>Prepared By</label>
 							</th>
 							<th>
@@ -149,6 +152,9 @@
 								<td>
 									@item.DateCreated.ToShortDateString()
 								</td>
+									<td>
+									@item.StatusName
+									</td>
 								<td>
 									@item.CreatedName
 								</td>
@@ -209,7 +215,7 @@
 									</div>
 									<div class="col">
 										<label for="DocCategory" class="col-form-label required">Document Category:</label>
-										<select id="docCategorySelect" class="form-select" onchange="getCategoryOnChange()" required>
+										<select id="docCategorySelect" class="form-select" required>
 											<option value="0">select type</option>
 											<option value="1">Internal</option>
 											<option value="2">Internal/External</option>
@@ -231,9 +237,9 @@
 										</select>
 									</div>
 									<div class="col">
-										<label for="DocLabel" id="DocLabel" class="col-form-label">Form/Process:</label>
-										<select id="labelSelect" class="form-select">
-											<option value="0">select label</option>
+										<label for="DocLabel" id="DocLabel" class="col-form-label">Forms/Process:</label>
+										<select id="FormsProcessSelect" class="form-select">
+											<option value="0">select forms/process</option>
 											<option value="1">Forms</option>
 											<option value="2">Process</option>
 										</select>
@@ -246,10 +252,11 @@
 										<br id="nextline" />
 										<input type="file" class="form-control" id="fileUpload" name="fileUpload" accept="application/pdf" onchange="validateFileType()" />
 
-										<span class="file-name">No file chosen</span>
+										
 
-										<a asp-controller="Document" asp-action="ViewDocument" asp-route-id="0" id="viewFile" target="_blank" class="btn btn-primary" title="View">  <i class="fa fa-download"></i></a>
-										<a href="#" id="deleteFile" onclick="removefile()" class="btn btn-danger" title="remove"> <i class="far fa-trash-alt"></i></a>
+										<a asp-controller="Document" asp-action="ViewDocument" asp-route-id="0" id="viewFile" target="_blank" title="View"><span class="file-name">No file chosen</span></a>
+										@* <a asp-controller="Document" asp-action="ViewDocument" asp-route-id="0" id="viewFile" target="_blank" class="btn btn-primary" title="View">  <i class="fa fa-download"></i></a> *@
+										@* <a href="#" id="deleteFile" onclick="removefile()" class="btn btn-danger" title="remove"> <i class="far fa-trash-alt"></i></a> *@
 									</div>
 									<div class="col">
 									</div>
@@ -290,9 +297,9 @@
 					});
 
 					0
-					document.getElementById("labelSelect").style.display = 'none';			
+					//document.getElementById("FormsProcessSelect").style.display = 'none';			
 					
-					document.getElementById("DocLabel").style.display = 'none';
+					//document.getElementById("DocLabel").style.display = 'none';
 
 					$('#fileUpload').on('change', function () {
 						var fileName = this.files[0] ? this.files[0].name : 'No file chosen';
@@ -316,7 +323,7 @@
 						const deptId = $('#departmentSelect').val();
 						const docCatId = $('#docCategorySelect').val();
 						//const sectionId = $('#sectionSelect').val();
-						const labelId = $('#labelSelect').val();
+						const formsProcess  = $('#FormsProcessSelect').val();
 						
 						const requestById = $('#requestBySelect').val();
 
@@ -330,8 +337,8 @@
 						formData.append('DocCategory', docCatId);
 						formData.append('RequestById', requestById);
 						//formData.append('SectionId', sectionId);
-						
-						formData.append('LabelId', labelId);
+
+						formData.append('FormsProcess', formsProcess);
 					
 						formData.append('DocFile', file);
 
@@ -402,7 +409,7 @@
 								document.getElementById("docCategorySelect").selectedIndex = "0";
 								//document.getElementById("sectionSelect").selectedIndex = "0";
 								
-								document.getElementById("labelSelect").selectedIndex = "0";
+								document.getElementById("FormsProcessSelect").selectedIndex = "0";
 							
 								
 								//$('#sectionSelect').val(0);
@@ -489,7 +496,7 @@
 								$('#DocTypeId').val(response.data.docTypeId);
 								$('#docCategorySelect').val(response.data.docCategory)
 								//$('#sectionSelect').val(response.data.sectionId
-								$('#labelSelect').val(response.data.labelId)
+								$('#FormsProcessSelect').val(response.data.formsProcess)
 								// $('#RequestById').val(response.data.requestById)
 								// $('#SectionId').val(response.data.sectionId)
 
@@ -573,13 +580,13 @@
 
 
 								//
-								if (response.data.labelId < 2) {
-									document.getElementById("labelSelect").style.display = 'none';
-									document.getElementById("DocLabel").style.display = 'none';
-								} else {
-									document.getElementById("labelSelect").style.display = 'block';
-									document.getElementById("DocLabel").style.display = 'block';
-								}
+								// if (response.data.labelId < 2) {
+								// 	document.getElementById("FormsProcessSelect").style.display = 'none';
+								// 	document.getElementById("DocLabel").style.display = 'none';
+								// } else {
+								// 	document.getElementById("FormsProcessSelect").style.display = 'block';
+								// 	document.getElementById("DocLabel").style.display = 'block';
+								// }
 
 								js('#createmodal').modal('show');
 							} else {
@@ -713,17 +720,17 @@
 					}
 				}
 
-				function getCategoryOnChange() {
-					let catId = document.getElementById("docCategorySelect").value;
+				// function getCategoryOnChange() {
+				// 	let catId = document.getElementById("docCategorySelect").value;
 
-					if (catId < 2){
+				// 	if (catId < 2){
 					
-						document.getElementById("labelSelect").style.display = 'none';
-						document.getElementById("DocLabel").style.display = 'none';						
-					}else{
-						document.getElementById("labelSelect").style.display = 'block';
-						document.getElementById("DocLabel").style.display = 'block';
-					}					
-				}
+				// 		document.getElementById("FormsProcessSelect").style.display = 'none';
+				// 		document.getElementById("DocLabel").style.display = 'none';						
+				// 	}else{
+				// 		document.getElementById("FormsProcessSelect").style.display = 'block';
+				// 		document.getElementById("DocLabel").style.display = 'block';
+				// 	}					
+				// }
 			</script>
 		}

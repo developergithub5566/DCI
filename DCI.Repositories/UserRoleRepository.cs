@@ -315,7 +315,7 @@ namespace DCI.Repositories
         {
             var role_entity = await _dbContext.Role.Where(x => x.IsActive == true).ToListAsync();
             var user_entity = await _dbContext.User.Where(x => x.IsActive == true).ToListAsync();
-            var moduleInRole_entity = await _dbContext.ModuleInRole.Where(x => x.IsActive == true).ToListAsync();
+            var moduleInRole_entity = await _dbContext.ModuleInRole.Where(x => x.IsActive == true && x.ModulePageId != (int)EnumModulePage.Administration).ToListAsync();
 
 			var result = role_entity.Select(role => new UserInRoleViewModel
             {

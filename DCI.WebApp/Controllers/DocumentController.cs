@@ -34,15 +34,35 @@ namespace DCI.WebApp.Controllers
 		{
 			List<DocumentViewModel> model = new List<DocumentViewModel>();
 
+			//using (var _httpclient = new HttpClient())
+			//{
+			//	HttpResponseMessage response = await _httpclient.GetAsync(_apiconfig.Value.apiConnection + "api/Document/GetAllDocument");
+			//	string responseBody = await response.Content.ReadAsStringAsync();
+
+			//	if (response.IsSuccessStatusCode)
+			//	{
+			//		model = JsonConvert.DeserializeObject<List<DocumentViewModel>>(responseBody)!;					
+			//	}
+			//}
+			//return View(model);
 			using (var _httpclient = new HttpClient())
 			{
-				HttpResponseMessage response = await _httpclient.GetAsync(_apiconfig.Value.apiConnection + "api/Document/GetAllDocument");
-				string responseBody = await response.Content.ReadAsStringAsync();
+				DocumentViewModel _filterRoleModel = new DocumentViewModel();
 
+				var currentUser = _userSessionHelper.GetCurrentUser();				
+				_filterRoleModel.RoleId = currentUser.RoleId;
+
+				var stringContent = new StringContent(JsonConvert.SerializeObject(_filterRoleModel), Encoding.UTF8, "application/json");
+				var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Document/GetAllDocument");
+
+				request.Content = stringContent;
+				var response = await _httpclient.SendAsync(request);
+				var responseBody = await response.Content.ReadAsStringAsync();
 				if (response.IsSuccessStatusCode)
 				{
-					model = JsonConvert.DeserializeObject<List<DocumentViewModel>>(responseBody)!;					
+					model = JsonConvert.DeserializeObject<List<DocumentViewModel>>(responseBody)!;
 				}
+				
 			}
 			return View(model);
 		}
@@ -130,7 +150,7 @@ namespace DCI.WebApp.Controllers
 					data.Add(new StringContent(model.DepartmentId.ToString() ?? ""), "DepartmentId");
 					data.Add(new StringContent(model.DocCategory.ToString() ?? ""), "DocCategory");
 					//data.Add(new StringContent(model.Section.ToString() ?? ""), "Section");
-					data.Add(new StringContent(model.LabelId.ToString() ?? ""), "LabelId");
+					data.Add(new StringContent(model.FormsProcess.ToString() ?? ""), "LabelId");
 					data.Add(new StringContent(model.StatusId.ToString() ?? ""), "StatusId");
 					data.Add(new StringContent(model.Reviewer.ToString() ?? ""), "Reviewer");
 					data.Add(new StringContent(model.Approver.ToString() ?? ""), "Approver");

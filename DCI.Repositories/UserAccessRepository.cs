@@ -151,11 +151,7 @@ namespace DCI.Repositories
 				if (pass.IsResetPassword == false && !PasswordHashingHelper.VerifyPassword(pass.CurrentPassword, useraccessEntity.Password))
 				{
 					return ((int)StatusCodes.Status401Unauthorized, "Invalid Current Password");
-				}
-				if (pass.NewPassword != pass.ConfirmPassword)
-				{
-					return (StatusCodes.Status401Unauthorized, "Passwords do not match.");
-				}
+				}			
 
 				var useraccess = _dbContext.UserAccess.FirstOrDefault(x => x.UserAccessId == useraccessEntity.UserAccessId);
 				useraccess.Password = PasswordHashingHelper.HashPassword(pass.NewPassword);
@@ -180,5 +176,7 @@ namespace DCI.Repositories
 			}
 			return (StatusCodes.Status401Unauthorized, "Invalid Current Password");
 		}
+			
+
 	}
 }

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using DCI.Repositories.Interface;
 using DCI.API.Service;
+using System.Configuration;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<DCIdbContext>(Options => Options.UseSqlServer(builder.Configuration.GetConnectionString("DCIConnection")));
+//builder.Services.AddDbContext<DCIdbContext>(options =>
+//	options.UseSqlServer(
+//		builder.Configuration.GetConnectionString("DCIConnection"),
+//		sqlServerOptions => sqlServerOptions.EnableRetryOnFailure(
+//			maxRetryCount: 5,      
+//			maxRetryDelay: TimeSpan.FromSeconds(10), 
+//			errorNumbersToAdd: null) 
+//	));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserAccessRepository, UserAccessRepository>();
 builder.Services.AddScoped<IEmailRepository, EmailRepository>();
@@ -52,11 +61,11 @@ var app = builder.Build();
 
 
 // Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseHttpsRedirection();
 

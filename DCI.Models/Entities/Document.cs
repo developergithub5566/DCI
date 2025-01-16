@@ -26,6 +26,7 @@ namespace DCI.Models.Entities
 		public int DepartmentId { get; set; } = 0;
 		public int? DocCategory { get; set; } = 0;
 		public string? UploadLink { get; set; } = string.Empty;
-		public int? LabelId { get; set; } = 0;
+		public int? FormsProcess { get; set; } = 0;
+		public bool ReUsed { get; set; } = false;
 	}
 }

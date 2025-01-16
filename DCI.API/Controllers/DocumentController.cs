@@ -20,11 +20,17 @@ namespace DCI.API.Controllers
             this._documentRepository = documentRepository;			
 		}
 
-		[HttpGet]
+		//[HttpGet]
+		//[Route("GetAllDocument")]
+		//public async Task<IActionResult> GetAllDocument()
+		//{
+		//	return Ok(await _documentRepository.GetAllDocument());
+		//}
+		[HttpPost]
 		[Route("GetAllDocument")]
-		public async Task<IActionResult> GetAllDocument()
+		public async Task<IActionResult> GetAllDocument([FromBody] DocumentViewModel model)
 		{
-			return Ok(await _documentRepository.GetAllDocument());
+			return Ok(await _documentRepository.GetAllDocument(model));
 		}
 
 		[HttpPost]

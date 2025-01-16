@@ -67,9 +67,13 @@ namespace DCI.Core.Common
 		Withdraw = 7,
 	}
 	public enum EnumDocumentStatus
-	{
-		Draft = 0,
-		Save = 1
+	{		
+		Draft = 1,
+		ForReview = 2,
+		Reviewed = 3,
+		Approved = 4,
+		Deleted = 5,
+		Reused = 6,
 	}
 	public enum EnumDocumentCategory
 	{
@@ -92,7 +96,7 @@ namespace DCI.Core.Common
 		Process = 2
 	}
 
-	public enum EnumLabelCode
+	public enum EnumFormsProcess
 	{
 		F = 1, //Forms = 1,
 		P = 2 //Process = 2

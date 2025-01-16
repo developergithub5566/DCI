@@ -1,4 +1,5 @@
 ﻿using DCI.Core.Helpers;
+using DCI.Core.Common;
 using DCI.Data;
 using DCI.Models.Configuration;
 using DCI.Models.Entities;
@@ -12,6 +13,11 @@ using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using DCI.API.Service;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+
+using System.Linq;
+
 
 namespace DCI.API.Controllers
 {
@@ -115,7 +121,7 @@ namespace DCI.API.Controllers
 				Log.CloseAndFlush();
 			}
 			return BadRequest();
-		}		
+		}
 
 		[HttpPost]
 		[Route("Login")]
@@ -161,10 +167,13 @@ namespace DCI.API.Controllers
 		{
 			try
 			{
-				if (!await _userRepository.IsExistsUsername(model.Email))
+				var inValidPass = await PasswordValidation(model);
+
+				if (inValidPass.isValidPass)
 				{
-					return StatusCode(StatusCodes.Status403Forbidden, "Username not found");
-				}
+					return StatusCode(inValidPass.statuscode, inValidPass.message);
+				}				
+
 				var result = await _useraccessRepository.ChangePassword(model);
 				return StatusCode(result.statuscode, result.message);
 			}
@@ -203,8 +212,70 @@ namespace DCI.API.Controllers
 				await _userRepository.SaveExternalUser(model);
 				var userContext = await _userContextService.GetUserContext(model.Email);
 				return Ok(userContext);
-			}	
+			}
 		}
 
+
+		private async Task<(bool isValidPass, int statuscode, string message)> PasswordValidation(ChangePasswordViewModel pass)
+		{
+			
+			if (!await _userRepository.IsExistsUsername(pass.Email))
+			{			
+				return (true, StatusCodes.Status403Forbidden, "Username not found.");
+			}
+
+			if (pass.NewPassword != pass.ConfirmPassword)
+			{
+				//return StatusCode(StatusCodes.Status401Unauthorized, "Passwords do not match.");
+				return (true, StatusCodes.Status401Unauthorized, "Passwords do not match.");
+			}
+
+			if (pass.NewPassword.Contains(" "))
+			{
+				//return StatusCode(StatusCodes.Status403Forbidden, "Password cannot contain space");
+				return (true, StatusCodes.Status403Forbidden, "Password cannot contain space.");
+			}
+
+			if (Utilities.IsMinCharacter(8, pass.NewPassword.ToString()))
+			{
+				return (true, StatusCodes.Status403Forbidden, "Password cannot be less then 8 characters.");
+			}
+
+			if (Utilities.IsMaxCharacter(32, pass.NewPassword.ToString()))
+			{
+				return (true, StatusCodes.Status403Forbidden, "Password cannot be more then 32 characters.");
+			}
+
+			if (!Utilities.IsContainsNumber(pass.NewPassword.ToString()))
+			{
+				return (true, StatusCodes.Status403Forbidden, "Password must contain number.");
+			}
+
+			if (!Utilities.IsContainsLowerCase(pass.NewPassword.ToString()))
+			{
+				return (true, StatusCodes.Status403Forbidden, "Password must contain lowercase character.");
+			}
+
+			if (!Utilities.IsContainsUpperCase(pass.NewPassword.ToString()))
+			{
+				return (true, StatusCodes.Status403Forbidden, "Password must contain uppercase character.");
+			}			
+
+			string specialCharacterString = @"%!@#$%^&*()?/>.<,:;'\|}]{[_~`+=-" + "\"";
+			HashSet<char> specialCharacters = specialCharacterString.ToCharArray().ToHashSet();
+
+		
+			char[] charArray = pass.NewPassword.ToCharArray();
+
+			foreach (char charpass in charArray)
+			{
+				if (specialCharacters.Contains(charpass))
+				{
+					return (false, StatusCodes.Status100Continue, string.Empty);
+				}
+				
+			}	
+			return (true, StatusCodes.Status403Forbidden, "Password must contain special character." );
+		}
 	}
 }

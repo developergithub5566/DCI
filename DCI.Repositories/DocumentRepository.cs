@@ -38,7 +38,7 @@ namespace DCI.Repositories
 			_dbContext.Dispose();
 		}
 
-		public async Task<IList<DocumentViewModel>> GetAllDocument()
+		public async Task<IList<DocumentViewModel>> GetAllDocument(DocumentViewModel param)
 		{
 			//return await _dbContext.Document.AsNoTracking().Where(x => x.IsActive == true).ToListAsync();
 
@@ -49,6 +49,7 @@ namespace DCI.Repositories
 			var query = from doc in context
 						join doctype in _dbContext.DocumentType on doc.DocTypeId equals doctype.DocTypeId
 						join user in _dbContext.User on doc.CreatedBy equals user.UserId
+						join stat in _dbContext.Status on doc.StatusId equals stat.StatusId
 						where doc.IsActive == true
 						select new DocumentViewModel
 						{
@@ -58,12 +59,18 @@ namespace DCI.Repositories
 							Version = doc.Version,
 							Filename = doc.Filename,
 							DocTypeId = doc.DocTypeId,
+							StatusId = doc.StatusId,
+							StatusName = stat.StatusName,
 							DocumentTypeList = null,
 							DocTypeName = doctype.Name,
 							CreatedName = user.Email,
 							DateCreated = doc.DateCreated,
 						};
 
+			if (param.RoleId == (int)EnumRole.User)
+			{
+				query = query.Where(x => x.StatusId != (int)EnumDocumentStatus.Deleted);
+			}
 
 			//result.DocumentTypeList = doctypeList.Count() > 0 ? doctypeList : null;
 			//result.DocumentList = query.ToList();
@@ -103,7 +110,7 @@ namespace DCI.Repositories
 								DocCategory = doc.DocCategory,
 								RequestById = doc.RequestById,
 								SectionId = doc.SectionId,
-								LabelId =doc.LabelId,
+								FormsProcess = doc.FormsProcess,
 							};
 
 				var result = query.FirstOrDefault();
@@ -148,8 +155,9 @@ namespace DCI.Repositories
 					entity.DocTypeId = model.DocTypeId;
 					entity.DocCategory = model.DocCategory;
 					entity.DepartmentId = model.DepartmentId;
+					entity.StatusId = (int)EnumDocumentStatus.Approved;
 					//entity.SectionId = model.SectionId;
-					entity.LabelId = model.LabelId;
+					entity.FormsProcess = model.FormsProcess;
 					entity.Version = model.Version;
 					entity.Filename = model.DocFile != null ? model.DocFile.FileName : string.Empty;
 					entity.CreatedBy = model.CreatedBy;
@@ -169,10 +177,12 @@ namespace DCI.Repositories
 					{
 						await SaveFile(model);
 					}
-					else
-					{
-						await _emailRepository.SendUploadFile(model);
-					}
+					//else
+					//{						
+					//}
+
+					await _emailRepository.SendUploadFile(model);
+
 					return (StatusCodes.Status200OK, String.Format("Document {0} has been created successfully.", entity.DocNo));
 				}
 				else
@@ -185,7 +195,7 @@ namespace DCI.Repositories
 					entity.DocCategory = model.DocCategory;
 					entity.DepartmentId = model.DepartmentId;
 					//entity.SectionId = model.SectionId;
-					entity.LabelId = model.LabelId;
+					entity.FormsProcess = model.FormsProcess;
 					entity.RequestById = model.RequestById;
 					entity.Version = model.Version;
 					entity.Filename = model.DocFile != null ? model.DocFile.FileName : entity.Filename;
@@ -228,7 +238,9 @@ namespace DCI.Repositories
 					return (StatusCodes.Status406NotAcceptable, "Invalid document Id");
 				}
 
-				entity.IsActive = false;
+				entity.UploadLink = string.Empty;
+				entity.StatusId = (int)EnumDocumentStatus.Deleted;
+				entity.IsActive = true;
 				entity.ModifiedBy = model.ModifiedBy;
 				entity.DateModified = DateTime.Now;
 				_dbContext.Document.Entry(entity).State = EntityState.Modified;
@@ -245,6 +257,7 @@ namespace DCI.Repositories
 				Log.CloseAndFlush();
 			}
 		}
+
 		private async Task SaveFile(DocumentViewModel model)
 		{
 			try
@@ -270,13 +283,13 @@ namespace DCI.Repositories
 				entity.ModifiedBy = model.ModifiedBy ?? null;
 				entity.DateModified = model.DateModified ?? null;
 
-				if (entity.Filename != null && entity.Filename !="")
+				if (entity.Filename != null && entity.Filename != "")
 				{
-                    entity.Version = Convert.ToInt16(entity.Version) + 1;
-                    entity.DocNo = IncrementVersion(entity.DocNo);
-                }              
-                entity.Filename = model.DocFile.FileName;
-                _dbContext.Document.Entry(entity).State = EntityState.Modified;
+					entity.Version = Convert.ToInt16(entity.Version) + 1;
+					entity.DocNo = IncrementVersion(entity.DocNo);
+				}
+				entity.Filename = model.DocFile.FileName;
+				_dbContext.Document.Entry(entity).State = EntityState.Modified;
 				await _dbContext.SaveChangesAsync();
 			}
 			catch (Exception ex)
@@ -288,16 +301,24 @@ namespace DCI.Repositories
 				Log.CloseAndFlush();
 			}
 		}
+
 		private async Task<string> GenerateDocCode(DocumentViewModel param)
 		{
-			
+
 			try
 			{
+				string docCode = await GetDeletedDocNoToReused(param);
+
+				if (docCode != string.Empty)
+				{
+					return docCode;
+				}
+
 				var _docContext = await _dbContext.Document
 												.Where(x => x.DepartmentId == param.DepartmentId && x.IsActive == true)
 												.AsQueryable()
 												.ToListAsync();
-				
+
 				var _deptContext = await _dbContext.Department
 												.AsQueryable()
 												.FirstOrDefaultAsync(x => x.DepartmentId == param.DepartmentId && x.IsActive == true);
@@ -314,12 +335,12 @@ namespace DCI.Repositories
 				int totalrecords = _docContext.Count() + 1;
 				string version = "0.0";
 				string finalSetRecords = GetFormattedRecord(totalrecords);
-				string yearLastTwoDigit = DateTime.Now.Year.ToString().Substring(2,2);
+				string yearLastTwoDigit = DateTime.Now.Year.ToString().Substring(2, 2);
 				string deptcode = _deptContext?.DepartmentCode?.Trim() ?? string.Empty;
-				string labelcode = param.LabelId == 1 ? EnumLabelCode.F.ToString() : EnumLabelCode.P.ToString();
-				
+				string formsProcess = param.FormsProcess == 1 ? EnumFormsProcess.F.ToString() : EnumFormsProcess.P.ToString();
+
 				if (param.DocCategory == (int)EnumDocumentCategory.Internal)
-				{					
+				{
 					//string section = _section?.SectionCode?.Trim() ?? string.Empty;
 					return $"{Constants.DocControlNo}-{yearLastTwoDigit}-{deptcode}.{finalSetRecords} Ver.{version}";
 				}
@@ -327,7 +348,7 @@ namespace DCI.Repositories
 				{
 					//string compcode = Constants.CompanyCode;
 					//string doctype = _docTypeContext.Name ?? string.Empty;
-					return $"{Constants.CompanyCode}-{yearLastTwoDigit}-{deptcode}-{labelcode}{finalSetRecords} Ver.{version}";
+					return $"{Constants.CompanyCode}-{yearLastTwoDigit}-{deptcode}-{formsProcess}{finalSetRecords} Ver.{version}";
 				}
 			}
 			catch (Exception ex)
@@ -357,25 +378,48 @@ namespace DCI.Repositories
 			return $"{formattedA}";
 		}
 
-        public static string IncrementVersion(string versionString)
-        {
-            // Define a regex pattern to extract the current version number
-            string pattern = @"Ver\.\s*(\d+)";
-            var match = Regex.Match(versionString, pattern);
+		private async Task<string> GetDeletedDocNoToReused(DocumentViewModel param)
+		{
+			var entity = await _dbContext.Document
+												.Where(x => x.DepartmentId == param.DepartmentId && x.DocCategory == param.DocCategory && x.FormsProcess == param.FormsProcess
+												&& x.IsActive == true
+												&& x.ReUsed == false
+												&& x.StatusId == (int)EnumDocumentStatus.Deleted)
+												.FirstOrDefaultAsync();
+			if (entity != null)
+			{
+				entity.ReUsed = true;
+				entity.ModifiedBy = param.ModifiedBy;
+				entity.DateModified = DateTime.Now;
+				_dbContext.Document.Entry(entity).State = EntityState.Modified;
+				await _dbContext.SaveChangesAsync();
+			}
 
-            if (match.Success)
-            {             
-                int currentVersion = int.Parse(match.Groups[1].Value);
-				
-                int newVersion = currentVersion + 1;
 
-                string updatedVersionString = Regex.Replace(versionString, pattern, $"Ver. {newVersion}");
+			return entity?.DocNo ?? string.Empty;
+		}
 
-                return updatedVersionString;
-            }
-            return versionString; 
-        }
-        public async Task<DocumentViewModel> ValidateToken(ValidateTokenViewModel param)
+
+		public static string IncrementVersion(string versionString)
+		{
+			// Define a regex pattern to extract the current version number
+			string pattern = @"Ver\.\s*(\d+)";
+			var match = Regex.Match(versionString, pattern);
+
+			if (match.Success)
+			{
+				int currentVersion = int.Parse(match.Groups[1].Value);
+
+				int newVersion = currentVersion + 1;
+
+				string updatedVersionString = Regex.Replace(versionString, pattern, $"Ver.{newVersion}");
+
+				return updatedVersionString;
+			}
+			return versionString;
+		}
+
+		public async Task<DocumentViewModel> ValidateToken(ValidateTokenViewModel param)
 		{
 			DocumentViewModel vm = new DocumentViewModel();
 			try
@@ -390,18 +434,18 @@ namespace DCI.Repositories
 						DocName = doc.DocName,
 						DocNo = doc.DocNo,
 						RequestById = doc.RequestById,
-                        Filename = doc.Filename,
-                        //Version = doc.Version,
-                        //FileLocation = doc.FileLocation,
-                        //DocTypeId = doc.DocTypeId,
-                        //DocumentTypeList = null,
-                        //DocTypeName = string.Empty,
-                        //StatusId = doc.StatusId,
-                        //Reviewer = doc.Reviewer,
-                        //Approver = doc.Approver,
-                        //DepartmentId = doc.DepartmentId,
-                        //DocCategory = doc.DocCategory
-                    }).FirstAsync();
+						Filename = doc.Filename,
+						//Version = doc.Version,
+						//FileLocation = doc.FileLocation,
+						//DocTypeId = doc.DocTypeId,
+						//DocumentTypeList = null,
+						//DocTypeName = string.Empty,
+						//StatusId = doc.StatusId,
+						//Reviewer = doc.Reviewer,
+						//Approver = doc.Approver,
+						//DepartmentId = doc.DepartmentId,
+						//DocCategory = doc.DocCategory
+					}).FirstAsync();
 				}
 				else
 				{
@@ -418,6 +462,7 @@ namespace DCI.Repositories
 				Log.CloseAndFlush();
 			}
 		}
+
 		public async Task<(int statuscode, string message)> UploadFile(DocumentViewModel model)
 		{
 			await SaveFile(model);

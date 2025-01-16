@@ -25,6 +25,7 @@ namespace DCI.Data
 		public DbSet<JobApplicant> JobApplicant { get; set; }
 		public DbSet<Document> Document { get; set; }
 		public DbSet<DocumentType> DocumentType { get; set; }
+		public DbSet<Status> Status { get; set; }
 		public DbSet<Section> Section { get; set; }
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
@@ -73,15 +74,19 @@ namespace DCI.Data
 						}
 						else
 						{
-
-
 							var modifiedByProperty = entry.Properties.FirstOrDefault(p => p.Metadata.Name == "ModifiedBy");
 							if (modifiedByProperty != null && modifiedByProperty.CurrentValue != null)
 							{
 								_createdBy = modifiedByProperty.CurrentValue.ToString();
 							}
-
-
+						}
+					}
+					if (xmodule == "DCI.Models.Entities.UserAccess")
+					{
+						var modifiedByProperty = entry.Properties.FirstOrDefault(p => p.Metadata.Name == "UserId");
+						if (modifiedByProperty != null && modifiedByProperty.CurrentValue != null)
+						{
+							_createdBy = modifiedByProperty.CurrentValue.ToString();
 						}
 					}
 				}
@@ -98,7 +103,7 @@ namespace DCI.Data
 						EntityName = entry.Metadata.ClrType.Name,
 						//Username = _username,
 						Username = _createdBy,
-						TimeStamp = DateTime.UtcNow,
+						TimeStamp = DateTime.Now, //DateTime.UtcNow,
 						Changes = entry.Properties.Select(p => new { p.Metadata.Name, p.CurrentValue }).ToDictionary(i => i.Name, i => i.CurrentValue),
 
 						// TempProperties are properties that are only generated on save, e.g. ID's

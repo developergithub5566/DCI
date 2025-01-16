@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace DCI.Core.Common
 {
@@ -29,5 +30,30 @@ namespace DCI.Core.Common
 			}
 			
 		}
+
+		public static bool IsMinCharacter(int minChar , string input)
+		{
+			return minChar > input.Length;
+		}
+
+		public static bool IsMaxCharacter(int maxChar, string input)
+		{
+			return maxChar < input.Length;
+		}
+
+		public static bool IsContainsNumber(string input) 
+		{ 
+			return input.Any(char.IsDigit);
+		}
+
+		public static bool IsContainsLowerCase(string input)
+		{
+			return input.Any(char.IsLower);
+		}
+
+		public static bool IsContainsUpperCase(string input)
+		{
+			return input.Any(char.IsUpper);
+		}		
 	}
 }
