@@ -27,6 +27,8 @@ namespace DCI.Data
 		public DbSet<DocumentType> DocumentType { get; set; }
 		public DbSet<Status> Status { get; set; }
 		public DbSet<Section> Section { get; set; }
+		public DbSet<ApprovalHistory> ApprovalHistory { get; set; }
+
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<AuditLog>().Property(ae => ae.Changes).HasConversion(

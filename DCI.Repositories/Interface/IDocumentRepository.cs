@@ -13,6 +13,7 @@ namespace DCI.Repositories.Interface
 		Task<DocumentViewModel> ValidateToken(ValidateTokenViewModel model);
 		Task<(int statuscode, string message)> UploadFile (DocumentViewModel model);
 		Task<IList<HomePageViewModel>> HomePage();
+		Task<WorkflowViewModel> Workflow(DocumentViewModel model);
 
 	}
 }

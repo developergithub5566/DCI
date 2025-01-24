@@ -3,6 +3,7 @@ using DCI.Models.Entities;
 using DCI.Models.ViewModel;
 using DCI.Repositories;
 using DCI.Repositories.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 

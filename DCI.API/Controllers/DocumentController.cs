@@ -3,6 +3,7 @@ using DCI.Data;
 using DCI.Models.ViewModel;
 using DCI.Repositories;
 using DCI.Repositories.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
@@ -98,6 +99,13 @@ namespace DCI.API.Controllers
 		public async Task<IActionResult> HomePage()
 		{			
 			return Ok(await _documentRepository.HomePage());
+		}
+
+		[HttpPost]
+		[Route("WorkflowByDocId")]
+		public async Task<IActionResult> WorkflowByDocId([FromBody] DocumentViewModel model)
+		{
+			return Ok(await _documentRepository.Workflow(model));
 		}
 	}
 }

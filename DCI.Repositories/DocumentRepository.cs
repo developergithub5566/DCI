@@ -26,12 +26,13 @@ namespace DCI.Repositories
 	{
 		private DCIdbContext _dbContext;
 		private readonly IOptions<FileModel> _filelocation;
-		private IEmailRepository _emailRepository;
+		private IEmailRepository _emailRepository;		
+
 		public DocumentRepository(DCIdbContext context, IOptions<FileModel> filelocation, IEmailRepository emailRepository)
 		{
 			this._dbContext = context;
 			this._filelocation = filelocation;
-			this._emailRepository = emailRepository;
+			this._emailRepository = emailRepository;			
 		}
 		public void Dispose()
 		{
@@ -198,7 +199,7 @@ namespace DCI.Repositories
 					entity.FormsProcess = model.FormsProcess;
 					entity.RequestById = model.RequestById;
 					entity.Version = model.Version;
-					entity.Filename = model.DocFile != null ? model.DocFile.FileName : entity.Filename;
+					entity.Filename = model.DocFile != null ? model.DocFile.FileName : entity.Filename;					
 					entity.DateCreated = entity.DateCreated;
 					entity.CreatedBy = entity.CreatedBy;
 					entity.DateModified = DateTime.Now;
@@ -263,11 +264,12 @@ namespace DCI.Repositories
 			try
 			{
 				string fileloc = _filelocation.Value.FileLocation + model.DocId.ToString() + @"\";
+				string filename = model.DocFile.FileName.Replace(",", "");
 
 				if (!Directory.Exists(fileloc))
 					Directory.CreateDirectory(fileloc);
 
-				string filenameLocation = Path.Combine(fileloc, model.DocFile.FileName);
+				string filenameLocation = Path.Combine(fileloc, filename);
 
 				using (var stream = new FileStream(filenameLocation, FileMode.Create, FileAccess.Write))
 				{
@@ -276,9 +278,7 @@ namespace DCI.Repositories
 
 				var entity = await _dbContext.Document.FirstOrDefaultAsync(x => x.DocId == model.DocId && x.IsActive == true);
 				entity.FileLocation = fileloc;
-
-				//entity.ModifiedBy = model.ModifiedBy != null ? model.ModifiedBy : null;
-				//entity.DateModified = model.DateModified != null ? model.DateModified : null;
+						
 
 				entity.ModifiedBy = model.ModifiedBy ?? null;
 				entity.DateModified = model.DateModified ?? null;
@@ -288,7 +288,7 @@ namespace DCI.Repositories
 					entity.Version = Convert.ToInt16(entity.Version) + 1;
 					entity.DocNo = IncrementVersion(entity.DocNo);
 				}
-				entity.Filename = model.DocFile.FileName;
+				entity.Filename = filename;
 				_dbContext.Document.Entry(entity).State = EntityState.Modified;
 				await _dbContext.SaveChangesAsync();
 			}
@@ -487,6 +487,44 @@ namespace DCI.Repositories
 			   .ToListAsync();
 
 			return result;
+		}
+
+		public async Task<WorkflowViewModel> Workflow(DocumentViewModel param)
+		{
+			var query = await (from doc in _dbContext.Document
+							   join stat in _dbContext.Status on doc.StatusId equals stat.StatusId
+							   join request in _dbContext.User on doc.RequestById equals request.UserId
+							   join reviewer in _dbContext.User on doc.Reviewer equals reviewer.UserId into reviewerGroup
+							   from reviewer in reviewerGroup.DefaultIfEmpty()
+							   join approver in _dbContext.User on doc.Approver equals approver.UserId into approverGroup
+							   from approver in approverGroup.DefaultIfEmpty()
+							   where doc.IsActive && doc.DocId == param.DocId
+							   select new WorkflowViewModel
+							   {
+								   DocId = doc.DocId,
+								   DocNo = doc.DocNo,
+								   StatusId = doc.StatusId,
+								   RequestBy = $"{request.Firstname} {request.Lastname}",
+								   RequestByDatetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm") ?? string.Empty,
+								   ReviewedBy = reviewer != null ? $"{reviewer.Firstname} {reviewer.Lastname}" : string.Empty,
+								   ReviewedByDatetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm") ?? string.Empty,
+								   ApprovedBy = approver != null ? $"{approver.Firstname} {approver.Lastname}" : string.Empty,
+								   ApprovedByDatetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm") ?? string.Empty,
+								   CurrentStatus = stat.StatusName,								 
+							   }).FirstOrDefaultAsync();
+
+			if(query.StatusId == (int)EnumDocumentStatus.ForReview)
+			{
+				query.ReviewedStatus = EnumDocumentStatus.InProgress.ToString();
+				query.ApprovedStatus = EnumDocumentStatus.Pending.ToString();
+			}
+			else if (query.StatusId == (int)EnumDocumentStatus.ForApproval)
+			{
+				query.ReviewedStatus = EnumDocumentStatus.Reviewed.ToString();
+				query.ApprovedStatus = EnumDocumentStatus.InProgress.ToString();
+			}
+
+			return query;
 		}
 	}
 }

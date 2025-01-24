@@ -15,6 +15,9 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Metadata;
 using DocumentFormat.OpenXml.InkML;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using GroupDocs.Viewer.Options;
+using Microsoft.AspNetCore.StaticFiles;
 
 
 namespace DCI.WebApp.Controllers
@@ -49,7 +52,7 @@ namespace DCI.WebApp.Controllers
 			{
 				DocumentViewModel _filterRoleModel = new DocumentViewModel();
 
-				var currentUser = _userSessionHelper.GetCurrentUser();				
+				var currentUser = _userSessionHelper.GetCurrentUser();
 				_filterRoleModel.RoleId = currentUser.RoleId;
 
 				var stringContent = new StringContent(JsonConvert.SerializeObject(_filterRoleModel), Encoding.UTF8, "application/json");
@@ -62,7 +65,7 @@ namespace DCI.WebApp.Controllers
 				{
 					model = JsonConvert.DeserializeObject<List<DocumentViewModel>>(responseBody)!;
 				}
-				
+
 			}
 			return View(model);
 		}
@@ -133,7 +136,7 @@ namespace DCI.WebApp.Controllers
 			{
 				using (var _httpclient = new HttpClient())
 				{
-					var currentUser =  _userSessionHelper.GetCurrentUser();
+					var currentUser = _userSessionHelper.GetCurrentUser();
 					model.CreatedBy = currentUser.UserId;
 					model.ModifiedBy = currentUser.UserId;
 
@@ -222,6 +225,8 @@ namespace DCI.WebApp.Controllers
 				Log.CloseAndFlush();
 			}
 		}
+
+
 		public async Task<IActionResult> ViewDocument(DocumentViewModel model)
 		{
 			//string filePath = @"C:\\DCI File\\Output\dci.txt"; 		
@@ -274,6 +279,7 @@ namespace DCI.WebApp.Controllers
 			return Json(new { success = false, message = "An error occurred. Please try again." });
 		}
 
+
 		public async Task<IActionResult> Upload(ValidateTokenViewModel model)
 		{
 			try
@@ -312,7 +318,7 @@ namespace DCI.WebApp.Controllers
 			{
 				using (var _httpclient = new HttpClient())
 				{
-										
+
 
 					var data = new MultipartFormDataContent();
 					data.Add(new StringContent(model.DocId.ToString() ?? ""), "DocId");
@@ -348,6 +354,53 @@ namespace DCI.WebApp.Controllers
 
 		public async Task<IActionResult> VerifyToken()
 		{
+			return View();
+		}
+
+		public async Task<IActionResult> Workflow(DocumentViewModel model)
+		{
+			try
+			{
+
+
+				//vm.OptionsRequestBy = vm.UserList.Select(x =>
+				//   new SelectListItem
+				//   {
+				//	   Value = x.UserId.ToString(),
+				//	   Text = x.Lastname + ", " + x.Firstname
+				//   }).ToList();
+
+
+				using (var _httpclient = new HttpClient())
+				{
+					var currentUser = _userSessionHelper.GetCurrentUser();
+					model.ModifiedBy = currentUser.UserId;
+
+					var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+					var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Document/WorkflowByDocId");
+
+					request.Content = stringContent;
+					var response = await _httpclient.SendAsync(request);
+					var responseBody = await response.Content.ReadAsStringAsync();
+					if (response.IsSuccessStatusCode)
+					{
+						WorkflowViewModel vm = JsonConvert.DeserializeObject<WorkflowViewModel>(responseBody)!;
+						return View(vm);
+					}
+					//return Json(new { success = false, message = responseBody });
+					return View();
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
+				return Json(new { success = false, message = ex.Message });
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+
 			return View();
 		}
 	}

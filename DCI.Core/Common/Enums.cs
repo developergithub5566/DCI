@@ -12,15 +12,15 @@ namespace DCI.Core.Common
 		Administrator = 1,
 		User = 2
 	}
-	public enum EnumStatusType
-	{
-		Draft = 1,
-		ForReview = 2,
-		ForApproval = 3,
-		Approved = 4,
-		ForDisposal = 5,
-		Disposed = 6
-	}
+	//public enum EnumStatusType
+	//{
+	//	Draft = 1,
+	//	ForReview = 2,
+	//	ForApproval = 3,
+	//	Approved = 4,
+	//	ForDisposal = 5,
+	//	Disposed = 6
+	//}
 
 	public enum EnumModulePage
 	{
@@ -35,7 +35,8 @@ namespace DCI.Core.Common
 		UserRole = 9,
 		SystemManagement = 10,
 		AuditTrail = 11,
-		Announcement = 12 
+		Announcement = 12 ,
+		Todo = 13
 	}
 	public enum EnumRole
 	{
@@ -69,11 +70,14 @@ namespace DCI.Core.Common
 	public enum EnumDocumentStatus
 	{		
 		Draft = 1,
-		ForReview = 2,
-		Reviewed = 3,
-		Approved = 4,
-		Deleted = 5,
-		Reused = 6,
+		Pending = 2,
+		InProgress = 3,
+		ForReview = 4,
+		Reviewed = 5,
+		ForApproval =6,
+		Approved = 7,
+		Deleted = 8,
+		Rejected = 9,
 	}
 	public enum EnumDocumentCategory
 	{

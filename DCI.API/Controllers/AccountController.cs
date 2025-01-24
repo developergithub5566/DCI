@@ -17,10 +17,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace DCI.API.Controllers
-{
+{	
 	[ApiController]
 	[Route("api/[controller]")]
 	public class AccountController : Controller
