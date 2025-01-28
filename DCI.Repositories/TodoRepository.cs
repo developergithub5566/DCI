@@ -1,6 +1,9 @@
-﻿using DCI.Data;
+﻿using DCI.Core.Common;
+using DCI.Data;
+using DCI.Models.Entities;
 using DCI.Models.ViewModel;
 using DCI.Repositories.Interface;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -9,10 +12,12 @@ namespace DCI.Repositories
 	public class TodoRepository : ITodoRepository, IDisposable
 	{
 		private DCIdbContext _dbContext;
+		private IEmailRepository _emailRepository;
 
-		public TodoRepository(DCIdbContext context)
+		public TodoRepository(DCIdbContext context, IEmailRepository emailRepository)
 		{
 			this._dbContext = context;
+			this._emailRepository = emailRepository;
 		}
 		public void Dispose()
 		{
@@ -23,6 +28,56 @@ namespace DCI.Repositories
 		//{
 		//	return await _dbContext.Department.FindAsync(DepartmentId);
 		//}
+
+
+
+		public async Task<IList<DocumentViewModel>> GetAllTodo(DocumentViewModel param)
+		{
+			try
+			{
+				var reviewerDocuments = _dbContext.Document.AsQueryable()
+				.Where(x => x.Reviewer == param.CurrentUserId && x.StatusId == (int)EnumDocumentStatus.ForReview && x.IsActive);
+
+				var approverDocuments = _dbContext.Document.AsQueryable()
+					.Where(x => x.Approver == param.CurrentUserId && x.StatusId == (int)EnumDocumentStatus.ForApproval && x.IsActive);
+
+				var combinedDocuments = reviewerDocuments.Union(approverDocuments);
+
+				var query = from doc in combinedDocuments
+							join doctype in _dbContext.DocumentType on doc.DocTypeId equals doctype.DocTypeId
+							join user in _dbContext.User on doc.CreatedBy equals user.UserId
+							join stat in _dbContext.Status on doc.StatusId equals stat.StatusId
+							select new DocumentViewModel
+							{
+								DocName = doc.DocName,
+								DocId = doc.DocId,
+								DocNo = doc.DocNo,
+								Version = doc.Version,
+								Filename = doc.Filename,
+								DocTypeId = doc.DocTypeId,
+								StatusId = doc.StatusId,
+								StatusName = stat.StatusName,
+								DocumentTypeList = null,
+								DocTypeName = doctype.Name,
+								CreatedName = user.Email,
+								DateCreated = doc.DateCreated,
+							};
+
+				// Execute the query and return the results
+				return query.ToList();
+
+
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+			return null;
+		}
 
 		public async Task<IList<ApprovalHistoryViewModel>> GetTodoByApproverId(ApprovalHistoryViewModel model)
 		{
@@ -68,5 +123,37 @@ namespace DCI.Repositories
 		//{
 		//	return await _dbContext.Department.AnyAsync(x => x.DepartmentId == DepartmentId && x.IsActive == true);
 		//}
+		public async Task<(int statuscode, string message)> Approval(ApprovalHistoryViewModel model)
+		{
+			try
+			{
+				ApprovalHistory entity = new ApprovalHistory();
+				entity.ApprovalHistoryId = model.ApprovalHistoryId;
+				entity.DocId = model.DocId;
+				entity.Action = model.Action;
+				entity.ApproverId = model.ApproverId;
+				entity.CreatedBy = model.CreatedBy;
+				entity.DateCreated = DateTime.Now;
+				entity.Remarks = model.Remarks;
+				entity.IsActive = true;
+				await _dbContext.ApprovalHistory.AddAsync(entity);
+				await _dbContext.SaveChangesAsync();
+
+				DocumentViewModel document = new DocumentViewModel();
+				await _emailRepository.SendApproval(document);
+
+				return (StatusCodes.Status200OK, "Successfully saved");
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
+				return (StatusCodes.Status406NotAcceptable, ex.ToString());
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+
+		}
 	}
 }

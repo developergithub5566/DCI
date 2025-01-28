@@ -15,12 +15,12 @@
     }
 
  .loginBG .companyLogo > div {
-            border: 5px solid #e0e7f2;
+           /* border: 5px solid #e0e7f2;*/
             margin: auto;
             width: 120px;
             height: 120px;
-            background: white;
-            border-radius: 50%;
+         /*   background: white;*/
+          /*  border-radius: 50%;*/
             padding: 10px;
             display: inline-block;
             vertical-align: middle;
@@ -31,7 +31,7 @@
             display: inline-block;
             height: 100%;
             vertical-align: middle;
-            border-radius: 50%;
+          /*  border-radius: 50%;*/
  }
 
 .loginBG .companyLogo div > i {
@@ -44,7 +44,7 @@
 .loginBG .loginDiv {
         background: white;
         padding: 60px 20px 30px 20px;
-        border-radius: 20px;
+      /*  border-radius: 20px;*/
         text-align: center;
         color: #1f1f1f;
         margin-top: 40px;

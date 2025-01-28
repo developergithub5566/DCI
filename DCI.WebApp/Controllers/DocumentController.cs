@@ -53,7 +53,7 @@ namespace DCI.WebApp.Controllers
 				DocumentViewModel _filterRoleModel = new DocumentViewModel();
 
 				var currentUser = _userSessionHelper.GetCurrentUser();
-				_filterRoleModel.RoleId = currentUser.RoleId;
+				_filterRoleModel.CurrentRoleId = currentUser.RoleId;
 
 				var stringContent = new StringContent(JsonConvert.SerializeObject(_filterRoleModel), Encoding.UTF8, "application/json");
 				var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Document/GetAllDocument");
@@ -110,6 +110,20 @@ namespace DCI.WebApp.Controllers
 						   Value = x.UserId.ToString(),
 						   Text = x.Lastname + ", " + x.Firstname
 					   }).ToList();
+
+					vm.OptionsReviewer = vm.UserList.Select(x =>
+				   new SelectListItem
+				   {
+					   Value = x.UserId.ToString(),
+					   Text = x.Lastname + ", " + x.Firstname
+				   }).ToList();
+
+					vm.OptionsApprover = vm.UserList.Select(x =>
+				   new SelectListItem
+				   {
+					   Value = x.UserId.ToString(),
+					   Text = x.Lastname + ", " + x.Firstname
+				   }).ToList();
 
 					if (response.IsSuccessStatusCode)
 					{
@@ -402,6 +416,67 @@ namespace DCI.WebApp.Controllers
 			}
 
 			return View();
+		}
+
+		public async Task<ActionResult> RequestForm(DocumentViewModel model)
+		{
+			try
+			{
+				//List<DocumentViewModel> model = new List<DocumentViewModel>();
+				using (var _httpclient = new HttpClient())
+				{
+					var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+					var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Document/GetDocumentById");
+					request.Content = stringContent;
+					var response = await _httpclient.SendAsync(request);
+					var responseBody = await response.Content.ReadAsStringAsync();
+					DocumentViewModel vm = JsonConvert.DeserializeObject<DocumentViewModel>(responseBody)!;
+
+					vm.OptionsDocumentType = vm.DocumentTypeList.Select(x =>
+									   new SelectListItem
+									   {
+										   Value = x.DocTypeId.ToString(),
+										   Text = x.Name
+									   }).ToList();
+
+					vm.OptionsDepartment = vm.DepartmentList.Select(x =>
+									   new SelectListItem
+									   {
+										   Value = x.DepartmentId.ToString(),
+										   Text = x.DepartmentName
+									   }).ToList();
+
+			
+
+					vm.OptionsRequestBy = vm.UserList.Select(x =>
+					   new SelectListItem
+					   {
+						   Value = x.UserId.ToString(),
+						   Text = x.Lastname + ", " + x.Firstname
+					   }).ToList();
+
+				
+
+					if (response.IsSuccessStatusCode)
+					{
+						//return Json(new { success = true, message = responseBody });
+						return View(vm);
+					}
+					//return Json(new { success = false, message = responseBody });
+					return View(vm);
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
+				//return Json(new { success = false, message = ex.Message });
+				return View(model);
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+
 		}
 	}
 }

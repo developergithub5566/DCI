@@ -6,734 +6,648 @@
 <link href="~/css/DCIcustom.css" rel="stylesheet" />
 <style>
 
-	.custom-file-label {
-		padding: 8px 16px;
-		background-color: #007bff;
-		color: white;
-		border-radius: 4px;
-		cursor: pointer;
-	}
+    .custom-file-label {
+        padding: 8px 16px;
+        background-color: #007bff;
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+    }
 
-	.file-name {
-		margin-left: 10px;
-		font-style: italic;
-	}
+    .file-name {
+        margin-left: 10px;
+        font-style: italic;
+    }
 
 </style>
 
 @{
-	var modulePageAccess = Context.Session.GetString("ModulePageAccess");
+    var modulePageAccess = Context.Session.GetString("ModulePageAccess");
 
-	var canView = false;
-	var canAdd = false;
-	var canEdit = false;
-	var canDelete = false;
+    var canView = false;
+    var canAdd = false;
+    var canEdit = false;
+    var canDelete = false;
 
-	if (modulePageAccess == null)
-	{
-		<script>
-			$.ajax({
-				type: 'POST',
-				url: '@Url.Action("Logout", "Account")',
-				success: function (response) {
+    if (modulePageAccess == null)
+    {
+        <script>
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Logout", "Account")',
+                success: function (response) {
 
-					Swal.fire({
-						text: "Your session has timed out. Please log in again.",
-						icon: "info",
-						confirmButtonText: "Ok"
-					}).then((result) => {
-						window.location.href = '/Account/Logout';
-					});
-				},
-				error: function () {
-					Swal.fire({
-						text: "An error occurred. Please try again.",
-						icon: "error"
-					});
-				}
-			})
-		</script>
-	}
-	else
-	{
-		var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
-						.FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Document);
-		canView = module?.View ?? false;
-		canAdd = module?.Add ?? false;
-		canEdit = module?.Update ?? false;
-		canDelete = module?.Delete ?? false;
-	}
+                    Swal.fire({
+                        text: "Your session has timed out. Please log in again.",
+                        icon: "info",
+                        confirmButtonText: "Ok"
+                    }).then((result) => {
+                        window.location.href = '/Account/Logout';
+                    });
+                },
+                error: function () {
+                    Swal.fire({
+                        text: "An error occurred. Please try again.",
+                        icon: "error"
+                    });
+                }
+            })
+        </script>
+    }
+    else
+    {
+        var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
+                        .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Document);
+        canView = module?.View ?? false;
+        canAdd = module?.Add ?? false;
+        canEdit = module?.Update ?? false;
+        canDelete = module?.Delete ?? false;
+    }
 }
 
 <div class="container-fluid">
-	<div class="spinner-overlay">
-		<div class="spinner-border text-light" role="status">
-			<span class="visually-hidden">Loading...</span>
-		</div>
-	</div>
+    <div class="spinner-overlay">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
 
 
 
-	<div class="d-sm-flex align-items-center justify-content-between mb-3">
-		<h6 class="m-0 font-weight-bold text-gray-800">To Do</h6>
-	
+    <div class="d-sm-flex align-items-center justify-content-between mb-3">
+        <h6 class="m-0 font-weight-bold text-gray-800">To Do</h6>
 
-	</div>
-	<div class="col-12 p0">
-		<ul class="breadcrumb">
-			<li><a href="~/Home/Index">Dashboard</a></li>
-			<li>To Do</li>
-		</ul>
-	</div>
 
-	<div class="card shadow mb-4">
-		<div class="card-header">
-			<label class="mb0">Data</label>
-		</div>
-		<div class="card-body">
-			<div class="table-responsive mt20">
-				<table class="table table-bordered nowrap" id="tblDocument" width="100%" cellspacing="0">
-					<thead>
-						<tr>
-							@* 	<th>
+    </div>
+    <div class="col-12 p0">
+        <ul class="breadcrumb">
+            <li><a href="~/Home/Index">Dashboard</a></li>
+            <li>To Do</li>
+        </ul>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header">
+            <label class="mb0">Data</label>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive mt20">
+                <table class="table table-bordered nowrap" id="tblDocument" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            @* 	<th>
 							<label>Id</label>
 							</th> *@
-							<th>
-								<label>Document No</label>
-							</th>
-							<th>
-								<label>Document Name</label>
-							</th>
-							<th>
-								<label>Document Type</label>
-							</th>
-							<th>
-								<label>Date Created</label>
-							</th>
-							<th>
-								<label>Status</label>
-							</th>
-							<th>
-								<label>Prepared By</label>
-							</th>
-							<th>
-								Action
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						@foreach (var item in Model)
-						{
-							<tr>
-								@* <td>
+                            <th>
+                                <label>Document No</label>
+                            </th>
+                            <th>
+                                <label>Document Name</label>
+                            </th>
+                            <th>
+                                <label>Document Type</label>
+                            </th>
+                            <th>
+                                <label>Date Created</label>
+                            </th>
+                            <th>
+                                <label>Status</label>
+                            </th>
+                            <th>
+                                <label>Prepared By</label>
+                            </th>
+                            <th>
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                @* <td>
 							@item.DocId
 							</td> *@
-								<td>
-									@item.DocNo
-								</td>
-								<td>
-									@item.DocName
-								</td>
-								<td>
-									@item.DocTypeName
-								</td>
-								<td>
-									@item.DateCreated.ToShortDateString()
-								</td>
-								<td>
-									@item.StatusName
-								</td>
-								<td>
-									@item.CreatedName
-								</td>
+                                <td>
+                                    @item.DocNo
+                                </td>
+                                <td class="col-2">
+                                    @*    <span class="d-inline-block text-truncate" style="width: 150px;" title="@item.DocName"> *@
+                                    <span class="d-inline-block text-truncate" style="width: 200px;" title="@item.DocName">
+                                        @item.DocName
+                                    </span>
+                                </td>
+                                <td>
+                                    @item.DocTypeName
+                                </td>
+                                <td>
+                                    @item.DateCreated.ToShortDateString()
+                                </td>
+                                <td>
+                                    @item.StatusName
+                                </td>
+                                <td>
+                                    @item.CreatedName
+                                </td>
 
-								<td>
-									<a href="#" onclick="editForm(@item.DocId,1)" title="View" class="btn btn-primary @(canView ? "" : "disabled") "><i class="fas fa-search"></i></a> |
-									<a href="#" onclick="editForm(@item.DocId,1)" title="View" class="btn btn-primary @(canView ? "" : "disabled") ">Approve <i class="fa fa-check-circle"></i></a> |
-									<a href="#" id="editForm" onclick="editForm(@item.DocId,0)" title="Update" class="btn btn-danger @(canEdit ? "" : "disabled") ">Disapprove <i class="fa fa-ban"></i></a>
-								
-								</td>
-							</tr>
-						}
-					</tbody>
-				</table>
-			</div>
-			</<div>
-			</div>
+                                <td>
 
-			<div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="createmodal">
-				<div class="modal-dialog modal-lg" role="document">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h5 class="modal-title" id="exampleModalLabel">Document</h5>
-							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-								<span aria-hidden="true">&times;</span>
-							</button>
-						</div>
-						<form id="createForm">
-							<div class="modal-body">
-								<input type="hidden" id="DocId" name="DocId">
-								<div class="row">
-									<div class="col" id="DocNoDiv">
-										<label for="DocNo" class="col-form-label">Document No:</label>
-										<input type="text" class="form-control" id="DocNo" name="DocNo" readonly>
-									</div>
-									<div class="col">
-									</div>
-								</div>
-								<div class="row">
-									<div class="col">
-										<label for="DocName" class="col-form-label">Document Name:</label>
-										<input type="text" class="form-control" id="DocName" name="DocName" maxlength="100" required>
-									</div>
-									<div class="col">
-										<label for="DocTypeId" class="col-form-label required">Document Type:</label>
-										<select id="documentSelect" class="form-select" required>
-											<option value="">select type</option>
-										</select>
-									</div>
+                                    <a href="#" id="view" onclick="editForm(@item.DocId,1)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a> |
+                                    <a href="#" id="approved" onclick="approvalForm(@item.DocId,true)" title="Approve" class="btn btn-info"> <i class="fa fa-check"></i></a> |
+                                    <a href="#" id="disapproved" onclick="approvalForm(@item.DocId,false)" title="Disapprove" class="btn btn-danger"> <i class="fa fa-ban"></i></a>
 
-								</div>
-								<div class="row">
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            </<div>
+            </div>
 
-									<div class="col">
-										<label for="Department" class="col-form-label required">Department:</label>
-										<select id="departmentSelect" class="form-select" required>
-											@*onchange="getSectionOnChange()"*@
-											<option value="">select department</option>
-										</select>
-									</div>
-									<div class="col">
-										<label for="DocCategory" class="col-form-label required">Document Category:</label>
-										<select id="docCategorySelect" class="form-select" required>
-											<option value="0">select type</option>
-											<option value="1">Internal</option>
-											<option value="2">Internal/External</option>
-										</select>
-									</div>
-								</div>
-								<div class="row">
-									@* 		<div class="col">
+            <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="createmodal">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Document</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="createForm">
+                            <div class="modal-body">
+                                <input type="hidden" id="DocId" name="DocId">
+                                <div class="row">
+                                    <div class="col" id="DocNoDiv">
+                                        <label for="DocNo" class="col-form-label">Document No:</label>
+                                        <input type="text" class="form-control" id="DocNo" name="DocNo" readonly>
+                                    </div>
+                                    <div class="col">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="DocName" class="col-form-label">Document Name:</label>
+                                        <input type="text" class="form-control" id="DocName" name="DocName" maxlength="100" required>
+                                    </div>
+                                    <div class="col">
+                                        <label for="DocTypeId" class="col-form-label required">Document Type:</label>
+                                        <select id="documentSelect" class="form-select" required>
+                                            <option value="">select type</option>
+                                        </select>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+
+                                    <div class="col">
+                                        <label for="Department" class="col-form-label required">Department:</label>
+                                        <select id="departmentSelect" class="form-select" required>
+                                            @*onchange="getSectionOnChange()"*@
+                                            <option value="">select department</option>
+                                        </select>
+                                    </div>
+                                    <div class="col">
+                                        <label for="DocCategory" class="col-form-label required">Document Category:</label>
+                                        <select id="docCategorySelect" class="form-select" required>
+                                            <option value="0">select type</option>
+                                            <option value="1">Internal</option>
+                                            <option value="2">Internal/External</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    @* 		<div class="col">
 										<label for="Section" class="col-form-label required">Section:</label>
 										<select id="sectionSelect" class="form-select" required>
 											<option value="">select section</option>
 										</select>
 									</div> *@
 
-									<div class="col">
-										<label for="RequestById" class="col-form-label required">Request By:</label>
-										<select id="requestBySelect" class="form-select" required>
-											<option value="">select requestor</option>
-										</select>
-									</div>
-									<div class="col">
-										<label for="DocLabel" id="DocLabel" class="col-form-label">Forms/Process:</label>
-										<select id="FormsProcessSelect" class="form-select">
-											<option value="0">select forms/process</option>
-											<option value="1">Forms</option>
-											<option value="2">Process</option>
-										</select>
-									</div>
-
-								</div>
-								<div class="row">
-									<div class="col">
-										<label for="fileUpload" class="col-form-label">File Upload:</label>
-										<br id="nextline" />
-										<input type="file" class="form-control" id="fileUpload" name="fileUpload" accept="application/pdf" onchange="validateFileType()" />
-
-
-
-										<a asp-controller="Document" asp-action="ViewDocument" asp-route-id="0" id="viewFile" target="_blank" title="View"><span class="file-name">No file chosen</span></a>
-										@* <a asp-controller="Document" asp-action="ViewDocument" asp-route-id="0" id="viewFile" target="_blank" class="btn btn-primary" title="View">  <i class="fa fa-download"></i></a> *@
-										@* <a href="#" id="deleteFile" onclick="removefile()" class="btn btn-danger" title="remove"> <i class="far fa-trash-alt"></i></a> *@
-									</div>
-									<div class="col">
-									</div>
-								</div>
-
-								<hr />
-
-								<div class="row">
-									<div class="col">
-										<label for="DocLabel" id="DocLabel" class="col-form-label">Reviewer:</label>
-										<select id="ReviewerSelect" class="form-select">
-											<option value="">select reviewer</option>
-
-										</select>
-									</div>
-									<div class="col">
-										<label for="DocLabel" id="DocLabel" class="col-form-label">Approver:</label>
-										<select id="ApproverSelect" class="form-select">
-											<option value="">select approver</option>
-
-										</select>
-									</div>
-								</div>
-								<div class="row">
-									<div class="col">
-										<label for="DocNo" class="col-form-label">Remarks:</label>
-										<textarea rows="2" class="form-control" id="Remarks" name="Remarks"></textarea>
-									</div>
-								</div>
-
-							</div>
-							<div class="modal-footer">
-								<button type="submit" class="btn btn-primary" id="btnSubmit">Submit</button>
-								<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-
-							</div>
-						</form>
-
-					</div>
-				</div>
-			</div>
-		</div>
-
-
-		@section scripts {
-			@* <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script> *@
-			<script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
-
-			<script src="~/js/file-upload.js"></script>
-
-			<script type="text/javascript">
-				var js = jQuery.noConflict(true);
-
-				$('.spinner-overlay').show();
-
-				setTimeout(() => {
-					$('.spinner-overlay').hide();
-				}, 200);
-
-				$(document).ready(function () {
-					js('#tblDocument').DataTable({
-						order: [[4, 'desc']]
-					});
-
-					0
-					//document.getElementById("FormsProcessSelect").style.display = 'none';
-
-					//document.getElementById("DocLabel").style.display = 'none';
-
-					$('#fileUpload').on('change', function () {
-						var fileName = this.files[0] ? this.files[0].name : 'No file chosen';
-						document.querySelector('.file-name').textContent = '';
-
-						const newrecord = $('#DocId').val();
-
-						if (newrecord != 0) {
-							$('.file-name').text(fileName);
-						}
-					});
-
-					$('#createForm').submit(function (event) {
-						event.preventDefault();
-						const fileInput = document.getElementById('fileUpload');
-						const file = fileInput.files[0]; // Get the first selected file
-						const docId = $('#DocId').val();
-						const docNo = $('#DocNo').val();
-						const docName = $('#DocName').val();
-						const doctypeId = $('#documentSelect').val();
-						const deptId = $('#departmentSelect').val();
-						const docCatId = $('#docCategorySelect').val();
-						//const sectionId = $('#sectionSelect').val();
-						const formsProcess  = $('#FormsProcessSelect').val();
-
-						const requestById = $('#requestBySelect').val();
-
-						// var formData = $(this).serialize();
-						const formData = new FormData();
-						formData.append('DocId', docId);
-						formData.append('DocNo', docNo);
-						formData.append('DocName', docName);
-						formData.append('DocTypeId', doctypeId);
-						formData.append('DepartmentId', deptId);
-						formData.append('DocCategory', docCatId);
-						formData.append('RequestById', requestById);
-						//formData.append('SectionId', sectionId);
-
-						formData.append('FormsProcess', formsProcess);
-
-						formData.append('DocFile', file);
-
-						Swal.fire({
-							text: "Are you sure you want to save this record?",
-							icon: "question",
-							showCancelButton: true,
-							confirmButtonText: "Ok"
-						}).then((result) => {
-							if (result.isConfirmed) {
-								$('.spinner-overlay').show();
-
-								$.ajax({
-									type: 'POST',
-									url: '@Url.Action("SaveDocument", "Document")',
-									data: formData,
-									processData: false,
-									contentType: false,
-									success: function (response) {
-										if (response.success) {
-											$('#createForm')[0].reset();
-											js('#createmodal').modal('hide');
-
-											Swal.fire({
-												text: response.message,
-												icon: "success",
-												confirmButtonText: "Ok"
-											}).then((result) => {
-												location.reload();
-											});
-
-										} else {
-											Swal.fire({
-												text: response.message,
-												icon: "error"
-											});
-										}
-										$('.spinner-overlay').hide();
-									},
-									error: function () {
-										$('.spinner-overlay').hide();
-										Swal.fire({
-											text: "An error occurred. Please try again.",
-											icon: "error"
-										});
-									}
-								});
-							}
-						});
-					});// submit
-
-				});
-
-				function newForm() {
-					$.ajax({
-						type: 'POST',
-						url: '@Url.Action("EditDocument", "Document")',
-						success: function (response) {
-							console.log(response.data);
-							if (response.success) {
-								$('#DocId').val("0");
-								$('#DocNo').val("");
-								$('#DocName').val("");
-								//js('#docCategorySelect').val('0');
-								//document.getElementById('docCategorySelect').value = '0'
-								// var leaveCode = document.querySelector('#docCategorySelect');
-								// leaveCode[i].selected = true;
-								document.getElementById("docCategorySelect").selectedIndex = "0";
-								//document.getElementById("sectionSelect").selectedIndex = "0";
-
-								document.getElementById("FormsProcessSelect").selectedIndex = "0";
-
-
-								//$('#sectionSelect').val(0);
-								$('#RequestById').val(0);
-								$('#DocTypeId').val(0);
-
-								const input = document.querySelector('#fileUpload')
-								input.value = '';
-
-								var $select = $('#documentSelect');
-								$select.empty();
-								$select.append('<option value="">Select type</option>');
-
-								$.each(response.data.optionsDocumentType, function (index, item) {
-									if (item.value == response.data.docTypeId) {
-										$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
-									} else {
-										$select.append('<option value="' + item.value + '">' + item.text + '</option>');
-									}
-								});
-
-								var $select = $('#departmentSelect');
-								$select.empty();
-								$select.append('<option value="">Select type</option>');
-
-								$.each(response.data.optionsDepartment, function (index, item) {
-									if (item.value == response.data.departmentId) {
-										$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
-									} else {
-										$select.append('<option value="' + item.value + '">' + item.text + '</option>');
-									}
-								});
-
-								var $select = $('#requestBySelect');
-								$select.empty();
-								$select.append('<option value="">select requestor</option>');
-
-								$.each(response.data.optionsRequestBy, function (index, item) {
-									if (item.value == response.data.requestBy) {
-										$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
-									} else {
-										$select.append('<option value="' + item.value + '">' + item.text + '</option>');
-									}
-								});
-
-
-								$('#DocNoDiv').hide();
-								document.querySelector('.file-name').textContent = '';
-								$('#fileUpload').show();
-								$('#viewFile').hide();
-								$('#deleteFile').hide();
-								$('#btnSubmit').show();
-								$('#createForm').find('input, select, textarea').prop('disabled', false);;
-								$('#fileUpload').prop('disabled', false);
-								js('#createmodal').modal('show');
-							} else {
-								Swal.fire({
-									text: response.message,
-									icon: "error"
-								});
-							}
-						},
-						error: function () {
-							Swal.fire({
-								text: "An error occurred. Please try again.",
-								icon: "error"
-							});
-						}
-					});
-				}
-
-				function editForm(id, view) {
-
-					$.ajax({
-						type: 'POST',
-						url: '@Url.Action("EditDocument", "Document")',
-						data: { DocId: id },
-						success: function (response) {
-							//	console.log(response.data);
-							if (response.success) {
-								$('#DocId').val(response.data.docId);
-								$('#DocNo').val(response.data.docNo);
-								$('#DocName').val(response.data.docName);
-								$('#DocTypeId').val(response.data.docTypeId);
-								$('#docCategorySelect').val(response.data.docCategory)
-								//$('#sectionSelect').val(response.data.sectionId
-								$('#FormsProcessSelect').val(response.data.formsProcess)
-								// $('#RequestById').val(response.data.requestById)
-								// $('#SectionId').val(response.data.sectionId)
-
-								var $select = $('#documentSelect');
-								$select.empty();
-								$select.append('<option value="">Select type</option>');
-								$.each(response.data.optionsDocumentType, function (index, item) {
-									if (item.value == response.data.docTypeId) {
-										$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
-									} else {
-										$select.append('<option value="' + item.value + '">' + item.text + '</option>');
-									}
-								});
-
-								var $select = $('#departmentSelect');
-								$select.empty();
-								$select.append('<option value="">Select department</option>');
-								$.each(response.data.optionsDepartment, function (index, item) {
-									if (item.value == response.data.departmentId) {
-										$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
-									} else {
-										$select.append('<option value="' + item.value + '">' + item.text + '</option>');
-									}
-								});
-
-								// var $select = $('#sectionSelect');
-								// $select.empty();
-								// $select.append('<option value="">Select section</option>');
-								// $.each(response.data.optionsSection, function (index, item) {
-								// 	if (item.value == response.data.sectionId) {
-								// 		$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
-								// 	} else {
-								// 		$select.append('<option value="' + item.value + '">' + item.text + '</option>');
-								// 	}
-								// });
-
-
-
-								var $select = $('#requestBySelect');
-								$select.empty();
-								$select.append('<option value="">Select requestor</option>');
-
-								$.each(response.data.optionsRequestBy, function (index, item) {
-									if (item.value == response.data.requestById) {
-										$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
-									} else {
-										$select.append('<option value="' + item.value + '">' + item.text + '</option>');
-									}
-								});
-
-
-								var linkElement = document.getElementById("viewFile");
-								linkElement.setAttribute('href', '/Document/ViewDocument?DocId=' + response.data.docId);
-
-								document.querySelector('.file-name').textContent = response.data.filename;
-
-								$('#DocNoDiv').show();
-								if (view == 1) {	//View button
-
-									$('#createForm').find('input, select, textarea').prop('disabled', true);
-									js('#createmodal').modal('show');
-									$('#btnSubmit').hide();
-									$('#deleteFile').hide();
-								}
-								else {  //Edit button
-									$('#createForm').find('input, select, textarea').prop('disabled', false);;
-									$('#fileUpload').prop('disabled', false);
-									$('#btnSubmit').show();
-									$('#deleteFile').show();
-								}
-
-
-								if (response.data.filename != '') { //if file exist
-									$('#fileUpload').hide();
-									$('#viewFile').show();
-								} else {
-									$('#fileUpload').show();
-									$('#viewFile').hide();
-									$('#deleteFile').hide();
-								}
-
-
-								//
-								// if (response.data.labelId < 2) {
-								// 	document.getElementById("FormsProcessSelect").style.display = 'none';
-								// 	document.getElementById("DocLabel").style.display = 'none';
-								// } else {
-								// 	document.getElementById("FormsProcessSelect").style.display = 'block';
-								// 	document.getElementById("DocLabel").style.display = 'block';
-								// }
-
-								js('#createmodal').modal('show');
-							} else {
-								Swal.fire({
-									text: response.message,
-									icon: "error"
-								});
-							}
-						},
-						error: function () {
-							Swal.fire({
-								text: "An error occurred. Please try again.",
-								icon: "error"
-							});
-						}
-					});
-				}
-
-				function deleteform(id) {
-
-					Swal.fire({
-						text: "Are you sure you want to delete this record?",
-						icon: "warning",
-						showCancelButton: true,
-						confirmButtonText: "Yes, delete it!"
-					}).then((result) => {
-						if (result.isConfirmed) {
-							$.ajax({
-								type: 'POST',
-								url: '@Url.Action("DeleteDocument", "Document")',
-								data: { DocId: id },
-								success: function (response) {
-									if (response.success) {
-										Swal.fire({
-											text: response.message,
-											icon: "success",
-											confirmButtonText: "Ok"
-										}).then((result) => {
-											location.reload();
-										});
-									} else {
-										Swal.fire({
-											text: response.message,
-											icon: "error"
-										});
-									}
-								},
-								error: function () {
-									Swal.fire({
-										text: "An error occurred. Please try again.",
-										icon: "error"
-									});
-								}
-							});
-						}
-					});
-				}
-
-				function removefile() {
-
-					Swal.fire({
-						text: "Are you sure you want to delete this file?",
-						icon: "warning",
-						showCancelButton: true,
-						confirmButtonText: "Yes, delete it!"
-					}).then((result) => {
-						if (result.isConfirmed) {
-							document.querySelector('.file-name').textContent = '';
-							$('#fileUpload').show();
-							$('#viewFile').hide();
-							$('#deleteFile').hide();
-
-							// $('#fileUpload').on('change', function () {
-							// 	var fileName = this.files[0] ? this.files[0].name : 'No file chosen';
-							// 	$('.file-name').text(fileName);
-							// });
-						}
-					});
-				}
-
-				function getSectionOnChange() {
-					let deptId = document.getElementById("departmentSelect").value;
-
-					$.ajax({
-						type: 'POST',
-						url: '@Url.Action("GetSectionByDepartmentId", "Maintenance")',
-						data: { DepartmentId: deptId },
-						success: function (response) {
-							if (response.success) {
-								console.log(response.data);
-
-								var $select = $('#sectionSelect');
-								$select.empty();
-								$select.append('<option value="">Select type</option>');
-								$.each(response.data.optionsSection, function (index, item) {
-									if (item.value == response.data.sectionId) {
-										$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
-									} else {
-										$select.append('<option value="' + item.value + '">' + item.text + '</option>');
-									}
-								});
-
-							} else {
-								Swal.fire({
-									text: response.message,
-									icon: "error"
-								});
-							}
-						},
-						error: function () {
-							Swal.fire({
-								text: "An error occurred. Please try again.",
-								icon: "error"
-							});
-						}
-					});
-				}
-
-				function validateFileType() {
-					const input = document.getElementById('fileUpload');
-					const file = input.files[0];
-
-					if (file) {
-						if (file.type !== "application/pdf") {
-							input.value = '';
-							Swal.fire({
-								text: "Invalid file type. Please select a PDF file.",
-								icon: "error"
-							});
-						}
-					}
-				}
-
-			</script>
-		}
+                                    <div class="col">
+                                        <label for="RequestById" class="col-form-label required">Request By:</label>
+                                        <select id="requestBySelect" class="form-select" required>
+                                            <option value="">select requestor</option>
+                                        </select>
+                                    </div>
+                                    <div class="col">
+                                        <label for="DocLabel" id="DocLabel" class="col-form-label">Forms/Process:</label>
+                                        <select id="FormsProcessSelect" class="form-select">
+                                            <option value="0">select forms/process</option>
+                                            <option value="1">Forms</option>
+                                            <option value="2">Process</option>
+                                        </select>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="fileUpload" class="col-form-label">File Upload:</label>
+                                        <br id="nextline" />
+                                        <input type="file" class="form-control" id="fileUpload" name="fileUpload" accept="application/pdf" onchange="validateFileType()" />
+
+
+
+                                        <a asp-controller="Document" asp-action="ViewDocument" asp-route-id="0" id="viewFile" target="_blank" title="View"><span class="file-name">No file chosen</span></a>
+                                        @* <a asp-controller="Document" asp-action="ViewDocument" asp-route-id="0" id="viewFile" target="_blank" class="btn btn-primary" title="View">  <i class="fa fa-download"></i></a> *@
+                                        @* <a href="#" id="deleteFile" onclick="removefile()" class="btn btn-danger" title="remove"> <i class="far fa-trash-alt"></i></a> *@
+                                    </div>
+                                    <div class="col">
+                                    </div>
+                                </div>
+
+                                <hr />
+
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="DocLabel" id="DocLabel" class="col-form-label">Reviewer:</label>
+                                        <select id="ReviewerSelect" class="form-select">
+                                            <option value="">select reviewer</option>
+
+                                        </select>
+                                    </div>
+                                    <div class="col">
+                                        <label for="DocLabel" id="DocLabel" class="col-form-label">Approver:</label>
+                                        <select id="ApproverSelect" class="form-select">
+                                            <option value="">select approver</option>
+
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="Remarks" class="col-form-label">Remarks:</label>
+                                        <textarea rows="2" class="form-control" id="Remarks" name="Remarks"></textarea>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="modal-footer">
+                                @* 			<button type="submit" class="btn btn-primary" id="btnSubmit">Submit</button> *@
+                                <button type="button" class="btn btn-info" onclick="approvalForm($('#DocId').val(),true)" id="btnApprove">Approve</button>
+                                <button type="button" class="btn btn-danger" onclick="approvalForm($('#DocId').val(),false)" id="btnDisapprove">Disapprove</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        @section scripts {
+            @* <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script> *@
+            <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
+
+            <script src="~/js/file-upload.js"></script>
+
+            <script type="text/javascript">
+                var js = jQuery.noConflict(true);
+
+                $('.spinner-overlay').show();
+
+                setTimeout(() => {
+                    $('.spinner-overlay').hide();
+                }, 200);
+
+                $(document).ready(function () {
+                    js('#tblDocument').DataTable({
+                        order: [[4, 'desc']]
+                    });
+
+                    0
+                    //document.getElementById("FormsProcessSelect").style.display = 'none';
+
+                    //document.getElementById("DocLabel").style.display = 'none';
+
+                    $('#fileUpload').on('change', function () {
+                        var fileName = this.files[0] ? this.files[0].name : 'No file chosen';
+                        document.querySelector('.file-name').textContent = '';
+
+                        const newrecord = $('#DocId').val();
+
+                        if (newrecord != 0) {
+                            $('.file-name').text(fileName);
+                        }
+                    });
+
+                    $('#createForm').submit(function (event) {
+                        event.preventDefault();
+                        const fileInput = document.getElementById('fileUpload');
+                        const file = fileInput.files[0]; // Get the first selected file
+                        const docId = $('#DocId').val();
+                        const docNo = $('#DocNo').val();
+                        const docName = $('#DocName').val();
+                        const doctypeId = $('#documentSelect').val();
+                        const deptId = $('#departmentSelect').val();
+                        const docCatId = $('#docCategorySelect').val();
+                        //const sectionId = $('#sectionSelect').val();
+                        const formsProcess  = $('#FormsProcessSelect').val();
+
+                        const requestById = $('#requestBySelect').val();
+
+                        // var formData = $(this).serialize();
+                        const formData = new FormData();
+                        formData.append('DocId', docId);
+                        formData.append('DocNo', docNo);
+                        formData.append('DocName', docName);
+                        formData.append('DocTypeId', doctypeId);
+                        formData.append('DepartmentId', deptId);
+                        formData.append('DocCategory', docCatId);
+                        formData.append('RequestById', requestById);
+                        //formData.append('SectionId', sectionId);
+
+                        formData.append('FormsProcess', formsProcess);
+
+                        formData.append('DocFile', file);
+
+                        Swal.fire({
+                            text: "Are you sure you want to save this record?",
+                            icon: "question",
+                            showCancelButton: true,
+                            confirmButtonText: "Ok"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $('.spinner-overlay').show();
+
+                                $.ajax({
+                                    type: 'POST',
+                                    url: '@Url.Action("SaveDocument", "Document")',
+                                    data: formData,
+                                    processData: false,
+                                    contentType: false,
+                                    success: function (response) {
+                                        if (response.success) {
+                                            $('#createForm')[0].reset();
+                                            js('#createmodal').modal('hide');
+
+                                            Swal.fire({
+                                                text: response.message,
+                                                icon: "success",
+                                                confirmButtonText: "Ok"
+                                            }).then((result) => {
+                                                location.reload();
+                                            });
+
+                                        } else {
+                                            Swal.fire({
+                                                text: response.message,
+                                                icon: "error"
+                                            });
+                                        }
+                                        $('.spinner-overlay').hide();
+                                    },
+                                    error: function () {
+                                        $('.spinner-overlay').hide();
+                                        Swal.fire({
+                                            text: "An error occurred. Please try again.",
+                                            icon: "error"
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    });// submit
+
+                });
+
+
+                function editForm(id, view) {
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("EditDocument", "Document")',
+                        data: { DocId: id },
+                        success: function (response) {
+                            //	console.log(response.data);
+                            if (response.success) {
+                                $('#DocId').val(response.data.docId);
+                                $('#DocNo').val(response.data.docNo);
+                                $('#DocName').val(response.data.docName);
+                                $('#DocTypeId').val(response.data.docTypeId);
+                                $('#docCategorySelect').val(response.data.docCategory)
+                                //$('#sectionSelect').val(response.data.sectionId
+                                $('#FormsProcessSelect').val(response.data.formsProcess)
+                                // $('#RequestById').val(response.data.requestById)
+                                // $('#SectionId').val(response.data.sectionId)
+
+                                var $select = $('#documentSelect');
+                                $select.empty();
+                                $select.append('<option value="">Select type</option>');
+                                $.each(response.data.optionsDocumentType, function (index, item) {
+                                    if (item.value == response.data.docTypeId) {
+                                        $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+                                    } else {
+                                        $select.append('<option value="' + item.value + '">' + item.text + '</option>');
+                                    }
+                                });
+
+                                var $select = $('#departmentSelect');
+                                $select.empty();
+                                $select.append('<option value="">Select department</option>');
+                                $.each(response.data.optionsDepartment, function (index, item) {
+                                    if (item.value == response.data.departmentId) {
+                                        $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+                                    } else {
+                                        $select.append('<option value="' + item.value + '">' + item.text + '</option>');
+                                    }
+                                });
+
+                                // var $select = $('#sectionSelect');
+                                // $select.empty();
+                                // $select.append('<option value="">Select section</option>');
+                                // $.each(response.data.optionsSection, function (index, item) {
+                                // 	if (item.value == response.data.sectionId) {
+                                // 		$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+                                // 	} else {
+                                // 		$select.append('<option value="' + item.value + '">' + item.text + '</option>');
+                                // 	}
+                                // });
+
+
+
+                                var $select = $('#requestBySelect');
+                                $select.empty();
+                                $select.append('<option value="">Select requestor</option>');
+
+                                $.each(response.data.optionsRequestBy, function (index, item) {
+                                    if (item.value == response.data.requestById) {
+                                        $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+                                    } else {
+                                        $select.append('<option value="' + item.value + '">' + item.text + '</option>');
+                                    }
+                                });
+
+
+                                var linkElement = document.getElementById("viewFile");
+                                linkElement.setAttribute('href', '/Document/ViewDocument?DocId=' + response.data.docId);
+
+                                document.querySelector('.file-name').textContent = response.data.filename;
+
+                                $('#DocNoDiv').show();
+                                if (view == 1) {	//View button
+
+                                    $('#createForm').find('input, select, textarea').prop('disabled', true);
+                                    js('#createmodal').modal('show');
+                                    //$('#btnSubmit').hide();
+                                    $('#deleteFile').hide();
+                                }
+                                else {  //Edit button
+                                    $('#createForm').find('input, select, textarea').prop('disabled', false);;
+                                    $('#fileUpload').prop('disabled', false);
+                                    //$('#btnSubmit').show();
+                                    $('#deleteFile').show();
+                                }
+
+                                $('#Remarks').prop('disabled', false);
+
+                                if (response.data.filename != '') { //if file exist
+                                    $('#fileUpload').hide();
+                                    $('#viewFile').show();
+                                } else {
+                                    $('#fileUpload').show();
+                                    $('#viewFile').hide();
+                                    $('#deleteFile').hide();
+                                }
+
+
+                                //
+                                // if (response.data.labelId < 2) {
+                                // 	document.getElementById("FormsProcessSelect").style.display = 'none';
+                                // 	document.getElementById("DocLabel").style.display = 'none';
+                                // } else {
+                                // 	document.getElementById("FormsProcessSelect").style.display = 'block';
+                                // 	document.getElementById("DocLabel").style.display = 'block';
+                                // }
+
+                                js('#createmodal').modal('show');
+                            } else {
+                                Swal.fire({
+                                    text: response.message,
+                                    icon: "error"
+                                });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                text: "An error occurred. Please try again.",
+                                icon: "error"
+                            });
+                        }
+                    });
+                }
+
+
+
+                function removefile() {
+
+                    Swal.fire({
+                        text: "Are you sure you want to delete this file?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Yes, delete it!"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            document.querySelector('.file-name').textContent = '';
+                            $('#fileUpload').show();
+                            $('#viewFile').hide();
+                            $('#deleteFile').hide();
+
+                            // $('#fileUpload').on('change', function () {
+                            // 	var fileName = this.files[0] ? this.files[0].name : 'No file chosen';
+                            // 	$('.file-name').text(fileName);
+                            // });
+                        }
+                    });
+                }
+
+                function getSectionOnChange() {
+                    let deptId = document.getElementById("departmentSelect").value;
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("GetSectionByDepartmentId", "Maintenance")',
+                        data: { DepartmentId: deptId },
+                        success: function (response) {
+                            if (response.success) {
+                                console.log(response.data);
+
+                                var $select = $('#sectionSelect');
+                                $select.empty();
+                                $select.append('<option value="">Select type</option>');
+                                $.each(response.data.optionsSection, function (index, item) {
+                                    if (item.value == response.data.sectionId) {
+                                        $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+                                    } else {
+                                        $select.append('<option value="' + item.value + '">' + item.text + '</option>');
+                                    }
+                                });
+
+                            } else {
+                                Swal.fire({
+                                    text: response.message,
+                                    icon: "error"
+                                });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                text: "An error occurred. Please try again.",
+                                icon: "error"
+                            });
+                        }
+                    });
+                }
+
+                function validateFileType() {
+                    const input = document.getElementById('fileUpload');
+                    const file = input.files[0];
+
+                    if (file) {
+                        if (file.type !== "application/pdf") {
+                            input.value = '';
+                            Swal.fire({
+                                text: "Invalid file type. Please select a PDF file.",
+                                icon: "error"
+                            });
+                        }
+                    }
+                }
+
+                function approvalForm(docid,approved) {
+                    console.log(docid,approved);
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("Approval", "Todo")',
+                        data: { DocId: docid , Action: approved, Remarks: $('#Remarks').val() },
+                        //data: JSON.stringify({ Action: approved, DocId: docid }),
+                        success: function (response) {
+                            if (response.success) {
+                                                    Swal.fire({
+                                                        text: response.message,
+                                                        icon: "success",
+                                                        confirmButtonText: "Ok"
+                                                    }).then((result) => {
+                                                        location.reload();
+                                                    });
+
+                                    } else {
+                                Swal.fire({
+                                    text: response.message,
+                                    icon: "error"
+                                });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                text: "An error occurred. Please try again.",
+                                icon: "error"
+                            });
+                        }
+                    });
+                }
+
+            </script>
+        }

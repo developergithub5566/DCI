@@ -68,7 +68,7 @@ namespace DCI.Repositories
 							DateCreated = doc.DateCreated,
 						};
 
-			if (param.RoleId == (int)EnumRole.User)
+			if (param.CurrentRoleId == (int)EnumRole.User)
 			{
 				query = query.Where(x => x.StatusId != (int)EnumDocumentStatus.Deleted);
 			}
@@ -88,7 +88,8 @@ namespace DCI.Repositories
 				var doctypeList = _dbContext.DocumentType.Where(x => x.IsActive == true).AsQueryable().ToList();
 				var departmentList = _dbContext.Department.Where(x => x.IsActive == true).AsQueryable().ToList();
 				var sectionList = _dbContext.Section.Where(x => x.IsActive == true).AsQueryable().ToList();
-				var userList = _dbContext.User.Where(x => x.IsActive == true).AsQueryable().ToList();
+				//var userList = _dbContext.User.Where(x => x.IsActive == true).AsQueryable().ToList();
+				var userList = _dbContext.User.Where(x => x.IsActive).OrderBy(x => x.Lastname).ToList();
 
 				var query = from doc in context
 							where doc.DocId == docId &&
@@ -111,7 +112,7 @@ namespace DCI.Repositories
 								DocCategory = doc.DocCategory,
 								RequestById = doc.RequestById,
 								SectionId = doc.SectionId,
-								FormsProcess = doc.FormsProcess,
+								FormsProcess = doc.FormsProcess,							
 							};
 
 				var result = query.FirstOrDefault();

@@ -189,5 +189,94 @@ namespace DCI.Repositories
 			return emailBody;
 		}
 		#endregion
+
+		#region Approval
+		public async Task SendApproval(DocumentViewModel model)
+		{
+			model = await ApprovalBodyMessage(model);
+
+
+			MailMessage mail = new MailMessage();
+			mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
+			mail.Subject = "Action Required: Please check the document no. " + model.DocNo;
+			mail.Body = model.EmailBody;
+			mail.IsBodyHtml = true;
+			mail.To.Add(model.RequestByEmail);
+			await SendMessage(mail);
+		}
+
+		async Task<DocumentViewModel> ApprovalBodyMessage(DocumentViewModel model)
+		{
+			var userEntity = await _userRepository.GetUserById(model.RequestById ?? default(int));
+
+			
+			string link = _apiconfig.Value.WebAppConnection + "Document/Upload?token=";
+			model.RequestByEmail = userEntity.Email;
+			model.EmailBody = $@"
+            <html>
+            <body>              
+                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
+                
+                 <p>This is an automated message from DCI Application.</p>
+                 <p> Please check the document (Document No: {model.DocNo}) { "For approval/for review" } by following the link below:  </p>   
+                 <a href='{link + model.UploadLink}'> Upload file</a>
+                <p>If you encounter any issues, please contact our support team at [DCI Application Support].</p>            
+                <p>Thank you,<br />Your DCI</p>
+            </body>
+            </html>";
+
+
+			return model;
+		}
+
+		async Task<DocumentViewModel> ApprovedBodyMessage(DocumentViewModel model)
+		{
+			var userEntity = await _userRepository.GetUserById(model.RequestById ?? default(int));
+
+
+			string link = _apiconfig.Value.WebAppConnection + "Document/Upload?token=";
+			model.RequestByEmail = userEntity.Email;
+			model.EmailBody = $@"
+            <html>
+            <body>              
+                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
+                
+                 <p>This is an automated message from DCI Application.</p>
+                 <p> Please check the document (Document No: {model.DocNo}) by following the link below:  </p>   
+                 <a href='{link + model.UploadLink}'> Upload file</a>
+                <p>If you encounter any issues, please contact our support team at [DCI Application Support].</p>            
+                <p>Thank you,<br />Your DCI</p>
+            </body>
+            </html>";
+
+
+			return model;
+		}
+
+		async Task<DocumentViewModel> DisapprovedBodyMessage(DocumentViewModel model)
+		{
+			var userEntity = await _userRepository.GetUserById(model.RequestById ?? default(int));
+
+
+			string link = _apiconfig.Value.WebAppConnection + "Document/Upload?token=";
+			model.RequestByEmail = userEntity.Email;
+			model.EmailBody = $@"
+            <html>
+            <body>              
+                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
+                
+                 <p>This is an automated message from DCI Application.</p>
+                 <p> Please check the document (Document No: {model.DocNo}) by following the link below:  </p>   
+                 <a href='{link + model.UploadLink}'> Upload file</a>
+                <p>If you encounter any issues, please contact our support team at [DCI Application Support].</p>            
+                <p>Thank you,<br />Your DCI</p>
+            </body>
+            </html>";
+
+
+			return model;
+		}
+
+		#endregion
 	}
 }

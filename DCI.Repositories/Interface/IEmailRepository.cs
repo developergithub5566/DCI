@@ -8,5 +8,6 @@ namespace DCI.Repositories.Interface
 		Task SendResetPassword(string email);
 		Task SendUploadFile(DocumentViewModel model);
 		Task SendSetPassword(string email);
+		Task SendApproval(DocumentViewModel model);
 	}
 }

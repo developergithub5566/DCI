@@ -18,6 +18,10 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 
 namespace DCI.API.Controllers
@@ -140,6 +144,7 @@ namespace DCI.API.Controllers
 				if (PasswordHashingHelper.VerifyPassword(loginvm.Password, userEntity.Password))
 				{
 					var userContext = _userContextService.GetUserContext(loginvm.Email);
+					var token = GenerateJwtToken(loginvm.Email);
 					return Ok(userContext.Result);
 					//return Ok("Login Successful");
 				}
@@ -160,7 +165,26 @@ namespace DCI.API.Controllers
 			return BadRequest("Invalid account");
 		}
 
+		private string GenerateJwtToken(string username)
+		{
+			var claims = new[]
+			{
+			new Claim(JwtRegisteredClaimNames.Sub, username),
+			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+		};
+			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("JWTAuthenticationHIGHsecuredPasswordVVVp1OH7Xzyr"));
+			//var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your_super_secret_key"));
+			var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+			var token = new JwtSecurityToken(
+				issuer: "yourdomain.com",
+				audience: "yourdomain.com",
+				claims: claims,
+				expires: DateTime.Now.AddMinutes(30),
+				signingCredentials: creds);
+
+			return new JwtSecurityTokenHandler().WriteToken(token);
+		}
 
 		[HttpPost]
 		[Route("ChangePassword")]

@@ -33,6 +33,9 @@ namespace DCI.Models.ViewModel
 		public IList<User>? UserList { get; set; }
 		public List<SelectListItem>? OptionsRequestBy { get; set; }
 
+		public List<SelectListItem>? OptionsReviewer { get; set; }
+		public List<SelectListItem>? OptionsApprover { get; set; }
+
 		public int? DocCategory { get; set; } = 0; //internal or internal/external 
 		//public int? Section { get; set; } = 0;
 		public int? StatusId { get; set; } = 0;
@@ -46,8 +49,12 @@ namespace DCI.Models.ViewModel
 		public string? UploadLink { get; set; } = string.Empty;
 		public int? FormsProcess { get; set; } = 0;
 		public bool ReUsed { get; set; } = false;
-		public int RoleId { get; set; } = 0;
+		//public int RoleId { get; set; } = 0;
 		public string StatusName { get; set; } = string.Empty;
+		public string? Remarks { get; set; } = string.Empty;
+
+		public int CurrentUserId { get; set; } = 0;
+		public int CurrentRoleId { get; set; } = 0;
 	}
 	
 

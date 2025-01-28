@@ -1,0 +1,135 @@
+﻿@model DCI.Models.ViewModel.DocumentViewModel
+
+<div class="loginBG">
+    <div class="spinner-overlay">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <div class="gap gap-lg"></div>
+    <div class="container">
+        <div class="row">
+            <div class="offset-xl-4 offset-lg-3 offset-md-2 offset-1 col-xl-4 col-lg-6 col-md-8 col-10">
+                <div class="loginDiv">
+                    <label class="title">Requests form</label>
+
+
+                    <form id="createForm" method="post">
+                  
+                        <div class="form-group">
+                            <label for="DocName" class="col-form-label">Document Name:</label>
+                            <input type="text" class="form-control" id="DocName" name="DocName" maxlength="255" required>
+                            </div>
+
+                        <div class="form-group">
+                            <label for="DocTypeId" class="col-form-label required">Document Type:</label>
+                            @* <select id="documentSelect" class="form-select" required>
+                                <option value="">select type</option>
+                            </select> *@
+                            @Html.DropDownList("documentSelect", Model.OptionsDocumentType.ToList(), htmlAttributes: new { @class = "form-select" })
+
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="Department" class="col-form-label required">Department:</label>
+                            @* <select id="departmentSelect" class="form-select" required>
+                                <option value="">select department</option>
+                            </select> *@
+                            @Html.DropDownList("documentSelect", Model.OptionsDepartment.ToList(), htmlAttributes: new { @class = "form-select" })
+                        </div>
+
+                        <div class="form-group">
+                            <label for="DocCategory" class="col-form-label required">Document Category:</label>
+                            <select id="docCategorySelect" class="form-select" required>
+                                <option value="0">select type</option>
+                                <option value="1">Internal</option>
+                                <option value="2">Internal/External</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="DocLabel" id="DocLabel" class="col-form-label">Forms/Process:</label>
+                            <select id="FormsProcessSelect" class="form-select">
+                                <option value="0">select forms/process</option>
+                                <option value="1">Forms</option>
+                                <option value="2">Process</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="RequestById" class="col-form-label required">Request By:</label>
+                           @*  <select id="requestBySelect" class="form-select" required>
+                                <option value="">select requestor</option>
+                            </select> *@
+                            @Html.DropDownList("documentSelect", Model.OptionsRequestBy.ToList(), htmlAttributes: new { @class = "form-select" })
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary btn-block w-100">Submit</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+            <div class="copyrights">
+                <label>&copy; 2025 DBP Data Center Inc.</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+
+
+    <script type="text/javascript">
+        // var js = jQuery.noConflict(true);
+        $('.spinner-overlay').show();
+
+        setTimeout(() => {
+            $('.spinner-overlay').hide();
+        }, 200);
+
+        $(document).ready(function () {
+
+
+                         // var $select = $('#documentSelect');
+                         //        $select.empty();
+                         //        $select.append('<option value="">Select type</option>');
+
+                         //        $.each(response.data.optionsDocumentType, function (index, item) {
+                         //            if (item.value == response.data.docTypeId) {
+                         //                $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+                         //            } else {
+                         //                $select.append('<option value="' + item.value + '">' + item.text + '</option>');
+                         //            }
+                         //        });
+
+                         //        var $select = $('#departmentSelect');
+                         //        $select.empty();
+                         //        $select.append('<option value="">Select type</option>');
+
+                         //        $.each(response.data.optionsDepartment, function (index, item) {
+                         //            if (item.value == response.data.departmentId) {
+                         //                $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+                         //            } else {
+                         //                $select.append('<option value="' + item.value + '">' + item.text + '</option>');
+                         //            }
+                         //        });
+
+                         //        var $select = $('#requestBySelect');
+                         //        $select.empty();
+                         //        $select.append('<option value="">select requestor</option>');
+
+                         //        $.each(response.data.optionsRequestBy, function (index, item) {
+                         //            if (item.value == response.data.requestBy) {
+                         //                $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+                         //            } else {
+                         //                $select.append('<option value="' + item.value + '">' + item.text + '</option>');
+                         //            }
+                         //        });
+
+                                });
+    </script>
+}
