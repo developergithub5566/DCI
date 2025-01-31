@@ -14,6 +14,6 @@ namespace DCI.Repositories.Interface
 		Task<(int statuscode, string message)> UploadFile (DocumentViewModel model);
 		Task<IList<HomePageViewModel>> HomePage();
 		Task<WorkflowViewModel> Workflow(DocumentViewModel model);
-
+		Task<DocumentViewModel> UpdateApprovalStatusByDocId(DocumentViewModel model, ApprovalViewModel apprvm);		
 	}
 }

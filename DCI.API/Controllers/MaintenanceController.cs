@@ -209,12 +209,12 @@ namespace DCI.API.Controllers
 
 		[HttpPost]
 		[Route("GetDepartmentById")]
-		public async Task<IActionResult> GetDepartmentById(DepartmentViewModel model)
+		public async Task<IActionResult> GetDepartmentById([FromBody]  DepartmentViewModel model)
 		{
-			if (!await _departmentRepository.IsExistsDepartment(model.DepartmentId))
-			{
-				return NotFound("Department Id invalid");
-			}
+			//if (!await _departmentRepository.IsExistsDepartment(model.DepartmentId))
+			//{
+			//	return NotFound("Department Id invalid");
+			//}
 			return Ok(await _departmentRepository.GetDepartmentById(model.DepartmentId));
 		}
 

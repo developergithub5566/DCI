@@ -13,11 +13,13 @@ namespace DCI.Repositories
 	{
 		private DCIdbContext _dbContext;
 		private IEmailRepository _emailRepository;
+		private IDocumentRepository _documentRepository;
 
-		public TodoRepository(DCIdbContext context, IEmailRepository emailRepository)
+		public TodoRepository(DCIdbContext context, IEmailRepository emailRepository, IDocumentRepository documentRepository)
 		{
 			this._dbContext = context;
 			this._emailRepository = emailRepository;
+			this._documentRepository = documentRepository;
 		}
 		public void Dispose()
 		{
@@ -139,10 +141,23 @@ namespace DCI.Repositories
 				await _dbContext.ApprovalHistory.AddAsync(entity);
 				await _dbContext.SaveChangesAsync();
 
-				DocumentViewModel document = new DocumentViewModel();
-				await _emailRepository.SendApproval(document);
+				var docVm = await _documentRepository.GetDocumentById(entity.DocId);
 
-				return (StatusCodes.Status200OK, "Successfully saved");
+				ApprovalViewModel apprvm = new ApprovalViewModel();
+				apprvm.Action = model.Action;		
+
+				var NewDocumentViewModel = await _documentRepository.UpdateApprovalStatusByDocId(docVm, apprvm);
+
+				if (NewDocumentViewModel.StatusId == (int)EnumDocumentStatus.ForApproval || NewDocumentViewModel.StatusId == (int)EnumDocumentStatus.Approved)
+				{
+					await _emailRepository.SendRequestor(NewDocumentViewModel, apprvm);
+				}
+				if (NewDocumentViewModel.StatusId == (int)EnumDocumentStatus.ForApproval || NewDocumentViewModel.StatusId == (int)EnumDocumentStatus.ForReview)
+				{
+					await _emailRepository.SendApproval(NewDocumentViewModel);
+				}
+			
+				return (StatusCodes.Status200OK, String.Format("Document {0} has been updated.", NewDocumentViewModel.DocNo));
 			}
 			catch (Exception ex)
 			{
@@ -153,7 +168,6 @@ namespace DCI.Repositories
 			{
 				Log.CloseAndFlush();
 			}
-
 		}
 	}
 }

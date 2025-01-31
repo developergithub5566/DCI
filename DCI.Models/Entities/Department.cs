@@ -21,5 +21,7 @@ namespace DCI.Models.Entities
 		public bool IsActive { get; set; } = true;
 
 		public string? DepartmentCode { get; set; } = string.Empty;
+		public int? Reviewer { get; set; } = 0;
+		public int? Approver { get; set; } = 0;
 	}
 }

@@ -13,5 +13,10 @@
 		public const string Email_Subject_SetPassword = "DCI App - Set Password";
 		public const string Email_Subject_ResetPassword = "DCI App - Reset Password";
 		public const string Email_Subject_UploadFile = "DCI App - Please Upload Your Document No";
+
+		public const string Approval_Approved = "Approved";
+		public const string Approval_Disapproved = "Disapproved";
+		public const string Approval_Reviewed = "Reviewed";
+
 	}
 }

@@ -153,9 +153,10 @@
                                 <td>
 
                                     <a href="#" id="view" onclick="editForm(@item.DocId,1)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a> |
-                                    <a href="#" id="approved" onclick="approvalForm(@item.DocId,true)" title="Approve" class="btn btn-info"> <i class="fa fa-check"></i></a> |
-                                    <a href="#" id="disapproved" onclick="approvalForm(@item.DocId,false)" title="Disapprove" class="btn btn-danger"> <i class="fa fa-ban"></i></a>
-
+                                    @*     <a href="#" id="approved" onclick="approvalForm(@item.DocId,true)" title="Approve" class="btn btn-info"> <i class="fa fa-check"></i></a> |
+                                    <a href="#" id="disapproved" onclick="approvalForm(@item.DocId,false)" title="Disapprove" class="btn btn-danger"> <i class="fa fa-ban"></i></a> *@
+                                    <a href="#" id="approved" onclick="remarksForm(@item.DocId,true)" title="Approve" class="btn btn-info"> <i class="fa fa-check"></i></a> |
+                                    <a href="#" id="disapproved" onclick="remarksForm(@item.DocId,false)" title="Disapprove" class="btn btn-danger"> <i class="fa fa-ban"></i></a>
                                 </td>
                             </tr>
                         }
@@ -294,6 +295,38 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Remarks modal -->
+            <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="remarksmodal" aria-hidden="true" id="remarksmodal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Required</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col">
+                                    <label for="Remarks" class="col-form-label required">Remarks:</label>
+                                    <textarea rows="2" class="form-control" id="Remarks_Approval" name="Remarks_Approval"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-info" onclick="approvalRemarksForm()" id="btnApprove">Submit</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <input type="hidden" id="HiddenDocId" name="HiddenDocId" value="">
+            <input type="hidden" id="HiddenAction" name="HiddenAction" value="">
+          
+
         </div>
 
 
@@ -415,6 +448,7 @@
 
 
                 function editForm(id, view) {
+                    $('#Remarks').val("");
 
                     $.ajax({
                         type: 'POST',
@@ -617,37 +651,111 @@
                 }
 
                 function approvalForm(docid,approved) {
-                    console.log(docid,approved);
-                    $.ajax({
-                        type: 'POST',
-                        url: '@Url.Action("Approval", "Todo")',
-                        data: { DocId: docid , Action: approved, Remarks: $('#Remarks').val() },
-                        //data: JSON.stringify({ Action: approved, DocId: docid }),
-                        success: function (response) {
-                            if (response.success) {
-                                                    Swal.fire({
-                                                        text: response.message,
-                                                        icon: "success",
-                                                        confirmButtonText: "Ok"
-                                                    }).then((result) => {
-                                                        location.reload();
-                                                    });
+                  if($('#Remarks').val() == "")
+                  {
+                         Swal.fire({
+                                        text: "Please input remarks",
+                                        icon: "error"
+                                    });
+                  }
+                  else
+                  {
 
-                                    } else {
+                             $('.spinner-overlay').show();
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("Approval", "Todo")',
+                            data: { DocId: docid , Action: approved, Remarks: $('#Remarks').val() },
+
+                            success: function (response) {
+                                if (response.success) {
+                                                        Swal.fire({
+                                                            text: response.message,
+                                                            icon: "success",
+                                                            confirmButtonText: "Ok"
+                                                        }).then((result) => {
+                                                            location.reload();
+                                                        });
+
+                                        } else {
+                                    Swal.fire({
+                                        text: response.message,
+                                        icon: "error"
+                                    });
+                                }
+                                 $('.spinner-overlay').hide();
+                            },
+                            error: function () {
+                                 $('.spinner-overlay').hide();
                                 Swal.fire({
-                                    text: response.message,
+                                    text: "An error occurred. Please try again.",
                                     icon: "error"
                                 });
                             }
-                        },
-                        error: function () {
-                            Swal.fire({
-                                text: "An error occurred. Please try again.",
-                                icon: "error"
-                            });
-                        }
-                    });
+                        });
+
+                   }
                 }
+
+                 function remarksForm(docid,approved) {
+                      $('#Remarks_Approval').val("");
+                      $('#HiddenDocId').val(docid);
+                      $('#HiddenAction').val(approved);
+                       js('#remarksmodal').modal('show');
+                 }
+
+                 function approvalRemarksForm() {
+
+                  if($('#Remarks_Approval').val() == "")
+                  {
+                         Swal.fire({
+                                        text: "Please input remarks",
+                                        icon: "error"
+                                    });
+                  }
+                  else
+                  {
+                     
+
+                     const _docId =  $('#HiddenDocId').val();
+                      const _action =  $('#HiddenAction').val();    
+
+                                          $('.spinner-overlay').show();
+
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("Approval", "Todo")',
+                            data: { DocId: _docId , Action: _action, Remarks: $('#Remarks_Approval').val() },
+                            success: function (response) {
+                                if (response.success) {
+                                                        Swal.fire({
+                                                            text: response.message,
+                                                            icon: "success",
+                                                            confirmButtonText: "Ok"
+                                                        }).then((result) => {
+                                                            location.reload();
+                                                        });
+
+                                        } else {
+                                    Swal.fire({
+                                        text: response.message,
+                                        icon: "error"
+                                    });
+                                }
+                                      $('.spinner-overlay').hide();
+                            },
+                            error: function () {
+                                      $('.spinner-overlay').hide();
+                                Swal.fire({
+                                    text: "An error occurred. Please try again.",
+                                    icon: "error"
+                                });
+                            }
+                        });
+
+                   }
+                   }
+
 
             </script>
         }

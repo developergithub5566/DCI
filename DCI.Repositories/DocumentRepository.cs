@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using System.Data;
 using DCI.Core.Helpers;
 using System.Text.RegularExpressions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DCI.Repositories
 {
@@ -26,13 +27,15 @@ namespace DCI.Repositories
 	{
 		private DCIdbContext _dbContext;
 		private readonly IOptions<FileModel> _filelocation;
-		private IEmailRepository _emailRepository;		
+		private IEmailRepository _emailRepository;
+		private IDepartmentRepository _departmentRepository;
 
-		public DocumentRepository(DCIdbContext context, IOptions<FileModel> filelocation, IEmailRepository emailRepository)
+		public DocumentRepository(DCIdbContext context, IOptions<FileModel> filelocation, IEmailRepository emailRepository, IDepartmentRepository departmentRepository)
 		{
 			this._dbContext = context;
 			this._filelocation = filelocation;
-			this._emailRepository = emailRepository;			
+			this._emailRepository = emailRepository;
+			this._departmentRepository = departmentRepository;
 		}
 		public void Dispose()
 		{
@@ -112,7 +115,7 @@ namespace DCI.Repositories
 								DocCategory = doc.DocCategory,
 								RequestById = doc.RequestById,
 								SectionId = doc.SectionId,
-								FormsProcess = doc.FormsProcess,							
+								FormsProcess = doc.FormsProcess,
 							};
 
 				var result = query.FirstOrDefault();
@@ -157,7 +160,12 @@ namespace DCI.Repositories
 					entity.DocTypeId = model.DocTypeId;
 					entity.DocCategory = model.DocCategory;
 					entity.DepartmentId = model.DepartmentId;
-					entity.StatusId = (int)EnumDocumentStatus.Approved;
+
+					DepartmentViewModel deptViewModel = await _departmentRepository.GetDepartmentById(model.DepartmentId);
+					entity.Reviewer = deptViewModel.Reviewer ?? 0;
+					entity.Approver = deptViewModel.Approver ?? 0;
+
+					entity.StatusId = model.StatusId ?? (int)EnumDocumentStatus.InProgress;
 					//entity.SectionId = model.SectionId;
 					entity.FormsProcess = model.FormsProcess;
 					entity.Version = model.Version;
@@ -174,16 +182,23 @@ namespace DCI.Repositories
 					model.DocId = entity.DocId;
 					model.DocNo = entity.DocNo;
 					model.UploadLink = entity.UploadLink;
+					model.StatusId = entity.StatusId;
 
 					if (model.DocFile != null)
 					{
 						await SaveFile(model);
 					}
-					//else
-					//{						
-					//}
 
-					await _emailRepository.SendUploadFile(model);
+					if (model.StatusId == (int)EnumDocumentStatus.InProgress)
+					{
+						await _emailRepository.SendUploadFile(model);
+					}
+
+					if (model.StatusId == (int)EnumDocumentStatus.ForReview)
+					{
+						await _emailRepository.SendApproval(model);
+					}
+
 
 					return (StatusCodes.Status200OK, String.Format("Document {0} has been created successfully.", entity.DocNo));
 				}
@@ -200,7 +215,7 @@ namespace DCI.Repositories
 					entity.FormsProcess = model.FormsProcess;
 					entity.RequestById = model.RequestById;
 					entity.Version = model.Version;
-					entity.Filename = model.DocFile != null ? model.DocFile.FileName : entity.Filename;					
+					entity.Filename = model.DocFile != null ? model.DocFile.FileName : entity.Filename;
 					entity.DateCreated = entity.DateCreated;
 					entity.CreatedBy = entity.CreatedBy;
 					entity.DateModified = DateTime.Now;
@@ -216,8 +231,20 @@ namespace DCI.Repositories
 					{
 						await SaveFile(model);
 					}
+
+					if (model.StatusId == (int)EnumDocumentStatus.InProgress)
+					{
+						await _emailRepository.SendUploadFile(model);
+					}
+
+					if (model.StatusId == (int)EnumDocumentStatus.ForReview)
+					{
+						await _emailRepository.SendApproval(model);
+					}
+
 					return (StatusCodes.Status200OK, String.Format("Document {0} has been updated successfully.", entity.DocNo));
 				}
+				
 			}
 			catch (Exception ex)
 			{
@@ -279,7 +306,7 @@ namespace DCI.Repositories
 
 				var entity = await _dbContext.Document.FirstOrDefaultAsync(x => x.DocId == model.DocId && x.IsActive == true);
 				entity.FileLocation = fileloc;
-						
+
 
 				entity.ModifiedBy = model.ModifiedBy ?? null;
 				entity.DateModified = model.DateModified ?? null;
@@ -291,6 +318,11 @@ namespace DCI.Repositories
 				}
 				entity.Filename = filename;
 				_dbContext.Document.Entry(entity).State = EntityState.Modified;
+
+				if (model.StatusId == (int)EnumDocumentStatus.ForReview)
+				{
+					await _emailRepository.SendApproval(model);
+				}
 				await _dbContext.SaveChangesAsync();
 			}
 			catch (Exception ex)
@@ -492,40 +524,105 @@ namespace DCI.Repositories
 
 		public async Task<WorkflowViewModel> Workflow(DocumentViewModel param)
 		{
-			var query = await (from doc in _dbContext.Document
-							   join stat in _dbContext.Status on doc.StatusId equals stat.StatusId
-							   join request in _dbContext.User on doc.RequestById equals request.UserId
-							   join reviewer in _dbContext.User on doc.Reviewer equals reviewer.UserId into reviewerGroup
-							   from reviewer in reviewerGroup.DefaultIfEmpty()
-							   join approver in _dbContext.User on doc.Approver equals approver.UserId into approverGroup
-							   from approver in approverGroup.DefaultIfEmpty()
-							   where doc.IsActive && doc.DocId == param.DocId
-							   select new WorkflowViewModel
-							   {
-								   DocId = doc.DocId,
-								   DocNo = doc.DocNo,
-								   StatusId = doc.StatusId,
-								   RequestBy = $"{request.Firstname} {request.Lastname}",
-								   RequestByDatetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm") ?? string.Empty,
-								   ReviewedBy = reviewer != null ? $"{reviewer.Firstname} {reviewer.Lastname}" : string.Empty,
-								   ReviewedByDatetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm") ?? string.Empty,
-								   ApprovedBy = approver != null ? $"{approver.Firstname} {approver.Lastname}" : string.Empty,
-								   ApprovedByDatetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm") ?? string.Empty,
-								   CurrentStatus = stat.StatusName,								 
-							   }).FirstOrDefaultAsync();
+			//var query = await (from doc in _dbContext.Document
+			//				   join stat in _dbContext.Status on doc.StatusId equals stat.StatusId
+			//				   join request in _dbContext.User on doc.RequestById equals request.UserId
+			//				   join reviewer in _dbContext.User on doc.Reviewer equals reviewer.UserId into reviewerGroup
+			//				   from reviewer in reviewerGroup.DefaultIfEmpty()
 
-			if(query.StatusId == (int)EnumDocumentStatus.ForReview)
+			//				   join approver in _dbContext.User on doc.Approver equals approver.UserId into approverGroup
+			//				   from approver in approverGroup.DefaultIfEmpty()
+
+			//				   where doc.IsActive && doc.DocId == param.DocId
+					var query = await (
+					from doc in _dbContext.Document
+					join stat in _dbContext.Status on doc.StatusId equals stat.StatusId into statGroup
+					from stat in statGroup.DefaultIfEmpty()
+
+					join request in _dbContext.User on doc.RequestById equals request.UserId into requestGroup
+					from request in requestGroup.DefaultIfEmpty()
+
+					join reviewer in _dbContext.User on doc.Reviewer equals reviewer.UserId into reviewerGroup
+					from reviewer in reviewerGroup.DefaultIfEmpty()
+
+					join apprUser in _dbContext.User on doc.Approver equals apprUser.UserId into apprUserGroup
+					from apprUser in apprUserGroup.DefaultIfEmpty()
+
+					join reviewApprv in _dbContext.ApprovalHistory on new { doc.DocId, CreatedBy = doc.Reviewer } equals new { reviewApprv.DocId, reviewApprv.CreatedBy } into reviewApprvGroup
+					from reviewApprv in reviewApprvGroup.DefaultIfEmpty()
+
+					join apprHist in _dbContext.ApprovalHistory on new { doc.DocId, CreatedBy = doc.Approver } equals new { apprHist.DocId, apprHist.CreatedBy } into apprHistGroup
+					from apprHist in apprHistGroup.DefaultIfEmpty()
+
+					where doc.IsActive && doc.DocId == param.DocId
+					select new WorkflowViewModel
+					{
+						DocId = doc.DocId,
+						DocNo = doc.DocNo,
+						StatusId = doc.StatusId,
+						RequestBy = $"{request.Firstname} {request.Lastname}",
+						RequestByDatetime = doc.DateCreated.ToString(),
+						ReviewedBy = reviewer != null ? $"{reviewer.Firstname} {reviewer.Lastname}" : string.Empty,
+						ReviewedByDatetime = reviewer != null ? reviewApprv.DateCreated.ToString() : string.Empty,
+						ApprovedBy = apprUser != null ? $"{apprUser.Firstname} {apprUser.Lastname}" : string.Empty,
+						ApprovedByDatetime = apprUser != null ? apprHist.DateCreated.ToString() : string.Empty,
+						CurrentStatus = stat.StatusName,
+						ReviewedRemarks = reviewApprv.Remarks,
+						ApprovedRemarks = apprHist.Remarks,
+					}).FirstOrDefaultAsync();
+
+			if (query.StatusId == (int)EnumDocumentStatus.ForReview)
 			{
 				query.ReviewedStatus = EnumDocumentStatus.InProgress.ToString();
 				query.ApprovedStatus = EnumDocumentStatus.Pending.ToString();
+				query.CurrentStatus = "Review";
+				query.Percentage = 33;	
+
 			}
 			else if (query.StatusId == (int)EnumDocumentStatus.ForApproval)
 			{
 				query.ReviewedStatus = EnumDocumentStatus.Reviewed.ToString();
 				query.ApprovedStatus = EnumDocumentStatus.InProgress.ToString();
+				query.CurrentStatus = "Approval";
+				query.Percentage = 66;
 			}
-
+			else if (query.StatusId == (int)EnumDocumentStatus.Approved)
+			{
+				query.CurrentStatus = "Completed";
+				query.Percentage = 100;
+			}
 			return query;
 		}
-	}
+
+		public async Task<DocumentViewModel> UpdateApprovalStatusByDocId(DocumentViewModel model, ApprovalViewModel apprvm)
+		{
+			var entity = await _dbContext.Document.FirstOrDefaultAsync(x => x.DocId == model.DocId);
+
+			if (entity.StatusId == (int)EnumDocumentStatus.ForReview && apprvm.Action)
+			{
+				entity.StatusId = (int)EnumDocumentStatus.ForApproval;
+			}
+			else if (entity.StatusId == (int)EnumDocumentStatus.ForApproval && apprvm.Action)
+			{
+				entity.StatusId = (int)EnumDocumentStatus.Approved;
+			}
+			else if (entity.StatusId == (int)EnumDocumentStatus.ForReview && !apprvm.Action)
+			{
+				entity.StatusId = (int)EnumDocumentStatus.InProgress;
+			}
+			else if (entity.StatusId == (int)EnumDocumentStatus.ForApproval && !apprvm.Action)
+			{
+				entity.StatusId = (int)EnumDocumentStatus.InProgress;
+			}
+
+			entity.DateModified = DateTime.Now;
+			entity.ModifiedBy = model.ModifiedBy;
+			entity.IsActive = true;
+
+			_dbContext.Document.Entry(entity).State = EntityState.Modified;
+			await _dbContext.SaveChangesAsync();
+
+			model.StatusId = entity.StatusId;
+			return model;
+		}	}
 }

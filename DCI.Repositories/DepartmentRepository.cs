@@ -19,18 +19,45 @@ namespace DCI.Repositories
 		{
 			_dbContext.Dispose();
 		}
-		public async Task<Department> GetDepartmentById(int DepartmentId)
+		//public async Task<Department> GetDepartmentById(int DepartmentId)
+		//{
+		//	return await _dbContext.Department.FindAsync(DepartmentId);
+		//}
+		public async Task<DepartmentViewModel> GetDepartmentById(int deptId)
 		{
-			return await _dbContext.Department.FindAsync(DepartmentId);
+			var context =   _dbContext.Department.AsQueryable();
+			var userList = _dbContext.User.Where(x => x.IsActive).OrderBy(x => x.Lastname).ToList();
+
+			var query = from dept in context						
+						where dept.IsActive == true && dept.DepartmentId == deptId
+						select new DepartmentViewModel
+						{
+							DepartmentId = dept.DepartmentId,
+							DepartmentCode = dept.DepartmentCode,
+							DepartmentName = dept.DepartmentName,
+							Description = dept.Description,							
+							CreatedBy = dept.CreatedBy,
+							DateCreated = dept.DateCreated,
+							Reviewer = dept.Reviewer,
+							Approver = dept.Approver
+						};
+			var result = query.FirstOrDefault();
+			if (result == null)
+			{
+				result = new DepartmentViewModel();
+			}
+			result.UserList = userList.Count() > 0 ? userList : null;
+
+			return result;
 		}
+
 		public async Task<IList<DepartmentViewModel>> GetAllDepartment()
 		{
 			//return await _dbContext.Department.AsNoTracking().Where(x => x.IsActive == true).ToListAsync();
 			try
 			{
 				var context = _dbContext.Department.AsQueryable().ToList();
-				var userList = _dbContext.User.AsQueryable().ToList();
-
+				var userList = _dbContext.User.AsQueryable().ToList();			
 
 				var query = from dept in context
 							join user in userList on dept.CreatedBy equals user.UserId
@@ -44,6 +71,8 @@ namespace DCI.Repositories
 								CreatedName = user.Email,
 								CreatedBy = dept.CreatedBy,
 								DateCreated = dept.DateCreated,
+								Reviewer = dept.Reviewer,
+								Approver = dept.Approver
 							};
 
 				return query.ToList();
@@ -74,6 +103,8 @@ namespace DCI.Repositories
 					entity.DepartmentCode = model.DepartmentCode;
 					entity.DepartmentName = model.DepartmentName;
 					entity.Description = model.Description;
+					entity.Reviewer = model.Reviewer;
+					entity.Approver = model.Approver;
 					entity.CreatedBy = model.CreatedBy;
 					entity.DateCreated = DateTime.Now;
 					entity.ModifiedBy = null;
@@ -89,6 +120,8 @@ namespace DCI.Repositories
 					entity.DepartmentCode = model.DepartmentCode;
 					entity.DepartmentName = model.DepartmentName;
 					entity.Description = model.Description;
+					entity.Reviewer = model.Reviewer;
+					entity.Approver = model.Approver;
 					entity.DateCreated = entity.DateCreated;
 					entity.CreatedBy = entity.CreatedBy;
 					entity.DateModified = DateTime.Now;

@@ -1,4 +1,7 @@
-﻿namespace DCI.Models.ViewModel
+﻿using DCI.Models.Entities;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace DCI.Models.ViewModel
 {
     public class DepartmentViewModel
     {
@@ -20,5 +23,13 @@
 
         public bool IsActive { get; set; } = true;
 		public string CreatedName { get; set; } = string.Empty;
+		public int? Reviewer { get; set; } = 0;
+		public int? Approver { get; set; } = 0;
+
+		public List<SelectListItem>? OptionsReviewer { get; set; }
+		public List<SelectListItem>? OptionsApprover { get; set; }
+
+		public IList<User>? UserList { get; set; }
+
 	}
 }

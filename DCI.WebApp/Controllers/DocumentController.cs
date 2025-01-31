@@ -18,6 +18,12 @@ using DocumentFormat.OpenXml.InkML;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using GroupDocs.Viewer.Options;
 using Microsoft.AspNetCore.StaticFiles;
+using DCI.Core.Common;
+using DCI.Core.Helpers;
+using System.Collections;
+using System.Drawing;
+using QRCoder;
+using System.Drawing.Imaging;
 
 
 namespace DCI.WebApp.Controllers
@@ -332,7 +338,7 @@ namespace DCI.WebApp.Controllers
 			{
 				using (var _httpclient = new HttpClient())
 				{
-
+					model.StatusId = (int)EnumDocumentStatus.ForReview;
 
 					var data = new MultipartFormDataContent();
 					data.Add(new StringContent(model.DocId.ToString() ?? ""), "DocId");
@@ -417,8 +423,13 @@ namespace DCI.WebApp.Controllers
 
 			return View();
 		}
-
-		public async Task<ActionResult> RequestForm(DocumentViewModel model)
+		public ActionResult RequestForm()
+		{
+			DocumentViewModel model = new DocumentViewModel();
+			return View(model);
+			;
+		}
+		public async Task<ActionResult> RequestFormLoad(DocumentViewModel model)
 		{
 			try
 			{
@@ -446,7 +457,7 @@ namespace DCI.WebApp.Controllers
 										   Text = x.DepartmentName
 									   }).ToList();
 
-			
+
 
 					vm.OptionsRequestBy = vm.UserList.Select(x =>
 					   new SelectListItem
@@ -455,22 +466,20 @@ namespace DCI.WebApp.Controllers
 						   Text = x.Lastname + ", " + x.Firstname
 					   }).ToList();
 
-				
+
 
 					if (response.IsSuccessStatusCode)
 					{
-						//return Json(new { success = true, message = responseBody });
-						return View(vm);
+						return Json(new { success = true, data = vm });
 					}
-					//return Json(new { success = false, message = responseBody });
-					return View(vm);
+					return Json(new { success = false, message = responseBody });
 				}
 			}
 			catch (Exception ex)
 			{
 				Log.Error(ex.ToString());
-				//return Json(new { success = false, message = ex.Message });
-				return View(model);
+				//return Json(new { success = false, message = ex.Message });	
+				return View();
 			}
 			finally
 			{
@@ -478,5 +487,93 @@ namespace DCI.WebApp.Controllers
 			}
 
 		}
+
+		public async Task<IActionResult> SaveRequestForm(DocumentViewModel model)
+		{
+			try
+			{
+				using (var _httpclient = new HttpClient())
+				{
+
+					model.CreatedBy = model.RequestById ?? 0;
+					model.StatusId = (int)EnumDocumentStatus.InProgress;
+
+					var data = new MultipartFormDataContent();
+					data.Add(new StringContent(model.DocId.ToString() ?? ""), "DocId");
+					data.Add(new StringContent(model.DocNo ?? ""), "DocNo");
+					data.Add(new StringContent(model.DocName ?? ""), "DocName");
+					data.Add(new StringContent(model.DocTypeId.ToString() ?? ""), "DocTypeId");
+					data.Add(new StringContent(model.Version.ToString() ?? ""), "Version");
+
+					data.Add(new StringContent(model.DepartmentId.ToString() ?? ""), "DepartmentId");
+					data.Add(new StringContent(model.DocCategory.ToString() ?? ""), "DocCategory");
+					data.Add(new StringContent(model.FormsProcess.ToString() ?? ""), "LabelId");
+					data.Add(new StringContent(model.StatusId.ToString() ?? ""), "StatusId");
+					data.Add(new StringContent(model.Reviewer.ToString() ?? ""), "Reviewer");
+					data.Add(new StringContent(model.Approver.ToString() ?? ""), "Approver");
+					data.Add(new StringContent(model.RequestById.ToString() ?? ""), "RequestById");
+					data.Add(new StringContent(model.SectionId.ToString() ?? ""), "SectionId");
+					data.Add(new StringContent(model.CreatedName.ToString() ?? ""), "CreatedName");
+					data.Add(new StringContent(model.DateCreated.ToString() ?? ""), "DateCreated");
+					data.Add(new StringContent(model.CreatedBy.ToString() ?? ""), "CreatedBy");
+					data.Add(new StringContent(model.ModifiedBy.ToString() ?? ""), "ModifiedBy");
+					data.Add(new StringContent(model.DateModified.ToString() ?? ""), "DateModified");
+					data.Add(new StringContent(model.IsActive.ToString() ?? ""), "IsActive");
+
+					if (model.DocFile != null)
+					{
+						var fileContent = new StreamContent(model.DocFile!.OpenReadStream());
+						data.Add(fileContent, "DocFile", model.DocFile.FileName);
+					}
+
+					var response = await _httpclient.PostAsync(_apiconfig.Value.apiConnection + "api/Document/SaveDocument", data);
+					var responseBody = await response.Content.ReadAsStringAsync();
+					if (response.IsSuccessStatusCode)
+					{
+						return Json(new { success = true, message = responseBody });
+					}
+					return Json(new { success = false, message = responseBody });
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.Message.ToString());
+				return Json(new { success = false, message = ex.Message });
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+		}
+
+		//public IActionResult QRCode()
+		//{
+		//	QRCodeGeneratorHelper qRCodeHelper = new QRCodeGeneratorHelper();
+
+		//	string text = "https://dms.com.ph/document/23";
+
+		//	byte[] QRCodeAsBytes = qRCodeHelper.GenerateQRCode(text);
+
+		//	string QRcodeAsImageBase64 = $"data:image/png;base64,{Convert.ToBase64String(QRCodeAsBytes)}";
+		//	ViewBag.QRCode = QRcodeAsImageBase64;
+
+		//	return View();
+		//}
+
+		//public IActionResult QRCode()
+		//{
+		//	QRCodeGenerator qrGenerator = new QRCodeGenerator();
+		//	QRCodeData qrCodeData = qrGenerator.CreateQrCode("", QRCodeGenerator.ECCLevel.Q);
+		
+
+		//	qrCodeImage.Save("filePath", ImageFormat.Png);
+
+
+		//	ViewBag.QRCode = qrCodeImage;
+
+		//	return View();
+		//}
+
+
 	}
 }

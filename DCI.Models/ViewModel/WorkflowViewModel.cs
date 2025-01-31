@@ -14,5 +14,8 @@
 		public int StatusId { get; set; } = 0;
 		public string ReviewedStatus { get; set; } = string.Empty;
 		public string ApprovedStatus { get; set; } = string.Empty;
+		public int Percentage { get; set; } =  0 ;
+		public string ReviewedRemarks { get; set; } = string.Empty;
+		public string ApprovedRemarks { get; set; } = string.Empty;
 	}
 }

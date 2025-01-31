@@ -55,6 +55,8 @@ namespace DCI.Models.ViewModel
 
 		public int CurrentUserId { get; set; } = 0;
 		public int CurrentRoleId { get; set; } = 0;
+
+	
 	}
 	
 

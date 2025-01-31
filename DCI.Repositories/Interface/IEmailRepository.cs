@@ -9,5 +9,6 @@ namespace DCI.Repositories.Interface
 		Task SendUploadFile(DocumentViewModel model);
 		Task SendSetPassword(string email);
 		Task SendApproval(DocumentViewModel model);
+		Task SendRequestor(DocumentViewModel model, ApprovalViewModel apprvm);
 	}
 }

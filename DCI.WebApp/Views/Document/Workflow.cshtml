@@ -114,9 +114,9 @@
     <!-- Progress Bar -->
     <div class="progress-container mb-4">
         <div class="progress">
-            <div class="progress-bar bg-success" role="progressbar" style="width: 33%;" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">33% Complete</div>
+            <div class="progress-bar bg-success" role="progressbar" style="width: @Model.Percentage%;" aria-valuenow="@Model.Percentage" aria-valuemin="0" aria-valuemax="100">@Model.Percentage% Complete</div>
         </div>
-        <small class="text-center d-block mt-2">Document is currently in the Review phase</small>
+        <small class="text-center d-block mt-2">Document is currently in the @Model.CurrentStatus phase</small>
     </div>
 
     <!-- Approval Steps Timeline -->
@@ -136,32 +136,103 @@
         </li>
 
         <!-- Reviewed By -->
-        <li class="timeline-item active">
-            <span class="timeline-icon">
-                <i class="fas fa-spinner"></i>
-            </span>
-            <div class="timeline-content">
-                <div class="step-title">Reviewed By</div>
-                <div class="step-details">
-                    <strong>@Model.ReviewedBy</strong> <br>
-                    <span>@Model.ReviewedStatus</span>
+        @if (Model.StatusId == 4)
+        {
+            <li class="timeline-item active">
+                <span class="timeline-icon">
+                    <i class="fas fa-spinner"></i>
+                </span>
+                <div class="timeline-content">
+                    <div class="step-title">Reviewed By</div>
+                    <div class="step-details">
+                        <strong>@Model.ReviewedBy</strong> <br>
+                        <span>
+                            @Model.ReviewedStatus
+                        </span>
+                    </div>
                 </div>
-            </div>
-        </li>
+            </li>
+        }
+        else
+        {
+            <li class="timeline-item completed">
+                <span class="timeline-icon">
+                    <i class="fas fa-check-circle"></i>
+                </span>
+                <div class="timeline-content">
+                    <div class="step-title">Reviewed By</div>
+                    <div class="step-details">
+                        <strong>@Model.ReviewedBy</strong> <br>
+                        <span>
+                            @Model.ReviewedByDatetime
+                        </span> <br />
+                        <span>
+                            @Model.ReviewedRemarks
+                        </span>
+                    </div>
+                </div>
+            </li>
+        }
+
+
 
         <!-- Approved By -->
-        <li class="timeline-item pending">
-            <span class="timeline-icon">
-                <i class="fas fa-hourglass-start"></i>
-            </span>
-            <div class="timeline-content">
-                <div class="step-title">Approved By</div>
-                <div class="step-details">
-                    <strong>@Model.ApprovedBy</strong> <br>
-                    <span>@Model.ApprovedStatus</span>
+        @if (Model.StatusId == 4)
+        {
+            <li class="timeline-item pending">
+                <span class="timeline-icon">
+                    <i class="fas fa-hourglass-start"></i>
+                </span>
+                <div class="timeline-content">
+                    <div class="step-title">Approved By</div>
+                    <div class="step-details">
+                        <strong>@Model.ApprovedBy</strong> <br>
+                        <span>
+                            @Model.ApprovedStatus
+                        </span>
+                    </div>
                 </div>
-            </div>
-        </li>
+            </li>
+        }
+        else if (Model.StatusId == 6)
+        {
+            <li class="timeline-item active">
+                <span class="timeline-icon">
+                    <i class="fas fa-spinner"></i>
+                </span>
+                <div class="timeline-content">
+                    <div class="step-title">Approved By</div>
+                    <div class="step-details">
+                        <strong>@Model.ApprovedBy</strong> <br>
+                        <span>
+                            @Model.ApprovedStatus
+                        </span> 
+                    </div>
+                </div>
+            </li>
+        }
+        else
+        {
+            <li class="timeline-item completed">
+                <span class="timeline-icon">
+                    <i class="fas fa-check-circle"></i>
+                </span>
+                <div class="timeline-content">
+                    <div class="step-title">Approved By</div>
+                    <div class="step-details">
+                        <strong>@Model.ApprovedBy</strong> <br>
+                        <span>
+                            @Model.ApprovedByDatetime
+                        </span>
+                        <br />
+                        <span>
+                            @Model.ApprovedRemarks
+                        </span>
+                    </div>
+                </div>
+            </li>
+        }
+
     </ul>
 </div>
 
