@@ -232,7 +232,24 @@
                 </div>
             </li>
         }
-
+            <li class="timeline-item completed">
+                <span class="timeline-icon">
+                    <i class="fas fa-check-circle"></i>
+                </span>
+                <div class="timeline-content">
+                    <div class="step-title">Approved By</div>
+                    <div class="step-details">
+                        <strong>@Model.ApprovedBy</strong> <br>
+                        <span>
+                            @Model.ApprovedByDatetime
+                        </span>
+                        <br />
+                        <span>
+                            @Model.ApprovedRemarks
+                        </span>
+                    </div>
+                </div>
+            </li>
     </ul>
 </div>
 

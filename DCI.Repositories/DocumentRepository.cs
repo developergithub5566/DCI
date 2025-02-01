@@ -310,7 +310,7 @@ namespace DCI.Repositories
 
 				entity.ModifiedBy = model.ModifiedBy ?? null;
 				entity.DateModified = model.DateModified ?? null;
-
+				entity.StatusId = model.StatusId ?? 0;
 				if (entity.Filename != null && entity.Filename != "")
 				{
 					entity.Version = Convert.ToInt16(entity.Version) + 1;
@@ -321,6 +321,8 @@ namespace DCI.Repositories
 
 				if (model.StatusId == (int)EnumDocumentStatus.ForReview)
 				{
+					model.Reviewer = entity.Reviewer;
+					model.Approver = entity.Approver;
 					await _emailRepository.SendApproval(model);
 				}
 				await _dbContext.SaveChangesAsync();
@@ -623,6 +625,8 @@ namespace DCI.Repositories
 			await _dbContext.SaveChangesAsync();
 
 			model.StatusId = entity.StatusId;
+			model.RequestById = entity.RequestById;
+			model.UploadLink = entity.UploadLink;
 			return model;
 		}	}
 }

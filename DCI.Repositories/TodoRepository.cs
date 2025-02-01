@@ -148,11 +148,14 @@ namespace DCI.Repositories
 
 				var NewDocumentViewModel = await _documentRepository.UpdateApprovalStatusByDocId(docVm, apprvm);
 
-				if (NewDocumentViewModel.StatusId == (int)EnumDocumentStatus.ForApproval || NewDocumentViewModel.StatusId == (int)EnumDocumentStatus.Approved)
+				if (NewDocumentViewModel.StatusId == (int)EnumDocumentStatus.ForApproval || 
+					NewDocumentViewModel.StatusId == (int)EnumDocumentStatus.Approved ||
+					NewDocumentViewModel.StatusId == (int)EnumDocumentStatus.InProgress)
 				{
 					await _emailRepository.SendRequestor(NewDocumentViewModel, apprvm);
 				}
-				if (NewDocumentViewModel.StatusId == (int)EnumDocumentStatus.ForApproval || NewDocumentViewModel.StatusId == (int)EnumDocumentStatus.ForReview)
+				if (NewDocumentViewModel.StatusId == (int)EnumDocumentStatus.ForApproval || 
+					NewDocumentViewModel.StatusId == (int)EnumDocumentStatus.ForReview)
 				{
 					await _emailRepository.SendApproval(NewDocumentViewModel);
 				}

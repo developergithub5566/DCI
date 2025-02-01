@@ -242,7 +242,15 @@ namespace DCI.Repositories
 
 		public async Task SendRequestor(DocumentViewModel model, ApprovalViewModel apprvm)
 		{
-			model = await RequestorNotificationBodyMessage(model, apprvm);
+			if(!apprvm.Action)
+			{
+				model = await DisapprovedReuploadBodyMessage(model, apprvm);
+			}
+			else
+			{
+				model = await RequestorNotificationBodyMessage(model, apprvm);
+			}
+		
 
 			apprvm.ApprovalStatus = apprvm.Action == true ? Constants.Approval_Approved : Constants.Approval_Disapproved;
 
@@ -261,7 +269,7 @@ namespace DCI.Repositories
 			var userEntity = await _userRepository.GetUserById(model.RequestById ?? default(int));
 
 
-			if(model.StatusId == (int)EnumDocumentStatus.Approved)
+			if (model.StatusId == (int)EnumDocumentStatus.Approved)
 			{
 				apprvm.ApprovalStatus = apprvm.Action == true ? Constants.Approval_Approved : Constants.Approval_Disapproved;
 			}
@@ -270,9 +278,12 @@ namespace DCI.Repositories
 				apprvm.ApprovalStatus = apprvm.Action == true ? Constants.Approval_Reviewed : Constants.Approval_Disapproved;
 			}
 
+			if (model.StatusId == (int)EnumDocumentStatus.InProgress && !apprvm.Action)
+			{
+				apprvm.ApprovalStatus = Constants.Approval_Disapproved;
+			}
 
-
-				string link = _apiconfig.Value.WebAppConnection + "Document";
+			string link = _apiconfig.Value.WebAppConnection + "Document";
 			model.RequestByEmail = userEntity.Email;
 			model.EmailBody = $@"
             <html>
@@ -280,8 +291,33 @@ namespace DCI.Repositories
                 <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
                 
                  <p>This is an automated message from DCI Application.</p>
-                 <p>The document (Document No: <a href='{link}'> { model.DocNo }</a>)  has been {apprvm.ApprovalStatus.ToLower()}.</p>   
+                 <p>The document (Document No: <a href='{link}'> {model.DocNo}</a>)  has been {apprvm.ApprovalStatus.ToLower()}.</p>   
               
+                <p>If you encounter any issues, please contact our support team at [DCI Application Support].</p>            
+                <p>Thank you,<br />Your DCI</p>
+            </body>
+            </html>";
+
+			return model;
+		}
+
+		async Task<DocumentViewModel> DisapprovedReuploadBodyMessage(DocumentViewModel model, ApprovalViewModel apprvm)
+		{
+			var userEntity = await _userRepository.GetUserById(model.RequestById ?? default(int));
+
+			apprvm.ApprovalStatus = Constants.Approval_Disapproved;
+
+			string link = _apiconfig.Value.WebAppConnection + "Document/Upload?token=";
+			model.RequestByEmail = userEntity.Email;
+			model.EmailBody = $@"
+            <html>
+            <body>              
+                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
+                
+                 <p>This is an automated message from DCI Application.</p>
+                 <p>The document (Document No: <a href='{link}'> {model.DocNo}</a>)  has been {apprvm.ApprovalStatus.ToLower()}.</p>   
+				 <p>Please upload the updated document </p> <a href='{link + model.UploadLink}'>Upload File</a>
+
                 <p>If you encounter any issues, please contact our support team at [DCI Application Support].</p>            
                 <p>Thank you,<br />Your DCI</p>
             </body>

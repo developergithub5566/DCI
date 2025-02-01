@@ -344,6 +344,7 @@ namespace DCI.WebApp.Controllers
 					data.Add(new StringContent(model.DocId.ToString() ?? ""), "DocId");
 					data.Add(new StringContent(model.DocNo.ToString() ?? ""), "DocNo");
 					data.Add(new StringContent(model.RequestById.ToString() ?? ""), "ModifiedBy");
+					data.Add(new StringContent(model.StatusId.ToString() ?? ""), "StatusId");
 					data.Add(new StringContent(DateTime.Now.ToString() ?? ""), "DateModified");
 
 					if (model.DocFile != null)
