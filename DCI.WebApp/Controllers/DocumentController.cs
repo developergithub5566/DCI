@@ -424,7 +424,46 @@ namespace DCI.WebApp.Controllers
 
 			return View();
 		}
-		public ActionResult RequestForm()
+
+        public async Task<IActionResult> ApprovalHistory(DocumentViewModel model)
+        {
+            try
+            {          
+
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    model.ModifiedBy = currentUser.UserId;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Document/ApprovalHistory");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode)
+                    {
+                       ApprovalHistoryHeaderViewmodel approvalHeader = JsonConvert.DeserializeObject<ApprovalHistoryHeaderViewmodel>(responseBody)!;
+                        return View(approvalHeader);
+                    }
+                    //return Json(new { success = false, message = responseBody });
+                    return View();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+
+            return View();
+        }
+
+        public ActionResult RequestForm()
 		{
 			DocumentViewModel model = new DocumentViewModel();
 			return View(model);

@@ -1,4 +1,4 @@
-﻿@model DCI.Models.ViewModel.WorkflowViewModel
+﻿@model DCI.Models.ViewModel.ApprovalHistoryHeaderViewmodel
 
 <!DOCTYPE html>
 
@@ -116,124 +116,71 @@
         <div class="progress">
             <div class="progress-bar bg-success" role="progressbar" style="width: @Model.Percentage%;" aria-valuenow="@Model.Percentage" aria-valuemin="0" aria-valuemax="100">@Model.Percentage% Complete</div>
         </div>
-        <small class="text-center d-block mt-2">Document is currently in the @Model.CurrentStatus phase</small>
     </div>
+    <small class="text-center d-block mt-2">Document is currently in the @Model.CurrentStatus phase</small>
+</div>
 
-    <!-- Approval Steps Timeline -->
-    <ul class="timeline">
-        <!-- Prepared By -->
-        <li class="timeline-item completed">
-            <span class="timeline-icon">
-                <i class="fas fa-check-circle"></i>
-            </span>
-            <div class="timeline-content">
-                <div class="step-title">Request By</div>
-                <div class="step-details">
-                    <strong>@Model.RequestBy</strong> <br>
-                    <span>@Model.RequestByDatetime</span>
-                </div>
+<!-- Approval Steps Timeline -->
+<ul class="timeline">
+    <!-- Prepared By -->
+    <li class="timeline-item completed">
+        <span class="timeline-icon">
+            <i class="fas fa-check-circle"></i>
+        </span>
+        <div class="timeline-content">
+            <div class="step-title">Request By</div>
+            <div class="step-details">
+                <strong>@Model.RequestBy</strong> <br>
+                <span>@Model.RequestByDatetime.ToString("MM/dd/yyyy hh:mmtt")</span>
             </div>
-        </li>
-
-        <!-- Reviewed By -->
-        @if (Model.StatusId == 4)
-        {
-            <li class="timeline-item active">
-                <span class="timeline-icon">
-                    <i class="fas fa-spinner"></i>
-                </span>
-                <div class="timeline-content">
-                    <div class="step-title">Reviewed By</div>
-                    <div class="step-details">
-                        <strong>@Model.ReviewedBy</strong> <br>
-                        <span>
-                            @Model.ReviewedStatus
-                        </span>
-                    </div>
-                </div>
-            </li>
-        }
-        else
+        </div>
+    </li>
+    @if (Model.ApprovalDetails != null)
+    {
+        @foreach (var app in Model.ApprovalDetails)
         {
             <li class="timeline-item completed">
                 <span class="timeline-icon">
                     <i class="fas fa-check-circle"></i>
                 </span>
                 <div class="timeline-content">
-                    <div class="step-title">Reviewed By</div>
-                    <div class="step-details">
-                        <strong>@Model.ReviewedBy</strong> <br>
-                        <span>
-                            @Model.ReviewedByDatetime
-                        </span> <br />
-                        <span>
-                            @Model.ReviewedRemarks
-                        </span>
-                    </div>
-                </div>
-            </li>
-        }
+                    @if (app.ApproverId > 0 && app.Action == true)
+                    {
+                        @if (Model.Reviewer == app.ApproverId)
+                        {
+                            <div class="step-title">Reviewed By</div>
+                        }
+                        else
+                        {
+                            <div class="step-title">Approved By</div>
+                        }
 
+                    }
+                    else if (app.ApproverId > 0 && app.Action == false)
+                    {
+                        <div class="step-title">Disapproved By</div>
+                    }
+                    else
+                    {
+                        <div class="step-title">Upload By</div>
+                    }
 
-
-        <!-- Approved By -->
-        @if (Model.StatusId == 4)
-        {
-            <li class="timeline-item pending">
-                <span class="timeline-icon">
-                    <i class="fas fa-hourglass-start"></i>
-                </span>
-                <div class="timeline-content">
-                    <div class="step-title">Approved By</div>
                     <div class="step-details">
-                        <strong>@Model.ApprovedBy</strong> <br>
+                        <strong>@app.Approver</strong> <br>
                         <span>
-                            @Model.ApprovedStatus
-                        </span>
-                    </div>
-                </div>
-            </li>
-        }
-        else if (Model.StatusId == 6)
-        {
-            <li class="timeline-item active">
-                <span class="timeline-icon">
-                    <i class="fas fa-spinner"></i>
-                </span>
-                <div class="timeline-content">
-                    <div class="step-title">Approved By</div>
-                    <div class="step-details">
-                        <strong>@Model.ApprovedBy</strong> <br>
-                        <span>
-                            @Model.ApprovedStatus
-                        </span> 
-                    </div>
-                </div>
-            </li>
-        }
-        else
-        {
-            <li class="timeline-item completed">
-                <span class="timeline-icon">
-                    <i class="fas fa-check-circle"></i>
-                </span>
-                <div class="timeline-content">
-                    <div class="step-title">Approved By</div>
-                    <div class="step-details">
-                        <strong>@Model.ApprovedBy</strong> <br>
-                        <span>
-                            @Model.ApprovedByDatetime
+                            @app.DateCreated.ToString("MM/dd/yyyy hh:mmtt")
                         </span>
                         <br />
                         <span>
-                            @Model.ApprovedRemarks
+                            <b>Remarks: </b>  @app.Remarks
                         </span>
                     </div>
                 </div>
             </li>
         }
-      
-    </ul>
+    }
+
+</ul>
 </div>
 
 

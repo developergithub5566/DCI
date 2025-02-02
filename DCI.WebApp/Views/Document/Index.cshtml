@@ -166,7 +166,7 @@
                                     <a href="#" onclick="editForm(@item.DocId,1)" title="View" class="btn btn-primary @(canView ? "" : "disabled") "><i class="fas fa-search"></i></a> |
                                     <a href="#" id="editForm" onclick="editForm(@item.DocId,0)" title="Update" class="btn btn-info @(canEdit ? "" : "disabled") "><i class="fa fa-edit"></i></a> |
                                     <a href="#" id="deleteform" onclick="deleteform(@item.DocId)" title="Delete" class="btn btn-danger @(canDelete ? "" : "disabled") "><i class="far fa-trash-alt"></i></a>
-                                    <a asp-controller="Document" asp-action="Workflow" asp-route-docid="@item.DocId" class="btn btn-success">
+                                    <a asp-controller="Document" asp-action="ApprovalHistory" asp-route-docid="@item.DocId" class="btn btn-success">
                                         <i class="fa fa-info-circle"></i>
                                     </a>
                                 </td>

@@ -316,7 +316,7 @@ namespace DCI.Repositories
                 
                  <p>This is an automated message from DCI Application.</p>
                  <p>The document (Document No: <a href='{link}'> {model.DocNo}</a>)  has been {apprvm.ApprovalStatus.ToLower()}.</p>   
-				 <p>Please upload the updated document </p> <a href='{link + model.UploadLink}'>Upload File</a>
+				 <p>Please upload the updated document. </p> <a href='{link + model.UploadLink}'>Upload File</a>
 
                 <p>If you encounter any issues, please contact our support team at [DCI Application Support].</p>            
                 <p>Thank you,<br />Your DCI</p>

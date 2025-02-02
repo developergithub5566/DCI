@@ -107,5 +107,12 @@ namespace DCI.API.Controllers
 		{
 			return Ok(await _documentRepository.Workflow(model));
 		}
-	}
+
+        [HttpPost]
+        [Route("ApprovalHistory")]
+        public async Task<IActionResult> ApprovalHistory([FromBody] DocumentViewModel model)
+        {
+            return Ok(await _documentRepository.ApprovalHistory(model));
+        }
+    }
 }

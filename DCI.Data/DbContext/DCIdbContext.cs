@@ -28,8 +28,9 @@ namespace DCI.Data
 		public DbSet<Status> Status { get; set; }
 		public DbSet<Section> Section { get; set; }
 		public DbSet<ApprovalHistory> ApprovalHistory { get; set; }
-
-		protected override void OnModelCreating(ModelBuilder modelBuilder)
+        public DbSet<RequestorHistory> RequestorHistory { get; set; }
+        
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<AuditLog>().Property(ae => ae.Changes).HasConversion(
 				value => JsonConvert.SerializeObject(value),
