@@ -16,6 +16,7 @@ namespace DCI.Repositories.Interface
 		Task<WorkflowViewModel> Workflow(DocumentViewModel model);
 		Task<DocumentViewModel> UpdateApprovalStatusByDocId(DocumentViewModel model, ApprovalViewModel apprvm);
         Task<ApprovalHistoryHeaderViewmodel> ApprovalHistory(DocumentViewModel param);
-
+        Task<DocumentViewModel> GenerateQRCode(DocumentViewModel model);
+		Task<DocumentDetailsViewModel> Details(DocumentViewModel model);
     }
 }

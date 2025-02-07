@@ -349,6 +349,69 @@ namespace DCI.Repositories
             }
         }
 
+        private async Task SaveFileFinalPDF(DocumentViewModel model)
+        {
+            try
+            {
+                string fileloc = _filelocation.Value.FileLocation + model.DocId.ToString() + @"\";
+                string filename = model.FinalOutputPDF.FileName.Replace(",", "");
+
+                if (!Directory.Exists(fileloc))
+                    Directory.CreateDirectory(fileloc);
+
+                string filenameLocation = Path.Combine(fileloc, filename);
+
+                if (System.IO.File.Exists(filenameLocation))
+                {
+                    System.IO.File.SetAttributes(filenameLocation, FileAttributes.Normal); // Remove read-only attribute if needed
+                    System.IO.File.Delete(filenameLocation); // Ensure the file is not locked
+                }
+                using (var stream = new FileStream(filenameLocation, FileMode.Create, FileAccess.Write, FileShare.None))
+                {
+                    model.FinalOutputPDF.CopyTo(stream);
+                }
+
+                var entity = await _dbContext.Document.FirstOrDefaultAsync(x => x.DocId == model.DocId && x.IsActive == true);
+                entity.FileLocation = fileloc;
+
+
+                entity.ModifiedBy = model.ModifiedBy ?? null;
+                entity.DateModified = model.DateModified ?? null;
+                entity.StatusId = model.StatusId ?? 0;
+                if (entity.Filename != null && entity.Filename != "")
+                {
+                    entity.Version = Convert.ToInt16(entity.Version) + 1;
+                    entity.DocNo = IncrementVersion(entity.DocNo);
+                }
+                entity.Filename = filename;
+                _dbContext.Document.Entry(entity).State = EntityState.Modified;
+
+                RequestorHistoryViewModel requestirViewModel = new RequestorHistoryViewModel();
+                requestirViewModel.DocId = entity.DocId;
+                requestirViewModel.RequestById = entity.RequestById ?? 0;
+                await _requestHistoryRepository.Save(requestirViewModel);
+
+
+                await _dbContext.SaveChangesAsync();
+
+                if (model.StatusId == (int)EnumDocumentStatus.ForReview)
+                {
+                    model.Reviewer = entity.Reviewer;
+                    model.Approver = entity.Approver;
+                    await _emailRepository.SendApproval(model);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+
         private async Task<string> GenerateDocCode(DocumentViewModel param)
         {
 
@@ -512,9 +575,59 @@ namespace DCI.Repositories
 
         public async Task<(int statuscode, string message)> UploadFile(DocumentViewModel model)
         {
-            await SaveFile(model);
+            if (model.DocFile is not null && model.DocFile.Length > 0)
+            {
+                await SaveFile(model);
+            }
+
+            if (model.FinalOutputPDF is not null && model.FinalOutputPDF.Length > 0)
+            {
+                await SaveFileFinalPDF(model);
+            }
+
             return (StatusCodes.Status200OK, "Your file has been successfully uploaded.");
         }
+
+        public async Task<DocumentViewModel> GenerateQRCode(DocumentViewModel model)
+        {
+            try
+            {
+                var _doc = _dbContext.Document.Where(x => x.DocId == model.DocId).FirstOrDefault();
+
+
+                string fileloc = _doc?.FileLocation + @"\";
+
+
+                if (!Directory.Exists(fileloc))
+                    Directory.CreateDirectory(fileloc);
+
+                string filenameLocation = Path.Combine(fileloc, model.QRCodeImage.FileName);
+
+                using (var stream = new FileStream(filenameLocation, FileMode.Create, FileAccess.Write))
+                {
+                    model.QRCodeImage.CopyTo(stream);
+                }
+                model.Filename = _doc.Filename;
+                model.FileLocation = _doc.FileLocation; //_doc.FileLocation;
+                model.QRCodeImage = null;
+                return model;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+
+                //  return (StatusCodes.Status406NotAcceptable, ex.ToString());
+                return null;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+
+        }
+
+
+
         public async Task<IList<HomePageViewModel>> HomePage()
         {
             var doctypeList = _dbContext.DocumentType.Where(x => x.IsActive == true);
@@ -610,126 +723,206 @@ namespace DCI.Repositories
 
         public async Task<DocumentViewModel> UpdateApprovalStatusByDocId(DocumentViewModel model, ApprovalViewModel apprvm)
         {
-            var entity = await _dbContext.Document.FirstOrDefaultAsync(x => x.DocId == model.DocId);
-
-            if (entity.StatusId == (int)EnumDocumentStatus.ForReview && apprvm.Action)
+            try
             {
-                entity.StatusId = (int)EnumDocumentStatus.ForApproval;
-            }
-            else if (entity.StatusId == (int)EnumDocumentStatus.ForApproval && apprvm.Action)
-            {
-                entity.StatusId = (int)EnumDocumentStatus.Approved;
-            }
-            else if (entity.StatusId == (int)EnumDocumentStatus.ForReview && !apprvm.Action)
-            {
-                entity.StatusId = (int)EnumDocumentStatus.InProgress;
-            }
-            else if (entity.StatusId == (int)EnumDocumentStatus.ForApproval && !apprvm.Action)
-            {
-                entity.StatusId = (int)EnumDocumentStatus.InProgress;
-            }
+                var entity = await _dbContext.Document.FirstOrDefaultAsync(x => x.DocId == model.DocId);
 
-            entity.DateModified = DateTime.Now;
-            entity.ModifiedBy = model.ModifiedBy;
-            entity.IsActive = true;
+                if (entity.StatusId == (int)EnumDocumentStatus.ForReview && apprvm.Action)
+                {
+                    entity.StatusId = (int)EnumDocumentStatus.ForApproval;
+                }
+                else if (entity.StatusId == (int)EnumDocumentStatus.ForApproval && apprvm.Action)
+                {
+                    entity.StatusId = (int)EnumDocumentStatus.Approved;
+                }
+                else if (entity.StatusId == (int)EnumDocumentStatus.ForReview && !apprvm.Action)
+                {
+                    entity.StatusId = (int)EnumDocumentStatus.InProgress;
+                }
+                else if (entity.StatusId == (int)EnumDocumentStatus.ForApproval && !apprvm.Action)
+                {
+                    entity.StatusId = (int)EnumDocumentStatus.InProgress;
+                }
 
-            _dbContext.Document.Entry(entity).State = EntityState.Modified;
-            await _dbContext.SaveChangesAsync();
+                entity.DateModified = DateTime.Now;
+                entity.ModifiedBy = model.ModifiedBy;
+                entity.IsActive = true;
 
-            model.StatusId = entity.StatusId;
-            model.RequestById = entity.RequestById;
-            model.UploadLink = entity.UploadLink;
-            return model;
+                _dbContext.Document.Entry(entity).State = EntityState.Modified;
+                await _dbContext.SaveChangesAsync();
+
+                model.StatusId = entity.StatusId;
+                model.RequestById = entity.RequestById;
+                model.UploadLink = entity.UploadLink;
+                return model;
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return model;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
         public async Task<ApprovalHistoryHeaderViewmodel> ApprovalHistory(DocumentViewModel param)
         {
             ApprovalHistoryHeaderViewmodel approvalHeader = new ApprovalHistoryHeaderViewmodel();
-            // var docContext = await _dbContext.Document.Where(x => x.IsActive == true && x.DocId == param.DocId).FirstOrDefaultAsync();
-            var docContext = await (from doc in _dbContext.Document
-                             join usr in _dbContext.User on doc.RequestById equals usr.UserId into usrGroup
-                             from usr in usrGroup.DefaultIfEmpty()
-                             join stat in _dbContext.Status on doc.StatusId equals stat.StatusId into statGroup
-                             from stat in statGroup.DefaultIfEmpty()
-                             where doc.DocId == param.DocId
-                             select new ApprovalHistoryHeaderViewmodel
-                             {
-                                 RequestBy = usr != null ? (usr.Firstname + " " + usr.Lastname) : string.Empty,
-                                 RequestByDatetime = doc.DateCreated,
-                                 CurrentStatus = stat.StatusName,
-                                 StatusId = doc.StatusId,
-                                 Reviewer = doc.Reviewer,
-                                 Approver = doc.Approver
-                             }).FirstOrDefaultAsync();
+            try
+            {
 
-            var approvalHistoryQuery = await (
-                    from ah in _dbContext.ApprovalHistory
-                    join usr in _dbContext.User on ah.ApproverId equals usr.UserId into usrGroup
+                // var docContext = await _dbContext.Document.Where(x => x.IsActive == true && x.DocId == param.DocId).FirstOrDefaultAsync();
+                var docContext = await (from doc in _dbContext.Document
+                                        join usr in _dbContext.User on doc.RequestById equals usr.UserId into usrGroup
+                                        from usr in usrGroup.DefaultIfEmpty()
+                                        join stat in _dbContext.Status on doc.StatusId equals stat.StatusId into statGroup
+                                        from stat in statGroup.DefaultIfEmpty()
+                                        where doc.DocId == param.DocId
+                                        select new ApprovalHistoryHeaderViewmodel
+                                        {
+                                            RequestBy = usr != null ? (usr.Firstname + " " + usr.Lastname) : string.Empty,
+                                            RequestByDatetime = doc.DateCreated,
+                                            CurrentStatus = stat.StatusName,
+                                            StatusId = doc.StatusId,
+                                            Reviewer = doc.Reviewer,
+                                            Approver = doc.Approver
+                                        }).FirstOrDefaultAsync();
+
+                var approvalHistoryQuery = await (
+                        from ah in _dbContext.ApprovalHistory
+                        join usr in _dbContext.User on ah.ApproverId equals usr.UserId into usrGroup
+                        from usr in usrGroup.DefaultIfEmpty()
+                        where ah.DocId == param.DocId
+                        select new ApprovalHistoryDetailViewmodel
+                        {
+                            DocId = ah.DocId,
+                            ApproverId = (int?)ah.ApproverId, // Ensure it's nullable for consistency
+                            Action = (bool?)ah.Action, // Make nullable to match second query
+                            Approver = usr != null ? (usr.Firstname + " " + usr.Lastname) : string.Empty,
+                            DateCreated = ah.DateCreated,
+                            Remarks = ah.Remarks
+                        }
+                    ).ToListAsync();
+
+                var requestorHistoryQuery = await (
+                    from rh in _dbContext.RequestorHistory
+                    join usr in _dbContext.User on rh.RequestById equals usr.UserId into usrGroup
                     from usr in usrGroup.DefaultIfEmpty()
-                    where ah.DocId == param.DocId
+                    where rh.DocId == param.DocId
                     select new ApprovalHistoryDetailViewmodel
                     {
-                        DocId = ah.DocId,
-                        ApproverId = (int?)ah.ApproverId, // Ensure it's nullable for consistency
-                        Action = (bool?)ah.Action, // Make nullable to match second query
+                        DocId = rh.DocId,
+                        ApproverId = (int?)null, // No Approver in this table
+                        Action = (bool?)null, // No Action column, so we set it to null
                         Approver = usr != null ? (usr.Firstname + " " + usr.Lastname) : string.Empty,
-                        DateCreated = ah.DateCreated,
-                        Remarks = ah.Remarks
+                        DateCreated = rh.DateCreated,
+                        Remarks = string.Empty
                     }
                 ).ToListAsync();
 
-            var requestorHistoryQuery = await (
-                from rh in _dbContext.RequestorHistory
-                join usr in _dbContext.User on rh.RequestById equals usr.UserId into usrGroup
-                from usr in usrGroup.DefaultIfEmpty()
-                where rh.DocId == param.DocId
-                select new ApprovalHistoryDetailViewmodel
+                // Combine the lists after materializing them
+                var combinedQuery = approvalHistoryQuery
+                    .Concat(requestorHistoryQuery)
+                    .OrderBy(x => x.DateCreated)
+                    .ToList();
+
+                approvalHeader.ApprovalDetails = combinedQuery;
+                approvalHeader.RequestByDatetime = docContext.RequestByDatetime;
+                approvalHeader.RequestBy = docContext.RequestBy;
+                approvalHeader.CurrentStatus = docContext.CurrentStatus;
+                approvalHeader.Reviewer = docContext.Reviewer;
+                approvalHeader.Approver = docContext.Approver;
+
+                if (docContext.StatusId == (int)EnumDocumentStatus.ForReview)
                 {
-                    DocId = rh.DocId,
-                    ApproverId = (int?)null, // No Approver in this table
-                    Action = (bool?)null, // No Action column, so we set it to null
-                    Approver = usr != null ? (usr.Firstname + " " + usr.Lastname) : string.Empty,
-                    DateCreated = rh.DateCreated,
-                  Remarks = string.Empty                 
+                    approvalHeader.CurrentStatus = "Review";
+                    approvalHeader.Percentage = 33;
+
                 }
-            ).ToListAsync();
-
-            // Combine the lists after materializing them
-            var combinedQuery = approvalHistoryQuery
-                .Concat(requestorHistoryQuery)
-                .OrderBy(x => x.DateCreated)
-                .ToList();
-
-            approvalHeader.ApprovalDetails = combinedQuery;         
-            approvalHeader.RequestByDatetime = docContext.RequestByDatetime;
-            approvalHeader.RequestBy = docContext.RequestBy;
-            approvalHeader.CurrentStatus = docContext.CurrentStatus;
-            approvalHeader.Reviewer = docContext.Reviewer;
-            approvalHeader.Approver = docContext.Approver;
-
-            if (docContext.StatusId == (int)EnumDocumentStatus.ForReview)
-            {
-                //query.ReviewedStatus = EnumDocumentStatus.InProgress.ToString();
-                //query.ApprovedStatus = EnumDocumentStatus.Pending.ToString();
-                approvalHeader.CurrentStatus = "Review";
-                approvalHeader.Percentage = 33;
-
+                else if (docContext.StatusId == (int)EnumDocumentStatus.ForApproval)
+                {
+                    approvalHeader.CurrentStatus = "Approval";
+                    approvalHeader.Percentage = 66;
+                }
+                else if (docContext.StatusId == (int)EnumDocumentStatus.Approved)
+                {
+                    approvalHeader.CurrentStatus = "Completed";
+                    approvalHeader.Percentage = 100;
+                }
+                return approvalHeader;
             }
-            else if (docContext.StatusId == (int)EnumDocumentStatus.ForApproval)
+            catch (Exception ex)
             {
-                //query.ReviewedStatus = EnumDocumentStatus.Reviewed.ToString();
-                //query.ApprovedStatus = EnumDocumentStatus.InProgress.ToString();
-                approvalHeader.CurrentStatus = "Approval";
-                approvalHeader.Percentage = 66;
+                Log.Error(ex.ToString());
+                return approvalHeader;
             }
-            else if (docContext.StatusId == (int)EnumDocumentStatus.Approved)
+            finally
             {
-                approvalHeader.CurrentStatus = "Completed";
-                approvalHeader.Percentage = 100;
+                Log.CloseAndFlush();
             }
-
-
-            return approvalHeader;
         }
+
+        public async Task<DocumentDetailsViewModel> Details(DocumentViewModel model)
+        {
+            try
+            {                
+                var context = _dbContext.Document.AsQueryable();
+                var doctypeList = _dbContext.DocumentType.Where(x => x.IsActive == true).AsQueryable().ToList();
+                var departmentList = _dbContext.Department.Where(x => x.IsActive == true).AsQueryable().ToList();
+                var sectionList = _dbContext.Section.Where(x => x.IsActive == true).AsQueryable().ToList();               
+                var userList = _dbContext.User.Where(x => x.IsActive).OrderBy(x => x.Lastname).ToList();
+
+                var result = await (from doc in context
+                              join usr in _dbContext.User on doc.RequestById equals usr.UserId into usrGroup
+                              from usr in usrGroup.DefaultIfEmpty()
+
+                              join reviewer in _dbContext.User on doc.Reviewer equals reviewer.UserId into reviewerGroup
+                              from reviewer in reviewerGroup.DefaultIfEmpty()
+
+                              join apprUser in _dbContext.User on doc.Approver equals apprUser.UserId into apprUserGroup
+                              from apprUser in apprUserGroup.DefaultIfEmpty()
+
+                              join stat in _dbContext.Status on doc.StatusId equals stat.StatusId into statGroup
+                              from stat in statGroup.DefaultIfEmpty()
+
+                              join dept in _dbContext.Department on doc.DepartmentId equals dept.DepartmentId into deptGroup
+                              from dept in deptGroup.DefaultIfEmpty()
+
+                              join docType in _dbContext.DocumentType on doc.DocTypeId equals docType.DocTypeId into doctypeGroup
+                              from docType in doctypeGroup.DefaultIfEmpty()
+
+
+                              where doc.DocId == model.DocId &&
+                              doc.IsActive == true
+                              select new DocumentDetailsViewModel
+                              {
+                                  DocId = doc.DocId,
+                                  DocName = doc.DocName,
+                                  DocNo = doc.DocNo,                             
+                                  DocDept = dept.DepartmentName,
+                                  DocTypeName = docType.Name,
+                                  Requestor = usr.Lastname + " " + usr.Firstname,
+                                  Status = stat.StatusName,
+                                  Reviewer = reviewer.Lastname + " " + reviewer.Firstname,
+                                  Approver = apprUser.Lastname + " " + apprUser.Firstname,
+                                  DateCreated = doc.DateCreated.ToString()
+                              }).FirstOrDefaultAsync();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return null;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
     }
 }

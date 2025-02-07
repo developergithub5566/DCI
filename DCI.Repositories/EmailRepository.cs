@@ -250,12 +250,19 @@ namespace DCI.Repositories
 			{
 				model = await RequestorNotificationBodyMessage(model, apprvm);
 			}
-		
-
-			apprvm.ApprovalStatus = apprvm.Action == true ? Constants.Approval_Approved : Constants.Approval_Disapproved;
 
 
-			MailMessage mail = new MailMessage();
+            if (model.StatusId == (int)EnumDocumentStatus.Approved)
+            {
+                apprvm.ApprovalStatus = apprvm.Action == true ? Constants.Approval_Approved : Constants.Approval_Disapproved;
+            }
+            else if (model.StatusId == (int)EnumDocumentStatus.ForApproval)
+            {
+                apprvm.ApprovalStatus = apprvm.Action == true ? Constants.Approval_Reviewed : Constants.Approval_Disapproved;
+            }
+
+
+            MailMessage mail = new MailMessage();
 			mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
 			mail.Subject = "DCI App - Your document No. " + model.DocNo + " has been " + apprvm.ApprovalStatus.ToLower();
 			mail.Body = model.EmailBody;

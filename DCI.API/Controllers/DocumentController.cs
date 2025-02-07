@@ -94,7 +94,14 @@ namespace DCI.API.Controllers
 			return StatusCode(result.statuscode, result.message);
 		}
 
-		[HttpGet]
+        [HttpPost]
+        [Route("GenerateQRCode")]
+        public async Task<IActionResult> GenerateQRCode(DocumentViewModel model)
+        {
+            return Ok(await _documentRepository.GenerateQRCode(model));    
+        }
+
+        [HttpGet]
 		[Route("HomePage")]
 		public async Task<IActionResult> HomePage()
 		{			
@@ -113,6 +120,13 @@ namespace DCI.API.Controllers
         public async Task<IActionResult> ApprovalHistory([FromBody] DocumentViewModel model)
         {
             return Ok(await _documentRepository.ApprovalHistory(model));
+        }
+
+        [HttpPost]
+        [Route("Details")]
+        public async Task<IActionResult> Details([FromBody] DocumentViewModel model)
+        {
+            return Ok(await _documentRepository.Details(model));
         }
     }
 }

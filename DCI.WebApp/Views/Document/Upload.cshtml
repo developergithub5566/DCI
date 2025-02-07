@@ -1,52 +1,5 @@
 ﻿@model DCI.Models.ViewModel.DocumentViewModel
 
-
-<style>
-    /* input[type=file]::file-selector-button {
-                            border: 2px solid #6c5ce7;
-                            padding: .2em .4em;
-                            border-radius: .2em;
-                            background-color: #a29bfe;
-                            transition: 1s;
-                        }
-
-                            input[type=file]::file-selector-button:hover {
-                                background-color: #81ecec;
-                                border: 2px solid #00cec9;
-                            } */
-
-</style>
-
-@* <div class="container">
-	<form id="createForm">
-		<input type="hidden" id="DocId" name="DocId" value="@Model.DocId" >
-		<div class="row">
-			<div class="col-md-4">
-				<label for="DocNo" class="col-form-label">Document No:</label>
-				<input type="text" class="form-control" id="DocNo" name="DocNo" value="@Model.DocNo" disabled>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-4">
-				<label for="DocName" class="col-form-label">Document Name:</label>
-				<input type="text" class="form-control" id="DocName" name="DocName" value="@Model.DocName" disabled>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-4">
-				<label for="DocName" class="col-form-label">Upload:</label>
-				<input type="file" class="form-control" id="fileUpload" name="fileUpload" />
-			</div>
-		</div>
-		<br />
-		<div class="row">
-			<div class="col-md-4">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-				<button type="submit" class="btn btn-primary">Submit</button>
-			</div>
-		</div>
-	</form>
-</div> *@
 <div class="loginBG">
     <div class="spinner-overlay">
         <div class="spinner-border text-light" role="status">
@@ -59,12 +12,15 @@
             <div class="offset-xl-4 offset-lg-3 offset-md-2 offset-1 col-xl-4 col-lg-6 col-md-8 col-10">
                 <div class="loginDiv">
                     <label class="title">Please upload your file</label>
-                    @* <p class="desc">Enter your email below to reset your password</p> *@
+  
 
                     <form id="createForm" method="post">
                         <input type="hidden" id="DocId" name="DocId" value="@Model.DocId">
                         <input type="hidden" id="RequestById" name="RequestById" value="@Model.RequestById">
                         <input type="hidden" id="Filename" name="Filename" value="@Model.Filename">
+                        <div id="blobpdf" hidden></div>
+                        <div id="qrcode" hidden></div>
+
 
                         <div class="form-group">
                             <label for="DocNo" class="col-form-label">Document No:</label>
@@ -82,15 +38,16 @@
 
                         <div class="form-group">
                             <button type="submit" class="btn btn-primary btn-block w-100">Submit</button>
-                        </div>
+                        </div> 
+
+                        <iframe id="pdfViewer" width="100%" height="600px" enctype="multipart/form-data" hidden >
+                            <input type="file" id="finalOutputPDF" name="finalOutputPDF" >
+                        </iframe>
                     </form>
                 </div>
-
-
-
             </div>
             <div class="copyrights">
-                <label>&copy; 2024 DBP Data Center Inc.</label>
+                <label>&copy; 2025 DBP Data Center Inc.</label>
             </div>
         </div>
     </div>
@@ -99,8 +56,13 @@
 
 @section scripts {
 
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script src="https://unpkg.com/pdf-lib@1.4.0"></script>
+    <script src="https://unpkg.com/downloadjs@1.4.7"></script>
 
     <script type="text/javascript">
+          const { degrees, PDFDocument, rgb, StandardFonts } = PDFLib
+
         // var js = jQuery.noConflict(true);
         $('.spinner-overlay').show();
 
@@ -108,20 +70,7 @@
             $('.spinner-overlay').hide();
         }, 200);
 
-        $(document).ready(function () {
-
-
-            // $('#fileUpload').on('change', function () {
-            // 	var fileName = this.files[0] ? this.files[0].name : 'No file chosen';
-            // 	document.querySelector('.file-name').textContent = '';
-
-            // 	const newrecord = $('#DocId').val();
-
-            // 	if (newrecord != 0) {
-            // 		$('.file-name').text(fileName);
-            // 	}
-
-            // });
+        $(document).ready(function () {         
 
             $('#createForm').submit(function (event) {
                 $('.spinner-overlay').hide();
@@ -163,16 +112,82 @@
                             contentType: false,
                             success: function (response) {
                                 if (response.success) {
+                                    $('.spinner-overlay').show();
 
+                                    const docId = $('#DocId').val();
+                                    let textQRCode = response.pathdDetails + docId;
+                                    var qrcode = new QRCode("qrcode");
 
-                                    Swal.fire({
-                                        text: response.message,
-                                        icon: "success",
-                                        confirmButtonText: "Ok"
-                                    }).then((result) => {
-                                        window.location = "/Account/Login";
-                                    });
+                                    qrcode.makeCode(textQRCode);
+                                            setTimeout(() => {
+                                            //saveQRCode();
+                                   }, 1000);      //5000                               
 
+                                    let qrCanvas = document.querySelector("#qrcode canvas"); // Get QR canvas
+                                    let imgData = qrCanvas.toDataURL("image/png");    
+                                    let qrFile =  base64ToFile(imgData, "QRCode.png");
+                                   
+
+                                    const formData = new FormData();
+                                    formData.append('DocId', docId);
+                                    formData.append('QRCodeImage', qrFile);
+
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: '@Url.Action("GenerateQRCode", "Document")',                                      
+                                        data: formData,
+                                        processData: false,
+                                        contentType: false,
+                                        success: function (response) {
+                                            if (response.success) {
+                                                  $('.spinner-overlay').show();
+
+                                                    InsertQRCodeInPDF(response.base64Pdf,response.base64QR)
+
+                                                    setTimeout(() => {
+                                                                 var fileInput = document.getElementById('fileUpload');
+                                                                  console.log(fileInput);
+                                                                 const formDataFinal = new FormData();
+                                                                 formDataFinal.append('DocId', docId);
+                                                                 formDataFinal.append('FinalOutputPDF',$('#blobpdf').val() ,fileInput.files[0].name);
+
+                                                                   $('.spinner-overlay').show();
+                                                                        $.ajax({
+                                                                            type: 'POST',
+                                                                            url: '@Url.Action("SaveFileFinalPDF", "Document")',
+                                                                            data: formDataFinal,                                                    
+                                                                            processData: false,
+                                                                            contentType: false,
+                                                                            success: function (response) {
+                                                                                if (response.success) {
+                                                                                      $('.spinner-overlay').show();
+                                                                                          Swal.fire({
+                                                                                               text: response.message,
+                                                                                               icon: "success",
+                                                                                               confirmButtonText: "Ok"
+                                                                                           }).then((result) => {
+                                                                                               window.location = "/Account/Login";
+                                                                                           });
+                                                                                          $('.spinner-overlay').hide();
+                                                                                }
+                                                                            },
+                                                                            error: function () {
+                                                                                Swal.fire({
+                                                                                    text: "An error occurred. Please try again.",
+                                                                                    icon: "error"
+                                                                                });
+                                                                            }
+                                                                       });  //ajax end
+                                                    }, 1000);
+                                     }
+                                        },
+                                        error: function () {
+                                            Swal.fire({
+                                                text: "An error occurred. Please try again.",
+                                                icon: "error"
+                                            });
+                                        }
+                                    });  //ajax end 
                                 } else {
                                     Swal.fire({
                                         text: response.message,
@@ -208,6 +223,70 @@
                     });
                 }
             }
+        }
+
+        function saveQRCode() {
+
+            let qrCanvas = document.querySelector("#qrcode canvas"); // Get the QR code canvas
+             let imgData = qrCanvas.toDataURL("image/png"); // Convert canvas to image URL
+            if (qrCanvas) {
+               let link = document.createElement("a"); // Create a download link
+               link.href = imgData;
+               link.download = "QRCodeXX.png"; // Set the filename
+               document.body.appendChild(link);
+               link.click(); // Trigger download
+                document.body.removeChild(link); // Clean up
+            }
+        }
+        
+        function base64ToFile(base64String, fileName) {
+            let arr = base64String.split(',');
+            let mime = arr[0].match(/:(.*?);/)[1]; // Extract MIME type
+            let bstr = atob(arr[1]); // Decode Base64
+            let n = bstr.length;
+            let u8arr = new Uint8Array(n);
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+            return new File([u8arr], fileName, { type: mime });
+        }
+              
+          async function InsertQRCodeInPDF(PdfBase64,QRbase64x) {
+                const dataUri = 'data:application/pdf;base64,' + PdfBase64
+                const QRdataUri = 'data:image/png;base64,' + QRbase64x
+                const pdfDoc = await PDFDocument.load(dataUri)                          
+                const jpgImageBytes = await fetch(QRdataUri).then((res) => res.arrayBuffer())
+                const pages = pdfDoc.getPages()
+                const firstPage = pages[0]
+                const jpgImage = await pdfDoc.embedPng(jpgImageBytes)
+                const { width, height } = firstPage.getSize()
+                const logoWidth = 100;
+                const logoHeight = 100;
+                const pngDims = jpgImage.scale(1);
+                const pageWidth = firstPage.getWidth();
+                const pageHeight = firstPage.getHeight();
+                     firstPage.drawImage(jpgImage, {
+                        x: pageWidth - logoWidth - 20,
+                          y: 18, //pageHeight - logoHeight - 20 important upper right
+                          width: logoWidth,
+                        height: logoHeight,
+                    });
+
+                const pdfBytes = await pdfDoc.save()      
+               
+                const blob = new Blob([pdfBytes], { type: "application/pdf" });
+                const url = URL.createObjectURL(blob);
+                    document.getElementById("pdfViewer").src = url;
+
+                      $('#blobpdf').val(blob);  
+
+                       // download(pdfBytes, "pdffile.pdf", "application/pdf");
+
+         }
+
+      
+         function uint8ArrayToString(uint8Array) {
+             return String.fromCharCode.apply(null, uint8Array);
         }
     </script>
 }
