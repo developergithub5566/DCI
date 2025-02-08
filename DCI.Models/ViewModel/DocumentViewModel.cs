@@ -59,6 +59,8 @@ namespace DCI.Models.ViewModel
         public IFormFile? QRCodeImage { get; set; }
 
         public IFormFile? FinalOutputPDF { get; set; }
+
+        public int ReportParam { get; set; } = 0;
     }
     public class DocumentDetailsViewModel
     {

@@ -868,48 +868,48 @@ namespace DCI.Repositories
         public async Task<DocumentDetailsViewModel> Details(DocumentViewModel model)
         {
             try
-            {                
+            {
                 var context = _dbContext.Document.AsQueryable();
                 var doctypeList = _dbContext.DocumentType.Where(x => x.IsActive == true).AsQueryable().ToList();
                 var departmentList = _dbContext.Department.Where(x => x.IsActive == true).AsQueryable().ToList();
-                var sectionList = _dbContext.Section.Where(x => x.IsActive == true).AsQueryable().ToList();               
+                var sectionList = _dbContext.Section.Where(x => x.IsActive == true).AsQueryable().ToList();
                 var userList = _dbContext.User.Where(x => x.IsActive).OrderBy(x => x.Lastname).ToList();
 
                 var result = await (from doc in context
-                              join usr in _dbContext.User on doc.RequestById equals usr.UserId into usrGroup
-                              from usr in usrGroup.DefaultIfEmpty()
+                                    join usr in _dbContext.User on doc.RequestById equals usr.UserId into usrGroup
+                                    from usr in usrGroup.DefaultIfEmpty()
 
-                              join reviewer in _dbContext.User on doc.Reviewer equals reviewer.UserId into reviewerGroup
-                              from reviewer in reviewerGroup.DefaultIfEmpty()
+                                    join reviewer in _dbContext.User on doc.Reviewer equals reviewer.UserId into reviewerGroup
+                                    from reviewer in reviewerGroup.DefaultIfEmpty()
 
-                              join apprUser in _dbContext.User on doc.Approver equals apprUser.UserId into apprUserGroup
-                              from apprUser in apprUserGroup.DefaultIfEmpty()
+                                    join apprUser in _dbContext.User on doc.Approver equals apprUser.UserId into apprUserGroup
+                                    from apprUser in apprUserGroup.DefaultIfEmpty()
 
-                              join stat in _dbContext.Status on doc.StatusId equals stat.StatusId into statGroup
-                              from stat in statGroup.DefaultIfEmpty()
+                                    join stat in _dbContext.Status on doc.StatusId equals stat.StatusId into statGroup
+                                    from stat in statGroup.DefaultIfEmpty()
 
-                              join dept in _dbContext.Department on doc.DepartmentId equals dept.DepartmentId into deptGroup
-                              from dept in deptGroup.DefaultIfEmpty()
+                                    join dept in _dbContext.Department on doc.DepartmentId equals dept.DepartmentId into deptGroup
+                                    from dept in deptGroup.DefaultIfEmpty()
 
-                              join docType in _dbContext.DocumentType on doc.DocTypeId equals docType.DocTypeId into doctypeGroup
-                              from docType in doctypeGroup.DefaultIfEmpty()
+                                    join docType in _dbContext.DocumentType on doc.DocTypeId equals docType.DocTypeId into doctypeGroup
+                                    from docType in doctypeGroup.DefaultIfEmpty()
 
 
-                              where doc.DocId == model.DocId &&
-                              doc.IsActive == true
-                              select new DocumentDetailsViewModel
-                              {
-                                  DocId = doc.DocId,
-                                  DocName = doc.DocName,
-                                  DocNo = doc.DocNo,                             
-                                  DocDept = dept.DepartmentName,
-                                  DocTypeName = docType.Name,
-                                  Requestor = usr.Lastname + " " + usr.Firstname,
-                                  Status = stat.StatusName,
-                                  Reviewer = reviewer.Lastname + " " + reviewer.Firstname,
-                                  Approver = apprUser.Lastname + " " + apprUser.Firstname,
-                                  DateCreated = doc.DateCreated.ToString()
-                              }).FirstOrDefaultAsync();
+                                    where doc.DocId == model.DocId &&
+                                    doc.IsActive == true
+                                    select new DocumentDetailsViewModel
+                                    {
+                                        DocId = doc.DocId,
+                                        DocName = doc.DocName,
+                                        DocNo = doc.DocNo,
+                                        DocDept = dept.DepartmentName,
+                                        DocTypeName = docType.Name,
+                                        Requestor = usr.Lastname + " " + usr.Firstname,
+                                        Status = stat.StatusName,
+                                        Reviewer = reviewer.Lastname + " " + reviewer.Firstname,
+                                        Approver = apprUser.Lastname + " " + apprUser.Firstname,
+                                        DateCreated = doc.DateCreated.ToString()
+                                    }).FirstOrDefaultAsync();
 
                 return result;
             }
@@ -923,6 +923,45 @@ namespace DCI.Repositories
                 Log.CloseAndFlush();
             }
         }
+        public async Task<IList<DocumentViewModel>> ReportsListofDocumentByStatus(DocumentViewModel param)
+        {
 
+            var context = _dbContext.Document.AsQueryable();
+
+            var userList = _dbContext.User.AsQueryable().ToList();
+
+            var query =  from doc in context
+                        join doctype in _dbContext.DocumentType on doc.DocTypeId equals doctype.DocTypeId
+                        join user in _dbContext.User on doc.CreatedBy equals user.UserId
+                        join stat in _dbContext.Status on doc.StatusId equals stat.StatusId
+                        where doc.IsActive == true
+                        select new DocumentViewModel
+                        {
+                            DocId = doc.DocId,
+                            DocName = doc.DocName,
+                            DocNo = doc.DocNo,
+                            Version = doc.Version,
+                            Filename = doc.Filename,
+                            DocTypeId = doc.DocTypeId,
+                            StatusId = doc.StatusId,
+                            StatusName = stat.StatusName,
+                            DocumentTypeList = null,
+                            DocTypeName = doctype.Name,
+                            CreatedName = user.Email,
+                            DateCreated = doc.DateCreated,
+                        };
+
+            if (param.CurrentRoleId == (int)EnumRole.User)
+            {
+                query = query.Where(x => x.StatusId != (int)EnumDocumentStatus.Deleted);
+            }
+
+            if (param.ReportParam > 0 && param.ReportParam == 1)
+            {
+                query.Where(x => x.StatusId == param.ReportParam);
+            }
+
+            return  query.ToList();
+        }
     }
 }

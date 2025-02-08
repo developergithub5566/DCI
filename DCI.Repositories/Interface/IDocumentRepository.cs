@@ -18,5 +18,6 @@ namespace DCI.Repositories.Interface
         Task<ApprovalHistoryHeaderViewmodel> ApprovalHistory(DocumentViewModel param);
         Task<DocumentViewModel> GenerateQRCode(DocumentViewModel model);
 		Task<DocumentDetailsViewModel> Details(DocumentViewModel model);
+		Task<IList<DocumentViewModel>> ReportsListofDocumentByStatus(DocumentViewModel param);
     }
 }

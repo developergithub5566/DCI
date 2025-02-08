@@ -728,5 +728,32 @@ namespace DCI.WebApp.Controllers
 
         }
 
+        public async Task<IActionResult> ReportsListofDocumentByStatus()
+        {
+            List<DocumentViewModel> model = new List<DocumentViewModel>();
+
+          
+            using (var _httpclient = new HttpClient())
+            {
+                DocumentViewModel _filterRoleModel = new DocumentViewModel();
+
+                var currentUser = _userSessionHelper.GetCurrentUser();
+                _filterRoleModel.CurrentRoleId = currentUser.RoleId;
+
+                var stringContent = new StringContent(JsonConvert.SerializeObject(_filterRoleModel), Encoding.UTF8, "application/json");
+                var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Document/GetAllDocument");
+
+                request.Content = stringContent;
+                var response = await _httpclient.SendAsync(request);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    model = JsonConvert.DeserializeObject<List<DocumentViewModel>>(responseBody)!;
+                }
+
+            }
+            return View(model);
+        }
+
     }
 }
