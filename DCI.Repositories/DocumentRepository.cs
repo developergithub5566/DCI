@@ -349,6 +349,89 @@ namespace DCI.Repositories
             }
         }
 
+        private async Task<DocumentViewModel> SaveFileFinal(DocumentViewModel model)
+        {
+            try
+            {
+                string fileloc = _filelocation.Value.FileLocation + model.DocId.ToString() + @"\";
+                string filename = model.DocFile.FileName.Replace(",", "");
+
+                if (!Directory.Exists(fileloc))
+                    Directory.CreateDirectory(fileloc);
+
+                string filenameLocation = Path.Combine(fileloc, filename);
+
+                using (var stream = new FileStream(filenameLocation, FileMode.Create, FileAccess.Write))
+                {
+                    model.DocFile.CopyTo(stream);
+                }
+
+                var entity = await _dbContext.Document.FirstOrDefaultAsync(x => x.DocId == model.DocId && x.IsActive == true);
+                entity.FileLocation = fileloc;
+
+
+                entity.ModifiedBy = model.ModifiedBy ?? null;
+                entity.DateModified = model.DateModified ?? null;
+                entity.StatusId = model.StatusId ?? 0;
+                if (entity.Filename != null && entity.Filename != "")
+                {
+                    entity.Version = Convert.ToInt16(entity.Version) + 1;
+                    entity.DocNo = IncrementVersion(entity.DocNo);
+                }
+                entity.Filename = filename;
+                _dbContext.Document.Entry(entity).State = EntityState.Modified;
+                await _dbContext.SaveChangesAsync();
+
+                model.DocFile = null;
+
+                if (model.QRCodeImage is not null && model.QRCodeImage.Length > 0)
+                {
+                    string filelocQR = entity?.FileLocation + @"\";
+                    if (!Directory.Exists(filelocQR))
+                        Directory.CreateDirectory(fileloc);
+
+                    string filenameLocationQR = Path.Combine(fileloc, "QRCode.png");
+
+                    using (var stream = new FileStream(filenameLocationQR, FileMode.Create, FileAccess.Write))
+                    {
+                        model.QRCodeImage.CopyTo(stream);
+                    }
+                    model.Filename = entity.Filename;
+                    model.FileLocation = entity.FileLocation; //_doc.FileLocation;
+                    model.QRCodeImage = null;
+                }
+
+
+
+
+
+                //--------
+
+                RequestorHistoryViewModel requestirViewModel = new RequestorHistoryViewModel();
+                requestirViewModel.DocId = entity.DocId;
+                requestirViewModel.RequestById = entity.RequestById ?? 0;
+                await _requestHistoryRepository.Save(requestirViewModel);
+
+                if (model.StatusId == (int)EnumDocumentStatus.ForReview)
+                {
+                    model.Reviewer = entity.Reviewer;
+                    model.Approver = entity.Approver;
+                    await _emailRepository.SendApproval(model);
+
+                }
+                return model;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return model;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
         private async Task SaveFileFinalPDF(DocumentViewModel model)
         {
             try
@@ -580,12 +663,37 @@ namespace DCI.Repositories
                 await SaveFile(model);
             }
 
+            if (model.QRCodeImage is not null && model.QRCodeImage.Length > 0)
+            {
+                await GenerateQRCode(model);
+            }
+
             if (model.FinalOutputPDF is not null && model.FinalOutputPDF.Length > 0)
             {
                 await SaveFileFinalPDF(model);
             }
 
             return (StatusCodes.Status200OK, "Your file has been successfully uploaded.");
+        }
+
+        public async Task<DocumentViewModel> UploadFileFinal(DocumentViewModel model)
+        {
+            if (model.DocFile is not null && model.DocFile.Length > 0)
+            {
+               return await SaveFileFinal(model);
+            }
+
+            //if (model.QRCodeImage is not null && model.QRCodeImage.Length > 0)
+            //{
+            //    model = await GenerateQRCode(model);
+            //}
+
+            if (model.FinalOutputPDF is not null && model.FinalOutputPDF.Length > 0)
+            {
+                await SaveFileFinalPDF(model);
+                return model;
+            }
+            return model;
         }
 
         public async Task<DocumentViewModel> GenerateQRCode(DocumentViewModel model)
@@ -930,7 +1038,7 @@ namespace DCI.Repositories
 
             var userList = _dbContext.User.AsQueryable().ToList();
 
-            var query =  from doc in context
+            var query = from doc in context
                         join doctype in _dbContext.DocumentType on doc.DocTypeId equals doctype.DocTypeId
                         join user in _dbContext.User on doc.CreatedBy equals user.UserId
                         join stat in _dbContext.Status on doc.StatusId equals stat.StatusId
@@ -961,7 +1069,7 @@ namespace DCI.Repositories
                 query.Where(x => x.StatusId == param.ReportParam);
             }
 
-            return  query.ToList();
+            return query.ToList();
         }
     }
 }

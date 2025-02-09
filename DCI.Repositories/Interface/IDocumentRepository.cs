@@ -19,5 +19,6 @@ namespace DCI.Repositories.Interface
         Task<DocumentViewModel> GenerateQRCode(DocumentViewModel model);
 		Task<DocumentDetailsViewModel> Details(DocumentViewModel model);
 		Task<IList<DocumentViewModel>> ReportsListofDocumentByStatus(DocumentViewModel param);
+		Task<DocumentViewModel> UploadFileFinal(DocumentViewModel model);
     }
 }

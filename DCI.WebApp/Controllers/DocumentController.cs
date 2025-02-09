@@ -313,7 +313,8 @@ namespace DCI.WebApp.Controllers
                     string responseBody = await response.Content.ReadAsStringAsync();
                     if (response.IsSuccessStatusCode)
                     {
-                        vm = JsonConvert.DeserializeObject<DocumentViewModel>(responseBody)!;
+                        vm = JsonConvert.DeserializeObject<DocumentViewModel>(responseBody)!;                    
+                        vm.FileLocation = _apiconfig.Value.WebAppConnection + "Document/Details?DocId=";
                         return View(vm);
                     }
                     return RedirectToAction("VerifyToken");
@@ -351,6 +352,12 @@ namespace DCI.WebApp.Controllers
                         data.Add(fileContent, "DocFile", model.DocFile.FileName);
                     }
 
+                    if (model.QRCodeImage != null)
+                    {
+                        var fileContent = new StreamContent(model.QRCodeImage!.OpenReadStream());
+                        data.Add(fileContent, "QRCodeImage", model.QRCodeImage.FileName);
+                    }
+
                     var response = await _httpclient.PostAsync(_apiconfig.Value.apiConnection + "api/Document/UploadFile", data);
                     var responseBody = await response.Content.ReadAsStringAsync();
 
@@ -359,6 +366,75 @@ namespace DCI.WebApp.Controllers
                     if (response.IsSuccessStatusCode)
                     {
                         return Json(new { success = true, message = responseBody , pathdDetails = documentDetails });
+                    }
+                    return Json(new { success = false, message = responseBody });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        public async Task<IActionResult> UploadFileFinal(DocumentViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    model.StatusId = (int)EnumDocumentStatus.ForReview;
+
+                    var data = new MultipartFormDataContent();
+                    data.Add(new StringContent(model.DocId.ToString() ?? ""), "DocId");
+                    data.Add(new StringContent(model.DocNo.ToString() ?? ""), "DocNo");
+                    data.Add(new StringContent(model.RequestById.ToString() ?? ""), "ModifiedBy");
+                    data.Add(new StringContent(model.StatusId.ToString() ?? ""), "StatusId");
+                    data.Add(new StringContent(DateTime.Now.ToString() ?? ""), "DateModified");
+
+                    if (model.DocFile != null)
+                    {
+                        var fileContent = new StreamContent(model.DocFile!.OpenReadStream());
+                        data.Add(fileContent, "DocFile", model.DocFile.FileName);
+                    }
+
+                    if (model.QRCodeImage != null)
+                    {
+                        var fileContent = new StreamContent(model.QRCodeImage!.OpenReadStream());
+                        data.Add(fileContent, "QRCodeImage", model.QRCodeImage.FileName);
+                    }
+
+                    var response = await _httpclient.PostAsync(_apiconfig.Value.apiConnection + "api/Document/UploadFileFinal", data);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+
+                    var documentDetails = _apiconfig.Value.WebAppConnection + "Document/Details?DocId=";
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        DocumentViewModel vm = JsonConvert.DeserializeObject<DocumentViewModel>(responseBody)!;
+
+                        string pdfLocation = vm.FileLocation + vm.Filename;
+                        string qrcodeLocation = vm.FileLocation + "QRCode.png"; //fixed name
+                        string base64Pdfx = string.Empty;
+                        string base64Qrx = string.Empty;
+
+                        if (System.IO.File.Exists(pdfLocation))
+                        {
+                            byte[] pdfBytes = System.IO.File.ReadAllBytes(pdfLocation);
+                            base64Pdfx = Convert.ToBase64String(pdfBytes);
+                        }
+
+                        if (System.IO.File.Exists(qrcodeLocation))
+                        {
+                            byte[] qrBytes = System.IO.File.ReadAllBytes(qrcodeLocation);
+                            base64Qrx = Convert.ToBase64String(qrBytes);
+                        }
+                        return Json(new { success = true, base64Pdf = base64Pdfx, base64QR = base64Qrx });
+                        //  return Json(new { success = true, message = responseBody, pathdDetails = documentDetails });
                     }
                     return Json(new { success = false, message = responseBody });
                 }
@@ -666,12 +742,12 @@ namespace DCI.WebApp.Controllers
                         data.Add(fileContent, "FinalOutputPDF", model.FinalOutputPDF.FileName);
                     }
 
-                    var response = await _httpclient.PostAsync(_apiconfig.Value.apiConnection + "api/Document/UploadFile", data);
+                    var response = await _httpclient.PostAsync(_apiconfig.Value.apiConnection + "api/Document/UploadFileFinal", data);
                     var responseBody = await response.Content.ReadAsStringAsync();
 
                     if (response.IsSuccessStatusCode)
                     {
-                        return Json(new { success = true, message = responseBody });
+                        return Json(new { success = true, message = "Your file has been successfully uploaded." });
                     }
                     return Json(new { success = false, message = responseBody });
                 }

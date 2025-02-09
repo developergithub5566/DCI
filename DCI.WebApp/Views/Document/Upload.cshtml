@@ -12,12 +12,13 @@
             <div class="offset-xl-4 offset-lg-3 offset-md-2 offset-1 col-xl-4 col-lg-6 col-md-8 col-10">
                 <div class="loginDiv">
                     <label class="title">Please upload your file</label>
-  
+
 
                     <form id="createForm" method="post">
                         <input type="hidden" id="DocId" name="DocId" value="@Model.DocId">
                         <input type="hidden" id="RequestById" name="RequestById" value="@Model.RequestById">
                         <input type="hidden" id="Filename" name="Filename" value="@Model.Filename">
+                        <input type="hidden" id="FileLocation" name="FileLocation" value="@Model.FileLocation">
                         <div id="blobpdf" hidden></div>
                         <div id="qrcode" hidden></div>
 
@@ -38,10 +39,10 @@
 
                         <div class="form-group">
                             <button type="submit" class="btn btn-primary btn-block w-100">Submit</button>
-                        </div> 
+                        </div>
 
-                        <iframe id="pdfViewer" width="100%" height="600px" enctype="multipart/form-data" hidden >
-                            <input type="file" id="finalOutputPDF" name="finalOutputPDF" >
+                        <iframe id="pdfViewer" width="100%" height="600px" enctype="multipart/form-data" hidden>
+                            <input type="file" id="finalOutputPDF" name="finalOutputPDF">
                         </iframe>
                     </form>
                 </div>
@@ -61,7 +62,7 @@
     <script src="https://unpkg.com/downloadjs@1.4.7"></script>
 
     <script type="text/javascript">
-          const { degrees, PDFDocument, rgb, StandardFonts } = PDFLib
+        const { degrees, PDFDocument, rgb, StandardFonts } = PDFLib
 
         // var js = jQuery.noConflict(true);
         $('.spinner-overlay').show();
@@ -70,7 +71,7 @@
             $('.spinner-overlay').hide();
         }, 200);
 
-        $(document).ready(function () {         
+        $(document).ready(function () {
 
             $('#createForm').submit(function (event) {
                 $('.spinner-overlay').hide();
@@ -79,7 +80,7 @@
 
                 const filename = $('#Filename').val();
                 let msg = "Are you sure you want to submit this file?";
-                if(filename != ""){
+                if (filename != "") {
                     msg = "Are you sure you want to submit this file? Submitting it will create a new version."
                 }
 
@@ -95,6 +96,20 @@
                 formData.append('RequestById', reqId);
                 formData.append('DocFile', file);
 
+                let textQRCode = $('#FileLocation').val() + docId;
+                var qrcode = new QRCode("qrcode");
+
+                qrcode.makeCode(textQRCode);
+
+
+                let qrCanvas = document.querySelector("#qrcode canvas"); // Get QR canvas
+                let imgData = qrCanvas.toDataURL("image/png");
+                let qrFile = base64ToFile(imgData, "QRCode.png");
+
+                formData.append('QRCodeImage', qrFile);
+
+                // console.log(qrFile);
+
                 Swal.fire({
                     text: msg,
                     icon: "question",
@@ -103,96 +118,61 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $('.spinner-overlay').show();
-
                         $.ajax({
                             type: 'POST',
-                            url: '@Url.Action("UploadFile", "Document")',
+                            url: '@Url.Action("UploadFileFinal", "Document")',
                             data: formData,
                             processData: false,
                             contentType: false,
                             success: function (response) {
                                 if (response.success) {
                                     $('.spinner-overlay').show();
+                                    InsertQRCodeInPDF(response.base64Pdf, response.base64QR)
 
-                                    const docId = $('#DocId').val();
-                                    let textQRCode = response.pathdDetails + docId;
-                                    var qrcode = new QRCode("qrcode");
 
-                                    qrcode.makeCode(textQRCode);
-                                            setTimeout(() => {
-                                            //saveQRCode();
-                                   }, 1000);      //5000                               
+                                    console.log("ok");
+                                    console.log($('#blobpdf').val());
 
-                                    let qrCanvas = document.querySelector("#qrcode canvas"); // Get QR canvas
-                                    let imgData = qrCanvas.toDataURL("image/png");    
-                                    let qrFile =  base64ToFile(imgData, "QRCode.png");
-                                   
+                                    setTimeout(() => {
+                                        var fileInput = document.getElementById('fileUpload');
+                                        console.log(fileInput);
+                                        const formDataFinal = new FormData();
+                                        formDataFinal.append('DocId', docId);
+                                        formDataFinal.append('FinalOutputPDF', $('#blobpdf').val(), fileInput.files[0].name);
 
-                                    const formData = new FormData();
-                                    formData.append('DocId', docId);
-                                    formData.append('QRCodeImage', qrFile);
-
-                                    $.ajax({
-                                        type: 'POST',
-                                        url: '@Url.Action("GenerateQRCode", "Document")',                                      
-                                        data: formData,
-                                        processData: false,
-                                        contentType: false,
-                                        success: function (response) {
-                                            if (response.success) {
-                                                  $('.spinner-overlay').show();
-
-                                                    InsertQRCodeInPDF(response.base64Pdf,response.base64QR)
-
-                                                    setTimeout(() => {
-                                                                 var fileInput = document.getElementById('fileUpload');
-                                                                  console.log(fileInput);
-                                                                 const formDataFinal = new FormData();
-                                                                 formDataFinal.append('DocId', docId);
-                                                                 formDataFinal.append('FinalOutputPDF',$('#blobpdf').val() ,fileInput.files[0].name);
-
-                                                                   $('.spinner-overlay').show();
-                                                                        $.ajax({
-                                                                            type: 'POST',
-                                                                            url: '@Url.Action("SaveFileFinalPDF", "Document")',
-                                                                            data: formDataFinal,                                                    
-                                                                            processData: false,
-                                                                            contentType: false,
-                                                                            success: function (response) {
-                                                                                if (response.success) {
-                                                                                      $('.spinner-overlay').show();
-                                                                                          Swal.fire({
-                                                                                               text: response.message,
-                                                                                               icon: "success",
-                                                                                               confirmButtonText: "Ok"
-                                                                                           }).then((result) => {
-                                                                                               window.location = "/Account/Login";
-                                                                                           });
-                                                                                          $('.spinner-overlay').hide();
-                                                                                }
-                                                                            },
-                                                                            error: function () {
-                                                                                Swal.fire({
-                                                                                    text: "An error occurred. Please try again.",
-                                                                                    icon: "error"
-                                                                                });
-                                                                            }
-                                                                       });  //ajax end
-                                                    }, 1000);
-                                     }
-                                        },
-                                        error: function () {
-                                            Swal.fire({
-                                                text: "An error occurred. Please try again.",
-                                                icon: "error"
-                                            });
-                                        }
-                                    });  //ajax end 
-                                } else {
-                                    Swal.fire({
-                                        text: response.message,
-                                        icon: "error"
-                                    });
+                                        $('.spinner-overlay').show();
+                                        $.ajax({
+                                            type: 'POST',
+                                            url: '@Url.Action("SaveFileFinalPDF", "Document")',
+                                            data: formDataFinal,
+                                            processData: false,
+                                            contentType: false,
+                                            success: function (response) {
+                                                if (response.success) {
+                                                    $('.spinner-overlay').show();
+                                                    Swal.fire({
+                                                        text: response.message,
+                                                        icon: "success",
+                                                        confirmButtonText: "Ok"
+                                                    }).then((result) => {
+                                                        window.location = "/Account/Login";
+                                                    });
+                                                    $('.spinner-overlay').hide();
+                                                } else {
+                                                    Swal.fire({
+                                                        text: response.message,
+                                                        icon: "error"
+                                                    });
+                                                }
+                                            },
+                                            error: function () {
+                                                Swal.fire({
+                                                    text: "An error occurred. Please try again.",
+                                                    icon: "error"
+                                                });
+                                            }
+                                        });  //ajax end
+                                    }, 1000);
                                 }
                                 $('.spinner-overlay').hide();
                             },
@@ -204,6 +184,7 @@
                                 });
                             }
                         });
+
                     }
                 });
             });
@@ -228,17 +209,17 @@
         function saveQRCode() {
 
             let qrCanvas = document.querySelector("#qrcode canvas"); // Get the QR code canvas
-             let imgData = qrCanvas.toDataURL("image/png"); // Convert canvas to image URL
+            let imgData = qrCanvas.toDataURL("image/png"); // Convert canvas to image URL
             if (qrCanvas) {
-               let link = document.createElement("a"); // Create a download link
-               link.href = imgData;
-               link.download = "QRCodeXX.png"; // Set the filename
-               document.body.appendChild(link);
-               link.click(); // Trigger download
+                let link = document.createElement("a"); // Create a download link
+                link.href = imgData;
+                link.download = "QRCodeXX.png"; // Set the filename
+                document.body.appendChild(link);
+                link.click(); // Trigger download
                 document.body.removeChild(link); // Clean up
             }
         }
-        
+
         function base64ToFile(base64String, fileName) {
             let arr = base64String.split(',');
             let mime = arr[0].match(/:(.*?);/)[1]; // Extract MIME type
@@ -250,43 +231,43 @@
             }
             return new File([u8arr], fileName, { type: mime });
         }
-              
-          async function InsertQRCodeInPDF(PdfBase64,QRbase64x) {
-                const dataUri = 'data:application/pdf;base64,' + PdfBase64
-                const QRdataUri = 'data:image/png;base64,' + QRbase64x
-                const pdfDoc = await PDFDocument.load(dataUri)                          
-                const jpgImageBytes = await fetch(QRdataUri).then((res) => res.arrayBuffer())
-                const pages = pdfDoc.getPages()
-                const firstPage = pages[0]
-                const jpgImage = await pdfDoc.embedPng(jpgImageBytes)
-                const { width, height } = firstPage.getSize()
-                const logoWidth = 100;
-                const logoHeight = 100;
-                const pngDims = jpgImage.scale(1);
-                const pageWidth = firstPage.getWidth();
-                const pageHeight = firstPage.getHeight();
-                     firstPage.drawImage(jpgImage, {
-                        x: pageWidth - logoWidth - 20,
-                          y: 18, //pageHeight - logoHeight - 20 important upper right
-                          width: logoWidth,
-                        height: logoHeight,
-                    });
 
-                const pdfBytes = await pdfDoc.save()      
-               
-                const blob = new Blob([pdfBytes], { type: "application/pdf" });
-                const url = URL.createObjectURL(blob);
-                    document.getElementById("pdfViewer").src = url;
+        async function InsertQRCodeInPDF(PdfBase64, QRbase64x) {
+            const dataUri = 'data:application/pdf;base64,' + PdfBase64
+            const QRdataUri = 'data:image/png;base64,' + QRbase64x
+            const pdfDoc = await PDFDocument.load(dataUri)
+            const jpgImageBytes = await fetch(QRdataUri).then((res) => res.arrayBuffer())
+            const pages = pdfDoc.getPages()
+            const firstPage = pages[0]
+            const jpgImage = await pdfDoc.embedPng(jpgImageBytes)
+            const { width, height } = firstPage.getSize()
+            const logoWidth = 100;
+            const logoHeight = 100;
+            const pngDims = jpgImage.scale(1);
+            const pageWidth = firstPage.getWidth();
+            const pageHeight = firstPage.getHeight();
+            firstPage.drawImage(jpgImage, {
+                x: pageWidth - logoWidth - 20,
+                y: 18, //pageHeight - logoHeight - 20 important upper right
+                width: logoWidth,
+                height: logoHeight,
+            });
 
-                      $('#blobpdf').val(blob);  
+            const pdfBytes = await pdfDoc.save()
 
-                       // download(pdfBytes, "pdffile.pdf", "application/pdf");
+            const blob = new Blob([pdfBytes], { type: "application/pdf" });
+            const url = URL.createObjectURL(blob);
+            document.getElementById("pdfViewer").src = url;
 
-         }
+            $('#blobpdf').val(blob);
 
-      
-         function uint8ArrayToString(uint8Array) {
-             return String.fromCharCode.apply(null, uint8Array);
+            // download(pdfBytes, "pdffile.pdf", "application/pdf");
+
+        }
+
+
+        function uint8ArrayToString(uint8Array) {
+            return String.fromCharCode.apply(null, uint8Array);
         }
     </script>
 }
