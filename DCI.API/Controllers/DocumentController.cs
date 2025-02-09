@@ -143,5 +143,7 @@ namespace DCI.API.Controllers
         {
             return Ok(await _documentRepository.ReportsListofDocumentByStatus(model));
         }
+
+      
     }
 }

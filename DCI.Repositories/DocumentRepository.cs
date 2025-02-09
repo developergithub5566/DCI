@@ -1086,7 +1086,7 @@ namespace DCI.Repositories
 
             if (param.ReportParam > 0 && param.ReportParam == 1)
             {
-                query.Where(x => x.StatusId == param.ReportParam);
+                query.Where(x => x.StatusId == param.StatusId);
             }
 
             return query.ToList();
