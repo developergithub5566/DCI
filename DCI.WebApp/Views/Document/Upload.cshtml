@@ -20,6 +20,7 @@
                         <input type="hidden" id="Filename" name="Filename" value="@Model.Filename">
                         <input type="hidden" id="FileLocation" name="FileLocation" value="@Model.FileLocation">
                         <div id="blobpdf" hidden></div>
+                        <div id="pdfBinary" hidden></div>
                         <div id="qrcode" hidden></div>
 
 
@@ -101,92 +102,85 @@
 
                 qrcode.makeCode(textQRCode);
 
-
                 let qrCanvas = document.querySelector("#qrcode canvas"); // Get QR canvas
                 let imgData = qrCanvas.toDataURL("image/png");
                 let qrFile = base64ToFile(imgData, "QRCode.png");
+                let QRCodebase64String = imgData.split(",")[1];
 
-                formData.append('QRCodeImage', qrFile);
+                formData.append('QRCodeImage', qrFile);       
 
-                // console.log(qrFile);
+                const pdfBinaryX = $('#pdfBinary').val();
+                InsertQRCodeInPDF(pdfBinaryX, QRCodebase64String)
 
-                Swal.fire({
-                    text: msg,
-                    icon: "question",
-                    showCancelButton: true,
-                    confirmButtonText: "Ok"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $('.spinner-overlay').show();
-                        $.ajax({
-                            type: 'POST',
-                            url: '@Url.Action("UploadFileFinal", "Document")',
-                            data: formData,
-                            processData: false,
-                            contentType: false,
-                            success: function (response) {
-                                if (response.success) {
-                                    $('.spinner-overlay').show();
-                                    InsertQRCodeInPDF(response.base64Pdf, response.base64QR)
+                //var fileInput = document.getElementById('fileUpload');
+                setTimeout(() => {
+                    formData.append('FinalOutputPDF', $('#blobpdf').val(), fileInput.files[0].name);
+                    // console.log(qrFile);
 
-
-                                    console.log("ok");
-                                    console.log($('#blobpdf').val());
-
-                                    setTimeout(() => {
-                                        var fileInput = document.getElementById('fileUpload');
-                                        console.log(fileInput);
-                                        const formDataFinal = new FormData();
-                                        formDataFinal.append('DocId', docId);
-                                        formDataFinal.append('FinalOutputPDF', $('#blobpdf').val(), fileInput.files[0].name);
-
+                    Swal.fire({
+                        text: msg,
+                        icon: "question",
+                        showCancelButton: true,
+                        confirmButtonText: "Ok"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $('.spinner-overlay').show();
+                            $.ajax({
+                                type: 'POST',
+                                url: '@Url.Action("UploadFileFinal", "Document")',
+                                data: formData,
+                                processData: false,
+                                contentType: false,
+                                success: function (response) {
+                                    if (response.success) {
                                         $('.spinner-overlay').show();
-                                        $.ajax({
-                                            type: 'POST',
-                                            url: '@Url.Action("SaveFileFinalPDF", "Document")',
-                                            data: formDataFinal,
-                                            processData: false,
-                                            contentType: false,
-                                            success: function (response) {
-                                                if (response.success) {
-                                                    $('.spinner-overlay').show();
-                                                    Swal.fire({
-                                                        text: response.message,
-                                                        icon: "success",
-                                                        confirmButtonText: "Ok"
-                                                    }).then((result) => {
-                                                        window.location = "/Account/Login";
-                                                    });
-                                                    $('.spinner-overlay').hide();
-                                                } else {
-                                                    Swal.fire({
-                                                        text: response.message,
-                                                        icon: "error"
-                                                    });
-                                                }
-                                            },
-                                            error: function () {
-                                                Swal.fire({
-                                                    text: "An error occurred. Please try again.",
-                                                    icon: "error"
-                                                });
-                                            }
-                                        });  //ajax end
-                                    }, 1000);
-                                }
-                                $('.spinner-overlay').hide();
-                            },
-                            error: function () {
-                                $('.spinner-overlay').hide();
-                                Swal.fire({
-                                    text: "An error occurred. Please try again.",
-                                    icon: "error"
-                                });
-                            }
-                        });
 
-                    }
-                });
+                                        Swal.fire({
+                                            text: response.message,
+                                            icon: "success",
+                                            confirmButtonText: "Ok"
+                                        }).then((result) => {
+                                            window.location = "/Account/Login";
+                                        });
+                                        $('.spinner-overlay').hide();
+
+
+
+
+
+                                    }
+                                    $('.spinner-overlay').hide();
+                                },
+                                error: function () {
+                                    $('.spinner-overlay').hide();
+                                    Swal.fire({
+                                        text: "An error occurred. Please try again.",
+                                        icon: "error"
+                                    });
+                                }
+                            });
+
+                        }
+                    });
+                }, 1000);
+            });
+
+            document.getElementById("fileUpload").addEventListener("change", function (event) {
+                let file = event.target.files[0]; // Get the selected file
+                if (file) {
+                    let reader = new FileReader();
+                    reader.readAsDataURL(file); // Read the file as Data URL (Base64)
+
+                    reader.onload = function () {
+                        let base64String = reader.result.split(",")[1]; // Extract only the Base64 content
+                        // console.log(base64String); // Display or send to backend
+                        document.getElementById("pdfBinary").value = base64String;
+                    };
+
+                    reader.onerror = function (error) {
+                        console.error("Error reading file: ", error);
+                    };
+                }
             });
 
         });
@@ -233,6 +227,8 @@
         }
 
         async function InsertQRCodeInPDF(PdfBase64, QRbase64x) {
+            console.log("InsertQRCodeInPDF");
+            console.log(QRbase64x);
             const dataUri = 'data:application/pdf;base64,' + PdfBase64
             const QRdataUri = 'data:image/png;base64,' + QRbase64x
             const pdfDoc = await PDFDocument.load(dataUri)
@@ -260,7 +256,8 @@
             document.getElementById("pdfViewer").src = url;
 
             $('#blobpdf').val(blob);
-
+            //  console.log("blob");
+            //  console.log(blob);
             // download(pdfBytes, "pdffile.pdf", "application/pdf");
 
         }

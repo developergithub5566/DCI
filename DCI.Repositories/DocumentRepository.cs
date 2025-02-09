@@ -170,7 +170,7 @@ namespace DCI.Repositories
                     entity.Reviewer = deptViewModel.Reviewer ?? 0;
                     entity.Approver = deptViewModel.Approver ?? 0;
 
-                    entity.StatusId = model.StatusId ?? (int)EnumDocumentStatus.InProgress;
+                    entity.StatusId =  (int)EnumDocumentStatus.InProgress;
                     //entity.SectionId = model.SectionId;
                     entity.FormsProcess = model.FormsProcess;
                     entity.Version = model.Version;
@@ -191,7 +191,17 @@ namespace DCI.Repositories
 
                     if (model.DocFile != null)
                     {
-                        await SaveFile(model);
+                        await SaveFileFinal(model);
+                    }
+
+                    if (model.QRCodeImage is not null && model.QRCodeImage.Length > 0)
+                    {
+                        await GenerateQRCode(model);
+                    }
+
+                    if (model.FinalOutputPDF is not null && model.FinalOutputPDF.Length > 0)
+                    {
+                        await SaveFileFinalPDF(model);
                     }
 
                     if (model.StatusId == (int)EnumDocumentStatus.InProgress)
@@ -235,6 +245,16 @@ namespace DCI.Repositories
                     if (model.DocFile != null)
                     {
                         await SaveFile(model);
+                    }
+
+                    if (model.QRCodeImage is not null && model.QRCodeImage.Length > 0)
+                    {
+                        await GenerateQRCode(model);
+                    }
+
+                    if (model.FinalOutputPDF is not null && model.FinalOutputPDF.Length > 0)
+                    {
+                        await SaveFileFinalPDF(model);
                     }
 
                     if (model.StatusId == (int)EnumDocumentStatus.InProgress)
@@ -680,7 +700,7 @@ namespace DCI.Repositories
         {
             if (model.DocFile is not null && model.DocFile.Length > 0)
             {
-               return await SaveFileFinal(model);
+               model = await SaveFileFinal(model);
             }
 
             //if (model.QRCodeImage is not null && model.QRCodeImage.Length > 0)

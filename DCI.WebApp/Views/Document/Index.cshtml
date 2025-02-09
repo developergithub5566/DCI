@@ -7,8 +7,8 @@
 <style>
     /* Hide the default file input */
     /* 	#fileUpload {
-                                                                    display: none;
-                                                                } */
+                                                                        display: none;
+                                                                    } */
 
     /* Style the custom button */
 
@@ -108,8 +108,8 @@
                     <thead>
                         <tr>
                             @* 	<th>
-							<label>Id</label>
-							</th> *@
+                            <label>Id</label>
+                            </th> *@
                             <th>
                                 <label>Document No</label>
                             </th>
@@ -138,15 +138,15 @@
                         {
                             <tr>
                                 @* <td>
-							@item.DocId
-							</td> *@
+                            @item.DocId
+                            </td> *@
                                 <td>
                                     @item.DocNo
                                 </td>
                                 <td class="col-2">
-                                 @*    <span class="d-inline-block text-truncate" style="width: 150px;" title="@item.DocName"> *@
+                                    @*    <span class="d-inline-block text-truncate" style="width: 150px;" title="@item.DocName"> *@
                                     <span class="d-inline-block text-truncate" style="width: 200px;" title="@item.DocName">
-                                    @item.DocName
+                                        @item.DocName
                                     </span>
                                 </td>
                                 <td>
@@ -190,6 +190,11 @@
                         <form id="createForm">
                             <div class="modal-body">
                                 <input type="hidden" id="DocId" name="DocId">
+
+                                <div id="blobpdf" hidden></div>
+                                <div id="pdfBinary" hidden></div>
+                                <div id="qrcode" hidden></div>
+
                                 <div class="row">
                                     <div class="col" id="DocNoDiv">
                                         <label for="DocNo" class="col-form-label">Document No:</label>
@@ -200,8 +205,8 @@
                                 </div>
                                 <div class="row">
                                     <div class="col">
-                                        <label for="DocName" class="col-form-label">Document Name:</label>                                    
-                                            <input type="text" class="form-control" id="DocName" name="DocName" maxlength="255" required>    
+                                        <label for="DocName" class="col-form-label">Document Name:</label>
+                                        <input type="text" class="form-control" id="DocName" name="DocName" maxlength="255" required>
                                     </div>
                                     <div class="col">
                                         <label for="DocTypeId" class="col-form-label required">Document Type:</label>
@@ -231,11 +236,11 @@
                                 </div>
                                 <div class="row">
                                     @* 		<div class="col">
-										<label for="Section" class="col-form-label required">Section:</label>
-										<select id="sectionSelect" class="form-select" required>
-											<option value="">select section</option>
-										</select>
-									</div> *@
+                                    <label for="Section" class="col-form-label required">Section:</label>
+                                    <select id="sectionSelect" class="form-select" required>
+                                    <option value="">select section</option>
+                                    </select>
+                                    </div> *@
 
                                     <div class="col">
                                         <label for="RequestById" class="col-form-label required">Request By:</label>
@@ -269,23 +274,27 @@
                                     </div>
                                 </div>
 
-                       @*          <hr />
-                             
+                                @*          <hr />
+
                                 <div class="row">
-                                    <div class="col">
-                                        <label for="Reviewer" id="ReviewerLabel" class="col-form-label">Reviewer:</label>
-                                        <select id="reviewerSelect" class="form-select">
-                                            <option value="">select reviewer</option>
-                                        </select>
-                                    </div>
-                                    <div class="col" >
-                                        <label for="Approver" id="ApproverLabel" class="col-form-label">Approver:</label>
-                                        <select id="approverSelect" class="form-select">
-                                            <option value="">select approver</option>
-                                        </select>
-                                    </div>
+                                <div class="col">
+                                <label for="Reviewer" id="ReviewerLabel" class="col-form-label">Reviewer:</label>
+                                <select id="reviewerSelect" class="form-select">
+                                <option value="">select reviewer</option>
+                                </select>
+                                </div>
+                                <div class="col" >
+                                <label for="Approver" id="ApproverLabel" class="col-form-label">Approver:</label>
+                                <select id="approverSelect" class="form-select">
+                                <option value="">select approver</option>
+                                </select>
+                                </div>
                                 </div> *@
-                       
+
+                                <iframe id="pdfViewer" width="100%" height="600px" enctype="multipart/form-data" hidden>
+                                    <input type="file" id="finalOutputPDF" name="finalOutputPDF">
+                                </iframe>
+
 
                             </div>
                             <div class="modal-footer">
@@ -315,8 +324,13 @@
             <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
             <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.1/css/buttons.dataTables.css">
 
+            <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+            <script src="https://unpkg.com/pdf-lib@1.4.0"></script>
+            <script src="https://unpkg.com/downloadjs@1.4.7"></script>
 
             <script type="text/javascript">
+                const { degrees, PDFDocument, rgb, StandardFonts } = PDFLib
+
                 var js = jQuery.noConflict(true);
 
                 $('.spinner-overlay').show();
@@ -379,7 +393,7 @@
                         const deptId = $('#departmentSelect').val();
                         const docCatId = $('#docCategorySelect').val();
                         //const sectionId = $('#sectionSelect').val();
-                        const formsProcess  = $('#FormsProcessSelect').val();
+                        const formsProcess = $('#FormsProcessSelect').val();
 
                         const requestById = $('#requestBySelect').val();
                         const reviewer = $('#reviewerSelect').val();
@@ -402,53 +416,89 @@
 
                         formData.append('DocFile', file);
 
-                        Swal.fire({
-                            text: "Are you sure you want to save this record?",
-                            icon: "question",
-                            showCancelButton: true,
-                            confirmButtonText: "Ok"
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                $('.spinner-overlay').show();
+                        //QRCode and PDF
+                        let textQRCode = $('#FileLocation').val() + docId;
+                        var qrcode = new QRCode("qrcode");
+                        qrcode.makeCode(textQRCode);
+                        let qrCanvas = document.querySelector("#qrcode canvas"); // Get QR canvas
+                        let imgData = qrCanvas.toDataURL("image/png");
+                        let qrFile = base64ToFile(imgData, "QRCode.png");
+                        let QRCodebase64String = imgData.split(",")[1];
+                        formData.append('QRCodeImage', qrFile);
+                        const pdfBinaryX = $('#pdfBinary').val();
+                        InsertQRCodeInPDF(pdfBinaryX, QRCodebase64String)
 
-                                $.ajax({
-                                    type: 'POST',
-                                    url: '@Url.Action("SaveDocument", "Document")',
-                                    data: formData,
-                                    processData: false,
-                                    contentType: false,
-                                    success: function (response) {
-                                        if (response.success) {
-                                            $('#createForm')[0].reset();
-                                            js('#createmodal').modal('hide');
+                        setTimeout(() => {
 
+                            formData.append('FinalOutputPDF', $('#blobpdf').val(), fileInput.files[0].name);
+
+
+                            Swal.fire({
+                                text: "Are you sure you want to save this record?",
+                                icon: "question",
+                                showCancelButton: true,
+                                confirmButtonText: "Ok"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    $('.spinner-overlay').show();
+
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: '@Url.Action("SaveDocument", "Document")',
+                                        data: formData,
+                                        processData: false,
+                                        contentType: false,
+                                        success: function (response) {
+                                            if (response.success) {
+                                                $('#createForm')[0].reset();
+                                                js('#createmodal').modal('hide');
+
+                                                Swal.fire({
+                                                    text: response.message,
+                                                    icon: "success",
+                                                    confirmButtonText: "Ok"
+                                                }).then((result) => {
+                                                    location.reload();
+                                                });
+
+                                            } else {
+                                                Swal.fire({
+                                                    text: response.message,
+                                                    icon: "error"
+                                                });
+                                            }
+                                            $('.spinner-overlay').hide();
+                                        },
+                                        error: function () {
+                                            $('.spinner-overlay').hide();
                                             Swal.fire({
-                                                text: response.message,
-                                                icon: "success",
-                                                confirmButtonText: "Ok"
-                                            }).then((result) => {
-                                                location.reload();
-                                            });
-
-                                        } else {
-                                            Swal.fire({
-                                                text: response.message,
+                                                text: "An error occurred. Please try again.",
                                                 icon: "error"
                                             });
                                         }
-                                        $('.spinner-overlay').hide();
-                                    },
-                                    error: function () {
-                                        $('.spinner-overlay').hide();
-                                        Swal.fire({
-                                            text: "An error occurred. Please try again.",
-                                            icon: "error"
-                                        });
-                                    }
-                                });
-                            }
-                        });
+                                    });
+                                }
+                            });
+                        }, 1000);
                     });// submit
+
+                    document.getElementById("fileUpload").addEventListener("change", function (event) {
+                        let file = event.target.files[0]; // Get the selected file
+                        if (file) {
+                            let reader = new FileReader();
+                            reader.readAsDataURL(file); // Read the file as Data URL (Base64)
+
+                            reader.onload = function () {
+                                let base64String = reader.result.split(",")[1]; // Extract only the Base64 content
+                                // console.log(base64String); // Display or send to backend
+                                document.getElementById("pdfBinary").value = base64String;
+                            };
+
+                            reader.onerror = function (error) {
+                                console.error("Error reading file: ", error);
+                            };
+                        }
+                    });
 
                 });
 
@@ -474,8 +524,8 @@
 
                                 //$('#sectionSelect').val(0);
                                 $('#RequestById').val(0);
-                                        // $('#Reviewer').val(0);
-                                        // 		$('#Approver').val(0);
+                                // $('#Reviewer').val(0);
+                                // 		$('#Approver').val(0);
                                 $('#DocTypeId').val(0);
 
                                 const input = document.querySelector('#fileUpload')
@@ -633,7 +683,7 @@
                                     }
                                 });
 
-                                    var $select = $('#reviewerSelect');
+                                var $select = $('#reviewerSelect');
                                 $select.empty();
                                 $select.append('<option value="">select reviewer</option>');
 
@@ -841,5 +891,50 @@
                 // 		document.getElementById("DocLabel").style.display = 'block';
                 // 	}
                 // }
+                async function InsertQRCodeInPDF(PdfBase64, QRbase64x) {
+                    console.log("InsertQRCodeInPDF");
+                    console.log(QRbase64x);
+                    const dataUri = 'data:application/pdf;base64,' + PdfBase64
+                    const QRdataUri = 'data:image/png;base64,' + QRbase64x
+                    const pdfDoc = await PDFDocument.load(dataUri)
+                    const jpgImageBytes = await fetch(QRdataUri).then((res) => res.arrayBuffer())
+                    const pages = pdfDoc.getPages()
+                    const firstPage = pages[0]
+                    const jpgImage = await pdfDoc.embedPng(jpgImageBytes)
+                    const { width, height } = firstPage.getSize()
+                    const logoWidth = 100;
+                    const logoHeight = 100;
+                    const pngDims = jpgImage.scale(1);
+                    const pageWidth = firstPage.getWidth();
+                    const pageHeight = firstPage.getHeight();
+                    firstPage.drawImage(jpgImage, {
+                        x: pageWidth - logoWidth - 20,
+                        y: 18, //pageHeight - logoHeight - 20 important upper right
+                        width: logoWidth,
+                        height: logoHeight,
+                    });
+
+                    const pdfBytes = await pdfDoc.save()
+
+                    const blob = new Blob([pdfBytes], { type: "application/pdf" });
+                    const url = URL.createObjectURL(blob);
+                    document.getElementById("pdfViewer").src = url;
+
+                    $('#blobpdf').val(blob);
+
+                }
+
+
+                function base64ToFile(base64String, fileName) {
+                    let arr = base64String.split(',');
+                    let mime = arr[0].match(/:(.*?);/)[1]; // Extract MIME type
+                    let bstr = atob(arr[1]); // Decode Base64
+                    let n = bstr.length;
+                    let u8arr = new Uint8Array(n);
+                    while (n--) {
+                        u8arr[n] = bstr.charCodeAt(n);
+                    }
+                    return new File([u8arr], fileName, { type: mime });
+                }
             </script>
         }

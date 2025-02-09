@@ -38,7 +38,7 @@ namespace DCI.WebApp.Controllers
         {
             this._apiconfig = apiconfig;
             this._userSessionHelper = userSessionHelper;
-            this._documentService = documentService;           
+            this._documentService = documentService;
         }
         public async Task<IActionResult> Index()
         {
@@ -193,6 +193,18 @@ namespace DCI.WebApp.Controllers
                         var fileContent = new StreamContent(model.DocFile!.OpenReadStream());
                         data.Add(fileContent, "DocFile", model.DocFile.FileName);
                     }
+                    if (model.QRCodeImage != null)
+                    {
+                        var fileContent = new StreamContent(model.QRCodeImage!.OpenReadStream());
+                        data.Add(fileContent, "QRCodeImage", model.QRCodeImage.FileName);
+                    }
+
+                    if (model.FinalOutputPDF is not null)
+                    {
+                        var fileContent = new StreamContent(model.FinalOutputPDF!.OpenReadStream());
+                        data.Add(fileContent, "FinalOutputPDF", model.FinalOutputPDF.FileName);
+                    }
+
 
                     var response = await _httpclient.PostAsync(_apiconfig.Value.apiConnection + "api/Document/SaveDocument", data);
                     var responseBody = await response.Content.ReadAsStringAsync();
@@ -313,7 +325,7 @@ namespace DCI.WebApp.Controllers
                     string responseBody = await response.Content.ReadAsStringAsync();
                     if (response.IsSuccessStatusCode)
                     {
-                        vm = JsonConvert.DeserializeObject<DocumentViewModel>(responseBody)!;                    
+                        vm = JsonConvert.DeserializeObject<DocumentViewModel>(responseBody)!;
                         vm.FileLocation = _apiconfig.Value.WebAppConnection + "Document/Details?DocId=";
                         return View(vm);
                     }
@@ -365,7 +377,7 @@ namespace DCI.WebApp.Controllers
 
                     if (response.IsSuccessStatusCode)
                     {
-                        return Json(new { success = true, message = responseBody , pathdDetails = documentDetails });
+                        return Json(new { success = true, message = responseBody, pathdDetails = documentDetails });
                     }
                     return Json(new { success = false, message = responseBody });
                 }
@@ -408,6 +420,12 @@ namespace DCI.WebApp.Controllers
                         data.Add(fileContent, "QRCodeImage", model.QRCodeImage.FileName);
                     }
 
+                    if (model.FinalOutputPDF is not null)
+                    {
+                        var fileContent = new StreamContent(model.FinalOutputPDF!.OpenReadStream());
+                        data.Add(fileContent, "FinalOutputPDF", model.FinalOutputPDF.FileName);
+                    }
+
                     var response = await _httpclient.PostAsync(_apiconfig.Value.apiConnection + "api/Document/UploadFileFinal", data);
                     var responseBody = await response.Content.ReadAsStringAsync();
 
@@ -415,28 +433,31 @@ namespace DCI.WebApp.Controllers
 
                     if (response.IsSuccessStatusCode)
                     {
-                        DocumentViewModel vm = JsonConvert.DeserializeObject<DocumentViewModel>(responseBody)!;
+                        //DocumentViewModel vm = JsonConvert.DeserializeObject<DocumentViewModel>(responseBody)!;
 
-                        string pdfLocation = vm.FileLocation + vm.Filename;
-                        string qrcodeLocation = vm.FileLocation + "QRCode.png"; //fixed name
-                        string base64Pdfx = string.Empty;
-                        string base64Qrx = string.Empty;
+                        //string pdfLocation = vm.FileLocation + vm.Filename;
+                        //string qrcodeLocation = vm.FileLocation + "QRCode.png"; //fixed name
+                        //string base64Pdfx = string.Empty;
+                        //string base64Qrx = string.Empty;
 
-                        if (System.IO.File.Exists(pdfLocation))
-                        {
-                            byte[] pdfBytes = System.IO.File.ReadAllBytes(pdfLocation);
-                            base64Pdfx = Convert.ToBase64String(pdfBytes);
-                        }
+                        //if (System.IO.File.Exists(pdfLocation))
+                        //{
+                        //    byte[] pdfBytes = System.IO.File.ReadAllBytes(pdfLocation);
+                        //    base64Pdfx = Convert.ToBase64String(pdfBytes);
+                        //}
 
-                        if (System.IO.File.Exists(qrcodeLocation))
-                        {
-                            byte[] qrBytes = System.IO.File.ReadAllBytes(qrcodeLocation);
-                            base64Qrx = Convert.ToBase64String(qrBytes);
-                        }
-                        return Json(new { success = true, base64Pdf = base64Pdfx, base64QR = base64Qrx });
-                        //  return Json(new { success = true, message = responseBody, pathdDetails = documentDetails });
+                        //if (System.IO.File.Exists(qrcodeLocation))
+                        //{
+                        //    byte[] qrBytes = System.IO.File.ReadAllBytes(qrcodeLocation);
+                        //    base64Qrx = Convert.ToBase64String(qrBytes);
+
+                            return Json(new { success = true, message = "Your file has been successfully uploaded." });
+                        //    // return Json(new { success = true, base64Pdf = base64Pdfx, base64QR = base64Qrx });
+                        //    //  return Json(new { success = true, message = responseBody, pathdDetails = documentDetails });
+                        //}
+
                     }
-                    return Json(new { success = false, message = responseBody });
+                    return Json(new { success = false, message = "Your file has been successfully uploaded." });
                 }
             }
             catch (Exception ex)
@@ -782,7 +803,7 @@ namespace DCI.WebApp.Controllers
                     {
                         byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
                         base64Pdfx = Convert.ToBase64String(fileBytes);
-                    }                    
+                    }
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -808,7 +829,7 @@ namespace DCI.WebApp.Controllers
         {
             List<DocumentViewModel> model = new List<DocumentViewModel>();
 
-          
+
             using (var _httpclient = new HttpClient())
             {
                 DocumentViewModel _filterRoleModel = new DocumentViewModel();
