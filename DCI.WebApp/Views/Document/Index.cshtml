@@ -341,31 +341,28 @@
 
                 $(document).ready(function () {
                     js('#tblDocument').DataTable({
-                        layout: {
-                            topStart: {
-                                buttons: [
-
-                                    {
-                                        extend: 'excel',
-                                        text: 'Excel',
-                                        title: 'Document Report',
-                                        exportOptions: {
-                                            columns: ':not(:last-child)' // Excludes the last column
-                                        }
-                                    },
-                                    {
-                                        extend: 'pdf',
-                                        text: 'PDF',
-                                        title: 'Document Report',
-                                        exportOptions: {
-                                            columns: ':not(:last-child)' // Excludes the last column
-                                        }
-                                    }
-
-                                ]
+                    dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
+                    buttons: [
+                        {
+                            extend: 'excel',
+                            text: 'Excel',
+                            title: 'Document Report',
+                            exportOptions: {
+                                columns: ':not(:last-child)' // Excludes the last column
+                            }
+                        },
+                        {
+                            extend: 'pdf',
+                            text: 'PDF',
+                            title: 'Document Report',
+                            exportOptions: {
+                                columns: ':not(:last-child)' // Excludes the last column
                             }
                         }
-                    });
+                    ],
+                    lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
+                    pageLength: 10 // Default entries per page
+                });
 
                     //document.getElementById("FormsProcessSelect").style.display = 'none';
 

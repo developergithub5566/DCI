@@ -340,7 +340,25 @@
 								</div>
 							</div>
 
-@* 
+								<div class="accordion-item no-caret no-collapse">
+									<div class="accordion-header">
+										<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTodo" aria-expanded="true" aria-controls="collapseTodo">
+											<input type="checkbox" name="mainModule[]" value="13" id="module2" class="form-check-input" @(Model.Todo == true ? "checked" : "")>
+											<label for="module2" class="text-dark">To Do</label>
+										</button>
+									</div>
+								</div>
+
+								<div class="accordion-item no-caret no-collapse">
+									<div class="accordion-header">
+										<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseReports" aria-expanded="true" aria-controls="collapseReports">
+											<input type="checkbox" name="mainModule[]" value="14" id="module2" class="form-check-input" @(Model.Reports == true ? "checked" : "")>
+											<label for="module2" class="text-dark">Report</label>
+										</button>
+									</div>
+								</div>
+							
+@*						
 							<div class="accordion-item">
 
 								<div class="accordion-header">

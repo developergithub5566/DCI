@@ -1084,10 +1084,10 @@ namespace DCI.Repositories
                 query = query.Where(x => x.StatusId != (int)EnumDocumentStatus.Deleted);
             }
 
-            if (param.ReportParam > 0 && param.ReportParam == 1)
-            {
-                query.Where(x => x.StatusId == param.StatusId);
-            }
+            //if (param.ReportParam > 0 && param.ReportParam == 1)
+            //{
+            //    query.Where(x => x.StatusId == param.StatusId);
+            //}
 
             return query.ToList();
         }

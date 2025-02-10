@@ -36,7 +36,8 @@ namespace DCI.Core.Common
 		SystemManagement = 10,
 		AuditTrail = 11,
 		Announcement = 12 ,
-		Todo = 13
+		Todo = 13,
+		Reports = 14
 	}
 	public enum EnumRole
 	{

@@ -77,7 +77,10 @@
 		public bool AnnouncementImport { get; set; } = false;
 		public bool AnnouncementExport { get; set; } = false;
 
-		public int ViewEdit { get; set; } = 1;
+        public bool Todo { get; set; } = false;
+        public bool Reports { get; set; } = false;
+
+        public int ViewEdit { get; set; } = 1;
 		public string DashboardLabel { get; set; } = string.Empty;
 	}
 }
