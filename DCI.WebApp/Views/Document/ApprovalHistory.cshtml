@@ -128,7 +128,7 @@
             <i class="fas fa-check-circle"></i>
         </span>
         <div class="timeline-content">
-            <div class="step-title">Request By</div>
+            <div class="step-title">Requested By</div>
             <div class="step-details">
                 <strong>@Model.RequestBy</strong> <br>
                 <span>@Model.RequestByDatetime.ToString("MM/dd/yyyy hh:mmtt")</span>
@@ -162,7 +162,7 @@
                     }
                     else
                     {
-                        <div class="step-title">Upload By</div>
+                        <div class="step-title">Uploaded By</div>
                     }
 
                     <div class="step-details">
@@ -172,7 +172,11 @@
                         </span>
                         <br />
                         <span>
-                            <b>Remarks: </b>  @app.Remarks
+                            @if(app.Remarks != null && app.Remarks != "")
+                            {
+                            <b>Remarks: </b> @app.Remarks
+                            }
+                           
                         </span>
                     </div>
                 </div>

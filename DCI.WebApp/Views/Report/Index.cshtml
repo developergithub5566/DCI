@@ -84,7 +84,7 @@
             </a> *@
             @*    <label for="DocTypeId" class="col-form-label required">Document Type:</label> *@
             <select id="statusSelect" class="form-select" onchange="loadData()">
-                <option value="0">select status</option>
+                <option value="0">select all</option>
                 <option value="3">In Progress</option>
                 <option value="4">For Review</option>
                 <option value="6">For Approval</option>
@@ -122,14 +122,16 @@
                             <th>
                                 <label>Document Type</label>
                             </th>
+                           
+                            <th>
+                                <label>Status</label>
+                            </th>
+                          
                             <th>
                                 <label>Date Created</label>
                             </th>
                             <th>
-                                <label>Status</label>
-                            </th>
-                            <th>
-                                <label>Prepared By</label>
+                                <label>Requested By</label>
                             </th>
                             @* <th>
                             Action
@@ -303,12 +305,18 @@
                         ],
                         data: data, // Set new data dynamically
                         columns: [
-                            { data: "docNo", title: "Document No" },
-                            { data: "docName", title: "Document Name" },
-                            { data: "docTypeId", title: "Document Type ID" },
-                            { data: "docTypeName", title: "Document Type Name" },
-                            { data: "statusName", title: "Status" },
-                            { data: "createdName", title: "Created By" }
+                            // { data: "docNo", title: "Document No" },
+                            // { data: "docName", title: "Document Name" },
+                            //    { data: "dateCreated", title: "Date Created" },
+                            // { data: "docTypeName", title: "Document Type Name" },
+                            // { data: "statusName", title: "Status" },
+                            // { data: "requestByEmail", title: "Requested By" }
+                                       { data: "docNo", title: "Document No" },
+                            { data: "docName", title: "Document Name" },                          
+                            { data: "docTypeName", title: "Document Type" },
+                            { data: "statusName", title: "Status" },                          
+                             { data: "dateCreatedString", title: "Date Created" },
+                               { data: "requestByEmail", title: "Requested By" }
                         ],
                         lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
                         pageLength: 10

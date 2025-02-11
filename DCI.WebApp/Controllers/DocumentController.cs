@@ -40,7 +40,7 @@ namespace DCI.WebApp.Controllers
             this._userSessionHelper = userSessionHelper;
             this._documentService = documentService;
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(DocumentViewModel param)
         {
             List<DocumentViewModel> model = new List<DocumentViewModel>();
 
@@ -61,6 +61,7 @@ namespace DCI.WebApp.Controllers
 
                 var currentUser = _userSessionHelper.GetCurrentUser();
                 _filterRoleModel.CurrentRoleId = currentUser.RoleId;
+                _filterRoleModel.DocTypeId = param.DocTypeId;
 
                 var stringContent = new StringContent(JsonConvert.SerializeObject(_filterRoleModel), Encoding.UTF8, "application/json");
                 var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Document/GetAllDocument");
@@ -797,7 +798,7 @@ namespace DCI.WebApp.Controllers
                     var responseBody = await response.Content.ReadAsStringAsync();
                     DocumentDetailsViewModel vm = JsonConvert.DeserializeObject<DocumentDetailsViewModel>(responseBody)!;
 
-                    string filePath = Path.Combine("C:\\qrcode\\pdf2.pdf");
+                    string filePath = Path.Combine(vm.FileLocation + vm.Filename);
                     string base64Pdfx = string.Empty;
                     if (System.IO.File.Exists(filePath))
                     {

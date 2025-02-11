@@ -176,25 +176,17 @@ namespace DCI.Repositories
 						if (entity.Export == true)
 							SysManageVM.AuditTrailExport = true;
 					}
-                  
-            
-                    //else if (entity.ModulePageId == 12)
-                    //{
-                    //    SysManageVM.Announcement = true;
-                    //    if (entity.View == true)
-                    //        SysManageVM.AnnouncementView = true;
-                    //    if (entity.Add == true)
-                    //        SysManageVM.AnnouncementAdd = true;
-                    //    if (entity.Update == true)
-                    //        SysManageVM.AnnouncementUpdate = true;
-                    //    if (entity.Delete == true)
-                    //        SysManageVM.AnnouncementDelete = true;
-                    //    if (entity.Import == true)
-                    //        SysManageVM.AnnouncementImport = true;
-                    //    if (entity.Export == true)
-                    //        SysManageVM.AnnouncementExport = true;
-                    //}
-                
+                    else if (entity.ModulePageId == 13)
+                    {
+                        SysManageVM.Todo = true;
+                       
+                    }
+                    else if (entity.ModulePageId == 14)
+                    {
+                        SysManageVM.Reports = true;
+
+                    }
+
                 }
                 SysManageVM.RoleId = roleEntity.RoleId;
                 SysManageVM.RoleName = roleEntity.RoleName;

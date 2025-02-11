@@ -222,7 +222,7 @@ namespace DCI.Repositories
 				statusName = "for approval";
 			}
 
-			string link = _apiconfig.Value.WebAppConnection + "Document";
+			string link = _apiconfig.Value.WebAppConnection + "Document/Details?DocId=" + model.DocId;
 			model.RequestByEmail = userEntity.Email;
 			model.EmailBody = $@"
             <html>
@@ -290,8 +290,8 @@ namespace DCI.Repositories
 				apprvm.ApprovalStatus = Constants.Approval_Disapproved;
 			}
 
-			string link = _apiconfig.Value.WebAppConnection + "Document";
-			model.RequestByEmail = userEntity.Email;
+			string link = _apiconfig.Value.WebAppConnection + "Document/Details?DocId=" + model.DocId;
+            model.RequestByEmail = userEntity.Email;
 			model.EmailBody = $@"
             <html>
             <body>              

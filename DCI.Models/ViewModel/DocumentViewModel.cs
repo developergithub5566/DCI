@@ -61,6 +61,9 @@ namespace DCI.Models.ViewModel
         public IFormFile? FinalOutputPDF { get; set; }
 
         public int ReportParam { get; set; } = 0;
+
+        public string DateCreatedString { get; set; } = string.Empty;
+        public string? RequestedName { get; set; } = string.Empty;
     }
     public class DocumentDetailsViewModel
     {
@@ -75,6 +78,8 @@ namespace DCI.Models.ViewModel
         public string Reviewer { get; set; } = string.Empty;
         public string Approver { get; set; } = string.Empty;
         public string PdfBytes { get; set; } = string.Empty;
+        public string Filename { get; set; } = string.Empty;
+        public string FileLocation { get; set; } = string.Empty;
     }
 
 }

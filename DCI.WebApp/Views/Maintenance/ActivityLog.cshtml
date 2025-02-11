@@ -126,6 +126,16 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
 		<script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
 
+		@* 	<script src="~/js/file-upload.js"></script> *@
+		<script src="https://cdn.datatables.net/buttons/3.2.1/js/dataTables.buttons.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+		<script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.html5.min.js"></script>
+		<script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.print.min.js"></script>
+		<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
+		<link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.1/css/buttons.dataTables.css">
+
 		<script type="text/javascript">
 			var js = jQuery.noConflict(true);
 			$('.spinner-overlay').show();
@@ -136,9 +146,34 @@
 
 
 			$(document).ready(function () {
+				// js('#tblAuditLog').DataTable({
+				// 	order: [[0, 'desc']]
+				// });
+
 				js('#tblAuditLog').DataTable({
-					order: [[0, 'desc']]
-				});
+					dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
+					buttons: [
+						{
+							extend: 'excel',
+							text: 'Excel',
+							title: 'Document Report',
+							exportOptions: {
+								 columns: ':visible'
+							}
+						},
+						{
+							extend: 'pdf',
+							text: 'PDF',
+							title: 'Document Report',
+							exportOptions: {
+								 columns: ':visible'
+							}
+						}
+					],
+					lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
+					pageLength: 10 // Default entries per page
+				//	order: [[0, 'desc']]
+			   });
 			});
 		</script>
 	}

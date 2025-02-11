@@ -57,7 +57,7 @@ namespace DCI.Repositories
 
             var query = from doc in context
                         join doctype in _dbContext.DocumentType on doc.DocTypeId equals doctype.DocTypeId
-                        join user in _dbContext.User on doc.CreatedBy equals user.UserId
+                        join user in _dbContext.User on doc.RequestById equals user.UserId
                         join stat in _dbContext.Status on doc.StatusId equals stat.StatusId
                         where doc.IsActive == true
                         select new DocumentViewModel
@@ -72,14 +72,21 @@ namespace DCI.Repositories
                             StatusName = stat.StatusName,
                             DocumentTypeList = null,
                             DocTypeName = doctype.Name,
-                            CreatedName = user.Email,
+                           // CreatedName = user.Email,
                             DateCreated = doc.DateCreated,
+                            RequestedName = user.Email
                         };
 
             if (param.CurrentRoleId == (int)EnumRole.User)
             {
                 query = query.Where(x => x.StatusId != (int)EnumDocumentStatus.Deleted);
             }
+
+            if (param.DocTypeId > 0)
+            {
+                query = query.Where(x => x.DocTypeId == param.DocTypeId);
+            }
+
 
             //result.DocumentTypeList = doctypeList.Count() > 0 ? doctypeList : null;
             //result.DocumentList = query.ToList();
@@ -768,6 +775,7 @@ namespace DCI.Repositories
                    doc => doc.DocTypeId, // key from Document
                    (doctype, docs) => new HomePageViewModel
                    {
+                       DocTypeId = doctype.DocTypeId,
                        DocumentType = doctype.Name,
                        TotalCount = docs.Count() // count the associated documents or 0 if no documents exist
                    }
@@ -964,16 +972,22 @@ namespace DCI.Repositories
                 approvalHeader.Reviewer = docContext.Reviewer;
                 approvalHeader.Approver = docContext.Approver;
 
-                if (docContext.StatusId == (int)EnumDocumentStatus.ForReview)
+                if (docContext.StatusId == (int)EnumDocumentStatus.InProgress)
+                {
+                    //approvalHeader.CurrentStatus = "In Progress";
+                    approvalHeader.Percentage = 25;
+
+                }
+                else if (docContext.StatusId == (int)EnumDocumentStatus.ForReview)
                 {
                     approvalHeader.CurrentStatus = "Review";
-                    approvalHeader.Percentage = 33;
+                    approvalHeader.Percentage = 50;
 
                 }
                 else if (docContext.StatusId == (int)EnumDocumentStatus.ForApproval)
                 {
                     approvalHeader.CurrentStatus = "Approval";
-                    approvalHeader.Percentage = 66;
+                    approvalHeader.Percentage = 75;
                 }
                 else if (docContext.StatusId == (int)EnumDocumentStatus.Approved)
                 {
@@ -1036,7 +1050,9 @@ namespace DCI.Repositories
                                         Status = stat.StatusName,
                                         Reviewer = reviewer.Lastname + " " + reviewer.Firstname,
                                         Approver = apprUser.Lastname + " " + apprUser.Firstname,
-                                        DateCreated = doc.DateCreated.ToString()
+                                        DateCreated = doc.DateCreated.ToString(),
+                                        FileLocation = doc.FileLocation,
+                                        Filename = doc.Filename
                                     }).FirstOrDefaultAsync();
 
                 return result;
@@ -1060,7 +1076,7 @@ namespace DCI.Repositories
 
             var query = from doc in context
                         join doctype in _dbContext.DocumentType on doc.DocTypeId equals doctype.DocTypeId
-                        join user in _dbContext.User on doc.CreatedBy equals user.UserId
+                        join user in _dbContext.User on doc.RequestById equals user.UserId
                         join stat in _dbContext.Status on doc.StatusId equals stat.StatusId
                         where doc.IsActive == true
                         select new DocumentViewModel
@@ -1075,8 +1091,8 @@ namespace DCI.Repositories
                             StatusName = stat.StatusName,
                             DocumentTypeList = null,
                             DocTypeName = doctype.Name,
-                            CreatedName = user.Email,
-                            DateCreated = doc.DateCreated,
+                            RequestByEmail = user.Email,
+                            DateCreatedString = doc.DateCreated.ToShortDateString(),
                         };
 
             if (param.CurrentRoleId == (int)EnumRole.User)

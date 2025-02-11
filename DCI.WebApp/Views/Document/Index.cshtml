@@ -7,22 +7,22 @@
 <style>
     /* Hide the default file input */
     /* 	#fileUpload {
-                                                                        display: none;
-                                                                    } */
+    display: none;
+    } */
 
     /* Style the custom button */
 
     .custom-file-label {
-        padding: 8px 16px;
-        background-color: #007bff;
-        color: white;
-        border-radius: 4px;
-        cursor: pointer;
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
     }
 
     .file-name {
-        margin-left: 10px;
-        font-style: italic;
+    margin-left: 10px;
+    font-style: italic;
     }
 
 </style>
@@ -34,29 +34,30 @@
     var canAdd = false;
     var canEdit = false;
     var canDelete = false;
+    var canExport = false;
 
     if (modulePageAccess == null)
     {
         <script>
             $.ajax({
-                type: 'POST',
-                url: '@Url.Action("Logout", "Account")',
-                success: function (response) {
+            type: 'POST',
+            url: '@Url.Action("Logout", "Account")',
+            success: function (response) {
 
-                    Swal.fire({
-                        text: "Your session has timed out. Please log in again.",
-                        icon: "info",
-                        confirmButtonText: "Ok"
-                    }).then((result) => {
-                        window.location.href = '/Account/Logout';
-                    });
-                },
-                error: function () {
-                    Swal.fire({
-                        text: "An error occurred. Please try again.",
-                        icon: "error"
-                    });
-                }
+            Swal.fire({
+            text: "Your session has timed out. Please log in again.",
+            icon: "info",
+            confirmButtonText: "Ok"
+            }).then((result) => {
+            window.location.href = '/Account/Logout';
+            });
+            },
+            error: function () {
+            Swal.fire({
+            text: "An error occurred. Please try again.",
+            icon: "error"
+            });
+            }
             })
         </script>
     }
@@ -68,6 +69,7 @@
         canAdd = module?.Add ?? false;
         canEdit = module?.Update ?? false;
         canDelete = module?.Delete ?? false;
+        canExport = module?.Export ?? false;
     }
 }
 
@@ -119,14 +121,15 @@
                             <th>
                                 <label>Document Type</label>
                             </th>
-                            <th>
-                                <label>Date Created</label>
-                            </th>
+                           
                             <th>
                                 <label>Status</label>
                             </th>
                             <th>
-                                <label>Prepared By</label>
+                                <label>Date Created</label>
+                            </th>
+                            <th>
+                                <label>Requested By</label>
                             </th>
                             <th>
                                 Action
@@ -153,13 +156,14 @@
                                     @item.DocTypeName
                                 </td>
                                 <td>
-                                    @item.DateCreated
-                                </td>
-                                <td>
                                     @item.StatusName
                                 </td>
                                 <td>
-                                    @item.CreatedName
+                                    @item.DateCreated.ToShortDateString()
+                                </td>
+                               
+                                <td>
+                                    @item.RequestedName
                                 </td>
 
                                 <td>
@@ -193,7 +197,8 @@
 
                                 <div id="blobpdf" hidden></div>
                                 <div id="pdfBinary" hidden></div>
-                                <div id="qrcode" hidden></div>
+                                <div id="qrcode" hidden></div>                              
+                                <input type="text" class="form-control" id="canExport" name="canExport" value="@canExport" hidden >
 
                                 <div class="row">
                                     <div class="col" id="DocNoDiv">
@@ -340,7 +345,10 @@
                 }, 200);
 
                 $(document).ready(function () {
-                    js('#tblDocument').DataTable({
+
+
+
+                      var table =  js('#tblDocument').DataTable({
                     dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
                     buttons: [
                         {
@@ -363,6 +371,21 @@
                     lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
                     pageLength: 10 // Default entries per page
                 });
+
+
+
+
+                 const _export =  $('#canExport').val();
+                
+
+                if(_export == 0){
+                        table.buttons(0).container().hide(); // Excel
+                        table.buttons(1).container().hide(); // PDF
+                }
+
+
+                    // $("dt-button buttons-excel buttons-html5").addClass("hide");
+                    //  $("dt-button buttons-pdf buttons-html5").addClass("hide");
 
                     //document.getElementById("FormsProcessSelect").style.display = 'none';
 
