@@ -346,8 +346,6 @@
 
                 $(document).ready(function () {
 
-
-
                       var table =  js('#tblDocument').DataTable({
                     dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
                     buttons: [
@@ -372,11 +370,7 @@
                     pageLength: 10 // Default entries per page
                 });
 
-
-
-
-                 const _export =  $('#canExport').val();
-                
+                 const _export =  $('#canExport').val();                
 
                 if(_export == 0){
                         table.buttons(0).container().hide(); // Excel

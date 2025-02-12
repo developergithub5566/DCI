@@ -138,12 +138,17 @@ namespace DCI.API.Controllers
         }
 
         [HttpPost]
-        [Route("ReportsListofDocumentByStatus")]
-        public async Task<IActionResult> ReportsListofDocumentByStatus([FromBody] DocumentViewModel model)
+        [Route("ReportsListofDocument")]
+        public async Task<IActionResult> ReportsListofDocument([FromBody] DocumentViewModel model)
         {
-            return Ok(await _documentRepository.ReportsListofDocumentByStatus(model));
+            return Ok(await _documentRepository.ReportsListofDocument(model));
         }
 
-      
+        [HttpGet]
+        [Route("ReportGraphByStatus")]
+        public async Task<IActionResult> ReportGraphByStatus()
+        {
+            return Ok(await _documentRepository.ReportGraphByStatus());
+        }
     }
 }

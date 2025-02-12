@@ -1067,12 +1067,14 @@ namespace DCI.Repositories
                 Log.CloseAndFlush();
             }
         }
-        public async Task<IList<DocumentViewModel>> ReportsListofDocumentByStatus(DocumentViewModel param)
+        public async Task<IList<DocumentViewModel>> ReportsListofDocument(DocumentViewModel param)
         {
 
             var context = _dbContext.Document.AsQueryable();
 
             var userList = _dbContext.User.AsQueryable().ToList();
+
+            var documentTypeList = _dbContext.DocumentType.Where(x => x.IsActive == true).AsQueryable().ToList();
 
             var query = from doc in context
                         join doctype in _dbContext.DocumentType on doc.DocTypeId equals doctype.DocTypeId
@@ -1098,14 +1100,41 @@ namespace DCI.Repositories
             if (param.CurrentRoleId == (int)EnumRole.User)
             {
                 query = query.Where(x => x.StatusId != (int)EnumDocumentStatus.Deleted);
-            }
-
-            //if (param.ReportParam > 0 && param.ReportParam == 1)
-            //{
-            //    query.Where(x => x.StatusId == param.StatusId);
-            //}
+            }      
 
             return query.ToList();
+        }
+
+
+        //  public async Task<Tuple<IList<ReportGraphViewModel>, IList<ReportGraphViewModel>>> ReportGraphByStatus()
+        public async Task<ReportGraphsDataViewModel> ReportGraphByStatus()
+        {
+            ReportGraphsDataViewModel model = new ReportGraphsDataViewModel();
+
+            var _statusData = await (from doc in _dbContext.Document
+                               join stat in _dbContext.Status on doc.StatusId equals stat.StatusId
+                               where doc.IsActive == true
+                               group doc by stat.StatusName into g                              
+                               select new ReportGraphViewModel
+                               {
+                                   Status = g.Key, // StatusName from the group
+                                   Count = g.Count() // Count of documents per status
+                               }).ToListAsync();
+
+            var _docTypeData = await (from doc in _dbContext.Document
+                               join doctype in _dbContext.DocumentType on doc.DocTypeId equals doctype.DocTypeId
+                                where doc.IsActive == true
+                                group doc by doctype.Name into g
+                               select new ReportGraphViewModel
+                               {
+                                   Status = g.Key, // StatusName from the group
+                                   Count = g.Count() // Count of documents per status
+                               }).ToListAsync();
+            
+            model.StatusData = _statusData;
+            model.TypeData = _docTypeData;
+            return model;
+            
         }
     }
 }
