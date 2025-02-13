@@ -261,14 +261,15 @@
 
                                 <div class="row">
                                     <div class="col">
-                                        <label for="DocLabel" id="DocLabel" class="col-form-label">Reviewer:</label>
+                                        <label for="reviewLabel" id="reviewLabel" class="col-form-label">Reviewer:</label>
                                         <select id="ReviewerSelect" class="form-select">
                                             <option value="">select reviewer</option>
-
                                         </select>
+                                       @*  @Html.DropDownListFor(m => m.SelectedReviewer, vm.OptionsReviewer, "Select Reviewer", new { @class = "form-select", id = "ReviewerSelect" }) *@
+
                                     </div>
                                     <div class="col">
-                                        <label for="DocLabel" id="DocLabel" class="col-form-label">Approver:</label>
+                                        <label for="approverLabel" id="approverLabel" class="col-form-label">Approver:</label>
                                         <select id="ApproverSelect" class="form-select">
                                             <option value="">select approver</option>
 
@@ -324,16 +325,12 @@
             </div>
 
             <input type="hidden" id="HiddenDocId" name="HiddenDocId" value="">
-            <input type="hidden" id="HiddenAction" name="HiddenAction" value="">
-          
-
+            <input type="hidden" id="HiddenAction" name="HiddenAction" value="">     
         </div>
-
 
         @section scripts {
             @* <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script> *@
             <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
-
             <script src="~/js/file-upload.js"></script>
 
             <script type="text/javascript">
@@ -348,12 +345,7 @@
                 $(document).ready(function () {
                     js('#tblDocument').DataTable({
                         order: [[4, 'desc']]
-                    });
-
-                    0
-                    //document.getElementById("FormsProcessSelect").style.display = 'none';
-
-                    //document.getElementById("DocLabel").style.display = 'none';
+                    });                  
 
                     $('#fileUpload').on('change', function () {
                         var fileName = this.files[0] ? this.files[0].name : 'No file chosen';
@@ -455,7 +447,7 @@
                         url: '@Url.Action("EditDocument", "Document")',
                         data: { DocId: id },
                         success: function (response) {
-                            //	console.log(response.data);
+                            	// console.log(response.data);
                             if (response.success) {
                                 $('#DocId').val(response.data.docId);
                                 $('#DocNo').val(response.data.docNo);
@@ -506,8 +498,35 @@
                                 $select.empty();
                                 $select.append('<option value="">Select requestor</option>');
 
-                                $.each(response.data.optionsRequestBy, function (index, item) {
+                                $.each(response.data.optionsRequestBy, function (index, item) {                                 
                                     if (item.value == response.data.requestById) {
+                                        $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+                                    } else {
+                                        $select.append('<option value="' + item.value + '">' + item.text + '</option>');
+                                    }
+                                });
+
+
+                                var $select = $('#ReviewerSelect');
+                                $select.empty();
+                                $select.append('<option value="">select reviewer</option>');
+                                $.each(response.data.optionsReviewer, function (index, item) {                                      
+                                    if (item.value == response.data.reviewer) {
+                                        $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+                                    } else {
+                                        $select.append('<option value="' + item.value + '">' + item.text + '</option>');
+                                    }                                              
+                                });
+                               
+
+
+                                var $select = $('#ApproverSelect');
+                                $select.empty();
+                                $select.append('<option value="">select approver</option>');
+
+                                $.each(response.data.optionsApprover, function (index, item) {
+                                    if (item.value == response.data.approver) {
+                                        console.log(response.data.approver);
                                         $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
                                     } else {
                                         $select.append('<option value="' + item.value + '">' + item.text + '</option>');

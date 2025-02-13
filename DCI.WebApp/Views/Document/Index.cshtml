@@ -279,7 +279,7 @@
                                     </div>
                                 </div>
 
-                                @*          <hr />
+                                      @*    <hr />
 
                                 <div class="row">
                                 <div class="col">
@@ -444,8 +444,9 @@
 
                         setTimeout(() => {
 
+                              if(typeof file !== "undefined" ){
                             formData.append('FinalOutputPDF', $('#blobpdf').val(), fileInput.files[0].name);
-
+                              }
 
                             Swal.fire({
                                 text: "Are you sure you want to save this record?",
@@ -670,25 +671,11 @@
                                     } else {
                                         $select.append('<option value="' + item.value + '">' + item.text + '</option>');
                                     }
-                                });
-
-                                // var $select = $('#sectionSelect');
-                                // $select.empty();
-                                // $select.append('<option value="">Select section</option>');
-                                // $.each(response.data.optionsSection, function (index, item) {
-                                // 	if (item.value == response.data.sectionId) {
-                                // 		$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
-                                // 	} else {
-                                // 		$select.append('<option value="' + item.value + '">' + item.text + '</option>');
-                                // 	}
-                                // });
-
-
+                                });        
 
                                 var $select = $('#requestBySelect');
                                 $select.empty();
                                 $select.append('<option value="">Select requestor</option>');
-
                                 $.each(response.data.optionsRequestBy, function (index, item) {
                                     if (item.value == response.data.requestById) {
                                         $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
@@ -700,7 +687,6 @@
                                 var $select = $('#reviewerSelect');
                                 $select.empty();
                                 $select.append('<option value="">select reviewer</option>');
-
                                 $.each(response.data.optionsReviewer, function (index, item) {
                                     if (item.value == response.data.reviewer) {
                                         $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
@@ -906,8 +892,8 @@
                 // 	}
                 // }
                 async function InsertQRCodeInPDF(PdfBase64, QRbase64x) {
-                    console.log("InsertQRCodeInPDF");
-                    console.log(QRbase64x);
+                 //   console.log("InsertQRCodeInPDF");
+                   // console.log(QRbase64x);
                     const dataUri = 'data:application/pdf;base64,' + PdfBase64
                     const QRdataUri = 'data:image/png;base64,' + QRbase64x
                     const pdfDoc = await PDFDocument.load(dataUri)

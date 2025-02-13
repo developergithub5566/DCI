@@ -195,7 +195,7 @@ namespace DCI.Repositories
                     model.DocNo = entity.DocNo;
                     model.UploadLink = entity.UploadLink;
                     model.StatusId = entity.StatusId;
-
+                  
                     if (model.DocFile != null)
                     {
                         await SaveFileFinal(model);
@@ -248,6 +248,7 @@ namespace DCI.Repositories
                     await _dbContext.SaveChangesAsync();
 
                     model.DocId = entity.DocId;
+                    model.StatusId = entity.StatusId;
 
                     if (model.DocFile != null)
                     {
@@ -342,7 +343,7 @@ namespace DCI.Repositories
 
                 entity.ModifiedBy = model.ModifiedBy ?? null;
                 entity.DateModified = model.DateModified ?? null;
-                entity.StatusId = model.StatusId ?? 0;
+                entity.StatusId = model.StatusId ?? (int)EnumDocumentStatus.ForReview;
                 if (entity.Filename != null && entity.Filename != "")
                 {
                     entity.Version = Convert.ToInt16(entity.Version) + 1;
@@ -399,7 +400,8 @@ namespace DCI.Repositories
 
                 entity.ModifiedBy = model.ModifiedBy ?? null;
                 entity.DateModified = model.DateModified ?? null;
-                entity.StatusId = model.StatusId ?? 0;
+                entity.StatusId = (int)EnumDocumentStatus.ForReview;
+                entity.IsActive = true;
                 if (entity.Filename != null && entity.Filename != "")
                 {
                     entity.Version = Convert.ToInt16(entity.Version) + 1;
@@ -487,7 +489,8 @@ namespace DCI.Repositories
 
                 entity.ModifiedBy = model.ModifiedBy ?? null;
                 entity.DateModified = model.DateModified ?? null;
-                entity.StatusId = model.StatusId ?? 0;
+                entity.StatusId = (int)EnumDocumentStatus.ForReview;
+                entity.IsActive = true;
                 if (entity.Filename != null && entity.Filename != "")
                 {
                     entity.Version = Convert.ToInt16(entity.Version) + 1;

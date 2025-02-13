@@ -314,7 +314,8 @@ namespace DCI.Repositories
 
 			apprvm.ApprovalStatus = Constants.Approval_Disapproved;
 
-			string link = _apiconfig.Value.WebAppConnection + "Document/Upload?token=";
+            string detailsLink = _apiconfig.Value.WebAppConnection + "Document/Details?DocId=" + model.DocId;
+            string uploadlink = _apiconfig.Value.WebAppConnection + "Document/Upload?token=";
 			model.RequestByEmail = userEntity.Email;
 			model.EmailBody = $@"
             <html>
@@ -322,8 +323,8 @@ namespace DCI.Repositories
                 <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
                 
                  <p>This is an automated message from DCI Application.</p>
-                 <p>The document (Document No: <a href='{link}'> {model.DocNo}</a>)  has been {apprvm.ApprovalStatus.ToLower()}.</p>   
-				 <p>Please upload the updated document. </p> <a href='{link + model.UploadLink}'>Upload File</a>
+                 <p>The document (Document No: <a href='{detailsLink}'> {model.DocNo}</a>)  has been {apprvm.ApprovalStatus.ToLower()}.</p>   
+				 <p>Please upload the updated document. </p> <a href='{uploadlink + model.UploadLink}'>Upload File</a>
 
                 <p>If you encounter any issues, please contact our support team at [DCI Application Support].</p>            
                 <p>Thank you,<br />Your DCI</p>
