@@ -8,5 +8,6 @@ namespace DCI.Repositories.Interface
         Task<IList<Form201ViewModel>> GetAllEmployee();
         Task<(int statuscode, string message)> Save(Form201ViewModel model);
         Task<(int statuscode, string message)> Delete(Form201ViewModel model);
+        Task<(int statuscode, string message)> Update201Form(Form201ViewModel model);
     }
 }

@@ -37,8 +37,9 @@ namespace DCI.API.Controllers
         [HttpPost]
         [Route("SaveEmployee")]
         public async Task<IActionResult> SaveEmployee([FromBody] Form201ViewModel model)
-        {
-            return Ok(await _employeeRepository.Save(model));
+        {          
+            var result = await _employeeRepository.Save(model);
+            return StatusCode(result.statuscode, result.message);
         }
 
         [HttpPost]
@@ -47,6 +48,14 @@ namespace DCI.API.Controllers
         {
             var result = await _employeeRepository.Delete(model);
             return StatusCode(result.statuscode, result.message);
-        }        
+        }
+
+        [HttpPost]
+        [Route("Update201Form")]
+        public async Task<IActionResult> Update201Form([FromBody] Form201ViewModel model)
+        {
+            var result = await _employeeRepository.Update201Form(model);
+            return StatusCode(result.statuscode, result.message);           
+        }
     }
 }

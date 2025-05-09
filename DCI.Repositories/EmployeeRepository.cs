@@ -214,6 +214,34 @@ namespace DCI.Repositories
             }
         }
 
+
+        public async Task<(int statuscode, string message)> Update201Form(Form201ViewModel model)
+        {
+            try
+            {        
+
+                    var emp = await _dbContext.Employee.FirstOrDefaultAsync(x => x.EmployeeId == model.EmployeeId);               
+                    emp.Nickname = model.Nickname;    
+                    emp.MobileNoPersonal = model.MobileNoPersonal;              
+                    emp.DateModified = DateTime.Now;
+                    emp.ModifiedBy = model.ModifiedBy;
+                    _dbContext.Employee.Entry(emp).State = EntityState.Modified;
+                    await _dbContext.SaveChangesAsync();
+
+                    return (StatusCodes.Status200OK, "Registration updated");
+              
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return (StatusCodes.Status406NotAcceptable, ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
         public async Task<(int statuscode, string message)> Delete(Form201ViewModel model)
         {
             try
