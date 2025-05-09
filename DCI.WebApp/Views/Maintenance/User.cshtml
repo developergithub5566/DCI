@@ -1,4 +1,5 @@
-﻿@model DCI.Models.ViewModel.UserModel
+﻿@* @model DCI.Models.ViewModel.UserModel *@
+@model IEnumerable<DCI.Models.ViewModel.UserModel>;
 @using Newtonsoft.Json;
 @using DCI.Core.Common
 @using DCI.Models.ViewModel;
@@ -101,14 +102,19 @@
 							<th>
 								<label>Contact No</label>
 							</th>
-
+							<th>
+								<label>Role</label>
+							</th>
+							<th>
+								<label>Department</label>
+							</th>
 							<th>
 								Action
 							</th>
 						</tr>
 					</thead>
 					<tbody>
-						@foreach (var item in Model.EmployeeList)
+						@foreach (var item in Model)
 						{
 							<tr>
 								@* <td>
@@ -128,6 +134,12 @@
 								</td>
 								<td>
 									@item.ContactNo
+								</td>
+									<td>
+									@item.RoleName
+								</td>
+								<td>
+									@item.DepartmentName
 								</td>
 								<td>
 									@* 	<a href="#" class="btn btn-primary" onclick="editForm(@item.UserId,1)"><i class="fas fa-search"></i></a> |
@@ -191,13 +203,26 @@
 										<label for="ContactNo" class="col-form-label">ContactNo:</label>
 										<input class="form-control" id="ContactNo" name="Contact No" maxlength="15" type="number"></input>
 									</div>
+								
+								</div>
+
+								<hr />
+
+								<div class="row mb-3">
+
 									<div class="col-md-6">
 										<label for="RoleId" class="col-form-label required">Role:</label>
 										<input type="hidden" id="RoleId" name="RoleId" value="0">
 										<select id="roleSelect" class="form-select" required>
 											<option value="">Select Role</option>
 										</select>
-
+									</div>
+									<div class="col-md-6">
+										<label for="Department" class="col-form-label required">Department:</label>
+										<input type="hidden" id="DepartmentId" name="DepartmentId" value="0">
+										<select id="departmentSelect" class="form-select" required>
+											<option value="">select department</option>
+										</select>
 									</div>
 								</div>
 
@@ -305,7 +330,7 @@
 								$('#ContactNo').val("");
 								$('#Email').val("");
 								$('#RoleId').val(0);
-
+								$('#DepartmentId').val(0);
 
 								var $select = $('#roleSelect');
 								$select.empty(); // Clear the current options
@@ -313,6 +338,18 @@
 
 								$.each(response.data.options, function (index, item) {
 									if (item.value == response.data.roleId) {
+										$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+									} else {
+										$select.append('<option value="' + item.value + '">' + item.text + '</option>');
+									}
+								});
+
+
+								var $select = $('#departmentSelect');
+								$select.empty(); // Clear the current options
+								$select.append('<option value="">Select Department</option>');
+								$.each(response.data.optionsDepartment, function (index, item) {
+									if (item.value == response.data.departmentId) {
 										$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
 									} else {
 										$select.append('<option value="' + item.value + '">' + item.text + '</option>');
@@ -355,7 +392,7 @@
 								$('#ContactNo').val(response.data.contactNo);
 								$('#Email').val(response.data.email);
 								$('#RoleId').val(response.data.roleId);
-
+									$('#DepartmentId').val(response.data.departmentId);
 
 								var $select = $('#roleSelect');
 								$select.empty(); // Clear the current options
@@ -363,6 +400,17 @@
 
 								$.each(response.data.options, function (index, item) {
 									if (item.value == response.data.roleId) {
+										$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+									} else {
+										$select.append('<option value="' + item.value + '">' + item.text + '</option>');
+									}
+								});
+
+										var $select = $('#departmentSelect');
+								$select.empty(); // Clear the current options
+								$select.append('<option value="">Select Department</option>');
+								$.each(response.data.optionsDepartment, function (index, item) {
+									if (item.value == response.data.departmentId) {
 										$select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
 									} else {
 										$select.append('<option value="' + item.value + '">' + item.text + '</option>');

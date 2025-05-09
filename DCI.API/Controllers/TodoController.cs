@@ -12,7 +12,7 @@ namespace DCI.API.Controllers
 
 	public class TodoController : Controller
 	{
-		private readonly DCIdbContext _dcIdbContext;
+		
 		ITodoRepository _todoRepository;
 
 
@@ -21,27 +21,27 @@ namespace DCI.API.Controllers
 			_todoRepository = todoRepository;
 		}
 
-		[HttpPost]
-		[Route("GetTodoByApproverId")]
-		public async Task<IActionResult> GetTodoByApproverId([FromBody] ApprovalHistoryViewModel model)
-		{		
-			return Ok(await _todoRepository.GetTodoByApproverId(model));
-		}
+		//[HttpPost]
+		//[Route("GetTodoByApproverId")]
+		//public async Task<IActionResult> GetTodoByApproverId([FromBody] ApprovalHistoryViewModel model)
+		//{		
+		//	return Ok(await _todoRepository.GetTodoByApproverId(model));
+		//}
 
-		[HttpPost]
-		[Route("Approval")]
-		public async Task<IActionResult> Approval([FromBody] ApprovalHistoryViewModel model)
-		{			
-			var result = await _todoRepository.Approval(model);
-			return StatusCode(result.statuscode, result.message);
-		}
-		[HttpPost]
-		[Route("GetAllTodo")]
-		public async Task<IActionResult> GetAllTodo([FromBody] DocumentViewModel model)
-		{	
-			var result = await _todoRepository.GetAllTodo(model);
-			return Ok(result);
-		}
+		//[HttpPost]
+		//[Route("Approval")]
+		//public async Task<IActionResult> Approval([FromBody] ApprovalHistoryViewModel model)
+		//{			
+		//	var result = await _todoRepository.Approval(model);
+		//	return StatusCode(result.statuscode, result.message);
+		//}
+		//[HttpPost]
+		//[Route("GetAllTodo")]
+		//public async Task<IActionResult> GetAllTodo([FromBody] DocumentViewModel model)
+		//{	
+		//	var result = await _todoRepository.GetAllTodo(model);
+		//	return Ok(result);
+		//}
 
 	}
 }

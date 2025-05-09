@@ -6,7 +6,8 @@ namespace DCI.Repositories.Interface
 {
     public interface IUserRepository : IDisposable
     {
-        Task<IList<User>> GetAllUsers();
+        //Task<IList<User>> GetAllUsers();
+        Task<IList<UserModel>> GetAllUsers();
         Task<User> GetUserById(int userid);
 		Task<(int statuscode, string message)> Registration(UserViewModel model);
         Task<User> GetUserByEmail(string email);

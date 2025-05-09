@@ -21,12 +21,12 @@ namespace DCI.API.Controllers
 		IDepartmentRepository _departmentRepository;
 		IEmploymentTypeRepository _employmentTypeRepository;
 		IUserRoleRepository _userRoleRepository;
-		IDocumentTypeRepository _documentTypeRepository;
+		//IDocumentTypeRepository _documentTypeRepository;
 		IAuditLogRepository _auditLogRepository;
-		ISectionRepository _sectionRepository;
+		//ISectionRepository _sectionRepository;
 		public MaintenanceController(IModulePageRepository modulePageRepository, IModuleInRoleRepository moduleInRoleRepository,
 			IRoleRepository roleRepository, IUserRepository userRepository, IDepartmentRepository DepartmentRepository, IEmploymentTypeRepository employmentTypeRepository,
-			IUserRoleRepository userRoleRepository, IDocumentTypeRepository documentTypeRepository, IAuditLogRepository auditLogRepository,ISectionRepository sectionRepository)
+			IUserRoleRepository userRoleRepository,  IAuditLogRepository auditLogRepository)
 		{
 			this._userRepository = userRepository;
 			this._moduleInRoleRepository = moduleInRoleRepository;
@@ -35,9 +35,8 @@ namespace DCI.API.Controllers
 			this._departmentRepository = DepartmentRepository;
 			this._employmentTypeRepository = employmentTypeRepository;
 			this._userRoleRepository = userRoleRepository;
-			this._documentTypeRepository = documentTypeRepository;
-			this._auditLogRepository = auditLogRepository;
-			this._sectionRepository = sectionRepository;
+			//this._documentTypeRepository = documentTypeRepository;
+			this._auditLogRepository = auditLogRepository;			
 		}
 
 
@@ -307,41 +306,7 @@ namespace DCI.API.Controllers
 		}
 		#endregion
 
-		#region Document Type
 
-		[HttpGet]
-		[Route("GetAllDocumentType")]
-		public async Task<IActionResult> GetAllDocumentType()
-		{
-			return Ok(await _documentTypeRepository.GetAllDocumentType());
-		}
-
-		[HttpPost]
-		[Route("GetDocumentTypeById")]
-		public async Task<IActionResult> GetDocumentTypeById(DocumentTypeViewModel model)
-		{
-			if (!await _documentTypeRepository.IsExistsDocumentType(model.DocTypeId))
-			{
-				return NotFound("Document Type Id invalid");
-			}
-			return Ok(await _documentTypeRepository.GetDocumentTypeById(model.DocTypeId));
-		}
-
-		[HttpPost]
-		[Route("SaveDocumentType")]
-		public async Task<IActionResult> SaveDocumentType([FromBody] DocumentTypeViewModel model)
-		{
-			var result = await _documentTypeRepository.Save(model);
-			return StatusCode(result.statuscode, result.message);
-		}
-		[HttpPost]
-		[Route("DeleteDocumentType")]
-		public async Task<IActionResult> DeleteEmploymentType([FromBody] DocumentTypeViewModel model)
-		{
-			var result = await _documentTypeRepository.Delete(model);
-			return StatusCode(result.statuscode, result.message);
-		}
-		#endregion
 
 		#region Audit Logs
 		[HttpPost]
@@ -359,47 +324,6 @@ namespace DCI.API.Controllers
 		}
 		#endregion
 
-		#region Section
 
-		[HttpGet]
-		[Route("GetAllSection")]
-		public async Task<IActionResult> GetAllSection()
-		{
-			return Ok(await _sectionRepository.GetAllSection());
-		}
-
-		[HttpPost]
-		[Route("GetSectionById")]
-		public async Task<IActionResult> GetSectionById(SectionViewModel model)
-		{
-			//if (!await _sectionRepository.IsExistsSection(model.SectionId))
-			//{
-			//	return NotFound("Section Id invalid");
-			//}
-			return Ok(await _sectionRepository.GetSectiontById(model.SectionId));
-		}
-
-		[HttpPost]
-		[Route("GetSectionByDepartmentId")]
-		public async Task<IActionResult> GetSectionByDepartmentId(SectionViewModel model)
-		{			
-			return Ok(await _sectionRepository.GetSectionByDepartmentId(model));
-		}
-
-		[HttpPost]
-		[Route("SaveSection")]
-		public async Task<IActionResult> SaveSection([FromBody] SectionViewModel model)
-		{
-			var result = await _sectionRepository.Save(model);
-			return StatusCode(result.statuscode, result.message);
-		}
-		[HttpPost]
-		[Route("DeleteSection")]
-		public async Task<IActionResult> DeleteSection([FromBody] SectionViewModel model)
-		{
-			var result = await _sectionRepository.Delete(model);
-			return StatusCode(result.statuscode, result.message);
-		}
-		#endregion
 	}
 }

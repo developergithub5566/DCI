@@ -1,0 +1,246 @@
+﻿using DCI.Data;
+using DCI.Models.Entities;
+using DCI.Models.ViewModel;
+using DCI.Repositories.Interface;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Serilog;
+using static QRCoder.PayloadGenerator;
+using System.Runtime.Intrinsics.X86;
+
+namespace DCI.Repositories
+{
+    public class EmployeeRepository : IEmployeeRepository, IDisposable
+    {
+        private DCIdbContext _dbContext;
+        public EmployeeRepository(DCIdbContext context)
+        {
+            this._dbContext = context;
+        }
+        public void Dispose()
+        {
+            _dbContext.Dispose();
+        }
+
+        public async Task<IList<Form201ViewModel>> GetAllEmployee()
+        {
+            return await _dbContext.Employee
+                .Where(emp => emp.IsActive)
+                .Select(emp => new Form201ViewModel
+                {
+                    EmployeeId = emp.EmployeeId,
+                    Firstname = emp.Firstname,
+                    Middlename = emp.Middlename,
+                    Lastname = emp.Lastname,
+                    Sex = emp.Sex,
+                    Prefix = emp.Prefix,
+                    Suffix = emp.Suffix,
+                    Nickname = emp.Nickname,
+                    DateBirth = emp.DateBirth,
+                    MobileNoPersonal = emp.MobileNoPersonal,
+                    LandlineNo = emp.LandlineNo,
+                    PresentAddress = emp.PresentAddress,
+                    PermanentAddress = emp.PermanentAddress,
+                    EmailPersonal = emp.EmailPersonal,
+                    DateCreated = emp.DateCreated,
+                    CreatedBy = emp.CreatedBy,
+                    DateModified = emp.DateModified,
+                    ModifiedBy = emp.ModifiedBy,
+                    IsActive = emp.IsActive
+                }).ToListAsync();
+        }
+
+        public async Task<Form201ViewModel?> GetEmployeeById(int empId)
+        {
+            try
+            {
+                var result = await (from emp in _dbContext.Employee
+                                    join dtl in _dbContext.EmployeeWorkDetails
+                                    on emp.EmployeeId equals dtl.EmployeeId
+                                    where emp.EmployeeId == empId
+                                    select new Form201ViewModel
+                                    {
+                                        EmployeeId = emp.EmployeeId,
+                                        Firstname = emp.Firstname,
+                                        Middlename = emp.Middlename,
+                                        Lastname = emp.Lastname,
+                                        Sex = emp.Sex,
+                                        Prefix = emp.Prefix,
+                                        Suffix = emp.Suffix,
+                                        Nickname = emp.Nickname,
+                                        DateBirth = emp.DateBirth,
+                                        MobileNoPersonal = emp.MobileNoPersonal,
+                                        LandlineNo = emp.LandlineNo,
+                                        PresentAddress = emp.PresentAddress,
+                                        PermanentAddress = emp.PermanentAddress,
+                                        EmailPersonal = emp.EmailPersonal,
+
+                                        EmployeeNo = dtl.EmployeeNo,
+                                        Email = dtl.Email,
+                                        SSSNo = dtl.SSSNo,
+                                        Tin = dtl.Tin,
+                                        Pagibig = dtl.Pagibig,
+                                        Philhealth = dtl.Philhealth,
+                                        TaxExemption = dtl.TaxExemption,
+                                        MobileNoOffice = dtl.MobileNoOffice,
+                                        Department = dtl.Department,
+                                        JobFunction = dtl.JobFunction,
+                                        DateHired = dtl.DateHired,
+                                        Position = dtl.Position,
+
+                                        DateCreated = emp.DateCreated,
+                                        CreatedBy = emp.CreatedBy,
+                                        DateModified = emp.DateModified,
+                                        ModifiedBy = emp.ModifiedBy,
+                                        IsActive = emp.IsActive
+                                    }).FirstOrDefaultAsync();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return null;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        public async Task<(int statuscode, string message)> Save(Form201ViewModel model)
+        {
+            try
+            {
+                if (model.EmployeeId == 0)
+                {
+                    Employee emp = new Employee();
+                    emp.Firstname = model.Firstname;
+                    emp.Middlename = model.Middlename;
+                    emp.Lastname = model.Lastname;
+                    emp.Sex = model.Sex;
+                    emp.Prefix = model.Prefix;
+                    emp.Suffix = model.Suffix;
+                    emp.Nickname = model.Nickname;
+                    emp.DateBirth = model.DateBirth;
+                    emp.MobileNoPersonal = model.MobileNoPersonal;
+                    emp.LandlineNo = model.LandlineNo;
+                    emp.PresentAddress = model.PresentAddress;
+                    emp.PermanentAddress = model.PermanentAddress;
+                    emp.EmailPersonal = model.EmailPersonal;
+                    emp.DateCreated = DateTime.Now;
+                    emp.CreatedBy = model.CreatedBy;
+                    emp.DateModified = null;
+                    emp.ModifiedBy = null;
+                    emp.IsActive = true;
+                    await _dbContext.Employee.AddAsync(emp);
+                    await _dbContext.SaveChangesAsync();
+
+                    EmployeeWorkDetails dtl = new EmployeeWorkDetails();
+                    dtl.EmployeeId = emp.EmployeeId;
+                    dtl.EmployeeNo = model.EmployeeNo;
+                    dtl.Email = model.Email;
+                    dtl.SSSNo = model.SSSNo;
+                    dtl.Tin = model.Tin;
+                    dtl.Pagibig = model.Pagibig;
+                    dtl.Philhealth = model.Philhealth;
+                    dtl.TaxExemption = model.TaxExemption;
+                    dtl.MobileNoOffice = model.MobileNoOffice;
+                    dtl.Department = model.Department;
+                    dtl.JobFunction = model.JobFunction;
+                    dtl.DateHired = model.DateHired;
+                    dtl.Position = model.Position;
+                    dtl.DateModified = null;
+                    dtl.DateModified = null;
+                    dtl.IsActive = true;
+                    await _dbContext.EmployeeWorkDetails.AddAsync(dtl);
+                    await _dbContext.SaveChangesAsync();
+                    return (StatusCodes.Status200OK, "Registration successful");
+                }
+                else
+                {
+
+                    var emp = await _dbContext.Employee.FirstOrDefaultAsync(x => x.EmployeeId == model.EmployeeId);
+                    emp.Firstname = model.Firstname;
+                    emp.Middlename = model.Middlename;
+                    emp.Lastname = model.Lastname;
+                    emp.Sex = model.Sex;
+                    emp.Prefix = model.Prefix;
+                    emp.Suffix = model.Suffix;
+                    emp.Nickname = model.Nickname;
+                    emp.DateBirth = model.DateBirth;
+                    emp.MobileNoPersonal = model.MobileNoPersonal;
+                    emp.LandlineNo = model.LandlineNo;
+                    emp.PresentAddress = model.PresentAddress;
+                    emp.PermanentAddress = model.PermanentAddress;
+                    emp.EmailPersonal = model.EmailPersonal;
+                    //emp.DateCreated = emp.DateCreated;
+                    //emp.CreatedBy = emp.CreatedBy;
+                    emp.DateModified = DateTime.Now;
+                    emp.ModifiedBy = model.ModifiedBy;
+                    _dbContext.Employee.Entry(emp).State = EntityState.Modified;
+                    await _dbContext.SaveChangesAsync();
+
+
+                    var dtl = await _dbContext.EmployeeWorkDetails.FirstOrDefaultAsync(x => x.EmployeeId == model.EmployeeId);
+                   // dtl.EmployeeId = emp.EmployeeId;
+                    dtl.EmployeeNo = model.EmployeeNo;
+                    dtl.Email = model.Email;
+                    dtl.SSSNo = model.SSSNo;
+                    dtl.Tin = model.Tin;
+                    dtl.Pagibig = model.Pagibig;
+                    dtl.Philhealth = model.Philhealth;
+                    dtl.TaxExemption = model.TaxExemption;
+                    dtl.MobileNoOffice = model.MobileNoOffice;
+                    dtl.Department = model.Department;
+                    dtl.JobFunction = model.JobFunction;
+                    dtl.DateHired = model.DateHired;
+                    dtl.Position = model.Position;
+                    dtl.DateModified = DateTime.Now;
+                    dtl.ModifiedBy = model.ModifiedBy;
+                    dtl.IsActive = true;
+                    _dbContext.EmployeeWorkDetails.Entry(dtl).State = EntityState.Modified;
+                    await _dbContext.SaveChangesAsync();
+                    return (StatusCodes.Status200OK, "Registration updated");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return (StatusCodes.Status406NotAcceptable, ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        public async Task<(int statuscode, string message)> Delete(Form201ViewModel model)
+        {
+            try
+            {
+                var entity = await _dbContext.Employee.FirstOrDefaultAsync(x => x.EmployeeId == model.EmployeeId && x.IsActive == true);
+                if (entity == null)
+                {
+                    return (StatusCodes.Status406NotAcceptable, "Invalid Employee Id");
+                }
+
+                entity.IsActive = false;
+                entity.ModifiedBy = model.ModifiedBy;
+                entity.DateModified = DateTime.Now;
+                _dbContext.Employee.Entry(entity).State = EntityState.Modified;
+                await _dbContext.SaveChangesAsync();
+                return (StatusCodes.Status200OK, "Successfully deleted");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return (StatusCodes.Status400BadRequest, ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+    }
+}

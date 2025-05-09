@@ -37,13 +37,13 @@ namespace DCI.API.Controllers
 		IUserAccessRepository _useraccessRepository;
 		IEmailRepository _emailRepository;
 		IRoleRepository _roleRepository;
-		IDocumentTypeRepository _documentTypeRepository;
+		//IDocumentTypeRepository _documentTypeRepository;
 
 		private readonly UserManager<User> _userManager;
 		private readonly IConfiguration _configuration;
 
 		public AccountController(IUserRepository userRepository, IEmailRepository emailRepository, IUserAccessRepository useraccessRepository, AuthenticationModel authenConfig,
-			IConfiguration configuration, IRoleRepository roleRepository, IUserContextService userContextService, IDocumentTypeRepository documentTypeRepository)
+			IConfiguration configuration, IRoleRepository roleRepository, IUserContextService userContextService)
 		{
 			this._userRepository = userRepository;
 			this._useraccessRepository = useraccessRepository;
@@ -52,7 +52,7 @@ namespace DCI.API.Controllers
 			this._configuration = configuration;
 			this._roleRepository = roleRepository;
 			this._userContextService = userContextService;
-			this._documentTypeRepository = documentTypeRepository;
+			//this._documentTypeRepository = documentTypeRepository;
 		}
 
 		[HttpPost]

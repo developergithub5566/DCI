@@ -1,0 +1,26 @@
+﻿namespace DCI.Models.Entities
+{
+    public class EmployeeWorkDetails
+    {
+        public int EmployeeWorkDetailsId { get; set; }
+        public int EmployeeId { get; set; }
+        public string? EmployeeNo { get; set; }
+        public string? Email { get; set; }
+        public string? SSSNo { get; set; }
+        public string? Tin { get; set; }
+        public string? Pagibig { get; set; }
+        public string? Philhealth { get; set; }
+        public string? TaxExemption { get; set; }
+        public string? MobileNoOffice { get; set; }
+        public int? EmploymentTypeId { get; set; }
+        public int? Department { get; set; }
+        public string? JobFunction { get; set; }
+        public DateTime? DateHired { get; set; }
+        public string? Position { get; set; }
+        public DateTime? DateModified { get; set; }
+        public int? ModifiedBy { get; set; }
+        public bool IsActive { get; set; }
+
+        public Employee? Employee { get; set; }  // Navigation property
+    }
+}

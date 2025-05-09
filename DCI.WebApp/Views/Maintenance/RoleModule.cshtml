@@ -357,7 +357,14 @@
                                         </button>
                                     </div>
                                 </div>
-
+                                <div class="accordion-item no-caret no-collapse">
+                                    <div class="accordion-header">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseReports" aria-expanded="true" aria-controls="collapseReports">
+                                            <input type="checkbox" name="mainModule[]" value="15" id="module15" class="form-check-input" @(Model.Reports == true ? "checked" : "")>
+                                            <label for="module15" class="text-dark">Request Form</label>
+                                        </button>
+                                    </div>
+                                </div>
                                 @*						
 							<div class="accordion-item">
 

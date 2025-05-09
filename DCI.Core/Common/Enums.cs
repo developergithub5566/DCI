@@ -37,7 +37,8 @@ namespace DCI.Core.Common
 		AuditTrail = 11,
 		Announcement = 12 ,
 		Todo = 13,
-		Reports = 14
+		Reports = 14,
+		Form201 = 15
 	}
 	public enum EnumRole
 	{
@@ -87,35 +88,39 @@ namespace DCI.Core.Common
 		[Description("Internal/External")] 
 		BothInExternal = 2
 	}
-	public enum EnumDocumentSection
-	{ 	
-		[Description("Project Management")]
-		PM = 0,
-		[Description("HR")]
-		HR = 1
-	}
 
-	public enum EnumLabel
+
+	public enum EnumEmploymentType
 	{
-		Forms = 1,
-		Process = 2
-	}
+		Regular = 1,
+        Probationary = 2,
+		Contractual = 3,
+		FixedTerm = 4,
+        Resigned = 5,
+        AWOL = 6,
+    }
 
-	public enum EnumFormsProcess
-	{
-		F = 1, //Forms = 1,
-		P = 2 //Process = 2
-	}
+    public enum EnumJobPosition
+    {
+       DepartmentHead = 1,
+	   Finance = 2,
+	   SoftwareEngineer = 3	
+    }
 
-	//public enum EnumCategoryCode
-	//{
-	//	TID = 1,
-	//	HR = 2,
-	//	Finance = 3
-	//}
-	//public enum EnumSectionCode
-	//{
-	//	PM =1,
-	//	HR = 2,
-	//}
+    public enum EnumSex
+    {
+        Male = 1,
+        Female = 2,      
+    }
+
+    public enum EnumStatus
+    {
+        Draft = 0,
+        Save = 1,
+        ForApproval = 2,   
+		Approved = 3,
+		Deleted = 4,
+		
+    }
+
 }

@@ -49,13 +49,16 @@ namespace DCI.Repositories
 									Email = usr.Email,
 									ContactNo = usr.ContactNo,
 									RoleId = usr.RoleId,
-									RoleList = null,
+                                    DepartmentId = usr.DepartmentId,
+                                    RoleList = null,
 									EmployeeList = null
 								}).FirstOrDefault() ?? new UserModel();
 
 				result.RoleList = _dbContext.Role.Where(x => x.IsActive).ToList();
 				result.EmployeeList = _dbContext.User.ToList();
-				return result;
+                result.DepartmentList = _dbContext.Department.Where(x => x.IsActive).ToList();
+
+                return result;
 			}
 			catch (Exception ex)
 			{
@@ -68,10 +71,35 @@ namespace DCI.Repositories
 			}
 		}
 
-		public async Task<IList<User>> GetAllUsers()
-		{
-			return await _dbContext.User.AsNoTracking().Where(x => x.IsActive == true).ToListAsync();
-		}
+        //public async Task<IList<User>> GetAllUsers()
+        public async Task<IList<UserModel>> GetAllUsers()
+        {
+			//return await _dbContext.User.AsNoTracking().Where(x => x.IsActive == true).ToListAsync();
+
+
+			var query = from usr in _dbContext.User
+						join role in _dbContext.Role on usr.RoleId equals role.RoleId
+						join depart in _dbContext.Department on usr.DepartmentId equals depart.DepartmentId
+						where usr.IsActive == true
+						select new UserModel
+						{
+							UserId = usr.UserId,
+							Lastname = usr.Lastname,
+							Middlename = usr.Middlename,
+							Firstname = usr.Firstname,
+							Email = usr.Email,
+							ContactNo = usr.ContactNo,
+							RoleId = usr.RoleId,
+							RoleName = role.RoleName,
+							DepartmentId = usr.DepartmentId,
+							DepartmentName = depart.DepartmentName,
+							RoleList = null,
+							EmployeeList = null
+						};
+
+			return query.ToList();
+
+        }
 
 		public async Task<(int statuscode, string message)> Registration(UserViewModel model)
 		{

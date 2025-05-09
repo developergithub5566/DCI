@@ -23,6 +23,7 @@ namespace DCI.Models.Entities
 		public int? ModifiedBy { get; set; }
 		public bool IsActive { get; set; }	
 		public virtual UserAccess UserAccess { get; set; }
-		//public ICollection<Role> UserRolelist { get; set; }
-	}
+        public int DepartmentId { get; set; }
+        //public ICollection<Role> UserRolelist { get; set; }
+    }
 }

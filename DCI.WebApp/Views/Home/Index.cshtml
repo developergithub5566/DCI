@@ -38,48 +38,132 @@
 	}	
 }
 
-<div class="container-fluid">
-	
-<div class="spinner-overlay">
-    <div class="spinner-border text-light" role="status">
-        <span class="visually-hidden">Loading...</span>
-    </div>
-</div>
 
+	<div id="content">
+		
 
-	<!-- Content Row -->
-	<div class="row">
-		<div class="col-12">
-			<h6 class="m-0 font-weight-bold text-gray-800">Dashboard</h6>
-			<hr>
+		<div class="dashboardHeader">
+			<label class="">Dashboard</label>
+			<p>Today is <span>Wednesday</span> - May 07, 2025</p>
+
 		</div>
 
-		@foreach(var x in Model)
-		{
-			<div class="col-xl-3 col-lg-4 col-md-4 col-sm-6 mb-4">
-				<div class="card shadow h-100 py-2">
-					<a asp-controller="Document" asp-action="Index" asp-route-doctypeid="@x.DocTypeId">
-					<div class="card-body" style="padding: 1.25rem; -webkit-box-flex:1; -ms-flex: 1 1 auto">
-						<div class="row no-gutters align-items-center">
-							<div class="col mr-2">					
-								<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">								
-										@x.DocumentType									
+
+
+		<!-- Begin Page Content -->
+		<div class="container-fluid">
+			<!-- Content Row -->
+			<div class="row">
+				<div class="col-12">
+					<div class="announcementDiv shadow">
+						<div class="row">
+							<div class="col-lg-8">
+								<div class="announcementInfo">
+									<div id="announementCarouselIndicators" class="carousel slide" data-ride="carousel">
+										<div class="carousel-inner">
+											<div class="carousel-item active">
+												<label class="date">May 24, 2024, June 24, 2024</label>
+												<label class="title">Lorem Ipsum</label>
+												<p class="desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+											</div>
+										</div>
+										<ol class="carousel-indicators carouselIndicators"><li data-target="#announementCarouselIndicators" data-slide-to="0" class="active"></li></ol>
+									</div>
 								</div>
-								<div class="h5 mb-0 font-weight-bold text-gray-800">@x.TotalCount</div>
 							</div>
-							<div class="col-auto">
-								<i class="fa-solid fa-file fa-2x text-gray-500"></i>
+							<div class="col-lg-4 text-center">
+							<img src="~/images/happy_announcement.svg" alt="Announcement">
 							</div>
 						</div>
 					</div>
-					</a>
 				</div>
 			</div>
-		}		
-		
+
+			<div class="row">
+				<div class="col-sm-5 mb-4">
+					<div class="row">
+						<div class="col-12 mb20">
+							<div class="card shadow py-2">
+								<div class="card-body">
+									<div class="row no-gutters align-items-center">
+										<div class="col-sm-10">
+											<div class="small text-muted">Version 1.0.0</div>
+											<div class="h5 font-weight-bold text-gray-900 mb-2">Employee Handbook</div>
+										</div>
+										<div class="col-sm-2">
+										<img src="~/images/book.svg" alt="Employee Handbook" width="100%">
+										</div>
+										<div class="col-12 mt10">
+											<a href="#" class="btn btnPrimary text-xs">View Handbook</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-12">
+							<div class="card shadow py-2">
+								<div class="card-body">
+									<div class="row no-gutters align-items-center">
+										<div class="col-sm-10">
+											<div class="small text-muted">Todays</div>
+											<div class="h5 font-weight-bold text-gray-900 mb-2">Time Attendance</div>
+										</div>
+										<div class="col-sm-2">
+										<img src="~/images/clock.svg" alt="Employee Handbook" width="100%">
+										</div>
+										<div class="col-12 mt10">
+											<div class="row timeAttendance">
+												<div class="col-6">
+													<div class="timeDiv">
+														<label class="time">--:--:--</label>
+														<label class="title">Time In</label>
+													</div>
+												</div>
+												<div class="col-6">
+													<div class="timeDiv">
+														<label class="time">--:--:--</label>
+														<label class="title">Time Out</label>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-sm-7 mb-4">
+					<div class="card shadow py-2 h-100">
+						<div class="card-body">
+							<div class="row align-items-center">
+								<div class="col-sm-4">
+								<img src="~/images/cake.svg" alt="Birthday Cake" width="100%" class="mb20">                            
+								</div>
+								<div class="col-sm-8">
+									<div class="small text-muted">This Month</div>
+									<div class="h5 font-weight-bold text-gray-900 mb-2">Birthday Celebrators</div>
+									<ul class="bdayList">
+										<li>
+											<label class="date">May 30</label>
+											<label class="name">Cabugao, Jc</label>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+		</div>
 	</div>
 
-</div>
+
+
 	@section scripts {
 			<script type="text/javascript">				 
 								$('.spinner-overlay').show();

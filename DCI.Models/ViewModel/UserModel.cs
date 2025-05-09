@@ -13,8 +13,14 @@ namespace DCI.Models.ViewModel
 		public string ContactNo { get; set; }
 		public string Email { get; set; }
 		public int RoleId { get; set; }
-		public IList<Role>? RoleList { get; set; }
+        public string RoleName { get; set; }
+        public int DepartmentId { get; set; }
+        public string DepartmentName { get; set; }
+        public IList<Role>? RoleList { get; set; }
 		public List<SelectListItem>? Options { get; set; }
-		public IList<User>? EmployeeList { get; set; }
-	}
+        public IList<User>? EmployeeList { get; set; }
+        public IList<UserViewModel>? UserViewList { get; set; }      
+        public IList<Department>? DepartmentList { get; set; }
+        public List<SelectListItem>? OptionsDepartment { get; set; }
+    }
 }

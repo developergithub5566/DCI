@@ -33,7 +33,7 @@ namespace DCI.WebApp.Controllers
 		#region User
 		public async Task<IActionResult> User()
 		{
-			List<User> model = new List<User>();
+			List<UserModel> model = new List<UserModel>();
 			try
 			{
 				using (var _httpclient = new HttpClient())
@@ -43,11 +43,11 @@ namespace DCI.WebApp.Controllers
 
 					if (response.IsSuccessStatusCode == true)
 					{
-						model = JsonConvert.DeserializeObject<List<User>>(responseBody)!;
+						model = JsonConvert.DeserializeObject<List<UserModel>>(responseBody)!;
 					}
 				}
 
-				UserModel vm = new UserModel();
+				//List<UserModel> vm = new List<UserModel>();
 				//vm.Options = vm.RoleList.Select(x =>
 				//							   new SelectListItem
 				//							   {
@@ -55,8 +55,8 @@ namespace DCI.WebApp.Controllers
 				//								   Text = x.RoleName
 				//							   }).ToList();
 
-				vm.EmployeeList = model;
-				return View(vm);
+			
+				return View(model);
 
 			}
 			catch (Exception ex)
@@ -92,7 +92,14 @@ namespace DCI.WebApp.Controllers
 													   Text = x.RoleName
 												   }).ToList();
 
-					if (response.IsSuccessStatusCode)
+                    vm.OptionsDepartment = vm.DepartmentList?.Select(x =>
+                               new SelectListItem
+                               {
+                                   Value = x.DepartmentId.ToString(),
+                                   Text = x.DepartmentName
+                               }).ToList();
+
+                    if (response.IsSuccessStatusCode)
 					{
 						return Json(new { success = true, data = vm });
 					}
@@ -1119,46 +1126,7 @@ namespace DCI.WebApp.Controllers
 			}
 		}
 
-		public async Task<JsonResult> GetSectionByDepartmentId(SectionViewModel model)
-		{
-			try
-			{
-				using (var _httpclient = new HttpClient())
-				{
-					
-					var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-					var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/GetSectionByDepartmentId");
-
-					request.Content = stringContent;
-					var response = await _httpclient.SendAsync(request);
-					string responseBody = await response.Content.ReadAsStringAsync();
-					SectionViewModel vm = JsonConvert.DeserializeObject<SectionViewModel>(responseBody)!;
-
-					vm.OptionsSection = vm.SectionList.Select(x =>
-									   new SelectListItem
-									   {
-										   Value = x.SectionId.ToString(),
-										   Text = x.SectionName
-									   }).ToList();
-
-					if (response.IsSuccessStatusCode)
-					{
-						return Json(new { success = true, data = vm });
-					}
-					return Json(new { success = false, message = responseBody });
-				}
-
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex.ToString());
-				return Json(new { success = false, message = ex.Message });
-			}
-			finally
-			{
-				Log.CloseAndFlush();
-			}
-		}
+	
 		#endregion
 
 	}

@@ -21,14 +21,12 @@ namespace DCI.Data
 		public DbSet<Role> Role { get; set; }
 		public DbSet<AuditLog> AuditLog { get; set; }
 		public DbSet<Department> Department { get; set; }
-		public DbSet<EmploymentType> EmploymentType { get; set; }
-		public DbSet<JobApplicant> JobApplicant { get; set; }
-		public DbSet<Document> Document { get; set; }
-		public DbSet<DocumentType> DocumentType { get; set; }
+		public DbSet<EmploymentType> EmploymentType { get; set; }	
+		public DbSet<Employee> Employee { get; set; }
+		public DbSet<EmployeeWorkDetails> EmployeeWorkDetails { get; set; }
 		public DbSet<Status> Status { get; set; }
-		public DbSet<Section> Section { get; set; }
-		public DbSet<ApprovalHistory> ApprovalHistory { get; set; }
-        public DbSet<RequestorHistory> RequestorHistory { get; set; }
+		//public DbSet<Section> Section { get; set; }
+		public DbSet<ApprovalHistory> ApprovalHistory { get; set; }       
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{

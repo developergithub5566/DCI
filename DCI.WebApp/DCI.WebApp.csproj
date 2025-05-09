@@ -38,6 +38,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\icon\" />
+    <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
   <ItemGroup>

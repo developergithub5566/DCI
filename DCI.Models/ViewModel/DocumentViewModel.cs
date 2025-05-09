@@ -23,12 +23,12 @@ namespace DCI.Models.ViewModel
         public IFormFile? DocFile { get; set; }
         public IList<DocumentViewModel>? DocumentList { get; set; }
 
-        public IList<DocumentType>? DocumentTypeList { get; set; }
+      //  public IList<DocumentType>? DocumentTypeList { get; set; }
         public List<SelectListItem>? OptionsDocumentType { get; set; }
 
         public IList<Department>? DepartmentList { get; set; }
         public List<SelectListItem>? OptionsDepartment { get; set; }
-        public IList<Section>? SectionList { get; set; }
+      //  public IList<Section>? SectionList { get; set; }
         public List<SelectListItem>? OptionsSection { get; set; }
         public IList<User>? UserList { get; set; }
         public List<SelectListItem>? OptionsRequestBy { get; set; }
