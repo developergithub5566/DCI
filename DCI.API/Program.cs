@@ -44,6 +44,7 @@ builder.Services.AddScoped<ITodoRepository, TodoRepository>();
 //builder.Services.AddScoped<IRequestHistoryRepository, RequestHistoryRepository>();
 
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IDailyTimeRecordRepository, DailyTimeRecordRepository>();
 
 builder.Services.Configure<SMTPModel>(builder.Configuration.GetSection("SmtpSettings"));
 builder.Services.AddSingleton<AuthenticationModel>();

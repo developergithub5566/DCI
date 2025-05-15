@@ -38,8 +38,10 @@ namespace DCI.Core.Common
 		Announcement = 12 ,
 		Todo = 13,
 		Reports = 14,
-		Form201 = 15
-	}
+		Form201 = 15,
+        DTRManagement = 16,
+        DailyTimeRecord = 17
+    }
 	public enum EnumRole
 	{
 		Admin = 1,

@@ -25,7 +25,7 @@ namespace DCI.Data
 		public DbSet<Employee> Employee { get; set; }
 		public DbSet<EmployeeWorkDetails> EmployeeWorkDetails { get; set; }
 		public DbSet<Status> Status { get; set; }
-		//public DbSet<Section> Section { get; set; }
+		public DbSet<vw_AttendanceSummary> vw_AttendanceSummary { get; set; }
 		public DbSet<ApprovalHistory> ApprovalHistory { get; set; }       
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)

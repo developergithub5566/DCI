@@ -3,8 +3,7 @@
     public class EmployeeWorkDetails
     {
         public int EmployeeWorkDetailsId { get; set; }
-        public int EmployeeId { get; set; }
-        public string? EmployeeNo { get; set; }
+        public int EmployeeId { get; set; }    
         public string? Email { get; set; }
         public string? SSSNo { get; set; }
         public string? Tin { get; set; }

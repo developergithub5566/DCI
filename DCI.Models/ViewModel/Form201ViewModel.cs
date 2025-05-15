@@ -9,6 +9,7 @@ namespace DCI.Models.ViewModel
     public class Form201ViewModel
     {
         public int EmployeeId { get; set; }
+        public string? EmployeeNo { get; set; }
         public string? Firstname { get; set; } = string.Empty;
         public string? Middlename { get; set; } = string.Empty;
         public string? Lastname { get; set; } = string.Empty;
@@ -28,8 +29,7 @@ namespace DCI.Models.ViewModel
         public int? ModifiedBy { get; set; }
         public bool IsActive { get; set; } = true;
 
-        public int EmployeeWorkDetailsId { get; set; } = 0;
-        public string? EmployeeNo { get; set; }
+        public int EmployeeWorkDetailsId { get; set; } = 0;     
         public string? Email { get; set; }
         public string? SSSNo { get; set; }
         public string? Tin { get; set; }

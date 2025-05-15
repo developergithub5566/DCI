@@ -61,6 +61,7 @@ namespace DCI.Repositories
                                     select new Form201ViewModel
                                     {
                                         EmployeeId = emp.EmployeeId,
+                                        EmployeeNo = emp.EmployeeNo,
                                         Firstname = emp.Firstname,
                                         Middlename = emp.Middlename,
                                         Lastname = emp.Lastname,
@@ -74,8 +75,7 @@ namespace DCI.Repositories
                                         PresentAddress = emp.PresentAddress,
                                         PermanentAddress = emp.PermanentAddress,
                                         EmailPersonal = emp.EmailPersonal,
-
-                                        EmployeeNo = dtl.EmployeeNo,
+                                    
                                         Email = dtl.Email,
                                         SSSNo = dtl.SSSNo,
                                         Tin = dtl.Tin,
@@ -114,6 +114,7 @@ namespace DCI.Repositories
                 if (model.EmployeeId == 0)
                 {
                     Employee emp = new Employee();
+                    emp.EmployeeNo = model.EmployeeNo;
                     emp.Firstname = model.Firstname;
                     emp.Middlename = model.Middlename;
                     emp.Lastname = model.Lastname;
@@ -136,8 +137,7 @@ namespace DCI.Repositories
                     await _dbContext.SaveChangesAsync();
 
                     EmployeeWorkDetails dtl = new EmployeeWorkDetails();
-                    dtl.EmployeeId = emp.EmployeeId;
-                    dtl.EmployeeNo = model.EmployeeNo;
+                    dtl.EmployeeId = emp.EmployeeId;                   
                     dtl.Email = model.Email;
                     dtl.SSSNo = model.SSSNo;
                     dtl.Tin = model.Tin;
@@ -160,6 +160,7 @@ namespace DCI.Repositories
                 {
 
                     var emp = await _dbContext.Employee.FirstOrDefaultAsync(x => x.EmployeeId == model.EmployeeId);
+                    emp.EmployeeNo = model.EmployeeNo;
                     emp.Firstname = model.Firstname;
                     emp.Middlename = model.Middlename;
                     emp.Lastname = model.Lastname;
@@ -182,8 +183,7 @@ namespace DCI.Repositories
 
 
                     var dtl = await _dbContext.EmployeeWorkDetails.FirstOrDefaultAsync(x => x.EmployeeId == model.EmployeeId);
-                   // dtl.EmployeeId = emp.EmployeeId;
-                    dtl.EmployeeNo = model.EmployeeNo;
+                   // dtl.EmployeeId = emp.EmployeeId;            
                     dtl.Email = model.Email;
                     dtl.SSSNo = model.SSSNo;
                     dtl.Tin = model.Tin;
