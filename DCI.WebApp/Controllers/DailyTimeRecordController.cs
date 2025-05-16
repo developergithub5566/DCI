@@ -20,6 +20,36 @@ namespace DCI.WebApp.Controllers
             this._userSessionHelper = userSessionHelper;
         }
 
+        public async Task<IActionResult> Timesheet()
+        {
+            List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();
+            try
+            {
+                //using (var _httpclient = new HttpClient())
+                //{
+                //    HttpResponseMessage response = await _httpclient.GetAsync(_apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllDTR");
+                //    string responseBody = await response.Content.ReadAsStringAsync();
+
+                //    if (response.IsSuccessStatusCode == true)
+                //    {
+                //        model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
+                //    }
+                //}
+
+                return View(model);
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return View(model);
+        }
+
         public async Task<IActionResult> Management()
         {
             List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();
@@ -77,6 +107,36 @@ namespace DCI.WebApp.Controllers
                 Log.CloseAndFlush();
             }
             return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
+        public async Task<IActionResult> Leave()
+        {
+            List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    HttpResponseMessage response = await _httpclient.GetAsync(_apiconfig.Value.apiConnection + "api/DailyTimeRecord/Leave");
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
+                    }
+                }
+
+                return View(model);
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return View(model);
         }
     }
 }
