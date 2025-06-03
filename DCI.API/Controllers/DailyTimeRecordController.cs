@@ -13,10 +13,12 @@ namespace DCI.API.Controllers
     {
         private readonly DCIdbContext _dcIdbContext;
         IDailyTimeRecordRepository _dtrRepository;
+        ILeaveRepository _leaveRepository;
 
-        public DailyTimeRecordController(IDailyTimeRecordRepository dtrRepository)
+        public DailyTimeRecordController(IDailyTimeRecordRepository dtrRepository, ILeaveRepository leaveRepository)
         {
             _dtrRepository = dtrRepository;
+            _leaveRepository = leaveRepository;
         }
 
         [HttpGet]
@@ -32,6 +34,13 @@ namespace DCI.API.Controllers
         public async Task<IActionResult> GetAllDTRByEmpNo([FromBody] DailyTimeRecordViewModel model)
         {
             return Ok(await _dtrRepository.GetAllDTRByEmpNo(model.EMPLOYEE_NO));
+        }
+
+        [HttpPost]
+        [Route("GetAllLeave")]
+        public async Task<IActionResult> GetAllLeave([FromBody] LeaveViewModel model)
+        {
+            return Ok(await _leaveRepository.GetAllLeave(model));
         }
     }
 }

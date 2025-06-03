@@ -16,23 +16,4 @@
         public string TOTAL_WORKING_HOURS { get; set; } = string.Empty;
     }
 
-    public class LeaveViewModel
-    {
-        public int LeaveId { get; set; } = 0;
-        public DateTime DateFiled { get; set; } = DateTime.Now;
-        public int LeaveType { get; set; } = 0;
-        public string Reason { get; set; } = string.Empty;
-        public DateTime? DateModified { get; set; }
-        public int? ModifiedBy { get; set; } = 0;
-        public bool IsActive { get; set; } = true;
-
-        public List<LeaveDetailViewModel> LeaveDetails { get; set; } = new();
-    }
-    public class LeaveDetailViewModel
-    {
-        public int LeaveDetailId { get; set; } = 0;
-        public DateTime LeaveDate { get; set; } = DateTime.Now;
-        public bool IsHalfDay { get; set; } = false;
-        public bool IsActive { get; set; } = true;
-    }
 }

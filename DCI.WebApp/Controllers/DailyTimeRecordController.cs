@@ -50,7 +50,7 @@ namespace DCI.WebApp.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> Management()
+        public async Task<IActionResult> List()
         {
             List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();
             try
@@ -89,7 +89,7 @@ namespace DCI.WebApp.Controllers
                     model.EMPLOYEE_NO = "080280";
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/GetAllEmployee/GetAllDTRByEmpNo");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllDTRByEmpNo");
                     request.Content = stringContent;
                     var response = await _httpclient.SendAsync(request);
                     var responseBody = await response.Content.ReadAsStringAsync();
@@ -109,19 +109,26 @@ namespace DCI.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
-        public async Task<IActionResult> Leave()
+        public async Task<IActionResult> Leave(LeaveViewModel model)
         {
-            List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();
+         //   LeaveViewModel model = new LeaveViewModel();
             try
             {
                 using (var _httpclient = new HttpClient())
                 {
-                    HttpResponseMessage response = await _httpclient.GetAsync(_apiconfig.Value.apiConnection + "api/DailyTimeRecord/Leave");
-                    string responseBody = await response.Content.ReadAsStringAsync();
+                    model.EmployeeId = 2;
+                    //model.SLBalance = 0;
+                    //model.VLBalance = 0;
+                  //  model.LeaveType = 1;
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllLeave");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
 
                     if (response.IsSuccessStatusCode == true)
                     {
-                        model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
+                        model = JsonConvert.DeserializeObject<LeaveViewModel>(responseBody)!;
                     }
                 }
 

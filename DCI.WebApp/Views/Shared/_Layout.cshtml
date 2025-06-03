@@ -127,7 +127,7 @@
                     @if (module.ModulePageId == (int)EnumModulePage.DTRManagement)
                     {
                         <hr class='sidebar-divider'>
-                        <a href="/DailyTimeRecord/Management/" class='mainModule'>
+                        <a href="/DailyTimeRecord/List" class='mainModule'>
                             <div class='sidebar-heading mainModuleActive'>
                                 <i class='fa-solid fa-file'></i>
                                 <span>DTR Management</span>
@@ -142,6 +142,17 @@
                             <div class='sidebar-heading mainModuleActive'>
                                 <i class='fa-solid fa-file'></i>
                                 <span>Timesheet</span>
+                                <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
+                            </div>
+                        </a>
+                    }
+                    @if (module.ModulePageId == (int)EnumModulePage.DailyTimeRecord)
+                    {
+                        <hr class='sidebar-divider'>
+                        <a href="/DailyTimeRecord/Leave" class='mainModule'>
+                            <div class='sidebar-heading mainModuleActive'>
+                                <i class='fa-solid fa-file'></i>
+                                <span>Leave</span>
                                 <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
                             </div>
                         </a>

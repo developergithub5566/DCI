@@ -1,6 +1,8 @@
-﻿namespace DCI.Models.Entities
+﻿using DCI.Models.Configuration;
+
+namespace DCI.Models.Entities
 {
-    public class EmployeeWorkDetails
+    public class EmployeeWorkDetails : IAuditable
     {
         public int EmployeeWorkDetailsId { get; set; }
         public int EmployeeId { get; set; }    

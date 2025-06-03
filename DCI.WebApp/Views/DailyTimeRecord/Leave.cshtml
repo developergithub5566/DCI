@@ -1,0 +1,328 @@
+﻿@model DCI.Models.ViewModel.LeaveViewModel
+@using Newtonsoft.Json;
+@* @using DCI.Core.Common; *@
+@using DCI.Models.ViewModel;
+
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-3">
+        <h6 class="m-0 font-weight-bold text-gray-800">Leave Application & Balances</h6>
+        <div class="upperRightDivBtn">
+            <button class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#leaveRequestModal">
+                <span class="icon text-white"><i class="fa-solid fa-file-pen text-xs"></i></span>
+                <span class="text"><small>Request Leave</small></span>
+            </button>
+        </div>
+    </div>
+    <div class="col-12 p0">
+        <ul class="breadcrumb">
+            <li><a href="http://192.168.1.100/DCI-ESS-STG/">Home</a></li>
+            <li>Leave Application</li>
+        </ul>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+            <div class="card shadow h-100 text-dark">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success mb-1">
+                                <span class="text-uppercase"> Vacation Leave</span> <br>
+                                <small class="text-secondary">(Remaining Balance)</small>
+                            </div>
+                            <div class="h3 mb-0 font-weight-bold text-dark">@Model.VLBalance</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fa-solid fa-tree-city fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+            <div class="card shadow h-100 text-dark">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger mb-1">
+                                <span class="text-uppercase"> Sick Leave</span> <br>
+                                <small class="text-secondary">(Remaining Balance)</small>
+                            </div>
+                            <div class="h3 mb-0 font-weight-bold text-dark">@Model.SLBalance</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fa-solid fa-temperature-high fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card shadow mb-4">
+                <!-- Card Header -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0  small font-weight-bold text-gray-800">Data</h6>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div id="accordion">
+                        <button type="button" class="btn btnSecondary btn-icon-split pr10" data-toggle="collapse" href="#collapseFilter">
+                            <span class="icon text-white">
+                                <i class="fa-solid fa-filter text-xs"></i>
+                            </span>
+                            <span class="text"><small>Filter</small></span>
+                        </button>
+
+                        <a href="http://192.168.1.100/DCI-ESS-STG/leave/" class="btn btnPrimary btn-icon-split">
+                            <span class="icon text-white">
+                                <i class="fa-solid fa-redo text-xs"></i>
+                            </span>
+                            <span class="text"><small>Reload</small></span>
+                        </a>
+
+
+                        <div id="collapseFilter" class="collapse  mt20" data-parent="#accordion">
+                            <form id="frmFilter" method="post" class="row">
+                                <div class="form-group col-3">
+                                    <label class="frmText">Date Filed From: </label>
+                                    <div class="input-group">
+                                        <input type="text" name="dateFrom" id="datepicker-from" class="form-control frmField" value="" autocomplete="off">
+                                        <div class="input-group-prepend prependBtn">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-3">
+                                    <label class="frmText">Date Filed To: </label>
+                                    <div class="input-group">
+                                        <input type="text" name="dateTo" id="datepicker-to" class="form-control frmField" value="" autocomplete="off">
+                                        <div class="input-group-prepend prependBtn">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6 col-md-4 col-lg-3 col-xl-2 mb0">
+                                    <label>&nbsp;</label>
+                                    <button class="btn btn-dark btn-icon-split d-block pl20">
+                                        <span class="text"><small>Apply </small></span>
+                                        <span class="icon text-white-50"><i class="fa-solid fa-caret-right text-xs"></i></span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="table-responsive mt20">
+                        <table class="table table-bordered dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th><span>Date Filed</span></th>
+                                    <th><span>Leave Type</span></th>
+                                    <th width="30%"><span>Date Covered</span></th>
+                                    <th><span>No. of Days</span></th>
+                                    <th><span>Status</span></th>
+                                    <th><span>Action</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>May 15, 2025 03:12:42pm</strong></td>
+                                    <td>Vacation Leave</td>
+                                    <td><strong><span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>May 29, 2025</span> <span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>May 30, 2025</span> <span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>May 28, 2025</span></strong></td>
+                                    <td><strong>3.0000</strong></td>
+                                    <td class="text-center"><strong><span class='btnPrimary  applicationStatus'>Pending</span></strong></td>
+
+                                    <td class="text-center">
+                                        <div class="dropdown">
+                                            <a href="#" class="dropdown-toggl text-lg" data-toggle="dropdown">
+                                                <i class="fa-solid fa-ellipsis"></i>
+                                            </a>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a href="#" onclick="viewModalInfo('5')"><i class="fa-solid fa-magnifying-glass"></i> View Details</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-6">
+            <div class="card shadow mb-4">
+                <!-- Card Header -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0  small font-weight-bold text-gray-800">Vacation Leave</h6>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-dark text-xs" width="100%" cellspacing="0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th><span>As of</span></th>
+                                    <th><span>Beg bal</span></th>
+                                    <th><span>Credit</span></th>
+                                    <th><span>Availed</span></th>
+                                    <th><span>VL Mon</span></th>
+                                    <th><span>End Bal</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var x in Model.vlSummaries)
+                                {
+                                    <tr class=''>
+                                        <td><strong> @x.AsOf  </strong></td>
+                                        <td><strong>  @x.BegBal</strong></td>
+                                        <td>@x.Credit</td>
+                                        <td><strong>@x.Availed</strong></td>
+                                        <td><strong>@x.Monetized</strong></td>
+                                        <td>@x.EndBal</td>
+                                    </tr>
+                                }
+
+                                @* <tr class=''>
+									<td><strong>Feb-25</strong></td>
+									<td><strong>0.0000</strong></td>
+									<td>0.0000</td>
+									<td><strong>0.0000</strong></td>
+									<td><strong>0.0000</strong></td>
+									<td>0.0000</td>
+								</tr>
+								<tr class=''>
+									<td><strong>Mar-25</strong></td>
+									<td><strong>0.0000</strong></td>
+									<td>0.0000</td>
+									<td><strong>0.0000</strong></td>
+									<td><strong>0.0000</strong></td>
+									<td>0.0000</td>
+								</tr>
+								<tr class=''>
+									<td><strong>Apr-25</strong></td>
+									<td><strong>0.0000</strong></td>
+									<td>0.0000</td>
+									<td><strong>0.0000</strong></td>
+									<td><strong>0.0000</strong></td>
+									<td>0.0000</td>
+								</tr>
+								<tr class=' text-success'>
+									<td><strong>May-25</strong></td>
+									<td><strong>0.0000</strong></td>
+									<td>0.0000</td>
+									<td><strong>0.0000</strong></td>
+									<td><strong>0.0000</strong></td>
+									<td>0.0000</td>
+								</tr>
+								<tr class=''>
+									<td><strong>Jun-25</strong></td>
+									<td><strong>0.0000</strong></td>
+									<td>0.0000</td>
+									<td><strong>0.0000</strong></td>
+									<td><strong>0.0000</strong></td>
+									<td>0.0000</td>
+								</tr>
+								<tr class=''>
+									<td><strong>Jul-25</strong></td>
+									<td><strong>0.0000</strong></td>
+									<td>0.0000</td>
+									<td><strong>0.0000</strong></td>
+									<td><strong>0.0000</strong></td>
+									<td>0.0000</td>
+								</tr>
+								<tr class=''>
+									<td><strong>Aug-25</strong></td>
+									<td><strong>0.0000</strong></td>
+									<td>0.0000</td>
+									<td><strong>0.0000</strong></td>
+									<td><strong>0.0000</strong></td>
+									<td>0.0000</td>
+								</tr>
+								<tr class=''>
+									<td><strong>Sep-25</strong></td>
+									<td><strong>0.0000</strong></td>
+									<td>0.0000</td>
+									<td><strong>0.0000</strong></td>
+									<td><strong>0.0000</strong></td>
+									<td>0.0000</td>
+								</tr>
+								<tr class=''>
+									<td><strong>Oct-25</strong></td>
+									<td><strong>0.0000</strong></td>
+									<td>0.0000</td>
+									<td><strong>0.0000</strong></td>
+									<td><strong>0.0000</strong></td>
+									<td>0.0000</td>
+								</tr>
+								<tr class=''>
+									<td><strong>Nov-25</strong></td>
+									<td><strong>0.0000</strong></td>
+									<td>0.0000</td>
+									<td><strong>0.0000</strong></td>
+									<td><strong>0.0000</strong></td>
+									<td>0.0000</td>
+								</tr>
+								<tr class=''>
+									<td><strong>Dec-25</strong></td>
+									<td><strong>0.0000</strong></td>
+									<td>0.0000</td>
+									<td><strong>0.0000</strong></td>
+									<td><strong>0.0000</strong></td>
+									<td>0.0000</td>
+								</tr> *@
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-6">
+            <div class="card shadow mb-4">
+                <!-- Card Header -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0  small font-weight-bold text-gray-800">Sick Leave</h6>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-dark text-xs" width="100%" cellspacing="0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th><span>As of</span></th>
+                                    <th><span>Beg bal</span></th>
+                                    <th><span>Credit</span></th>
+                                    <th><span>Availed</span></th>
+                                    <th><span>SL Mon</span></th>
+                                    <th><span>End Bal</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var x in Model.slSummaries)
+                                {
+                                    <tr class=''>
+                                        <td><strong> @x.AsOf  </strong></td>
+                                        <td><strong>  @x.BegBal</strong></td>
+                                        <td>@x.Credit</td>
+                                        <td><strong>@x.Availed</strong></td>
+                                        <td><strong>@x.Monetized</strong></td>
+                                        <td>@x.EndBal</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

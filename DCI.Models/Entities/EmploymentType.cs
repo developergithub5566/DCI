@@ -1,7 +1,9 @@
-﻿namespace DCI.Models.Entities
+﻿using DCI.Models.Configuration;
+
+namespace DCI.Models.Entities
 {
-	public class EmploymentType
-	{
+	public class EmploymentType : IAuditable
+    {
 		public int EmploymentTypeId { get; set; }
 
 		public string EmploymentTypeName { get; set; } = string.Empty;
