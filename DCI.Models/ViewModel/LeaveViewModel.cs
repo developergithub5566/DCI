@@ -22,11 +22,14 @@ namespace DCI.Models.ViewModel
         public string RequestNo { get; set; } = string.Empty;
         public DateTime DateFiled { get; set; }
         public int LeaveTypeId { get; set; }
+        public string LeaveName { get; set; } = string.Empty;
+        public int Status { get; set; }
+        public string StatusName { get; set; } = string.Empty;
         public string Reason { get; set; } = string.Empty;
         public DateTime? DateModified { get; set; }
         public string? ModifiedBy { get; set; }
         public bool IsActive { get; set; }
-
+        public decimal NoofDays { get; set; } = 0;
         public List<LeaveRequestDetailViewModel> LeaveRequestDetailViewModel { get; set; } = new();
     }
 

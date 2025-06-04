@@ -29,8 +29,9 @@ namespace DCI.Data
         public DbSet<vw_AttendanceSummary> vw_AttendanceSummary { get; set; }
         public DbSet<ApprovalHistory> ApprovalHistory { get; set; }
         public DbSet<LeaveInfo> LeaveInfo { get; set; }
+        public DbSet<LeaveType> LeaveType { get; set; }
         public DbSet<LeaveRequestHeader> LeaveRequestHeader { get; set; }
-        public DbSet<LeaveRequestDetail> LeaveRequestDetail { get; set; }
+        public DbSet<LeaveRequestDetails> LeaveRequestDetails { get; set; }
         public DbSet<LeaveSummary> LeaveSummary { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

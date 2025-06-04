@@ -3,6 +3,7 @@ using DCI.Models.Entities;
 using DCI.Models.ViewModel;
 using DCI.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -26,49 +27,47 @@ namespace DCI.Repositories
         {
             LeaveViewModel model = new LeaveViewModel();
             model.EmployeeId = param.EmployeeId;
-              
+
             var leaveinfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == param.EmployeeId).FirstOrDefault();
             model.VLBalance = leaveinfo.VLBalance;
-            model.SLBalance  = leaveinfo.SLBalance;
+            model.SLBalance = leaveinfo.SLBalance;
 
             var leaveReqHeaderDbContext = _dbContext.LeaveRequestHeader.AsQueryable();
 
-            //model.LeaveRequestHeaderViewModel = (from lheader in leaveReqHeaderDbContext
-            //                                     select new LeaveRequestHeaderViewModel
-            //                                     {
-            //                                         LeaveRequestHeaderId = lheader.LeaveRequestHeaderId,
-            //                                         EmployeeId = lheader.EmployeeId,
-            //                                         RequestNo = lheader.RequestNo,
-            //                                         DateFiled = lheader.DateFiled,
-            //                                         LeaveTypeId = lheader.LeaveTypeId                                                    
-            //                                     }).ToList();
+            model.LeaveRequestHeaderViewModel = (from lheader in _dbContext.LeaveRequestHeader
+                                                 join lvtype in _dbContext.LeaveType
+                                                 on lheader.LeaveTypeId equals lvtype.LeaveTypeId
+                                                 join stat in _dbContext.Status
+                                               on lheader.Status equals stat.StatusId
+                                                 select new LeaveRequestHeaderViewModel
+                                                 {
+                                                     LeaveRequestHeaderId = lheader.LeaveRequestHeaderId,
+                                                     EmployeeId = lheader.EmployeeId,
+                                                     RequestNo = lheader.RequestNo,
+                                                     DateFiled = lheader.DateFiled,
+                                                     LeaveTypeId = lheader.LeaveTypeId,
+                                                     LeaveName = lvtype.Name,
+                                                     Status = lheader.Status,
+                                                     StatusName = stat.StatusName,
+                                                     Reason = lheader.Reason,
+                                                     DateModified = lheader.DateModified,
+                                                     ModifiedBy = lheader.ModifiedBy,
+                                                     IsActive = lheader.IsActive,
+                                                     NoofDays = _dbContext.LeaveRequestDetails
+                                                                                     .Where(ld => ld.LeaveRequestHeaderId == lheader.LeaveRequestHeaderId)
+                                                                                     .Sum(ld => (decimal?)ld.Amount) ?? 0,
 
-            //model.LeaveRequestHeaderViewModel = _dbContext.LeaveRequestHeader
-            //                                    .Where(h => h.IsActive)
-            //                                    .Select(h => new LeaveRequestHeaderViewModel
-            //                                    {
-            //                                        LeaveRequestHeaderId = h.LeaveRequestHeaderId,
-            //                                        EmployeeId = h.EmployeeId,
-            //                                        RequestNo = h.RequestNo,
-            //                                        DateFiled = h.DateFiled,
-            //                                        LeaveTypeId = h.LeaveTypeId,
-            //                                        Reason = h.Reason,
-            //                                        DateModified = h.DateModified,
-            //                                        ModifiedBy = h.ModifiedBy,
-            //                                        IsActive = h.IsActive,
-
-            //                                        LeaveRequestDetailViewModel = h.LeaveRequestDetails
-            //                                            .Where(d => d.IsActive)
-            //                                            .Select(d => new LeaveRequestDetailViewModel
-            //                                            {
-            //                                                LeaveRequestDetailId = d.LeaveRequestDetailId,
-            //                                                LeaveRequestHeaderId = d.LeaveRequestHeaderId,
-            //                                                LeaveDate = d.LeaveDate,
-            //                                                Amount = d.Amount,
-            //                                                IsActive = d.IsActive
-            //                                            }).ToList()
-            //                                    }).ToList();
-
+                                                     LeaveRequestDetailViewModel = _dbContext.LeaveRequestDetails
+                                                         .Where(ld => ld.LeaveRequestHeaderId == lheader.LeaveRequestHeaderId)
+                                                         .Select(ld => new LeaveRequestDetailViewModel
+                                                         {
+                                                             LeaveRequestDetailId = ld.LeaveRequestDetailId,
+                                                             LeaveRequestHeaderId = ld.LeaveRequestHeaderId,
+                                                             LeaveDate = ld.LeaveDate,
+                                                             Amount = ld.Amount,
+                                                             IsActive = ld.IsActive
+                                                         }).ToList()
+                                                 }).ToList();
 
 
 

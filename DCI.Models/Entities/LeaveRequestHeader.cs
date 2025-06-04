@@ -9,11 +9,11 @@ namespace DCI.Models.Entities
         public string RequestNo { get; set; }
         public DateTime DateFiled { get; set; }
         public int LeaveTypeId { get; set; }
+        public int Status { get; set; }
         public string Reason { get; set; } = string.Empty;
         public DateTime? DateModified { get; set; }
         public string? ModifiedBy { get; set; }
         public bool IsActive { get; set; }
-        public Employee? Employee { get; set; }
+        public Employee? Employee { get; set; }   
     }
-
 }

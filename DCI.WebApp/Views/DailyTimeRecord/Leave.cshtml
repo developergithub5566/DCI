@@ -129,7 +129,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                                @*      <tr>
                                     <td><strong>May 15, 2025 03:12:42pm</strong></td>
                                     <td>Vacation Leave</td>
                                     <td><strong><span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>May 29, 2025</span> <span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>May 30, 2025</span> <span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>May 28, 2025</span></strong></td>
@@ -148,7 +148,37 @@
                                             </ul>
                                         </div>
                                     </td>
-                                </tr>
+                                </tr> *@
+                                @foreach (var hdr in Model.LeaveRequestHeaderViewModel)
+                                {
+                                    <tr>
+                                        <td><strong>@hdr.DateFiled.ToString("MMMM dd yyyy hh:mm tt")</strong></td>
+                                        <td>@hdr.LeaveName</td>
+                                        <td>
+                                            <strong>
+                                                @foreach (var dtl in hdr.LeaveRequestDetailViewModel)
+                                                {
+                                                    <span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>@dtl.LeaveDate.ToShortDateString()</span>
+                                                }
+                                            </strong>
+                                        </td>
+                                        <td><strong>@hdr.NoofDays</strong></td>
+                                        <td class="text-center"><strong><span class='btnPrimary  applicationStatus'>@hdr.StatusName</span></strong></td>
+
+                                        <td class="text-center">
+                                            <div class="dropdown">
+                                                <a href="#" class="dropdown-toggl text-lg" data-toggle="dropdown">
+                                                    <i class="fa-solid fa-ellipsis"></i>
+                                                </a>
+                                                <ul class="dropdown-menu">
+                                                    <li>
+                                                        <a href="#" onclick="viewModalInfo('5')"><i class="fa-solid fa-magnifying-glass"></i> View Details</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
                             </tbody>
                         </table>
                     </div>
@@ -178,15 +208,15 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var x in Model.vlSummaries)
+                                @foreach (var vl in Model.vlSummaries)
                                 {
                                     <tr class=''>
-                                        <td><strong> @x.AsOf  </strong></td>
-                                        <td><strong>  @x.BegBal</strong></td>
-                                        <td>@x.Credit</td>
-                                        <td><strong>@x.Availed</strong></td>
-                                        <td><strong>@x.Monetized</strong></td>
-                                        <td>@x.EndBal</td>
+                                        <td><strong> @vl.AsOf  </strong></td>
+                                        <td><strong>  @vl.BegBal</strong></td>
+                                        <td>@vl.Credit</td>
+                                        <td><strong>@vl.Availed</strong></td>
+                                        <td><strong>@vl.Monetized</strong></td>
+                                        <td>@vl.EndBal</td>
                                     </tr>
                                 }
 
@@ -307,15 +337,15 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var x in Model.slSummaries)
+                                @foreach (var sl in Model.slSummaries)
                                 {
                                     <tr class=''>
-                                        <td><strong> @x.AsOf  </strong></td>
-                                        <td><strong>  @x.BegBal</strong></td>
-                                        <td>@x.Credit</td>
-                                        <td><strong>@x.Availed</strong></td>
-                                        <td><strong>@x.Monetized</strong></td>
-                                        <td>@x.EndBal</td>
+                                        <td><strong> @sl.AsOf  </strong></td>
+                                        <td><strong>  @sl.BegBal</strong></td>
+                                        <td>@sl.Credit</td>
+                                        <td><strong>@sl.Availed</strong></td>
+                                        <td><strong>@sl.Monetized</strong></td>
+                                        <td>@sl.EndBal</td>
                                     </tr>
                                 }
                             </tbody>
