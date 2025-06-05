@@ -8,10 +8,14 @@
     <div class="d-sm-flex align-items-center justify-content-between mb-3">
         <h6 class="m-0 font-weight-bold text-gray-800">Leave Application & Balances</h6>
         <div class="upperRightDivBtn">
-            <button class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#leaveRequestModal">
+         @*    <button class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#leaveRequestModal">
                 <span class="icon text-white"><i class="fa-solid fa-file-pen text-xs"></i></span>
                 <span class="text"><small>Request Leave</small></span>
-            </button>
+            </button> *@
+            <a href="#" title="Request Leave" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#" onclick="newForm()">
+                <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
+                <span class="text text-white"><small>Request Leave</small></span>
+            </a>
         </div>
     </div>
     <div class="col-12 p0">
@@ -173,7 +177,6 @@
                                                 <ul class="dropdown-menu">
                                                     <li>
                                                         <a href="#" onclick="viewModalInfo('5')"><i class="fa-solid fa-magnifying-glass"></i> View Details</a>
-                                                    </li>
                                                 </ul>
                                             </div>
                                         </td>
@@ -220,94 +223,6 @@
                                     </tr>
                                 }
 
-                                @* <tr class=''>
-									<td><strong>Feb-25</strong></td>
-									<td><strong>0.0000</strong></td>
-									<td>0.0000</td>
-									<td><strong>0.0000</strong></td>
-									<td><strong>0.0000</strong></td>
-									<td>0.0000</td>
-								</tr>
-								<tr class=''>
-									<td><strong>Mar-25</strong></td>
-									<td><strong>0.0000</strong></td>
-									<td>0.0000</td>
-									<td><strong>0.0000</strong></td>
-									<td><strong>0.0000</strong></td>
-									<td>0.0000</td>
-								</tr>
-								<tr class=''>
-									<td><strong>Apr-25</strong></td>
-									<td><strong>0.0000</strong></td>
-									<td>0.0000</td>
-									<td><strong>0.0000</strong></td>
-									<td><strong>0.0000</strong></td>
-									<td>0.0000</td>
-								</tr>
-								<tr class=' text-success'>
-									<td><strong>May-25</strong></td>
-									<td><strong>0.0000</strong></td>
-									<td>0.0000</td>
-									<td><strong>0.0000</strong></td>
-									<td><strong>0.0000</strong></td>
-									<td>0.0000</td>
-								</tr>
-								<tr class=''>
-									<td><strong>Jun-25</strong></td>
-									<td><strong>0.0000</strong></td>
-									<td>0.0000</td>
-									<td><strong>0.0000</strong></td>
-									<td><strong>0.0000</strong></td>
-									<td>0.0000</td>
-								</tr>
-								<tr class=''>
-									<td><strong>Jul-25</strong></td>
-									<td><strong>0.0000</strong></td>
-									<td>0.0000</td>
-									<td><strong>0.0000</strong></td>
-									<td><strong>0.0000</strong></td>
-									<td>0.0000</td>
-								</tr>
-								<tr class=''>
-									<td><strong>Aug-25</strong></td>
-									<td><strong>0.0000</strong></td>
-									<td>0.0000</td>
-									<td><strong>0.0000</strong></td>
-									<td><strong>0.0000</strong></td>
-									<td>0.0000</td>
-								</tr>
-								<tr class=''>
-									<td><strong>Sep-25</strong></td>
-									<td><strong>0.0000</strong></td>
-									<td>0.0000</td>
-									<td><strong>0.0000</strong></td>
-									<td><strong>0.0000</strong></td>
-									<td>0.0000</td>
-								</tr>
-								<tr class=''>
-									<td><strong>Oct-25</strong></td>
-									<td><strong>0.0000</strong></td>
-									<td>0.0000</td>
-									<td><strong>0.0000</strong></td>
-									<td><strong>0.0000</strong></td>
-									<td>0.0000</td>
-								</tr>
-								<tr class=''>
-									<td><strong>Nov-25</strong></td>
-									<td><strong>0.0000</strong></td>
-									<td>0.0000</td>
-									<td><strong>0.0000</strong></td>
-									<td><strong>0.0000</strong></td>
-									<td>0.0000</td>
-								</tr>
-								<tr class=''>
-									<td><strong>Dec-25</strong></td>
-									<td><strong>0.0000</strong></td>
-									<td>0.0000</td>
-									<td><strong>0.0000</strong></td>
-									<td><strong>0.0000</strong></td>
-									<td>0.0000</td>
-								</tr> *@
                             </tbody>
                         </table>
                     </div>
@@ -355,4 +270,218 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Leave Request</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form  id="createForm">
+                        <input type="hidden" id="SelectedDatesJson" name="SelectedDates" />
+
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="frmText"><span class="required">*</span> Type</label>
+                                <select class="form-control frmField" name="LeaveTypeId" id="LeaveTypeId">
+                                    <option value="">Select</option>
+                                    <option value='1'>Vacation Leave</option>
+                                    <option value='2'>Sick Leave</option>
+                                    <option value='3'>Special Leave</option>
+                                    <option value='4'>Maternity Leave</option>
+                                    <option value='5'>Paternity Leave</option>
+                                    <option value='6'>Mobile Status</option>
+                                    <option value='7'>Official Business</option>
+                                    <option value='8'>VL Monetization</option>
+                                    <option value='9'>SL Monetization</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="frmText"><span class="required">*</span> No. of Days</label>
+                               @*  <input type="number" min="0" step="any" name="NO_DAYS" class="form-control frmField" autocomplete="off"> *@
+                                <input type="text" min="0" step="any" id="NoOfDays" name="NoOfDays" class="form-control frmField" readonly="true">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="frmText"><span class="required">*</span> Period Covered: </label>
+                                <div class="input-group">
+                                    <input type="text" name="COVERED_DATE" id="dateCovered" class="form-control frmField" autocomplete="off">
+                                    <div class="input-group-prepend prependBtn">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                </div>
+                                <label for="dateCovered" generated="true" class="error"></label>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label class="frmText"><span class="required">*</span> Reason:</label>
+                                <textarea class="form-control frmField" name="Reason" id="Reason"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer pt0">
+                    <button class="btn btnPrimary btn-icon-split d-block" type="button" onclick="save()">
+                        <span class="icon text-white-50">
+                            <i class="fa-regular fa-file-lines text-xs"></i>
+                        </span>
+                        <span class="text"><small>Submit </small></span>
+                    </button>
+
+                    <button class="btn btnSecondary btn-icon-split d-block" data-dismiss="modal">
+                        <span class="icon text-white-50">
+                            <i class="fa-solid fa-xmark text-xs"></i>
+                        </span>
+                        <span class="text"><small>Close </small></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
+
+@section scripts {
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+
+    <script type="text/javascript">
+                        var js = jQuery.noConflict(true);
+                        $('.spinner-overlay').show();
+
+                        setTimeout(() => {
+                            $('.spinner-overlay').hide();
+                        }, 200);
+            
+                        
+                       $(document).ready(function () {
+                            let nodays = 0.0000;
+                                                       // flatpickr("#dateCovered", {
+                                                       //         mode: "multiple",
+                                                       //                    enableTime: false,
+                                                       //                    dateFormat: "Y-m-d",
+                                                       //                    onChange: function(selectedDates, dateStr, instance) {
+                                                       //                      console.log("Selected Date: " + dateStr);
+                                                       //                         nodays = selectedDates.length;
+                                                       //                                        let formattedDays = nodays.toFixed(4);
+                                                       //                             $('#NoOfDays').val(formattedDays);
+                                                       //                    }
+                                                       //              });
+
+                                                               flatpickr("#dateCovered", {
+                                                                          mode: "multiple",
+                                                                          enableTime: false,
+                                                                          dateFormat: "Y-m-d",
+                                                                          onChange: function(selectedDates, dateStr, instance) {
+                                                                            // Update number of selected days
+                                                                            let nodays = selectedDates.length;
+                                                                            let formattedDays = nodays.toFixed(4);
+                                                                            $('#NoOfDays').val(formattedDays);
+
+                                                                            // Convert selected Date objects to formatted strings
+                                                                            let selectedDateStrings = selectedDates.map(date =>
+                                                                              instance.formatDate(date, "Y-m-d")
+                                                                            );
+
+                                                                            console.log("Selected Dates:", selectedDateStrings);
+
+                                                                            // Example: Store in a hidden field or send via AJAX
+                                                                            $('#SelectedDatesJson').val(JSON.stringify(selectedDateStrings));
+                                                                          }
+                                                                        });
+
+
+                 $('#createForm').submit(function (event) {
+                     event.preventDefault();
+                     alert("ok")    
+
+             }); //submit
+                          }); //end doc
+
+                   function newForm() {
+                    js('#createmodal').modal('show');
+                
+                   }
+
+               function save() {
+                       const leaveTypeId = $('#LeaveTypeId').val();
+                    const selectedDatesJson = $('#SelectedDatesJson').val();
+                        const noOfDays = $('#NoOfDays').val();
+                          const reason = $('#Reason').val();
+                
+
+
+                            const formData = new FormData();
+
+                           formData.append('LeaveTypeId', leaveTypeId);
+                            formData.append('NoOfDays', noOfDays);
+                             formData.append('SelectedDates', selectedDatesJson);
+                              formData.append('Reason', reason);
+                     
+
+
+        Swal.fire({
+                     text: "Are you sure you want to save this record?",
+                     icon: "question",
+                     showCancelButton: true,
+                     confirmButtonText: "Ok"
+                 }).then((result) => {
+                     if (result.isConfirmed) {
+                         $('.spinner-overlay').show();
+
+                         $.ajax({
+                             type: 'POST',
+                             url: '@Url.Action("SaveLeave", "DailyTimeRecord")',
+                             data: formData,
+                             success: function (response) {
+                                 if (response.success) {
+                                     $('#createForm')[0].reset();
+                                     js('#createmodal').modal('hide');
+
+                                     Swal.fire({
+                                         text: response.message,
+                                         icon: "success",
+                                         confirmButtonText: "Ok"
+                                     }).then((result) => {
+                                         location.reload();
+                                     });
+
+                                 } else {
+                                     Swal.fire({
+                                         text: response.message,
+                                         icon: "error"
+                                     });
+                                 }
+                                 $('.spinner-overlay').hide();
+                             },
+                             error: function () {
+                                 $('.spinner-overlay').hide();
+                                 Swal.fire({
+                                     text: "An error occurred. Please try again.",
+                                     icon: "error"
+                                 });
+                             }
+                         });
+                     }
+                 });
+
+              }
+
+     
+
+    </script>
+}

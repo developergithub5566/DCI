@@ -66,6 +66,15 @@ namespace DCI.Models.ViewModel
         public decimal EndBal { get; set; }
     }
 
+    public class LeaveForm
+    {
+        public int EmployeeId { get; set; }
+        public int LeaveTypeId { get; set; }
+        public decimal NoOfDays { get; set; }
+        public string Period { get; set; }
+        public string Reason { get; set; }
+        public List<DateTime> SelectedDates { get; set; } = new();
+    }
 
     //public class LeaveSummaryVL
     //{

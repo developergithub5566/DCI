@@ -121,8 +121,19 @@ namespace DCI.Core.Common
         Save = 1,
         ForApproval = 2,   
 		Approved = 3,
-		Deleted = 4,
-		
+		Deleted = 4,		
     }
 
+    public enum EnumLeaveType
+    {
+        VL = 1,       
+        SL = 2,
+        SPL = 3,
+        ML = 4,
+        PL = 5,
+        MS = 6,
+        OB = 7,
+        VLMon = 8,
+        SLMon = 9
+    }
 }

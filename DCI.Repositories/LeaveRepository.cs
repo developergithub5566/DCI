@@ -46,7 +46,7 @@ namespace DCI.Repositories
                                                      RequestNo = lheader.RequestNo,
                                                      DateFiled = lheader.DateFiled,
                                                      LeaveTypeId = lheader.LeaveTypeId,
-                                                     LeaveName = lvtype.Name,
+                                                     LeaveName = lvtype.Description,
                                                      Status = lheader.Status,
                                                      StatusName = stat.StatusName,
                                                      Reason = lheader.Reason,
