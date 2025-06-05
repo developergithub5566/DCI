@@ -447,6 +447,8 @@
                              type: 'POST',
                              url: '@Url.Action("SaveLeave", "DailyTimeRecord")',
                              data: formData,
+                                 processData: false,
+                                    contentType: false,
                              success: function (response) {
                                  if (response.success) {
                                      $('#createForm')[0].reset();
