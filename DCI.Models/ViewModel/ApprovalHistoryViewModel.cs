@@ -3,10 +3,11 @@
 	public class ApprovalHistoryViewModel
 	{
 		public int ApprovalHistoryId { get; set; } = 0;
-		public int DocId { get; set; } = 0;
-		public string DocumentName { get; set; } = string.Empty;
-		public bool Action { get; set; } 
-		public int ApproverId { get; set; } = 0;
+        public int ModulePageId { get; set; } = 0;
+        public int TransactionId { get; set; } = 0;
+        //public string DocumentName { get; set; } = string.Empty;
+        public int ApproverId { get; set; } = 0;
+		public int Status { get; set; } = 0;
 		public DateTime DateCreated { get; set; } = DateTime.Now;
 		public int CreatedBy { get; set; } = 0;
 		public string? Remarks { get; set; } = string.Empty;

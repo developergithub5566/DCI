@@ -1,4 +1,5 @@
 ﻿using DCI.Models.Entities;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DCI.Models.ViewModel
 {
@@ -8,17 +9,28 @@ namespace DCI.Models.ViewModel
         public string EmpNo { get; set; } = string.Empty;
         public decimal VLBalance { get; set; } = 0;
         public decimal SLBalance { get; set; } = 0;
-        public int LeaveType { get; set; } = 0;
+        public int LeaveTypeId { get; set; } = 0;
 
         public List<LeaveSummaryViewModel>? vlSummaries { get; set; } = new();
         public List<LeaveSummaryViewModel>? slSummaries { get; set; } = new();
-        public List<LeaveRequestHeaderViewModel>? LeaveRequestHeaderViewModel { get; set; } = new();
+
+        public int LeaveRequestHeaderId { get; set; } = 0;
+
+        public LeaveRequestHeaderViewModel? LeaveRequestHeader { get; set; } = new();
+        public List<LeaveRequestHeaderViewModel>? LeaveRequestHeaderList { get; set; } = new(); 
+        public List<LeaveTypeViewModel>? LeaveTypeList { get; set; } = new();
+
+        public string SelectedDateJson { get; set; } = string.Empty;
+        public List<SelectListItem>? OptionsLeaveType { get; set; }
+
+        public List<DateTime> LeaveDateList { get; set; } = new();
     }
 
     public class LeaveRequestHeaderViewModel
     {
         public int LeaveRequestHeaderId { get; set; }
         public int EmployeeId { get; set; }
+        public string EmployeeName { get; set; } = string.Empty;
         public string RequestNo { get; set; } = string.Empty;
         public DateTime DateFiled { get; set; }
         public int LeaveTypeId { get; set; }
@@ -30,7 +42,9 @@ namespace DCI.Models.ViewModel
         public string? ModifiedBy { get; set; }
         public bool IsActive { get; set; }
         public decimal NoofDays { get; set; } = 0;
-        public List<LeaveRequestDetailViewModel> LeaveRequestDetailViewModel { get; set; } = new();
+        public List<LeaveRequestDetailViewModel> LeaveRequestDetailList { get; set; } = new();
+        public IList<LeaveType>? LeaveTypeList { get; set; }
+        public List<DateTime>? LeaveDateList { get; set; }
     }
 
     public class LeaveRequestDetailViewModel
@@ -66,14 +80,24 @@ namespace DCI.Models.ViewModel
         public decimal EndBal { get; set; }
     }
 
-    public class LeaveForm
+    public class LeaveFormViewModel
     {
-        public int EmployeeId { get; set; }
+        public int EmployeeId { get; set; } = 0;
+        public int LeaveTypeId { get; set; } = 0;
+        public decimal NoOfDays { get; set; } = 0;
+        public string Period { get; set; } = string.Empty;
+        public string Reason { get; set; } = string.Empty;
+        public string RequestNo { get; set; } = string.Empty;
+        public string SelectedDateJson { get; set; } = string.Empty;
+        public List<DateTime> SelectedDateList { get; set; } = new();
+    }
+
+    public class LeaveTypeViewModel
+    {
         public int LeaveTypeId { get; set; }
-        public decimal NoOfDays { get; set; }
-        public string Period { get; set; }
-        public string Reason { get; set; }
-        public List<DateTime> SelectedDates { get; set; } = new();
+        public string Code { get; set; }
+        public string Description { get; set; }
+        public decimal Amount { get; set; }
     }
 
     //public class LeaveSummaryVL

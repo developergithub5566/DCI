@@ -1,5 +1,6 @@
 ﻿using DCI.Core.Common;
 using DCI.Models.Configuration;
+using DCI.Models.Entities;
 using DCI.Models.ViewModel;
 using DCI.WebApp.Configuration;
 using Microsoft.AspNetCore.Mvc;
@@ -60,15 +61,15 @@ namespace DCI.WebApp.Controllers
 
 		public async Task<IActionResult> Index()
 		{
-			List<DocumentViewModel> model = new List<DocumentViewModel>();
+			List<LeaveRequestHeaderViewModel> model = new List<LeaveRequestHeaderViewModel>();
 
 			using (var _httpclient = new HttpClient())
 			{
-				DocumentViewModel _filterRoleModel = new DocumentViewModel();
+				LeaveViewModel _filterRoleModel = new LeaveViewModel();
 
 				var currentUser = _userSessionHelper.GetCurrentUser();
-				_filterRoleModel.CurrentUserId = currentUser.RoleId;
-				_filterRoleModel.CurrentUserId = currentUser.UserId;
+				//_filterRoleModel = currentUser.RoleId;
+				//_filterRoleModel.CurrentUserId = currentUser.UserId;
 
 				var stringContent = new StringContent(JsonConvert.SerializeObject(_filterRoleModel), Encoding.UTF8, "application/json");
 				var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Todo/GetAllTodo");
@@ -78,7 +79,7 @@ namespace DCI.WebApp.Controllers
 				var responseBody = await response.Content.ReadAsStringAsync();
 				if (response.IsSuccessStatusCode)
 				{
-					model = JsonConvert.DeserializeObject<List<DocumentViewModel>>(responseBody)!;
+					model = JsonConvert.DeserializeObject<List<LeaveRequestHeaderViewModel>>(responseBody)!;
 				}
 
 			}
@@ -93,7 +94,7 @@ namespace DCI.WebApp.Controllers
 					var currentUser = _userSessionHelper.GetCurrentUser();
 					model.CreatedBy = currentUser.UserId;
 					model.ApproverId = currentUser.UserId;
-
+			
 					var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
 					var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Todo/Approval");
 

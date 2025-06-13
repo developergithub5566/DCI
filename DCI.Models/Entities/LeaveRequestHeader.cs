@@ -1,9 +1,11 @@
 ﻿using DCI.Models.Configuration;
+using System.ComponentModel.DataAnnotations;
 
 namespace DCI.Models.Entities
 {
     public class LeaveRequestHeader : IAuditable
     {
+        [Key]
         public int LeaveRequestHeaderId { get; set; }
         public int EmployeeId { get; set; }
         public string RequestNo { get; set; }
@@ -14,6 +16,8 @@ namespace DCI.Models.Entities
         public DateTime? DateModified { get; set; }
         public string? ModifiedBy { get; set; }
         public bool IsActive { get; set; }
-        public Employee? Employee { get; set; }   
+        public Employee? Employee { get; set; }
+         public decimal NoOfDays { get; set; }
+        public virtual ICollection<LeaveRequestDetails> LeaveRequestDetailsList { get; set; }
     }
 }

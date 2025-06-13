@@ -2,10 +2,13 @@
 using DCI.Models.ViewModel;
 using DCI.WebApp.Configuration;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Serilog;
+using System.Net.Http;
 using System.Text;
+
 
 namespace DCI.WebApp.Controllers
 {
@@ -146,12 +149,17 @@ namespace DCI.WebApp.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> SaveLeave(LeaveForm model)
+        public async Task<IActionResult> SaveLeave(LeaveFormViewModel model)
         {
             try
             {
                 using (var _httpclient = new HttpClient())
                 {
+                    model.EmployeeId = 2;
+        
+                    model.SelectedDateList = JsonConvert.DeserializeObject<List<DateTime>>(model.SelectedDateJson);
+
+
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/SaveLeave");
                     request.Content = stringContent;
@@ -175,6 +183,57 @@ namespace DCI.WebApp.Controllers
                 Log.CloseAndFlush();
             }
             return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
+        public async Task<IActionResult> RequestLeave(LeaveViewModel model)
+        {
+           
+            try
+            { 
+                using (var _httpclient = new HttpClient())
+                {
+                    model.EmployeeId = 2;
+                  //  model.LeaveRequestHeaderId = 4;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/RequestLeave");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<LeaveViewModel>(responseBody)!;
+
+                        model.OptionsLeaveType = model.LeaveRequestHeader.LeaveTypeList.Select(x =>
+                                    new SelectListItem
+                                    {
+                                        Value = x.LeaveTypeId.ToString(),
+                                        Text = x.Description
+                                    }).ToList();
+
+                        //model.SelectedDateJson = JsonConvert.SerializeObject(model.LeaveDateList);
+                        var dateList = new List<string> { "2025-06-09","2025-06-10" };
+                        var jsonDates = JsonConvert.SerializeObject(dateList);
+                        model.SelectedDateJson = jsonDates;
+                        //string json = JsonConvert.SerializeObject(model.LeaveDateList);
+                    }
+                    return Json(new { success = true, data = model });
+                }
+                return Json(new { success = false, message = "" });
+                // return View(model);
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+          //  return View(model);
         }
     }
 }

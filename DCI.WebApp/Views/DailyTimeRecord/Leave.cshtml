@@ -124,53 +124,46 @@
                         <table class="table table-bordered dataTable" width="100%" cellspacing="0">
                             <thead>
                                 <tr>
+                                    <th><span>Request No.</span></th>
                                     <th><span>Date Filed</span></th>
                                     <th><span>Leave Type</span></th>
                                     <th width="30%"><span>Date Covered</span></th>
-                                    <th><span>No. of Days</span></th>
-                                    <th><span>Status</span></th>
+                                    <th width="10%"><span>No. of Days</span></th>
+                                    <th width="10%"><span>Status</span></th>
                                     <th><span>Action</span></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @*      <tr>
-                                    <td><strong>May 15, 2025 03:12:42pm</strong></td>
-                                    <td>Vacation Leave</td>
-                                    <td><strong><span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>May 29, 2025</span> <span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>May 30, 2025</span> <span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>May 28, 2025</span></strong></td>
-                                    <td><strong>3.0000</strong></td>
-                                    <td class="text-center"><strong><span class='btnPrimary  applicationStatus'>Pending</span></strong></td>
-
-                                    <td class="text-center">
-                                        <div class="dropdown">
-                                            <a href="#" class="dropdown-toggl text-lg" data-toggle="dropdown">
-                                                <i class="fa-solid fa-ellipsis"></i>
-                                            </a>
-                                            <ul class="dropdown-menu">
-                                                <li>
-                                                    <a href="#" onclick="viewModalInfo('5')"><i class="fa-solid fa-magnifying-glass"></i> View Details</a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr> *@
-                                @foreach (var hdr in Model.LeaveRequestHeaderViewModel)
+                             
+                                @foreach (var hdr in Model.LeaveRequestHeaderList)
                                 {
                                     <tr>
-                                        <td><strong>@hdr.DateFiled.ToString("MMMM dd yyyy hh:mm tt")</strong></td>
+                                        <td><strong>@hdr.RequestNo</strong></td>
+                                        <td>@hdr.DateFiled.ToString("MMMM dd yyyy hh:mm tt")</td>
                                         <td>@hdr.LeaveName</td>
                                         <td>
                                             <strong>
-                                                @foreach (var dtl in hdr.LeaveRequestDetailViewModel)
+                                                @foreach (var dtl in hdr.LeaveRequestDetailList)
                                                 {
                                                     <span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>@dtl.LeaveDate.ToShortDateString()</span>
                                                 }
                                             </strong>
                                         </td>
                                         <td><strong>@hdr.NoofDays</strong></td>
-                                        <td class="text-center"><strong><span class='btnPrimary  applicationStatus'>@hdr.StatusName</span></strong></td>
+                                        @if (hdr.StatusName == "Approved")
+                                        {
+                                            <td class="text-center"><strong><span class='btnPrimary applicationStatus'>@hdr.StatusName</span></strong></td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-center"><strong><span class='btn-danger applicationStatus'>@hdr.StatusName</span></strong></td>
+                                        }
+                                     
 
                                         <td class="text-center">
-                                            <div class="dropdown">
+                                            <a href="#" onclick="editForm(@hdr.LeaveRequestHeaderId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+
+                                       @*      <div class="dropdown">
                                                 <a href="#" class="dropdown-toggl text-lg" data-toggle="dropdown">
                                                     <i class="fa-solid fa-ellipsis"></i>
                                                 </a>
@@ -178,7 +171,7 @@
                                                     <li>
                                                         <a href="#" onclick="viewModalInfo('5')"><i class="fa-solid fa-magnifying-glass"></i> View Details</a>
                                                 </ul>
-                                            </div>
+                                            </div> *@
                                         </td>
                                     </tr>
                                 }
@@ -283,11 +276,18 @@
                 <div class="modal-body">
                     <form  id="createForm">
                         <input type="hidden" id="SelectedDatesJson" name="SelectedDates" />
+                        <input type="hidden" id="dateSelected" name="dateSelected" />
+                        
+                        <input type="hidden" id="SelectedLeaveTypeAmount" name="SelectedLeaveTypeAmount" value="0" />
+                        <input type="hidden" id="preloadedDates"  />
 
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label class="frmText"><span class="required">*</span> Type</label>
-                                <select class="form-control frmField" name="LeaveTypeId" id="LeaveTypeId">
+                                <select id="leaveTypeSelect" class="form-select" required onchange="GetLeaveTypeAmount()">
+                                    <option value="">select type</option>
+                                </select>
+                              @*   <select class="form-control frmField" name="LeaveTypeId" id="LeaveTypeId">
                                     <option value="">Select</option>
                                     <option value='1'>Vacation Leave</option>
                                     <option value='2'>Sick Leave</option>
@@ -298,7 +298,7 @@
                                     <option value='7'>Official Business</option>
                                     <option value='8'>VL Monetization</option>
                                     <option value='9'>SL Monetization</option>
-                                </select>
+                                </select> *@
                             </div>
                         </div>
 
@@ -370,17 +370,7 @@
                         
                        $(document).ready(function () {
                             let nodays = 0.0000;
-                                                       // flatpickr("#dateCovered", {
-                                                       //         mode: "multiple",
-                                                       //                    enableTime: false,
-                                                       //                    dateFormat: "Y-m-d",
-                                                       //                    onChange: function(selectedDates, dateStr, instance) {
-                                                       //                      console.log("Selected Date: " + dateStr);
-                                                       //                         nodays = selectedDates.length;
-                                                       //                                        let formattedDays = nodays.toFixed(4);
-                                                       //                             $('#NoOfDays').val(formattedDays);
-                                                       //                    }
-                                                       //              });
+                                                 
 
                                                                flatpickr("#dateCovered", {
                                                                           mode: "multiple",
@@ -389,17 +379,22 @@
                                                                           onChange: function(selectedDates, dateStr, instance) {
                                                                             // Update number of selected days
                                                                             let nodays = selectedDates.length;
-                                                                            let formattedDays = nodays.toFixed(4);
+                                                                                   let amount =     $('#SelectedLeaveTypeAmount').val();
+                                                                               console.log("select-amount-",amount);
+                                                                         let total = amount * nodays;
+                                                                       let formattedDays = total.toFixed(4);
                                                                             $('#NoOfDays').val(formattedDays);
 
-                                                                            // Convert selected Date objects to formatted strings
+                                                                       
                                                                             let selectedDateStrings = selectedDates.map(date =>
                                                                               instance.formatDate(date, "Y-m-d")
                                                                             );
 
-                                                                            console.log("Selected Dates:", selectedDateStrings);
-
-                                                                            // Example: Store in a hidden field or send via AJAX
+                                                                                    // let selectedDatesXXX = flatpickr.selectedDates.map(date =>
+                                                                                    //   flatpickr.formatDate(date, "yyyy-MM-dd")
+                                                                                    // );
+                                                                                    // $('#dateSelected').val(selectedDatesXXX);
+                                                                                                                                               
                                                                             $('#SelectedDatesJson').val(JSON.stringify(selectedDateStrings));
                                                                           }
                                                                         });
@@ -413,28 +408,176 @@
                           }); //end doc
 
                    function newForm() {
+                      const my_fp = document.querySelector("#dateCovered")._flatpickr;
+                                      my_fp.clear();
+                                  let nodays = 0.0000;     
+                                $('#NoOfDays').val(nodays.toFixed(4));
+                            $('#Reason').val('');
+
+                         $.ajax({
+                             type: 'POST',
+                             url: '@Url.Action("RequestLeave", "DailyTimeRecord")',                            
+                             success: function (response) {
+                                 if (response.success) {
+
+
+                                var $select = $('#leaveTypeSelect');
+                                 $select.empty();
+                                 $select.append('<option value="">Select type</option>');
+
+                                 $.each(response.data.optionsLeaveType, function (index, item) {
+                                if (item.value == response.data.leaveRequestHeader.leaveTypeId) {
+                                         $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+                                     } else {
+                                         $select.append('<option value="' + item.value + '">' + item.text + '</option>');
+                                     }
+                                 });
+
+                            console.log(response);
+
+                         // $('#dateCovered').val(response.data.selectedDateJson);
+                           $('#NoOfDays').val(response.data.leaveRequestHeader.noofDays);
+                                $('#Reason').val(response.data.leaveRequestHeader.reason);
+                           //  $('#preloadedDates').val(response.data.leaveRequestHeader.selectedDateJson);
+
+       //  let preloaded = response.data.selectedDateJson;
+           // let preloaded = JSON.parse(raw);
+                                // let preloaded = JSON.parse(document.getElementById("preloadedDates").value);
+                              //  let preloaded = document.getElementById("preloadedDates").value;
+
+
+                                   // let fp = flatpickr("#dateCovered", {
+                                   //        mode: "multiple",
+                                   //         dateFormat: "Y-m-d"
+                                   //      });
+
+
+                      // let preloaded = ["2025-06-10", "2025-06-15", "2025-06-20"];
+                               //    fp.setDate(["2025-06-10", "2025-06-15", "2025-06-20"]);
+                                      // console.log(preloaded);
+                                     //  fp.setDate(preloaded);
+
+                                     js('#createmodal').modal('show');                             
+                                 } else {
+                                     Swal.fire({
+                                         text: response.message,
+                                         icon: "error"
+                                     });
+                                 }
+                                 $('.spinner-overlay').hide();
+                             },
+                             error: function () {
+                                 $('.spinner-overlay').hide();
+                                 Swal.fire({
+                                     text: "An error occurred. Please try again.",
+                                     icon: "error"
+                                 });
+                             }
+                         });
+
                     js('#createmodal').modal('show');
                 
                    }
 
-               function save() {
-                       const leaveTypeId = $('#LeaveTypeId').val();
-                    const selectedDatesJson = $('#SelectedDatesJson').val();
-                        const noOfDays = $('#NoOfDays').val();
-                          const reason = $('#Reason').val();
-                
+                    function editForm(leaveHdrId) {
+                     const my_fp = document.querySelector("#dateCovered")._flatpickr;
+                                     my_fp.clear();
+                                 let nodays = 0.0000;
+                               $('#NoOfDays').val(nodays.toFixed(4));
+                           $('#Reason').val('');
+
+                                                 
 
 
                             const formData = new FormData();
+                            formData.append('LeaveRequestHeaderId', leaveHdrId);
+                           
 
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("RequestLeave", "DailyTimeRecord")',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function (response) {
+                                if (response.success) {
+
+                                var $select = $('#leaveTypeSelect');
+                                    $select.empty();
+                                    $select.append('<option value="">Select type</option>');
+
+                                    $.each(response.data.optionsLeaveType, function (index, item) {
+                                if (item.value == response.data.leaveRequestHeader.leaveTypeId) {
+                                        $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+                                    } else {
+                                        $select.append('<option value="' + item.value + '">' + item.text + '</option>');
+                                    }
+                                });
+
+                           console.log(response);
+
+                         $('#dateCovered').val(response.data.selectedDateJson);
+                          $('#NoOfDays').val(response.data.leaveRequestHeader.noofDays);
+                               $('#Reason').val(response.data.leaveRequestHeader.reason);
+                          //  $('#preloadedDates').val(response.data.leaveRequestHeader.selectedDateJson);
+
+                         let preloaded = response.data.selectedDateJson;
+                                    // let preloaded = JSON.parse(raw);
+                               // let preloaded = JSON.parse(document.getElementById("preloadedDates").value);
+                             //  let preloaded = document.getElementById("preloadedDates").value;
+
+
+                                  let fp = flatpickr("#dateCovered", {
+                                         mode: "multiple",
+                                          dateFormat: "Y-m-d"
+                                       });
+
+
+                                  // let preloaded = ["2025-06-10", "2025-06-15", "2025-06-20"];
+                              //    fp.setDate(["2025-06-10", "2025-06-15", "2025-06-20"]);
+                                      console.log(preloaded);
+                                      fp.setDate(preloaded);
+
+                                    js('#createmodal').modal('show');
+                                } else {
+                                    Swal.fire({
+                                        text: response.message,
+                                        icon: "error"
+                                    });
+                                }
+                                $('.spinner-overlay').hide();
+                            },
+                            error: function () {
+                                $('.spinner-overlay').hide();
+                                Swal.fire({
+                                    text: "An error occurred. Please try again.",
+                                    icon: "error"
+                                });
+                            }
+                        });
+
+                   js('#createmodal').modal('show');
+
+                  }
+
+               function save() {
+                       const leaveTypeId = $('#leaveTypeSelect').val();
+                    const selectedDatesJson = $('#SelectedDatesJson').val();
+                         
+                
+                    
+                        const noOfDays = $('#NoOfDays').val();
+                          const reason = $('#Reason').val();    
+
+                            const formData = new FormData();
                            formData.append('LeaveTypeId', leaveTypeId);
                             formData.append('NoOfDays', noOfDays);
-                             formData.append('SelectedDates', selectedDatesJson);
-                              formData.append('Reason', reason);
-                     
+                             formData.append('SelectedDateJson', selectedDatesJson);
+                                  
+                              formData.append('Reason', reason);                    
 
 
-        Swal.fire({
+                 Swal.fire({
                      text: "Are you sure you want to save this record?",
                      icon: "question",
                      showCancelButton: true,
@@ -481,6 +624,26 @@
                      }
                  });
 
+              }
+
+              function GetLeaveTypeAmount(){
+                    let leave =  $('#leaveTypeSelect').val();
+                     console.log(leave);
+                    let  _amount = 0.0000;
+                   if(leave ==1){
+                      _amount = 0.5000;
+                      $('#SelectedLeaveTypeAmount').val(_amount);
+                   }else{
+                       _amount = 1.0000;
+                      $('#SelectedLeaveTypeAmount').val(_amount);
+                   }
+
+                  //const clearDate = flatpickr("#dateCovered", {});
+                    // const clearDate = $("#dateCovered").flatpickr();
+                    //       clearDate.clear();
+
+                      const my_fp = document.querySelector("#dateCovered")._flatpickr;
+                       my_fp.clear();
               }
 
      

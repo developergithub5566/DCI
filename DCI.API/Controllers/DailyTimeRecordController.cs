@@ -42,5 +42,24 @@ namespace DCI.API.Controllers
         {
             return Ok(await _leaveRepository.GetAllLeave(model));
         }
+
+        [HttpPost]
+        [Route("RequestLeave")]
+        public async Task<IActionResult> RequestLeave([FromBody] LeaveViewModel model)
+        {
+            //LeaveViewModel model = new LeaveViewModel();
+            //var result = await _leaveRepository.RequestLeave(model);
+            // return Ok(result);
+            return Ok(await _leaveRepository.RequestLeave(model));
+        }
+
+        [HttpPost]
+        [Route("SaveLeave")]
+        public async Task<IActionResult> SaveLeave([FromBody] LeaveFormViewModel model)
+        {
+            return Ok(await _leaveRepository.SaveLeave(model));
+        }
+
+
     }
 }
