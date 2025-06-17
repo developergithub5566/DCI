@@ -33,6 +33,7 @@ namespace DCI.Data
         public DbSet<LeaveRequestHeader> LeaveRequestHeader { get; set; }
         public DbSet<LeaveRequestDetails> LeaveRequestDetails { get; set; }
         public DbSet<LeaveSummary> LeaveSummary { get; set; }
+        public DbSet<Announcement> Announcement { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

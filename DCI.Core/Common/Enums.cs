@@ -84,6 +84,7 @@ namespace DCI.Core.Common
         Deleted = 8,
         Rejected = 9,
     }
+   
     public enum EnumDocumentCategory
     {
         [Description("Internal")]
@@ -118,12 +119,15 @@ namespace DCI.Core.Common
 
     public enum EnumStatus
     {
-        Draft = 0,
-        Save = 1,
+        Draft = 1,
         Pending = 2,
-        Approved = 3,
-        Deleted = 4,
-        ForApproval = 5
+        ForApproval = 3,
+        Approved = 4,
+        Rejected = 5,
+        Cancelled = 6,
+        Deleted = 7,
+        Active = 8,
+        InActive = 9
     }
 
     public enum EnumLeaveType

@@ -121,7 +121,7 @@
                         </div>
                     </div>
                     <div class="table-responsive mt20">
-                        <table class="table table-bordered dataTable" width="100%" cellspacing="0">
+                        <table class="table table-bordered dataTable" width="100%" cellspacing="0" id="tblDocument">
                             <thead>
                                 <tr>
                                     <th><span>Request No.</span></th>
@@ -154,11 +154,15 @@
                                         {
                                             <td class="text-center"><strong><span class='btnPrimary applicationStatus'>@hdr.StatusName</span></strong></td>
                                         }
-                                        else
+                                        else if (hdr.StatusName == "Rejected")
                                         {
                                             <td class="text-center"><strong><span class='btn-danger applicationStatus'>@hdr.StatusName</span></strong></td>
                                         }
-                                     
+                                        else
+                                        {
+                                            <td class="text-center"><strong><span class='btn-success applicationStatus'>@hdr.StatusName</span></strong></td>
+                                        }
+
 
                                         <td class="text-center">
                                             <a href="#" onclick="editForm(@hdr.LeaveRequestHeaderId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
@@ -287,18 +291,7 @@
                                 <select id="leaveTypeSelect" class="form-select" required onchange="GetLeaveTypeAmount()">
                                     <option value="">select type</option>
                                 </select>
-                              @*   <select class="form-control frmField" name="LeaveTypeId" id="LeaveTypeId">
-                                    <option value="">Select</option>
-                                    <option value='1'>Vacation Leave</option>
-                                    <option value='2'>Sick Leave</option>
-                                    <option value='3'>Special Leave</option>
-                                    <option value='4'>Maternity Leave</option>
-                                    <option value='5'>Paternity Leave</option>
-                                    <option value='6'>Mobile Status</option>
-                                    <option value='7'>Official Business</option>
-                                    <option value='8'>VL Monetization</option>
-                                    <option value='9'>SL Monetization</option>
-                                </select> *@
+                    
                             </div>
                         </div>
 
@@ -331,20 +324,30 @@
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer pt0">
-                    <button class="btn btnPrimary btn-icon-split d-block" type="button" onclick="save()">
-                        <span class="icon text-white-50">
-                            <i class="fa-regular fa-file-lines text-xs"></i>
-                        </span>
-                        <span class="text"><small>Submit </small></span>
-                    </button>
-
-                    <button class="btn btnSecondary btn-icon-split d-block" data-dismiss="modal">
-                        <span class="icon text-white-50">
-                            <i class="fa-solid fa-xmark text-xs"></i>
-                        </span>
-                        <span class="text"><small>Close </small></span>
-                    </button>
+                <div class="modal-footer pt0"> 
+                    <div id="btnSubmit">
+                        <button class="btn btnPrimary btn-icon-split d-block" type="button" onclick="save()">
+                            <span class="icon text-white-50">
+                                <i class="fa-regular fa-file-lines text-xs"></i>
+                            </span>
+                            <span class="text"><small>Submit </small></span>
+                        </button>
+                    </div>
+                    <div id="btnCancel">
+                        <button class="btn btnDanger btn-icon-split d-block" type="button" onclick="cancel()">
+                            <span class="icon text-white-50">
+                                <i class="fa-regular fa-file-lines text-xs"></i>
+                            </span>
+                            <span class="text"><small>Cancel Request</small></span>
+                        </button>
+                    </div>
+                        <button class="btn btnSecondary btn-icon-split d-block" data-dismiss="modal">
+                            <span class="icon text-white-50">
+                                <i class="fa-solid fa-xmark text-xs"></i>
+                            </span>
+                            <span class="text"><small>Close </small></span>
+                        </button>
+                   
                 </div>
             </div>
         </div>
@@ -357,7 +360,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
+    <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
 
     <script type="text/javascript">
                         var js = jQuery.noConflict(true);
@@ -369,6 +372,12 @@
             
                         
                        $(document).ready(function () {
+                             js('#tblDocument').DataTable({
+                         order: [[1, 'desc']]
+                     });
+
+
+
                             let nodays = 0.0000;
                                                  
 
@@ -419,7 +428,8 @@
                              url: '@Url.Action("RequestLeave", "DailyTimeRecord")',                            
                              success: function (response) {
                                  if (response.success) {
-
+                                
+                                     $('#createForm').find('input, select, textarea').prop('disabled', false);
 
                                 var $select = $('#leaveTypeSelect');
                                  $select.empty();
@@ -480,17 +490,17 @@
                    }
 
                     function editForm(leaveHdrId) {
-                     const my_fp = document.querySelector("#dateCovered")._flatpickr;
+                                const my_fp = document.querySelector("#dateCovered")._flatpickr;
                                      my_fp.clear();
                                  let nodays = 0.0000;
-                               $('#NoOfDays').val(nodays.toFixed(4));
-                           $('#Reason').val('');
-
+                                 $('#NoOfDays').val(nodays.toFixed(4));
+                                 $('#Reason').val('');
+                                   const formData = new FormData();
+                                 formData.append('LeaveRequestHeaderId', leaveHdrId);
                                                  
 
 
-                            const formData = new FormData();
-                            formData.append('LeaveRequestHeaderId', leaveHdrId);
+                           
                            
 
                         $.ajax({
@@ -519,12 +529,31 @@
                          $('#dateCovered').val(response.data.selectedDateJson);
                           $('#NoOfDays').val(response.data.leaveRequestHeader.noofDays);
                                $('#Reason').val(response.data.leaveRequestHeader.reason);
+                               
+                               $('#btnCancel').hide();
+                                            $('#createForm').find('input, select, textarea').prop('disabled', true);
+                                  if(response.data.leaveRequestHeader.status == 2){  //pending
+                                               $('#btnCancel').show();
+                                                $('#btnSubmit').hide();
+                                             }
+                               else if(response.data.leaveRequestHeader.status == 4){     //approved                             
+                                              $('#btnSubmit').hide();
+                                                  $('#btnCancel').hide();                                              
+                                   }
+                                        else if(response.data.leaveRequestHeader.status == 5){     //Rejected
+                                               $('#btnSubmit').hide();
+                                                   $('#btnCancel').hide();
+                                    }
+                                     
+
                           //  $('#preloadedDates').val(response.data.leaveRequestHeader.selectedDateJson);
 
                          let preloaded = response.data.selectedDateJson;
                                     // let preloaded = JSON.parse(raw);
                                // let preloaded = JSON.parse(document.getElementById("preloadedDates").value);
                              //  let preloaded = document.getElementById("preloadedDates").value;
+
+
 
 
                                   let fp = flatpickr("#dateCovered", {

@@ -14,7 +14,7 @@ namespace DCI.Models.Entities
         public int Status { get; set; }
         public string Reason { get; set; } = string.Empty;
         public DateTime? DateModified { get; set; }
-        public string? ModifiedBy { get; set; }
+        public int? ModifiedBy { get; set; }
         public bool IsActive { get; set; }
         public Employee? Employee { get; set; }
          public decimal NoOfDays { get; set; }

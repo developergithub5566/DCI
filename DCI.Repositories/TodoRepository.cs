@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DCI.Repositories
 {
@@ -37,26 +38,25 @@ namespace DCI.Repositories
             var statusList = _dbContext.Status.AsQueryable().ToList();
 
             //var query = from leave in context
-            //            .Include(l => l.LeaveRequestDetails)
+            //                //  join dtl in _dbContext.LeaveRequestDetails on leave.LeaveRequestHeaderId equals dtl.LeaveRequestHeaderId
             //            join emp in empList on leave.EmployeeId equals emp.EmployeeId
             //            join stat in statusList on leave.Status equals stat.StatusId
-            //            where leave.IsActive == true
+            //            where leave.IsActive == true && leave.Status == (int)EnumStatus.Pending
             //            select new LeaveRequestHeaderViewModel
             //            {
             //                LeaveRequestHeaderId = leave.LeaveRequestHeaderId,
             //                RequestNo = leave.RequestNo,
             //                EmployeeId = leave.EmployeeId,
+            //                EmployeeName = emp.Firstname + " " +emp.Lastname,
             //                DateFiled = leave.DateFiled,
             //                Status = leave.Status,
-            //                StatusName = stat.StatusName, 
+            //                StatusName = stat.StatusName,
             //                Reason = leave.Reason,
-            //                NoofDays = leave.NoOfDays,
-            //                LeaveDateList = leave.LeaveRequestDetailList
-            //                    .Select(dtl => dtl.LeaveDate.ToShortDateString())
-            //                    .ToList()
+            //                NoofDays = leave.NoOfDays
+            //               // ,LeaveDateList = leave.LeaveRequestDetailsList.Select(dtl => dtl.LeaveDate).ToList()
             //            };
 
-            var query = from leave in context
+            var query = (from leave in context
                             //  join dtl in _dbContext.LeaveRequestDetails on leave.LeaveRequestHeaderId equals dtl.LeaveRequestHeaderId
                         join emp in empList on leave.EmployeeId equals emp.EmployeeId
                         join stat in statusList on leave.Status equals stat.StatusId
@@ -66,14 +66,22 @@ namespace DCI.Repositories
                             LeaveRequestHeaderId = leave.LeaveRequestHeaderId,
                             RequestNo = leave.RequestNo,
                             EmployeeId = leave.EmployeeId,
-                            EmployeeName = emp.Firstname + " " +emp.Lastname,
+                            EmployeeName = emp.Firstname + " " + emp.Lastname,
                             DateFiled = leave.DateFiled,
                             Status = leave.Status,
                             StatusName = stat.StatusName,
                             Reason = leave.Reason,
-                            NoofDays = leave.NoOfDays
-                           // ,LeaveDateList = leave.LeaveRequestDetailsList.Select(dtl => dtl.LeaveDate).ToList()
-                        };
+                            NoofDays = leave.NoOfDays,
+                            LeaveRequestDetailList = (from dtl in _dbContext.LeaveRequestDetails
+                                             where dtl.LeaveRequestHeaderId == leave.LeaveRequestHeaderId
+                                             select new LeaveRequestDetailViewModel
+                                             {
+                                                 LeaveRequestHeaderId = dtl.LeaveRequestHeaderId,
+                                                 LeaveRequestDetailId = dtl.LeaveRequestDetailId,
+                                                 LeaveDate = dtl.LeaveDate,                                   
+                                                 Amount = dtl.Amount
+                                             }).ToList()
+                        }).ToList();
 
 
             return query.ToList();
@@ -149,5 +157,59 @@ namespace DCI.Repositories
                 Log.CloseAndFlush();
             }
         }
+
+        public async Task<IList<LeaveRequestHeaderViewModel>> GetApprovalLog(LeaveViewModel model)
+        {
+            try
+            {
+            var leaveHdr = _dbContext.LeaveRequestHeader.AsQueryable().ToList();
+            var contextDetail = _dbContext.LeaveRequestDetails.AsQueryable().ToList();
+            var empList = _dbContext.Employee.AsQueryable().ToList();
+            var statusList = _dbContext.Status.AsQueryable().ToList();
+            var approvalLog = _dbContext.ApprovalHistory.AsQueryable().ToList();
+    
+
+            var query = from apprv in approvalLog
+                        join hdr in leaveHdr on apprv.TransactionId equals hdr.LeaveRequestHeaderId
+                        join emp in empList on hdr.EmployeeId equals emp.EmployeeId
+                        join stat in statusList on hdr.Status equals stat.StatusId
+                        where apprv.IsActive == true && apprv.ApproverId == model.CurrentUserId && apprv.ModulePageId == (int)EnumModulePage.Leave
+                        select new LeaveRequestHeaderViewModel
+                        {
+                            LeaveRequestHeaderId = hdr.LeaveRequestHeaderId,
+                            RequestNo = hdr.RequestNo,
+                            EmployeeId = hdr.EmployeeId,
+                            EmployeeName = emp.Firstname + " " + emp.Lastname,
+                            DateFiled = hdr.DateFiled,
+                            Status = hdr.Status,
+                            StatusName = stat.StatusName,
+                            Reason = hdr.Reason,
+                            NoofDays = hdr.NoOfDays ,
+                            DateApprovedDisapproved = apprv.DateCreated,
+                            LeaveRequestDetailList = (from dtl in _dbContext.LeaveRequestDetails
+                                                      where dtl.LeaveRequestHeaderId == hdr.LeaveRequestHeaderId
+                                                      select new LeaveRequestDetailViewModel
+                                                      {
+                                                          LeaveRequestHeaderId = dtl.LeaveRequestHeaderId,
+                                                          LeaveRequestDetailId = dtl.LeaveRequestDetailId,
+                                                          LeaveDate = dtl.LeaveDate,
+                                                          Amount = dtl.Amount
+                                                      }).ToList()
+                        };
+
+
+            return query.ToList();
+        }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());               
+                return null;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
     }
 }

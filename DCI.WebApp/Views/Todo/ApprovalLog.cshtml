@@ -75,14 +75,14 @@
 
 
     <div class="d-sm-flex align-items-center justify-content-between mb-3">
-        <h6 class="m-0 font-weight-bold text-gray-800">To Do</h6>
+        <h6 class="m-0 font-weight-bold text-gray-800">Approval Log</h6>
 
 
     </div>
     <div class="col-12 p0">
         <ul class="breadcrumb">
             <li><a href="~/Home/Index">Dashboard</a></li>
-            <li>To Do</li>
+            <li>Approval Log</li>
         </ul>
     </div>
 
@@ -113,11 +113,11 @@
                             <th>
                                 <label>No. of Days</label>
                             </th>
-                           @*  <th>
-                                <label>Status</label>
-                            </th>     *@                     
                             <th>
-                                Action
+                                <label>Status</label>
+                            </th>
+                            <th>
+                                <label>Status Date</label>
                             </th>
                         </tr>
                     </thead>
@@ -125,7 +125,7 @@
                         @foreach (var item in Model)
                         {
                             <tr>
-                            
+
                                 <td>
                                     @item.RequestNo
                                 </td>
@@ -146,24 +146,13 @@
                                 <td>
                                     @item.NoofDays
                                 </td>
-                             @*    <td>
-                                    @item.StatusName
-                                </td>   *@                            
-
                                 <td>
-                                    @* <a href="#" onclick="editForm(@item.LeaveRequestHeaderId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a> *@
-                                    <a href="#" onclick='editForm({
-                                                                requestNo:"@item.RequestNo",
-                                                                dateFiled:"@item.DateFiled",
-                                                                empName :"@item.EmployeeName" ,
-                                                                dateCovered : "" ,
-                                                                noDays : "@item.NoofDays",
-                                                                status : "@item.StatusName",
-                                                                reason : "@item.Reason"
-                                                                })' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a> 
-                                    <a href="#" id="approved" onclick="approvalForm(@item.LeaveRequestHeaderId,true)" title="Approve" class="btn btn-info"> <i class="fa fa-check"></i></a> 
-                                    <a href="#" id="disapproved" onclick="remarksForm(@item.LeaveRequestHeaderId,false)" title="Disapprove" class="btn btn-danger"> <i class="fa fa-remove"></i></a>
-                                </td>                            
+                                    @item.StatusName
+                                </td>
+                                <td>
+                                    @item.DateApprovedDisapproved
+                                </td>
+
                             </tr>
                         }
                     </tbody>
@@ -171,7 +160,7 @@
             </div>
             </<div>
             </div>
- 
+
             <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
@@ -193,7 +182,7 @@
                                             <th>Date Filed:</th>
                                             <th class="tblDate">  <label id="lblDateFiled"></label>  </th>
                                         </tr>
-                                      
+
                                         <tr>
                                             <th>Employee Name:</th>
                                             <th class="tblName"> <label id="lblName"></label> </th>
@@ -253,11 +242,11 @@
             </div>
 
             <input type="hidden" id="HiddenHeaderId" name="HiddenDocId" value="">
-            <input type="hidden" id="HiddenAction" name="HiddenAction" value="">     
+            <input type="hidden" id="HiddenAction" name="HiddenAction" value="">
         </div>
 
-        @section scripts {
-            @* <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script> *@
+@section scripts {
+    @* <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script> *@
             <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
             <script src="~/js/file-upload.js"></script>
 
@@ -273,7 +262,7 @@
                 $(document).ready(function () {
                     js('#tblDocument').DataTable({
                         order: [[4, 'desc']]
-                    });                  
+                    });
 
                     $('#fileUpload').on('change', function () {
                         var fileName = this.files[0] ? this.files[0].name : 'No file chosen';
@@ -286,7 +275,7 @@
                         }
                     });
 
-                  
+
                 });
 
 
@@ -299,16 +288,16 @@
                                   document.getElementById('lblStatus').textContent = dtr.status
                                      document.getElementById('lblReason').textContent = dtr.reason
                                 js('#createmodal').modal('show');
-                          
+
                 }
 
 
 
 
 
-     
 
-                function approvalForm(leaveId,approved) {               
+
+                function approvalForm(leaveId,approved) {
 
                              $('.spinner-overlay').show();
                         $.ajax({
@@ -343,7 +332,7 @@
                             }
                         });
 
-                 
+
                 }
 
                  function remarksForm(leaveId,approved) {
@@ -367,7 +356,7 @@
 
 
                      const _transId =  $('#HiddenHeaderId').val();
-                      const _action =  $('#HiddenAction').val();    
+                      const _action =  $('#HiddenAction').val();
 
                                           $('.spinner-overlay').show();
 
@@ -407,4 +396,4 @@
 
 
             </script>
-        }
+}

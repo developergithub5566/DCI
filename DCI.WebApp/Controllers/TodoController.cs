@@ -118,5 +118,32 @@ namespace DCI.WebApp.Controllers
 				Log.CloseAndFlush();
 			}
 		}
-	}
+
+        public async Task<IActionResult> ApprovalLog()
+        {
+            List<LeaveRequestHeaderViewModel> model = new List<LeaveRequestHeaderViewModel>();
+
+            using (var _httpclient = new HttpClient())
+            {
+                LeaveViewModel _filterModel = new LeaveViewModel();
+
+                var currentUser = _userSessionHelper.GetCurrentUser();
+                //_filterRoleModel = currentUser.RoleId;
+                _filterModel.CurrentUserId = currentUser.UserId;
+
+                var stringContent = new StringContent(JsonConvert.SerializeObject(_filterModel), Encoding.UTF8, "application/json");
+                var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Todo/GetApprovalLog");
+
+                request.Content = stringContent;
+                var response = await _httpclient.SendAsync(request);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    model = JsonConvert.DeserializeObject<List<LeaveRequestHeaderViewModel>>(responseBody)!;
+                }
+
+            }
+            return View(model);
+        }
+    }
 }

@@ -131,6 +131,7 @@ namespace DCI.Repositories
                             LeaveName = lvtype.Description,
                             Reason = lheader.Reason,
                             NoofDays = lheader.NoOfDays,
+                            Status = lheader.Status
                         };
 
             model.LeaveRequestHeader = query.FirstOrDefault();

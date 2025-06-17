@@ -24,6 +24,8 @@ namespace DCI.Models.ViewModel
         public List<SelectListItem>? OptionsLeaveType { get; set; }
 
         public List<DateTime> LeaveDateList { get; set; } = new();
+
+        public int CurrentUserId { get; set; } = 0;
     }
 
     public class LeaveRequestHeaderViewModel
@@ -39,12 +41,14 @@ namespace DCI.Models.ViewModel
         public string StatusName { get; set; } = string.Empty;
         public string Reason { get; set; } = string.Empty;
         public DateTime? DateModified { get; set; }
-        public string? ModifiedBy { get; set; }
+        public int? ModifiedBy { get; set; }
         public bool IsActive { get; set; }
         public decimal NoofDays { get; set; } = 0;
         public List<LeaveRequestDetailViewModel> LeaveRequestDetailList { get; set; } = new();
         public IList<LeaveType>? LeaveTypeList { get; set; }
-        public List<DateTime>? LeaveDateList { get; set; }
+        //public List<DateTime>? LeaveDateList { get; set; }
+
+        public DateTime DateApprovedDisapproved { get; set; }
     }
 
     public class LeaveRequestDetailViewModel

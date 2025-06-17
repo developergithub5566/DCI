@@ -8,6 +8,7 @@ namespace DCI.Repositories.Interface
         //Task<(int statuscode, string message)> Approval(ApprovalHistoryViewModel model);
         Task<IList<LeaveRequestHeaderViewModel>> GetAllTodo(LeaveViewModel model);
         Task<(int statuscode, string message)> Approval(ApprovalHistoryViewModel model);
+        Task<IList<LeaveRequestHeaderViewModel>> GetApprovalLog(LeaveViewModel model);
 
     }
 }

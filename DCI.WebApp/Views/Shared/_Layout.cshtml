@@ -100,7 +100,7 @@
                                 <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
                             </div>
                         </a>
-                    }
+                    }                   
 
                     @if (module.ModulePageId == (int)EnumModulePage.Administration)
                     {
@@ -135,7 +135,7 @@
                             </div>
                         </a>
                     }
-                    @if (module.ModulePageId == (int)EnumModulePage.DailyTimeRecord)
+                  @*   @if (module.ModulePageId == (int)EnumModulePage.DailyTimeRecord)
                     {
                         <hr class='sidebar-divider'>
                         <a href="/DailyTimeRecord/Timesheet/" class='mainModule'>
@@ -145,7 +145,7 @@
                                 <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
                             </div>
                         </a>
-                    }
+                    } *@
                     @if (module.ModulePageId == (int)EnumModulePage.DailyTimeRecord)
                     {
                         <hr class='sidebar-divider'>
@@ -242,6 +242,12 @@
                                     <a asp-controller="Maintenance" asp-action="ActivityLog" asp-route-id="-1" class="dropdown-item">
                                         <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-800"></i>
                                         Activity Log
+                                    </a>
+                                   
+                            
+                                    <a asp-controller="Todo" asp-action="ApprovalLog" class="dropdown-item">
+                                        <i class="fas fa-check fa-sm fa-fw mr-2 text-gray-800"></i>
+                                        Approval Log
                                     </a>
                                     <div class="dropdown-divider"></div>
 

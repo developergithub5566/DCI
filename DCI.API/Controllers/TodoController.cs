@@ -51,5 +51,13 @@ namespace DCI.API.Controllers
             return Ok(result);
         }
 
+        [HttpPost]
+        [Route("GetApprovalLog")]
+        public async Task<IActionResult> GetApprovalLog([FromBody] LeaveViewModel model)
+        {
+            var result = await _todoRepository.GetApprovalLog(model);
+            return Ok(result);
+        }
+
     }
 }

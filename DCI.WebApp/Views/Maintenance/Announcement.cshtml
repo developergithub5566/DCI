@@ -1,0 +1,446 @@
+﻿@model IEnumerable<DCI.Models.ViewModel.AnnouncementViewModel>
+@using Newtonsoft.Json;
+@using DCI.Core.Common;
+@using DCI.Models.ViewModel;
+
+<link href="~/css/dcicustom.css" rel="stylesheet" />
+
+@{
+    var modulePageAccess = Context.Session.GetString("ModulePageAccess");
+    var canView = false;
+    var canAdd = false;
+    var canEdit = false;
+    var canDelete = false;
+
+    if (modulePageAccess == null)
+    {
+        <script>
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Logout", "Account")',
+                success: function (response) {
+
+                    Swal.fire({
+                        text: "Your session has timed out. Please log in again.",
+                        icon: "info",
+                        confirmButtonText: "Ok"
+                    }).then((result) => {
+                        window.location.href = '/Account/Logout';
+                    });
+                },
+                error: function () {
+                    Swal.fire({
+                        text: "An error occurred. Please try again.",
+                        icon: "error"
+                    });
+                }
+            })
+        </script>
+    }
+    else
+    {
+        var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
+                    .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Department);
+        canView = module?.View ?? false;
+        canAdd = module?.Add ?? false;
+        canEdit = module?.Update ?? false;
+        canDelete = module?.Delete ?? false;
+    }
+
+}
+
+<div class="container-fluid">
+    <div class="spinner-overlay">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <div class="d-sm-flex align-items-center justify-content-between mb-3">
+        <h6 class="m-0 font-weight-bold text-gray-800">Announcement</h6>
+        <div class="upperRightDivBtn">
+            <a href="#" title="Add Announcement" class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")" data-toggle="modal" data-target="#" onclick="newForm()">
+                <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
+                <span class="text text-white"><small>Add Announcement</small></span>
+            </a>
+        </div>
+
+    </div>
+    <div class="col-12 p0">
+        <ul class="breadcrumb">
+            <li><a href="~/Home/Index">Dashboard</a></li>
+            <li><a href="~/Maintenance/Index">Administration</a></li>
+            <li>Announcement</li>
+        </ul>
+    </div>
+
+
+
+
+    <div class="card shadow mb-4">
+        <div class="card-header">
+            <label class="mb0">Data</label>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive mt20">
+                <table class="table table-bordered" id="tblDepartment">
+                    <thead>
+                        <tr>
+                      
+                            <th>
+                                <label>Title</label>
+                            </th>
+                            <th>
+                                <label>Date</label>
+                            </th>
+                            <th>
+                                <label>Details</label>
+                            </th>
+                            <th>
+                                <label>Status</label>
+                            </th>
+                            <th>
+                                <label>Created By</label>
+                            </th>
+                            <th>
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                               
+                                <td>
+                                    @item.Title
+                                </td>
+                                <td>
+                                    @item.Date
+                                </td>
+                                <td>
+                                    @item.Details
+                                </td>
+                                <td>
+                                    @item.Status
+                                </td>
+                                <td>
+                                    @item.CreatedName
+                                </td>
+
+                                <td>
+                           
+
+                                    <a href="#" onclick="editForm(@item.AnnouncementId,1)" title="View" class="btn btn-primary @(canView ? "" : "disabled") "><i class="fas fa-search"></i></a> |
+                                    <a href="#" id="editForm" onclick="editForm(@item.AnnouncementId,0)" title="Update" class="btn btn-info @(canEdit ? "" : "disabled") "><i class="fa fa-edit"></i></a> |
+                                    <a href="#" id="deleteform" onclick="deleteform(@item.AnnouncementId)" title="Delete" class="btn btn-danger @(canDelete ? "" : "disabled") "><i class="far fa-trash-alt"></i></a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+</<div>
+</div>
+
+            <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Announcement</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="createForm">
+                            <div class="modal-body">
+                                <input type="hidden" id="SelectedDatesJson" name="SelectedDates" />
+
+                                <input type="hidden" id="AnnouncementId" name="AnnouncementId" value="0">
+
+                                <div class="form-group">
+                                    <label for="DepartmentCode" class="col-form-label required">Title:</label>
+                                    <input type="text" class="form-control" id="Title" name="Title" maxlength="3" onkeypress="return alphaNumericOnly(event);" required>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label class="frmText"><span class="required">*</span> Period Covered: </label>
+                                        <div class="input-group">
+                                            <input type="text" name="COVERED_DATE" id="dateCovered" class="form-control frmField" autocomplete="off">
+                                            <div class="input-group-prepend prependBtn">
+                                                <i class="fa fa-calendar"></i>
+                                            </div>
+                                        </div>
+                                        <label for="dateCovered" generated="true" class="error"></label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="Details" class="col-form-label">Details:</label>
+                                    <textarea class="form-control" id="Details" name="Details" ></textarea>
+                                </div>                              
+
+                              
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary" id="btnSave">Save</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+
+
+
+@section scripts {
+                <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+                <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
+                <script src="~/js/dci-validation.js"></script>
+
+                <script type="text/javascript">
+                        var js = jQuery.noConflict(true);
+
+                                $('.spinner-overlay').show();
+
+                    setTimeout(() => {
+                        $('.spinner-overlay').hide();
+                    }, 200);
+
+
+                        $(document).ready(function () {
+                            js('#tblDepartment').DataTable({
+                            });
+
+                                   flatpickr("#dateCovered", {
+                                                                          mode: "multiple",
+                                                                          enableTime: false,
+                                                                          dateFormat: "Y-m-d",
+                                                                          onChange: function(selectedDates, dateStr, instance) {
+                                                                            // Update number of selected days
+                                                                            let nodays = selectedDates.length;
+                                                                                   let amount =     $('#SelectedLeaveTypeAmount').val();
+                                                                               console.log("select-amount-",amount);
+                                                                         let total = amount * nodays;
+                                                                       let formattedDays = total.toFixed(4);
+                                                                            $('#NoOfDays').val(formattedDays);
+
+
+                                                                            let selectedDateStrings = selectedDates.map(date =>
+                                                                              instance.formatDate(date, "Y-m-d")
+                                                                            );                                                                               
+
+                                                                            $('#SelectedDatesJson').val(JSON.stringify(selectedDateStrings));
+                                                                          }
+                                                                        });
+
+
+                            $('#createForm').submit(function (event) {
+                                event.preventDefault();
+                
+
+                    const formData = new FormData();
+                    const fields = {
+                        DepartmentId: '#DepartmentId',
+                        DepartmentCode: '#DepartmentCode',
+                        DepartmentName: '#DepartmentName',
+                        Description: '#Description',
+                        Reviewer: '#reviewerSelect',
+                        Approver: '#approverSelect'
+                    };
+
+                    $.each(fields, (key, selector) => {
+                        formData.append(key, $(selector).val());
+                    });
+
+                                Swal.fire({
+                                    text: "Are you sure you want to save this record?",
+                                    icon: "question",
+                                    showCancelButton: true,
+                                    confirmButtonText: "Ok"
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        $.ajax({
+                                            type: 'POST',
+                                            url: '@Url.Action("SaveDepartment", "Maintenance")',
+                                            data: formData,
+                                             processData: false,
+                                    contentType: false,
+                                            success: function (response) {
+                                                if (response.success) {
+                                                    $('#createForm')[0].reset();
+                                                    js('#createmodal').modal('hide');
+
+                                                    Swal.fire({
+                                                        text: response.message,
+                                                        icon: "success",
+                                                        confirmButtonText: "Ok"
+                                                    }).then((result) => {
+                                                        location.reload();
+                                                    });
+
+                                                } else {
+                                                    Swal.fire({
+                                                        text: response.message,
+                                                        icon: "error"
+                                                    });
+                                                }
+                                            },
+                                            error: function () {
+                                                Swal.fire({
+                                                    text: "An error occurred. Please try again.",
+                                                    icon: "error"
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                            }); //submit
+
+                        });
+
+                     
+
+                        function newForm() {
+                             // const my_fp = document.querySelector("#DateCovered")._flatpickr;
+                             //          my_fp.clear();
+
+                           $.ajax({
+                                type: 'POST',
+                                url: '@Url.Action("EditAnnouncement", "Maintenance")',
+
+                                success: function (response) {
+                                    if (response.success) {
+                                    $('#AnnouncementId').val("0");
+                                    $('#Title').val("");
+                                    $('#Date').val("");
+                                    $('#Details').val("");
+
+
+                                           $('#btnSave').show();
+                                        $('#createForm').find('input, select, textarea').prop('disabled', false);
+                                        js('#createmodal').modal('show');
+
+                                    } else {
+                                        Swal.fire({
+                                            text: response.message,
+                                            icon: "error"
+                                        });
+                                    }
+                                },
+                                error: function () {
+                                    Swal.fire({
+                                        text: "An error occurred. Please try again.",
+                                        icon: "error"
+                                    });
+                                }
+                            });
+                        }
+
+
+                        function editForm(id, view) {
+                            $.ajax({
+                                type: 'POST',
+                                url: '@Url.Action("EditDepartment", "Maintenance")',
+                                data: { DepartmentId: id },
+                                success: function (response) {
+                                    if (response.success) {
+                                        $('#DepartmentId').val(response.data.departmentId);
+                                        $('#DepartmentCode').val(response.data.departmentCode);
+                                        $('#DepartmentName').val(response.data.departmentName);
+                                        $('#Description').val(response.data.description);
+
+                                var $select = $('#reviewerSelect');
+                                $select.empty();
+                                $select.append('<option value="">select reviewer</option>');
+
+                                $.each(response.data.optionsReviewer, function (index, item) {
+                                    if (item.value == response.data.reviewer) {
+                                        $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+                                    } else {
+                                        $select.append('<option value="' + item.value + '">' + item.text + '</option>');
+                                    }
+                                });
+
+                                var $select = $('#approverSelect');
+                                $select.empty();
+                                $select.append('<option value="">select approver</option>');
+
+                                $.each(response.data.optionsApprover, function (index, item) {
+                                    if (item.value == response.data.approver) {
+                                        $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+                                    } else {
+                                        $select.append('<option value="' + item.value + '">' + item.text + '</option>');
+                                    }
+                                });
+
+
+                                        if (view == 1) {	//View button
+                                            $('#createForm').find('input, select, textarea').prop('disabled', true);
+                                            $('#btnSave').hide();
+                                        }
+                                        else {  //Edit button
+                                            $('#createForm').find('input, select, textarea').prop('disabled', false);
+                                            $('#btnSave').show();
+                                        }
+
+                                        js('#createmodal').modal('show');
+                                    } else {
+                                        Swal.fire({
+                                            text: response.message,
+                                            icon: "error"
+                                        });
+                                    }
+                                },
+                                error: function () {
+                                    Swal.fire({
+                                        text: "An error occurred. Please try again.",
+                                        icon: "error"
+                                    });
+                                }
+                            });
+                        }
+
+                        function deleteform(id) {
+
+                            Swal.fire({
+                                text: "Are you sure you want to delete this record?",
+                                icon: "warning",
+                                showCancelButton: true,
+                                confirmButtonText: "Yes, delete it!"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: '@Url.Action("DeleteDepartment", "Maintenance")',
+                                        data: { DepartmentId: id },
+                                        success: function (response) {
+                                            if (response.success) {
+                                                Swal.fire({
+                                                    text: response.message,
+                                                    icon: "success",
+                                                    confirmButtonText: "Ok"
+                                                }).then((result) => {
+                                                    location.reload();
+                                                });
+                                            } else {
+                                                Swal.fire({
+                                                    text: response.message,
+                                                    icon: "error"
+                                                });
+                                            }
+                                        },
+                                        error: function () {
+                                            Swal.fire({
+                                                text: "An error occurred. Please try again.",
+                                                icon: "error"
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+
+                        }
+                </script>
+}

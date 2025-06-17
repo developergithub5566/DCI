@@ -1126,8 +1126,128 @@ namespace DCI.WebApp.Controllers
 			}
 		}
 
-	
-		#endregion
 
-	}
+        #endregion
+
+
+        #region Announcement
+        public async Task<IActionResult> Announcement()
+        {
+            List<AnnouncementViewModel> model = new List<AnnouncementViewModel>();
+
+            using (var _httpclient = new HttpClient())
+            {
+                HttpResponseMessage response = await _httpclient.GetAsync(_apiconfig.Value.apiConnection + "api/Maintenance/GetAllAnnouncement");
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    model = JsonConvert.DeserializeObject<List<AnnouncementViewModel>>(responseBody)!;
+                }
+            }
+            return View(model);
+        }
+        public async Task<IActionResult> EditAnnouncement(AnnouncementViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/GetAnnouncementById");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    AnnouncementViewModel vm = JsonConvert.DeserializeObject<AnnouncementViewModel>(responseBody)!;
+
+					                   
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, data = vm });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
+        public async Task<IActionResult> SaveAnnouncement(AnnouncementViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    model.CreatedBy = currentUser.UserId;
+                    model.ModifiedBy = currentUser.UserId;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/SaveAnnouncement");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = responseBody });
+                    }
+                    return Json(new { success = false, message = responseBody });
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        public async Task<IActionResult> DeleteAnnouncement(AnnouncementViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    model.ModifiedBy = currentUser.UserId;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/DeleteAnnouncement");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = responseBody });
+                    }
+                    return Json(new { success = false, message = responseBody });
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+        #endregion
+    }
 }

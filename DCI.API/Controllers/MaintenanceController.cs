@@ -23,10 +23,11 @@ namespace DCI.API.Controllers
 		IUserRoleRepository _userRoleRepository;
 		//IDocumentTypeRepository _documentTypeRepository;
 		IAuditLogRepository _auditLogRepository;
-		//ISectionRepository _sectionRepository;
+		IAnnouncementRepository _announcementRepository;
+
 		public MaintenanceController(IModulePageRepository modulePageRepository, IModuleInRoleRepository moduleInRoleRepository,
 			IRoleRepository roleRepository, IUserRepository userRepository, IDepartmentRepository DepartmentRepository, IEmploymentTypeRepository employmentTypeRepository,
-			IUserRoleRepository userRoleRepository,  IAuditLogRepository auditLogRepository)
+			IUserRoleRepository userRoleRepository,  IAuditLogRepository auditLogRepository, IAnnouncementRepository announcementRepository)
 		{
 			this._userRepository = userRepository;
 			this._moduleInRoleRepository = moduleInRoleRepository;
@@ -36,7 +37,8 @@ namespace DCI.API.Controllers
 			this._employmentTypeRepository = employmentTypeRepository;
 			this._userRoleRepository = userRoleRepository;
 			//this._documentTypeRepository = documentTypeRepository;
-			this._auditLogRepository = auditLogRepository;			
+			this._auditLogRepository = auditLogRepository;	
+			this._announcementRepository = announcementRepository;
 		}
 
 
@@ -322,8 +324,41 @@ namespace DCI.API.Controllers
 		{
 			return Ok(await _auditLogRepository.GetAllAuditLogs());
 		}
-		#endregion
+        #endregion
 
 
-	}
+
+        #region Announcement
+
+        [HttpGet]
+        [Route("GetAllAnnouncement")]
+        public async Task<IActionResult> GetAllAnnouncement()
+        {
+            return Ok(await _announcementRepository.GetAllAnnouncement());
+        }
+
+        [HttpPost]
+        [Route("GetAnnouncementById")]
+        public async Task<IActionResult> GetAnnouncementById([FromBody] AnnouncementViewModel model)
+        {           
+            return Ok(await _announcementRepository.GetAnnouncementById(model.AnnouncementId));
+        }
+
+        [HttpPost]
+        [Route("SaveAnnouncement")]
+        public async Task<IActionResult> SaveAnnouncement([FromBody] AnnouncementViewModel model)
+        {
+            var result = await _announcementRepository.Save(model);
+            return StatusCode(result.statuscode, result.message);
+        }
+        [HttpPost]
+        [Route("DeleteAnnouncement")]
+        public async Task<IActionResult> DeleteAnnouncement([FromBody] AnnouncementViewModel model)
+        {
+            var result = await _announcementRepository.Delete(model);
+            return StatusCode(result.statuscode, result.message);
+        }
+        #endregion
+
+    }
 }
