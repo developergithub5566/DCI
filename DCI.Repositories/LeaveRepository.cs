@@ -16,10 +16,12 @@ namespace DCI.Repositories
     public class LeaveRepository : ILeaveRepository, IDisposable
     {
         private DCIdbContext _dbContext;
+        private readonly IEmailRepository _emailRepository;
 
-        public LeaveRepository(DCIdbContext dbContext)
+        public LeaveRepository(DCIdbContext dbContext, IEmailRepository emailRepository)
         {
             _dbContext = dbContext;
+            _emailRepository = emailRepository;
         }
 
         public void Dispose()
@@ -224,6 +226,13 @@ namespace DCI.Repositories
                         await _dbContext.LeaveRequestDetails.AddAsync(entityDtl);
                         await _dbContext.SaveChangesAsync();
                     }
+
+                    var workdtls = _dbContext.EmployeeWorkDetails.Where(x => x.EmployeeId == param.EmployeeId).FirstOrDefault();
+                    var dept = _dbContext.Department.Where(x => x.DepartmentId == workdtls.DepartmentId).FirstOrDefault();
+                    model.ApproverId = dept.ApproverId;
+                    model.LeaveRequestHeader.Status = entity.Status;
+                    model.LeaveRequestHeader.RequestNo = entity.RequestNo;
+                   await _emailRepository.SendToApproval(model);
 
                     return (StatusCodes.Status200OK, "Successfully saved");
                 }              

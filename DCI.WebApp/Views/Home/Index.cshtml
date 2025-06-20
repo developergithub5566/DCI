@@ -1,59 +1,59 @@
-﻿@model IEnumerable<DCI.Models.ViewModel.HomePageViewModel>
+﻿@model DCI.Models.ViewModel.DashboardViewModel
 
-	<link href="~/css/DCIcustom.css" rel="stylesheet" />
+<link href="~/css/DCIcustom.css" rel="stylesheet" />
 
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 @{
-	var modulePageAccess = Context.Session.GetString("ModulePageAccess");
+    var modulePageAccess = Context.Session.GetString("ModulePageAccess");
 
-	if (modulePageAccess == null)
-	{
-		<script>
-			$.ajax({
-				type: 'POST',
-				url: '@Url.Action("Logout", "Account")',
-				success: function (response) {
+    if (modulePageAccess == null)
+    {
+        <script>
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Logout", "Account")',
+                success: function (response) {
 
-					Swal.fire({
-						text: "Your session has timed out. Please log in again.",
-						icon: "info",
-						confirmButtonText: "Ok"
-					}).then((result) => {
-						window.location.href = '/Account/Logout';
-					});
-				},
-				error: function () {
-					Swal.fire({
-						text: "An error occurred. Please try again.",
-						icon: "error"
-					});
-				}
-			})
-		</script>
-	}	
+                    Swal.fire({
+                        text: "Your session has timed out. Please log in again.",
+                        icon: "info",
+                        confirmButtonText: "Ok"
+                    }).then((result) => {
+                        window.location.href = '/Account/Logout';
+                    });
+                },
+                error: function () {
+                    Swal.fire({
+                        text: "An error occurred. Please try again.",
+                        icon: "error"
+                    });
+                }
+            })
+        </script>
+    }
 }
 
 
-	<div id="content">
-		
-
-		<div class="dashboardHeader">
-			<label class="">Dashboard</label>
-			<p>Today is <span>Wednesday</span> - May 07, 2025</p>
-
-		</div>
+<div id="content">
 
 
+    <div class="dashboardHeader">
+        <label class="">Dashboard</label>
+        @* <p>Today is <span>Wednesday</span> - May 07, 2025</p> *@
+        <p>Today is <span>@DateTime.Today.ToString("dddd")</span> - @DateTime.Today.ToString("MMMM  dd, yyyy")</p>
+    </div>
 
-		<!-- Begin Page Content -->
-		<div class="container-fluid">
-			<!-- Content Row -->
-			<div class="row">
+
+
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
+        <!-- Content Row -->
+        @* 	<div class="row">
 				<div class="col-12">
 					<div class="announcementDiv shadow">
 						<div class="row">
@@ -77,100 +77,144 @@
 						</div>
 					</div>
 				</div>
-			</div>
+			</div> *@
 
-			<div class="row">
-				<div class="col-sm-5 mb-4">
-					<div class="row">
-						<div class="col-12 mb20">
-							<div class="card shadow py-2">
-								<div class="card-body">
-									<div class="row no-gutters align-items-center">
-										<div class="col-sm-10">
-											<div class="small text-muted">Version 1.0.0</div>
-											<div class="h5 font-weight-bold text-gray-900 mb-2">Employee Handbook</div>
-										</div>
-										<div class="col-sm-2">
-										<img src="~/images/book.svg" alt="Employee Handbook" width="100%">
-										</div>
-										<div class="col-12 mt10">
-											<a href="#" class="btn btnPrimary text-xs">View Handbook</a>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
+        <div class="row">
+            <div class="col-12">
+                <div class="announcementDiv shadow">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="announcementInfo">
+                                <div id="announementCarouselIndicators" class="carousel slide" data-ride="carousel">
+                                    <div class="carousel-inner">
+                                        @for (int i = 0; i < Model.AnnouncementList.Count; i++)
+                                        {
+                                            var item = Model.AnnouncementList[i];
+                                            var activeClass = i == 0 ? "active" : "";
 
-						<div class="col-12">
-							<div class="card shadow py-2">
-								<div class="card-body">
-									<div class="row no-gutters align-items-center">
-										<div class="col-sm-10">
-											<div class="small text-muted">Todays</div>
-											<div class="h5 font-weight-bold text-gray-900 mb-2">Time Attendance</div>
-										</div>
-										<div class="col-sm-2">
-										<img src="~/images/clock.svg" alt="Employee Handbook" width="100%">
-										</div>
-										<div class="col-12 mt10">
-											<div class="row timeAttendance">
-												<div class="col-6">
-													<div class="timeDiv">
-														<label class="time">--:--:--</label>
-														<label class="title">Time In</label>
-													</div>
-												</div>
-												<div class="col-6">
-													<div class="timeDiv">
-														<label class="time">--:--:--</label>
-														<label class="title">Time Out</label>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
+                                            <div class="carousel-item @activeClass">
+                                                <label class="date">@item.Date</label>
+                                                <label class="title">@item.Title</label>
+                                                <p class="desc">@item.Details</p>
+                                            </div>
+                                        }
+                                    </div>
 
-				<div class="col-sm-7 mb-4">
-					<div class="card shadow py-2 h-100">
-						<div class="card-body">
-							<div class="row align-items-center">
-								<div class="col-sm-4">
-								<img src="~/images/cake.svg" alt="Birthday Cake" width="100%" class="mb20">                            
-								</div>
-								<div class="col-sm-8">
-									<div class="small text-muted">This Month</div>
-									<div class="h5 font-weight-bold text-gray-900 mb-2">Birthday Celebrators</div>
-									<ul class="bdayList">
-										<li>
-											<label class="date">May 30</label>
-											<label class="name">Cabugao, Jc</label>
-										</li>
-									</ul>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
+                                    <ol class="carousel-indicators carouselIndicators">
+                                        @for (int i = 0; i < Model.AnnouncementList.Count; i++)
+                                        {
+                                            var activeClass = i == 0 ? "active" : "";
+                                            <li data-target="#announementCarouselIndicators" data-slide-to="@i" class="@activeClass"></li>
+                                        }
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 text-center">
+                            <img src="~/images/happy_announcement.svg" alt="Announcement">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
-		</div>
-	</div>
+        <div class="row">
+            <div class="col-sm-5 mb-4">
+                <div class="row">
+                    <div class="col-12 mb20">
+                        <div class="card shadow py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col-sm-10">
+                                        <div class="small text-muted">Version 1.0.0</div>
+                                        <div class="h5 font-weight-bold text-gray-900 mb-2">Employee Handbook</div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <img src="~/images/book.svg" alt="Employee Handbook" width="100%">
+                                    </div>
+                                    <div class="col-12 mt10">
+                                        <a href="#" class="btn btnPrimary text-xs">View Handbook</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="card shadow py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col-sm-10">
+                                        <div class="small text-muted">Todays</div>
+                                        <div class="h5 font-weight-bold text-gray-900 mb-2">Time Attendance</div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <img src="~/images/clock.svg" alt="Employee Handbook" width="100%">
+                                    </div>
+                                    <div class="col-12 mt10">
+                                        <div class="row timeAttendance">
+                                            <div class="col-6">
+                                                <div class="timeDiv">
+                                                    <label class="time">@Model.FIRST_IN</label>
+                                                    <label class="title">Time In</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="timeDiv">
+                                                    <label class="time">@Model.LAST_OUT</label>
+                                                    <label class="title">Time Out</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-7 mb-4">
+                <div class="card shadow py-2 h-100">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-sm-4">
+                                <img src="~/images/cake.svg" alt="Birthday Cake" width="100%" class="mb20">
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="small text-muted">This Month</div>
+                                <div class="h5 font-weight-bold text-gray-900 mb-2">Birthday Celebrators</div>
+                                <ul class="bdayList">
+                                    @foreach (var bday in Model.BirthdayList)
+                                    {
+                                        <li>
+                                            <label class="date">@bday.Birthdate</label>
+                                            <label class="name">@bday.EmployeeName</label>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
 
 
 
-	@section scripts {
-			<script type="text/javascript">				 
-								$('.spinner-overlay').show();
+@section scripts {
+    <script type="text/javascript">
 
-								setTimeout(() => {
-									 $('.spinner-overlay').hide();
-								}, 200);
-						 
-			</script>
-		}
+        $('.spinner-overlay').show();
+
+        setTimeout(() => {
+             $('.spinner-overlay').hide();
+        }, 200);
+
+    </script>
+}

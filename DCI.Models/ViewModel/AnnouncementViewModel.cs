@@ -24,4 +24,19 @@
 
         public string CreatedName { get; set; } = string.Empty;
     }
+
+    public class BirthdayViewModel
+    {
+        public string EmployeeName { get; set; } = string.Empty;
+        public string Birthdate { get; set; } = string.Empty;   
+    }
+
+    public class DashboardViewModel
+    {
+        public int CurrentUserId { get; set; } = 0;
+        public string FIRST_IN { get; set; } = string.Empty;
+        public string LAST_OUT { get; set; } = string.Empty;
+        public List<AnnouncementViewModel> AnnouncementList { get; set; } = new();
+        public List<BirthdayViewModel> BirthdayList { get; set; } = new();
+    }
 }

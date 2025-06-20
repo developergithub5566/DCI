@@ -26,6 +26,10 @@ namespace DCI.Models.ViewModel
         public List<DateTime> LeaveDateList { get; set; } = new();
 
         public int CurrentUserId { get; set; } = 0;
+
+        public string EmailBody { get; set; } = string.Empty;
+        public string ApproverEmail { get; set; } = string.Empty;
+        public int? ApproverId { get; set; } = 0;
     }
 
     public class LeaveRequestHeaderViewModel

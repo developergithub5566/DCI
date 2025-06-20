@@ -422,7 +422,9 @@
                                   let nodays = 0.0000;     
                                 $('#NoOfDays').val(nodays.toFixed(4));
                             $('#Reason').val('');
-
+                              $('#btnCancel').hide();
+                                $('#btnSubmit').show();
+                               
                          $.ajax({
                              type: 'POST',
                              url: '@Url.Action("RequestLeave", "DailyTimeRecord")',                            

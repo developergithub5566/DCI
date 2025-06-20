@@ -85,7 +85,7 @@
                 <table class="table table-bordered" id="tblDepartment">
                     <thead>
                         <tr>
-                      
+
                             <th>
                                 <label>Title</label>
                             </th>
@@ -110,7 +110,7 @@
                         @foreach (var item in Model)
                         {
                             <tr>
-                               
+
                                 <td>
                                     @item.Title
                                 </td>
@@ -120,15 +120,24 @@
                                 <td>
                                     @item.Details
                                 </td>
-                                <td>
+                               @*  <td>
                                     @item.Status
-                                </td>
+                                </td> *@
+                                @if(item.Status == 8)
+                                {
+                                    <td class="text-center"><a href="#" class="btnActivate" onclick="changeStatus(@item.AnnouncementId, 8)"><i class="fas fa-toggle-on"></i></a></td>
+                                }
+                                else
+                                {
+                                    <td class="text-center"><a href="#" class="btnDeactivate" onclick="changeStatus(@item.AnnouncementId, 9)"><i class="fas fa-toggle-off"></i></a></td>
+                                }                             
+
                                 <td>
                                     @item.CreatedName
                                 </td>
 
                                 <td>
-                           
+
 
                                     <a href="#" onclick="editForm(@item.AnnouncementId,1)" title="View" class="btn btn-primary @(canView ? "" : "disabled") "><i class="fas fa-search"></i></a> |
                                     <a href="#" id="editForm" onclick="editForm(@item.AnnouncementId,0)" title="Update" class="btn btn-info @(canEdit ? "" : "disabled") "><i class="fa fa-edit"></i></a> |
@@ -158,27 +167,25 @@
                                 <input type="hidden" id="AnnouncementId" name="AnnouncementId" value="0">
 
                                 <div class="form-group">
-                                    <label for="DepartmentCode" class="col-form-label required">Title:</label>
-                                    <input type="text" class="form-control" id="Title" name="Title" maxlength="3" onkeypress="return alphaNumericOnly(event);" required>
+                                    <label for="Title" class="col-form-label required">Title:</label>
+                                    <input type="text" class="form-control" id="Title" name="Title" onkeypress="return alphaNumericOnly(event);" required>
                                 </div>
-                                <div class="col-lg-12">
-                                    <div class="form-group">
-                                        <label class="frmText"><span class="required">*</span> Period Covered: </label>
-                                        <div class="input-group">
-                                            <input type="text" name="COVERED_DATE" id="dateCovered" class="form-control frmField" autocomplete="off">
-                                            <div class="input-group-prepend prependBtn">
-                                                <i class="fa fa-calendar"></i>
-                                            </div>
+                                <div class="form-group">
+                                    <label class="frmText"><span class="required">*</span> Period Covered: </label>
+                                    <div class="input-group">
+                                        <input type="text" name="dateCovered" id="dateCovered" class="form-control frmField" autocomplete="off">
+                                        <div class="input-group-prepend prependBtn">
+                                            <i class="fa fa-calendar"></i>
                                         </div>
-                                        <label for="dateCovered" generated="true" class="error"></label>
                                     </div>
+                                    <label for="dateCovered" generated="true" class="error"></label>
                                 </div>
                                 <div class="form-group">
                                     <label for="Details" class="col-form-label">Details:</label>
-                                    <textarea class="form-control" id="Details" name="Details" ></textarea>
-                                </div>                              
+                                    <textarea class="form-control" id="Details" name="Details"></textarea>
+                                </div>
 
-                              
+
                             </div>
                             <div class="modal-footer">
                                 <button type="submit" class="btn btn-primary" id="btnSave">Save</button>
@@ -229,7 +236,7 @@
 
                                                                             let selectedDateStrings = selectedDates.map(date =>
                                                                               instance.formatDate(date, "Y-m-d")
-                                                                            );                                                                               
+                                                                            );
 
                                                                             $('#SelectedDatesJson').val(JSON.stringify(selectedDateStrings));
                                                                           }
@@ -238,16 +245,14 @@
 
                             $('#createForm').submit(function (event) {
                                 event.preventDefault();
-                
+
 
                     const formData = new FormData();
                     const fields = {
-                        DepartmentId: '#DepartmentId',
-                        DepartmentCode: '#DepartmentCode',
-                        DepartmentName: '#DepartmentName',
-                        Description: '#Description',
-                        Reviewer: '#reviewerSelect',
-                        Approver: '#approverSelect'
+                        AnnouncementId: '#AnnouncementId',
+                        Title: '#Title',
+                        Date: '#dateCovered',
+                        Details: '#Details'
                     };
 
                     $.each(fields, (key, selector) => {
@@ -263,7 +268,7 @@
                                     if (result.isConfirmed) {
                                         $.ajax({
                                             type: 'POST',
-                                            url: '@Url.Action("SaveDepartment", "Maintenance")',
+                                            url: '@Url.Action("SaveAnnouncement", "Maintenance")',
                                             data: formData,
                                              processData: false,
                                     contentType: false,
@@ -300,7 +305,7 @@
 
                         });
 
-                     
+
 
                         function newForm() {
                              // const my_fp = document.querySelector("#DateCovered")._flatpickr;
@@ -314,7 +319,7 @@
                                     if (response.success) {
                                     $('#AnnouncementId').val("0");
                                     $('#Title').val("");
-                                    $('#Date').val("");
+                                    $('#dateCovered').val("");
                                     $('#Details').val("");
 
 
@@ -342,14 +347,14 @@
                         function editForm(id, view) {
                             $.ajax({
                                 type: 'POST',
-                                url: '@Url.Action("EditDepartment", "Maintenance")',
-                                data: { DepartmentId: id },
+                                url: '@Url.Action("EditAnnouncement", "Maintenance")',
+                                data: { AnnouncementId: id },
                                 success: function (response) {
                                     if (response.success) {
-                                        $('#DepartmentId').val(response.data.departmentId);
-                                        $('#DepartmentCode').val(response.data.departmentCode);
-                                        $('#DepartmentName').val(response.data.departmentName);
-                                        $('#Description').val(response.data.description);
+                                        $('#AnnouncementId').val(response.data.announcementId);
+                                        $('#Title').val(response.data.title);
+                                        $('#dateCovered').val(response.data.date);
+                                        $('#Details').val(response.data.details);
 
                                 var $select = $('#reviewerSelect');
                                 $select.empty();
@@ -413,8 +418,8 @@
                                 if (result.isConfirmed) {
                                     $.ajax({
                                         type: 'POST',
-                                        url: '@Url.Action("DeleteDepartment", "Maintenance")',
-                                        data: { DepartmentId: id },
+                                        url: '@Url.Action("DeleteAnnouncement", "Maintenance")',
+                                        data: { AnnouncementId: id },
                                         success: function (response) {
                                             if (response.success) {
                                                 Swal.fire({
@@ -441,6 +446,51 @@
                                 }
                             });
 
+                        }
+
+                        function changeStatus(id,status){
+                            var strActivate = "Activate";
+                            if(status == 8){
+                                 strActivate = "Deactivate";
+                            }
+
+
+                                Swal.fire({
+                                text: "Are you sure you want to " + strActivate + " this?",
+                                icon: "warning",
+                                showCancelButton: true,
+                                confirmButtonText: strActivate
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: '@Url.Action("SaveAnnouncement", "Maintenance")',
+                                        data: { DepartmentId: id },
+                                        success: function (response) {
+                                            if (response.success) {
+                                                Swal.fire({
+                                                    text: response.message,
+                                                    icon: "success",
+                                                    confirmButtonText: "Ok"
+                                                }).then((result) => {
+                                                    location.reload();
+                                                });
+                                            } else {
+                                                Swal.fire({
+                                                    text: response.message,
+                                                    icon: "error"
+                                                });
+                                            }
+                                        },
+                                        error: function () {
+                                            Swal.fire({
+                                                text: "An error occurred. Please try again.",
+                                                icon: "error"
+                                            });
+                                        }
+                                    });
+                                }
+                            });
                         }
                 </script>
 }

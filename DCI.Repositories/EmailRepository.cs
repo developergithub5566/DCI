@@ -109,47 +109,11 @@ namespace DCI.Repositories
 		#endregion
 
 
-		#region Upload File
-		public async Task SendUploadFile(DocumentViewModel model)
-		{
-			model = await UploadFileBodyMessage(model);
-
-			MailMessage mail = new MailMessage();
-			mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-			mail.Subject = "Action Required: Please Upload Your Document No. " + model.DocNo;
-			mail.Body = model.EmailBody;
-			mail.IsBodyHtml = true;
-			mail.To.Add(model.RequestByEmail);
-			await SendMessage(mail);
-		}
-
-		async Task<DocumentViewModel> UploadFileBodyMessage(DocumentViewModel model)
-		{
-			var userEntity = await _userRepository.GetUserById(model.RequestById ?? default(int));
-
-			//string link = "http://192.168.1.78:83/Document/Upload?token=";
-			string link = _apiconfig.Value.WebAppConnection + "Document/Upload?token=";
-			model.RequestByEmail = userEntity.Email;
-			model.EmailBody = $@"
-            <html>
-            <body>              
-                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
-                
-                 <p>This is an automated message from DCI Application.</p>
-                 <p> Please upload the required document (Document No: {model.DocNo}) by following the link below:  </p>   
-                 <a href='{link + model.UploadLink}'> Upload file</a>
-                <p>If you encounter any issues, please contact our support team at [DCI Application Support].</p>            
-                <p>Thank you,<br />Your DCI</p>
-            </body>
-            </html>";
-
-
-			return model;
-		}
-		#endregion
+		
 
 
 		#region Set Password
+
 		public async Task SendSetPassword(string email)
 		{
 			MailMessage mail = new MailMessage();
@@ -191,46 +155,44 @@ namespace DCI.Repositories
 		#endregion
 
 		#region Approval
-		public async Task SendApproval(DocumentViewModel model)
+		public async Task SendToApproval(LeaveViewModel model)
 		{
 			model = await ApprovalNotificationBodyMessage(model);
 
 
 			MailMessage mail = new MailMessage();
 			mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-			mail.Subject = "Action Required: Please check the document no. " + model.DocNo;
+			mail.Subject = "Action Required: Please check the Leave Request no. " + model.LeaveRequestHeader.RequestNo;
 			mail.Body = model.EmailBody;
 			mail.IsBodyHtml = true;
-			mail.To.Add(model.RequestByEmail);
+			mail.To.Add(model.ApproverEmail);
 			await SendMessage(mail);
 		}
 
-		async Task<DocumentViewModel> ApprovalNotificationBodyMessage(DocumentViewModel model)
+		async Task<LeaveViewModel> ApprovalNotificationBodyMessage(LeaveViewModel model)
 		{
 			var userEntity = new User();
 			string statusName = string.Empty;
+	
 
-			if (model.StatusId == (int)EnumDocumentStatus.ForReview)
+			if (model.LeaveRequestHeader.Status == (int)EnumStatus.ForApproval)
 			{
-				userEntity = await _userRepository.GetUserById(model.Reviewer ?? default(int));
-				statusName = "for review";
-			}
-
-			if (model.StatusId == (int)EnumDocumentStatus.ForApproval)
-			{
-				userEntity = await _userRepository.GetUserById(model.Approver ?? default(int));
+				userEntity = await _userRepository.GetUserById(model.ApproverId ?? default(int));
 				statusName = "for approval";
 			}
 
-			string link = _apiconfig.Value.WebAppConnection + "Document/Details?DocId=" + model.DocId;
-			model.RequestByEmail = userEntity.Email;
+            //string link = _apiconfig.Value.WebAppConnection + "Document/Details?DocId=" + model.DocId;
+
+            //<p>Please check the Leave Request {model.LeaveRequestHeader.RequestNo} {statusName}. </p> 
+            model.ApproverEmail = userEntity.Email;
 			model.EmailBody = $@"
             <html>
             <body>              
                 <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
                 
                  <p>This is an automated message from DCI Application.</p>
-                 <p>Please check the document (Document No:<a href='{link}'> {model.DocNo}</a>) {statusName}. </p>   
+                 
+				<p>You have been assigned leave request {model.LeaveRequestHeader.RequestNo} {statusName}. Kindly review and proceed accordingly. </p> 
             
                 <p>If you encounter any issues, please contact our support team at [DCI Application Support].</p>            
                 <p>Thank you,<br />Your DCI</p>
@@ -240,99 +202,99 @@ namespace DCI.Repositories
 			return model;
 		}
 
-		public async Task SendRequestor(DocumentViewModel model, ApprovalViewModel apprvm)
-		{
-			if(!apprvm.Action)
-			{
-				model = await DisapprovedReuploadBodyMessage(model, apprvm);
-			}
-			else
-			{
-				model = await RequestorNotificationBodyMessage(model, apprvm);
-			}
+		//public async Task SendRequestor(DocumentViewModel model, ApprovalViewModel apprvm)
+		//{
+		//	if(!apprvm.Action)
+		//	{
+		//		model = await DisapprovedReuploadBodyMessage(model, apprvm);
+		//	}
+		//	else
+		//	{
+		//		model = await RequestorNotificationBodyMessage(model, apprvm);
+		//	}
 
 
-            if (model.StatusId == (int)EnumDocumentStatus.Approved)
-            {
-                apprvm.ApprovalStatus = apprvm.Action == true ? Constants.Approval_Approved : Constants.Approval_Disapproved;
-            }
-            else if (model.StatusId == (int)EnumDocumentStatus.ForApproval)
-            {
-                apprvm.ApprovalStatus = apprvm.Action == true ? Constants.Approval_Reviewed : Constants.Approval_Disapproved;
-            }
+  //          if (model.StatusId == (int)EnumDocumentStatus.Approved)
+  //          {
+  //              apprvm.ApprovalStatus = apprvm.Action == true ? Constants.Approval_Approved : Constants.Approval_Disapproved;
+  //          }
+  //          else if (model.StatusId == (int)EnumDocumentStatus.ForApproval)
+  //          {
+  //              apprvm.ApprovalStatus = apprvm.Action == true ? Constants.Approval_Reviewed : Constants.Approval_Disapproved;
+  //          }
 
 
-            MailMessage mail = new MailMessage();
-			mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-			mail.Subject = "DCI App - Your document No. " + model.DocNo + " has been " + apprvm.ApprovalStatus.ToLower();
-			mail.Body = model.EmailBody;
-			mail.IsBodyHtml = true;
-			mail.To.Add(model.RequestByEmail);
-			await SendMessage(mail);
-		}
+  //          MailMessage mail = new MailMessage();
+		//	mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
+		//	mail.Subject = "DCI App - Your document No. " + model.DocNo + " has been " + apprvm.ApprovalStatus.ToLower();
+		//	mail.Body = model.EmailBody;
+		//	mail.IsBodyHtml = true;
+		//	mail.To.Add(model.RequestByEmail);
+		//	await SendMessage(mail);
+		//}
 
-		async Task<DocumentViewModel> RequestorNotificationBodyMessage(DocumentViewModel model, ApprovalViewModel apprvm)
-		{
-			var userEntity = await _userRepository.GetUserById(model.RequestById ?? default(int));
+		//async Task<DocumentViewModel> RequestorNotificationBodyMessage(DocumentViewModel model, ApprovalViewModel apprvm)
+		//{
+		//	var userEntity = await _userRepository.GetUserById(model.RequestById ?? default(int));
 
 
-			if (model.StatusId == (int)EnumDocumentStatus.Approved)
-			{
-				apprvm.ApprovalStatus = apprvm.Action == true ? Constants.Approval_Approved : Constants.Approval_Disapproved;
-			}
-			else if (model.StatusId == (int)EnumDocumentStatus.ForApproval)
-			{
-				apprvm.ApprovalStatus = apprvm.Action == true ? Constants.Approval_Reviewed : Constants.Approval_Disapproved;
-			}
+		//	if (model.StatusId == (int)EnumDocumentStatus.Approved)
+		//	{
+		//		apprvm.ApprovalStatus = apprvm.Action == true ? Constants.Approval_Approved : Constants.Approval_Disapproved;
+		//	}
+		//	else if (model.StatusId == (int)EnumDocumentStatus.ForApproval)
+		//	{
+		//		apprvm.ApprovalStatus = apprvm.Action == true ? Constants.Approval_Reviewed : Constants.Approval_Disapproved;
+		//	}
 
-			if (model.StatusId == (int)EnumDocumentStatus.InProgress && !apprvm.Action)
-			{
-				apprvm.ApprovalStatus = Constants.Approval_Disapproved;
-			}
+		//	if (model.StatusId == (int)EnumDocumentStatus.InProgress && !apprvm.Action)
+		//	{
+		//		apprvm.ApprovalStatus = Constants.Approval_Disapproved;
+		//	}
 
-			string link = _apiconfig.Value.WebAppConnection + "Document/Details?DocId=" + model.DocId;
-            model.RequestByEmail = userEntity.Email;
-			model.EmailBody = $@"
-            <html>
-            <body>              
-                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
+		//	string link = _apiconfig.Value.WebAppConnection + "Document/Details?DocId=" + model.DocId;
+  //          model.RequestByEmail = userEntity.Email;
+		//	model.EmailBody = $@"
+  //          <html>
+  //          <body>              
+  //              <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
                 
-                 <p>This is an automated message from DCI Application.</p>
-                 <p>The document (Document No: <a href='{link}'> {model.DocNo}</a>)  has been {apprvm.ApprovalStatus.ToLower()}.</p>   
+  //               <p>This is an automated message from DCI Application.</p>
+  //               <p>The document (Document No: <a href='{link}'> {model.DocNo}</a>)  has been {apprvm.ApprovalStatus.ToLower()}.</p>   
               
-                <p>If you encounter any issues, please contact our support team at [DCI Application Support].</p>            
-                <p>Thank you,<br />Your DCI</p>
-            </body>
-            </html>";
+  //              <p>If you encounter any issues, please contact our support team at [DCI Application Support].</p>            
+  //              <p>Thank you,<br />Your DCI</p>
+  //          </body>
+  //          </html>";
 
-			return model;
-		}
+		//	return model;
+		//}
 
-		async Task<DocumentViewModel> DisapprovedReuploadBodyMessage(DocumentViewModel model, ApprovalViewModel apprvm)
-		{
-			var userEntity = await _userRepository.GetUserById(model.RequestById ?? default(int));
+		//async Task<DocumentViewModel> DisapprovedReuploadBodyMessage(DocumentViewModel model, ApprovalViewModel apprvm)
+		//{
+		//	var userEntity = await _userRepository.GetUserById(model.RequestById ?? default(int));
 
-			apprvm.ApprovalStatus = Constants.Approval_Disapproved;
+		//	apprvm.ApprovalStatus = Constants.Approval_Disapproved;
 
-            string detailsLink = _apiconfig.Value.WebAppConnection + "Document/Details?DocId=" + model.DocId;
-            string uploadlink = _apiconfig.Value.WebAppConnection + "Document/Upload?token=";
-			model.RequestByEmail = userEntity.Email;
-			model.EmailBody = $@"
-            <html>
-            <body>              
-                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
+  //          string detailsLink = _apiconfig.Value.WebAppConnection + "Document/Details?DocId=" + model.DocId;
+  //          string uploadlink = _apiconfig.Value.WebAppConnection + "Document/Upload?token=";
+		//	model.RequestByEmail = userEntity.Email;
+		//	model.EmailBody = $@"
+  //          <html>
+  //          <body>              
+  //              <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
                 
-                 <p>This is an automated message from DCI Application.</p>
-                 <p>The document (Document No: <a href='{detailsLink}'> {model.DocNo}</a>)  has been {apprvm.ApprovalStatus.ToLower()}.</p>   
-				 <p>Please upload the updated document. </p> <a href='{uploadlink + model.UploadLink}'>Upload File</a>
+  //               <p>This is an automated message from DCI Application.</p>
+  //               <p>The document (Document No: <a href='{detailsLink}'> {model.DocNo}</a>)  has been {apprvm.ApprovalStatus.ToLower()}.</p>   
+		//		 <p>Please upload the updated document. </p> <a href='{uploadlink + model.UploadLink}'>Upload File</a>
 
-                <p>If you encounter any issues, please contact our support team at [DCI Application Support].</p>            
-                <p>Thank you,<br />Your DCI</p>
-            </body>
-            </html>";
+  //              <p>If you encounter any issues, please contact our support team at [DCI Application Support].</p>            
+  //              <p>Thank you,<br />Your DCI</p>
+  //          </body>
+  //          </html>";
 
-			return model;
-		}
+		//	return model;
+		//}
 
 
 

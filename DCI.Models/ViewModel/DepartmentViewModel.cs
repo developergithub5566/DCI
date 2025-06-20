@@ -12,8 +12,8 @@ namespace DCI.Models.ViewModel
         public string DepartmentName { get; set; } = string.Empty;
 
         public string? Description { get; set; } = string.Empty;
-
-		public DateTime DateCreated { get; set; } = DateTime.Now;
+        public int? ApproverId { get; set; } = 0;
+        public DateTime DateCreated { get; set; } = DateTime.Now;
 
         public int CreatedBy { get; set; } = 0;
 
@@ -22,9 +22,7 @@ namespace DCI.Models.ViewModel
         public int? ModifiedBy { get; set; } = 0;
 
         public bool IsActive { get; set; } = true;
-		public string CreatedName { get; set; } = string.Empty;
-		public int? Reviewer { get; set; } = 0;
-		public int? Approver { get; set; } = 0;
+		public string CreatedName { get; set; } = string.Empty;	
 
 		public List<SelectListItem>? OptionsReviewer { get; set; }
 		public List<SelectListItem>? OptionsApprover { get; set; }

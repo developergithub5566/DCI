@@ -1158,9 +1158,7 @@ namespace DCI.WebApp.Controllers
                     request.Content = stringContent;
                     var response = await _httpclient.SendAsync(request);
                     var responseBody = await response.Content.ReadAsStringAsync();
-                    AnnouncementViewModel vm = JsonConvert.DeserializeObject<AnnouncementViewModel>(responseBody)!;
-
-					                   
+                    AnnouncementViewModel vm = JsonConvert.DeserializeObject<AnnouncementViewModel>(responseBody)!;					                   
 
                     if (response.IsSuccessStatusCode)
                     {

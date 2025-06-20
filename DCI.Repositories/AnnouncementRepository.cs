@@ -23,43 +23,54 @@ namespace DCI.Repositories
 
         public async Task<AnnouncementViewModel> GetAnnouncementById(int announceId)
         {
-            var context = _dbContext.Announcement.AsQueryable();
-            //var userList = _dbContext.User.Where(x => x.IsActive).OrderBy(x => x.Lastname).ToList();
-
-            var query = from announce in context
-                        where announce.IsActive == true //&& announce.Status == (int)EnumStatus.Active
-                        select new AnnouncementViewModel
-                        {
-                            AnnouncementId = announce.AnnouncementId,
-                            Title = announce.Title,
-                            Date = announce.Date,
-                            Details = announce.Details,
-                            Status = announce.Status,
-                            CreatedBy = announce.CreatedBy,
-                            DateCreated = announce.DateCreated,
-                            DateModified = announce.DateModified,
-                            ModifiedBy = announce.ModifiedBy,
-                            IsActive = announce.IsActive
-                        };
-            var result = query.FirstOrDefault();
-            if (result == null)
+            try
             {
-                result = new AnnouncementViewModel();
-            }          
+                var query = from announce in _dbContext.Announcement
+                            join usr in _dbContext.User.Where(x => x.IsActive)
+                            on announce.CreatedBy equals usr.UserId
+                            where announce.AnnouncementId == announceId
+                            select new AnnouncementViewModel
+                            {
+                                AnnouncementId = announce.AnnouncementId,
+                                Title = announce.Title,
+                                Date = announce.Date,
+                                Details = announce.Details,
+                                Status = announce.Status,
+                                CreatedBy = announce.CreatedBy,
+                                DateCreated = announce.DateCreated,
+                                DateModified = announce.DateModified,
+                                ModifiedBy = announce.ModifiedBy,
+                                IsActive = announce.IsActive,
+                                CreatedName = usr.Firstname + " " + usr.Lastname
+                            };
 
-            return result;
+                var result = query.FirstOrDefault();
+                if (result == null)
+                {
+                    result = new AnnouncementViewModel();
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return null;
         }
 
         public async Task<IList<AnnouncementViewModel>> GetAllAnnouncement()
         {
-         
-            try
-            {
-                var context = _dbContext.Announcement.AsQueryable().ToList();
-               // var userList = _dbContext.User.AsQueryable().ToList();
 
-                var query = from announce in context
-                           // join user in userList on dept.CreatedBy equals user.UserId
+            try
+            {             
+
+                var query = from announce in _dbContext.Announcement
+                            join usr in _dbContext.User.Where(x => x.IsActive) on announce.CreatedBy equals usr.UserId
                             where announce.IsActive == true
                             select new AnnouncementViewModel
                             {
@@ -72,7 +83,8 @@ namespace DCI.Repositories
                                 DateCreated = announce.DateCreated,
                                 DateModified = announce.DateModified,
                                 ModifiedBy = announce.ModifiedBy,
-                                IsActive = announce.IsActive
+                                IsActive = announce.IsActive,
+                                CreatedName = usr.Firstname + " " + usr.Lastname
                             };
 
                 return query.ToList();
@@ -99,7 +111,7 @@ namespace DCI.Repositories
                     entity.Title = model.Title;
                     entity.Date = model.Date;
                     entity.Details = model.Details;
-                    entity.Status = model.Status;                  
+                    entity.Status = (int)EnumStatus.Active;
                     entity.CreatedBy = model.CreatedBy;
                     entity.DateCreated = DateTime.Now;
                     entity.ModifiedBy = null;

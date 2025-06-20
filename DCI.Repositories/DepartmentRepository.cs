@@ -37,9 +37,8 @@ namespace DCI.Repositories
 							DepartmentName = dept.DepartmentName,
 							Description = dept.Description,							
 							CreatedBy = dept.CreatedBy,
-							DateCreated = dept.DateCreated,
-							Reviewer = dept.Reviewer,
-							Approver = dept.Approver
+							DateCreated = dept.DateCreated,						
+							ApproverId = dept.ApproverId
 						};
 			var result = query.FirstOrDefault();
 			if (result == null)
@@ -70,10 +69,9 @@ namespace DCI.Repositories
 								Description = dept.Description,
 								CreatedName = user.Email,
 								CreatedBy = dept.CreatedBy,
-								DateCreated = dept.DateCreated,
-								Reviewer = dept.Reviewer,
-								Approver = dept.Approver
-							};
+								DateCreated = dept.DateCreated,							
+								ApproverId = dept.ApproverId
+                            };
 
 				return query.ToList();
 			}
@@ -103,8 +101,8 @@ namespace DCI.Repositories
 					entity.DepartmentCode = model.DepartmentCode;
 					entity.DepartmentName = model.DepartmentName;
 					entity.Description = model.Description;
-					entity.Reviewer = model.Reviewer;
-					entity.Approver = model.Approver;
+				
+					entity.ApproverId = model.ApproverId;
 					entity.CreatedBy = model.CreatedBy;
 					entity.DateCreated = DateTime.Now;
 					entity.ModifiedBy = null;
@@ -119,9 +117,8 @@ namespace DCI.Repositories
 					var entity = await _dbContext.Department.FirstOrDefaultAsync(x => x.DepartmentId == model.DepartmentId);
 					entity.DepartmentCode = model.DepartmentCode;
 					entity.DepartmentName = model.DepartmentName;
-					entity.Description = model.Description;
-					entity.Reviewer = model.Reviewer;
-					entity.Approver = model.Approver;
+					entity.Description = model.Description;					
+					entity.ApproverId = model.ApproverId;
 					entity.DateCreated = entity.DateCreated;
 					entity.CreatedBy = entity.CreatedBy;
 					entity.DateModified = DateTime.Now;

@@ -83,7 +83,7 @@ namespace DCI.Repositories
                                         Philhealth = dtl.Philhealth,
                                         TaxExemption = dtl.TaxExemption,
                                         MobileNoOffice = dtl.MobileNoOffice,
-                                        Department = dtl.Department,
+                                        DepartmentId = dtl.DepartmentId,
                                         JobFunction = dtl.JobFunction,
                                         DateHired = dtl.DateHired,
                                         Position = dtl.Position,
@@ -145,7 +145,7 @@ namespace DCI.Repositories
                     dtl.Philhealth = model.Philhealth;
                     dtl.TaxExemption = model.TaxExemption;
                     dtl.MobileNoOffice = model.MobileNoOffice;
-                    dtl.Department = model.Department;
+                    dtl.DepartmentId = model.DepartmentId;
                     dtl.JobFunction = model.JobFunction;
                     dtl.DateHired = model.DateHired;
                     dtl.Position = model.Position;
@@ -191,7 +191,7 @@ namespace DCI.Repositories
                     dtl.Philhealth = model.Philhealth;
                     dtl.TaxExemption = model.TaxExemption;
                     dtl.MobileNoOffice = model.MobileNoOffice;
-                    dtl.Department = model.Department;
+                    dtl.DepartmentId = model.DepartmentId;
                     dtl.JobFunction = model.JobFunction;
                     dtl.DateHired = model.DateHired;
                     dtl.Position = model.Position;

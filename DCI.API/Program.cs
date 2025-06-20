@@ -41,7 +41,7 @@ builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 //builder.Services.AddScoped<ISectionRepository, SectionRepository>();
 builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 builder.Services.AddScoped<ITodoRepository, TodoRepository>();
-//builder.Services.AddScoped<IRequestHistoryRepository, RequestHistoryRepository>();
+builder.Services.AddScoped<IHomeRepository, HomeRepository>();
 
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IDailyTimeRecordRepository, DailyTimeRecordRepository>();
