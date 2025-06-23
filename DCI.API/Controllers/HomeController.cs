@@ -24,5 +24,13 @@ namespace DCI.API.Controllers
             var result = await _homeRepository.GetAllAnnouncement(model);
             return Ok(result);
         }
+
+        [HttpPost]
+        [Route("GetAllNotification")]
+        public async Task<IActionResult> GetAllNotification(NotificationViewModel model)
+        {
+            return Ok(await _homeRepository.GetAllNotification(model));
+        }
+
     }
 }

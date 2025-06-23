@@ -76,6 +76,8 @@ builder.Services.AddSession(options =>
 
 });
 
+builder.Services.AddSignalR();
+
 builder.Services.AddScoped<UserSessionHelper>();
 builder.Services.AddScoped<DocumentService>();
 
@@ -111,5 +113,7 @@ app.UseEndpoints(endpoints =>
 		name: "default",
 		pattern: "{controller=Account}/{action=Login}/{id?}");
 });
+
+app.MapHub<NotificationHub>("/notificationHub");
 
 app.Run();

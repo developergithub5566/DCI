@@ -160,9 +160,9 @@
                                                                 noDays : "@item.NoofDays",
                                                                 status : "@item.StatusName",
                                                                 reason : "@item.Reason"
-                                                                })' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a> 
-                                    <a href="#" id="approved" onclick="approvalForm(@item.LeaveRequestHeaderId,true)" title="Approve" class="btn btn-info"> <i class="fa fa-check"></i></a> 
-                                    <a href="#" id="disapproved" onclick="remarksForm(@item.LeaveRequestHeaderId,false)" title="Disapprove" class="btn btn-danger"> <i class="fa fa-remove"></i></a>
+                                                                })' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+                                    <a href="#" id="approved" onclick="approvalForm(@item.LeaveRequestHeaderId,@((int)EnumStatus.Approved))" title="Approve" class="btn btn-info"> <i class="fa fa-check"></i></a>
+                                    <a href="#" id="disapproved" onclick="remarksForm(@item.LeaveRequestHeaderId,@((int)EnumStatus.Rejected))" class="btn btn-danger"> <i class="fa fa-remove"></i></a>
                                 </td>                            
                             </tr>
                         }
@@ -308,13 +308,13 @@
 
      
 
-                function approvalForm(leaveId,approved) {               
+                function approvalForm(leaveId,status) {               
 
                              $('.spinner-overlay').show();
                         $.ajax({
                             type: 'POST',
                             url: '@Url.Action("Approval", "Todo")',
-                            data: { TransactionId : leaveId , Status: 1, Remarks: $('#Remarks').val() },
+                            data: { TransactionId : leaveId , Status: status, Remarks: $('#Remarks').val() },
 
                             success: function (response) {
                                 if (response.success) {
@@ -346,10 +346,10 @@
                  
                 }
 
-                 function remarksForm(leaveId,approved) {
+                 function remarksForm(leaveId,status) {
                       $('#Remarks_Approval').val("");
                       $('#HiddenHeaderId').val(leaveId);
-                      $('#HiddenAction').val(approved);
+                      $('#HiddenAction').val(status);
                        js('#remarksmodal').modal('show');
                  }
 
@@ -374,7 +374,7 @@
                         $.ajax({
                             type: 'POST',
                             url: '@Url.Action("Approval", "Todo")',
-                            data: { TransactionId: _transId , Status: 2, Remarks: $('#Remarks_Approval').val() },
+                            data: { TransactionId: _transId , Status: _action, Remarks: $('#Remarks_Approval').val() },
                             success: function (response) {
                                 if (response.success) {
                                                         Swal.fire({

@@ -34,6 +34,7 @@ namespace DCI.Data
         public DbSet<LeaveRequestDetails> LeaveRequestDetails { get; set; }
         public DbSet<LeaveSummary> LeaveSummary { get; set; }
         public DbSet<Announcement> Announcement { get; set; }
+        public DbSet<Notification> Notification { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

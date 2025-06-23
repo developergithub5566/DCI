@@ -127,6 +127,7 @@ namespace DCI.Repositories
                         select new LeaveRequestHeaderViewModel
                         {
                             LeaveRequestHeaderId = lheader.LeaveRequestHeaderId,
+                            EmployeeId = lheader.EmployeeId,
                             RequestNo = lheader.RequestNo,
                             DateFiled = lheader.DateFiled,
                             LeaveTypeId = lheader.LeaveTypeId,

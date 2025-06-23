@@ -1,0 +1,121 @@
+﻿@model IEnumerable<DCI.Models.ViewModel.NotificationViewModel>
+@using Newtonsoft.Json;
+@using DCI.Core.Common;
+@using DCI.Models.ViewModel;
+
+
+<div class="main-panel">
+	<div class="content-wrapper">
+
+
+		<div class="page-header">
+			<h3 class="page-title">
+				<span class="page-title-icon bg-gradient-primary text-white me-2">
+					<i class="mdi mdi-file"></i>
+				</span> Notification
+			</h3>
+
+		</div>
+
+
+		<div class="spinner-overlay">
+			<div class="spinner-border text-light" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
+
+		<table class="table table-hover" id="tblnotif">
+			<thead>
+				<tr>
+					<th>
+						<label>Title</label>
+					</th>
+					<th>
+						<label>Description</label>
+					</th>
+					<th>
+						<label>Read/Unread</label>
+					</th>
+
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var item in Model)
+				{
+					<tr onclick="window.location.href='@item.URL'" style="cursor:pointer;">
+						<td>
+							@item.Title
+						</td>
+						<td>
+							@item.Description
+						</td>
+						<td>
+							@(@item.MarkRead == true ? "Read" : "Unread")
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+@section scripts {
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
+	<script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
+
+	@* 	<script src="~/js/file-upload.js"></script> *@
+	<script src="https://cdn.datatables.net/buttons/3.2.1/js/dataTables.buttons.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+	<script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.html5.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.print.min.js"></script>
+	<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
+	<link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.1/css/buttons.dataTables.css">
+
+	<script type="text/javascript">
+		var js = jQuery.noConflict(true);
+		$('.spinner-overlay').show();
+
+		setTimeout(() => {
+			$('.spinner-overlay').hide();
+		}, 200);
+
+
+		$(document).ready(function () {
+			// js('#tblAuditLog').DataTable({
+			// 	order: [[0, 'desc']]
+			// });
+
+		var table = 	js('#tblAuditLog').DataTable({
+				dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
+				buttons: [
+					{
+						extend: 'excel',
+						text: 'Excel',
+						title: 'Document Report',
+						exportOptions: {
+							 columns: ':visible'
+						}
+					},
+					{
+						extend: 'pdf',
+						text: 'PDF',
+						title: 'Document Report',
+						exportOptions: {
+							 columns: ':visible'
+						}
+					}
+				],
+				lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
+				pageLength: 10, // Default entries per page
+				order: [[0, 'desc']]
+		   });
+				const _export =  $('#canExport').val();
+				console.log(_export);
+				if(_export == 0){
+						table.buttons(0).container().hide(); // Excel
+						table.buttons(1).container().hide(); // PDF
+				}
+		});
+	</script>
+}

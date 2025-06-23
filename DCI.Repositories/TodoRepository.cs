@@ -11,80 +11,75 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace DCI.Repositories
 {
-	public class TodoRepository : ITodoRepository, IDisposable
-	{
-		private DCIdbContext _dbContext;
-		private IEmailRepository _emailRepository;
+    public class TodoRepository : ITodoRepository, IDisposable
+    {
+        private DCIdbContext _dbContext;
+        private IEmailRepository _emailRepository;
+        private ILeaveRepository _leaveRepository;
 
 
-		public TodoRepository(DCIdbContext context, IEmailRepository emailRepository)
-		{
-			this._dbContext = context;
-			this._emailRepository = emailRepository;
-			
-		}
-		public void Dispose()
-		{
-			_dbContext.Dispose();
-		}
+        public TodoRepository(DCIdbContext context, IEmailRepository emailRepository, ILeaveRepository leaveRepository)
+        {
+            this._dbContext = context;
+            this._emailRepository = emailRepository;
+            this._leaveRepository = leaveRepository;
+
+        }
+        public void Dispose()
+        {
+            _dbContext.Dispose();
+        }
 
 
         public async Task<IList<LeaveRequestHeaderViewModel>> GetAllTodo(LeaveViewModel model)
         {
-            
-            var context = _dbContext.LeaveRequestHeader.AsQueryable().ToList();
-            var contextDetail = _dbContext.LeaveRequestDetails.AsQueryable().ToList();
-            var empList = _dbContext.Employee.AsQueryable().ToList();
-            var statusList = _dbContext.Status.AsQueryable().ToList();
-
-            //var query = from leave in context
-            //                //  join dtl in _dbContext.LeaveRequestDetails on leave.LeaveRequestHeaderId equals dtl.LeaveRequestHeaderId
-            //            join emp in empList on leave.EmployeeId equals emp.EmployeeId
-            //            join stat in statusList on leave.Status equals stat.StatusId
-            //            where leave.IsActive == true && leave.Status == (int)EnumStatus.Pending
-            //            select new LeaveRequestHeaderViewModel
-            //            {
-            //                LeaveRequestHeaderId = leave.LeaveRequestHeaderId,
-            //                RequestNo = leave.RequestNo,
-            //                EmployeeId = leave.EmployeeId,
-            //                EmployeeName = emp.Firstname + " " +emp.Lastname,
-            //                DateFiled = leave.DateFiled,
-            //                Status = leave.Status,
-            //                StatusName = stat.StatusName,
-            //                Reason = leave.Reason,
-            //                NoofDays = leave.NoOfDays
-            //               // ,LeaveDateList = leave.LeaveRequestDetailsList.Select(dtl => dtl.LeaveDate).ToList()
-            //            };
-
-            var query = (from leave in context
-                            //  join dtl in _dbContext.LeaveRequestDetails on leave.LeaveRequestHeaderId equals dtl.LeaveRequestHeaderId
-                        join emp in empList on leave.EmployeeId equals emp.EmployeeId
-                        join stat in statusList on leave.Status equals stat.StatusId
-                        where leave.IsActive == true && leave.Status == (int)EnumStatus.Pending
-                        select new LeaveRequestHeaderViewModel
-                        {
-                            LeaveRequestHeaderId = leave.LeaveRequestHeaderId,
-                            RequestNo = leave.RequestNo,
-                            EmployeeId = leave.EmployeeId,
-                            EmployeeName = emp.Firstname + " " + emp.Lastname,
-                            DateFiled = leave.DateFiled,
-                            Status = leave.Status,
-                            StatusName = stat.StatusName,
-                            Reason = leave.Reason,
-                            NoofDays = leave.NoOfDays,
-                            LeaveRequestDetailList = (from dtl in _dbContext.LeaveRequestDetails
-                                             where dtl.LeaveRequestHeaderId == leave.LeaveRequestHeaderId
-                                             select new LeaveRequestDetailViewModel
-                                             {
-                                                 LeaveRequestHeaderId = dtl.LeaveRequestHeaderId,
-                                                 LeaveRequestDetailId = dtl.LeaveRequestDetailId,
-                                                 LeaveDate = dtl.LeaveDate,                                   
-                                                 Amount = dtl.Amount
-                                             }).ToList()
-                        }).ToList();
+            try
+            {
+                var context = _dbContext.LeaveRequestHeader.AsQueryable().ToList();
+                var contextDetail = _dbContext.LeaveRequestDetails.AsQueryable().ToList();
+                var empList = _dbContext.Employee.AsQueryable().ToList();
+                var statusList = _dbContext.Status.AsQueryable().ToList();
 
 
-            return query.ToList();
+                var query = (from leave in context
+                                 //  join dtl in _dbContext.LeaveRequestDetails on leave.LeaveRequestHeaderId equals dtl.LeaveRequestHeaderId
+                             join emp in empList on leave.EmployeeId equals emp.EmployeeId
+                             join stat in statusList on leave.Status equals stat.StatusId
+                             where leave.IsActive == true && leave.Status == (int)EnumStatus.ForApproval
+                             select new LeaveRequestHeaderViewModel
+                             {
+                                 LeaveRequestHeaderId = leave.LeaveRequestHeaderId,
+                                 RequestNo = leave.RequestNo,
+                                 EmployeeId = leave.EmployeeId,
+                                 EmployeeName = emp.Firstname + " " + emp.Lastname,
+                                 DateFiled = leave.DateFiled,
+                                 Status = leave.Status,
+                                 StatusName = stat.StatusName,
+                                 Reason = leave.Reason,
+                                 NoofDays = leave.NoOfDays,
+                                 LeaveRequestDetailList = (from dtl in _dbContext.LeaveRequestDetails
+                                                           where dtl.LeaveRequestHeaderId == leave.LeaveRequestHeaderId
+                                                           select new LeaveRequestDetailViewModel
+                                                           {
+                                                               LeaveRequestHeaderId = dtl.LeaveRequestHeaderId,
+                                                               LeaveRequestDetailId = dtl.LeaveRequestDetailId,
+                                                               LeaveDate = dtl.LeaveDate,
+                                                               Amount = dtl.Amount
+                                                           }).ToList()
+                             }).ToList();
+
+
+                return query.ToList();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return null;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
 
@@ -92,33 +87,32 @@ namespace DCI.Repositories
         {
             try
             {
-                ApprovalHistory entity = new ApprovalHistory();              
+                ApprovalHistory entity = new ApprovalHistory();
                 entity.ModulePageId = (int)EnumModulePage.Leave;
                 entity.TransactionId = param.TransactionId;
                 entity.ApproverId = param.ApproverId;
                 entity.Status = param.Status;
                 entity.Remarks = param.Remarks;
                 entity.CreatedBy = param.CreatedBy;
-                entity.DateCreated = DateTime.Now;              
+                entity.DateCreated = DateTime.Now;
                 entity.IsActive = true;
                 await _dbContext.ApprovalHistory.AddAsync(entity);
                 await _dbContext.SaveChangesAsync();
 
 
                 var contextHdr = _dbContext.LeaveRequestHeader.Where(x => x.LeaveRequestHeaderId == param.TransactionId).FirstOrDefault();
-               // var contextDtl = _dbContext.LeaveRequestDetails.Where(x => x.LeaveRequestHeaderId == param.TransactionId);
 
-                if (contextHdr != null) 
-                {               
-                    var contextLeaveInfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == contextHdr.EmployeeId).FirstOrDefault();             
+                if (contextHdr != null)
+                {
+                    var contextLeaveInfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == contextHdr.EmployeeId).FirstOrDefault();
 
                     if (contextHdr.LeaveTypeId == (int)EnumLeaveType.VL)
                     {
-                        contextLeaveInfo.VLBalance = contextLeaveInfo.VLBalance - contextHdr.NoOfDays;               
+                        contextLeaveInfo.VLBalance = contextLeaveInfo.VLBalance - contextHdr.NoOfDays;
                         _dbContext.LeaveInfo.Entry(contextLeaveInfo).State = EntityState.Modified;
                         _dbContext.SaveChanges();
                     }
-                    else if(contextHdr.LeaveTypeId == (int)EnumLeaveType.SL)
+                    else if (contextHdr.LeaveTypeId == (int)EnumLeaveType.SL)
                     {
                         contextLeaveInfo.SLBalance = contextLeaveInfo.SLBalance - contextHdr.NoOfDays;
                         _dbContext.LeaveInfo.Entry(contextLeaveInfo).State = EntityState.Modified;
@@ -132,18 +126,15 @@ namespace DCI.Repositories
                 _dbContext.LeaveRequestHeader.Entry(contextHdr).State = EntityState.Modified;
                 _dbContext.SaveChanges();
 
-                //if (NewDocumentViewModel.StatusId == (int)EnumDocumentStatus.ForApproval ||
-                //    NewDocumentViewModel.StatusId == (int)EnumDocumentStatus.Approved ||
-                //    NewDocumentViewModel.StatusId == (int)EnumDocumentStatus.InProgress)
-                //{
-                //    await _emailRepository.SendRequestor(NewDocumentViewModel, apprvm);
-                //}
-                //if (NewDocumentViewModel.StatusId == (int)EnumDocumentStatus.ForApproval ||
-                //    NewDocumentViewModel.StatusId == (int)EnumDocumentStatus.ForReview)
-                //{
-                //    await _emailRepository.SendApproval(NewDocumentViewModel);
-                //}
-                string status = param.Status == 1 ? "approved" : "disapproved";
+                LeaveViewModel lv = new LeaveViewModel();
+                lv.LeaveRequestHeaderId = contextHdr.LeaveRequestHeaderId;
+
+                var entitiesToViewModel = await _leaveRepository.RequestLeave(lv);
+
+                // Send Email Notif
+                await _emailRepository.SendToRequestor(entitiesToViewModel);
+
+                string status = param.Status == (int)EnumStatus.Approved ? "approved" : "disapproved";
 
                 return (StatusCodes.Status200OK, String.Format("Leave Request {0} has been {1}.", contextHdr.RequestNo, status));
             }
@@ -162,47 +153,47 @@ namespace DCI.Repositories
         {
             try
             {
-            var leaveHdr = _dbContext.LeaveRequestHeader.AsQueryable().ToList();
-            var contextDetail = _dbContext.LeaveRequestDetails.AsQueryable().ToList();
-            var empList = _dbContext.Employee.AsQueryable().ToList();
-            var statusList = _dbContext.Status.AsQueryable().ToList();
-            var approvalLog = _dbContext.ApprovalHistory.AsQueryable().ToList();
-    
-
-            var query = from apprv in approvalLog
-                        join hdr in leaveHdr on apprv.TransactionId equals hdr.LeaveRequestHeaderId
-                        join emp in empList on hdr.EmployeeId equals emp.EmployeeId
-                        join stat in statusList on hdr.Status equals stat.StatusId
-                        where apprv.IsActive == true && apprv.ApproverId == model.CurrentUserId && apprv.ModulePageId == (int)EnumModulePage.Leave
-                        select new LeaveRequestHeaderViewModel
-                        {
-                            LeaveRequestHeaderId = hdr.LeaveRequestHeaderId,
-                            RequestNo = hdr.RequestNo,
-                            EmployeeId = hdr.EmployeeId,
-                            EmployeeName = emp.Firstname + " " + emp.Lastname,
-                            DateFiled = hdr.DateFiled,
-                            Status = hdr.Status,
-                            StatusName = stat.StatusName,
-                            Reason = hdr.Reason,
-                            NoofDays = hdr.NoOfDays ,
-                            DateApprovedDisapproved = apprv.DateCreated,
-                            LeaveRequestDetailList = (from dtl in _dbContext.LeaveRequestDetails
-                                                      where dtl.LeaveRequestHeaderId == hdr.LeaveRequestHeaderId
-                                                      select new LeaveRequestDetailViewModel
-                                                      {
-                                                          LeaveRequestHeaderId = dtl.LeaveRequestHeaderId,
-                                                          LeaveRequestDetailId = dtl.LeaveRequestDetailId,
-                                                          LeaveDate = dtl.LeaveDate,
-                                                          Amount = dtl.Amount
-                                                      }).ToList()
-                        };
+                var leaveHdr = _dbContext.LeaveRequestHeader.AsQueryable().ToList();
+                var contextDetail = _dbContext.LeaveRequestDetails.AsQueryable().ToList();
+                var empList = _dbContext.Employee.AsQueryable().ToList();
+                var statusList = _dbContext.Status.AsQueryable().ToList();
+                var approvalLog = _dbContext.ApprovalHistory.AsQueryable().ToList();
 
 
-            return query.ToList();
-        }
+                var query = from apprv in approvalLog
+                            join hdr in leaveHdr on apprv.TransactionId equals hdr.LeaveRequestHeaderId
+                            join emp in empList on hdr.EmployeeId equals emp.EmployeeId
+                            join stat in statusList on hdr.Status equals stat.StatusId
+                            where apprv.IsActive == true && apprv.ApproverId == model.CurrentUserId && apprv.ModulePageId == (int)EnumModulePage.Leave
+                            select new LeaveRequestHeaderViewModel
+                            {
+                                LeaveRequestHeaderId = hdr.LeaveRequestHeaderId,
+                                RequestNo = hdr.RequestNo,
+                                EmployeeId = hdr.EmployeeId,
+                                EmployeeName = emp.Firstname + " " + emp.Lastname,
+                                DateFiled = hdr.DateFiled,
+                                Status = hdr.Status,
+                                StatusName = stat.StatusName,
+                                Reason = hdr.Reason,
+                                NoofDays = hdr.NoOfDays,
+                                DateApprovedDisapproved = apprv.DateCreated,
+                                LeaveRequestDetailList = (from dtl in _dbContext.LeaveRequestDetails
+                                                          where dtl.LeaveRequestHeaderId == hdr.LeaveRequestHeaderId
+                                                          select new LeaveRequestDetailViewModel
+                                                          {
+                                                              LeaveRequestHeaderId = dtl.LeaveRequestHeaderId,
+                                                              LeaveRequestDetailId = dtl.LeaveRequestDetailId,
+                                                              LeaveDate = dtl.LeaveDate,
+                                                              Amount = dtl.Amount
+                                                          }).ToList()
+                            };
+
+
+                return query.ToList();
+            }
             catch (Exception ex)
             {
-                Log.Error(ex.ToString());               
+                Log.Error(ex.ToString());
                 return null;
             }
             finally

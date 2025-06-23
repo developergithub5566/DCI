@@ -72,6 +72,29 @@ namespace DCI.Repositories
             return null;
         }
 
+        public async Task<IList<NotificationViewModel>> GetAllNotification(NotificationViewModel model)
+        {
+            var query = await _dbContext.Notification
+                .Where(notif => notif.IsActive == true)// && notif.AssignId == model.AssignId)
+                .Select(notif => new NotificationViewModel
+                {
+                    NotificationId = notif.NotificationId,
+                    Title = notif.Title,
+                    Description = notif.Description,
+                    ModuleId = notif.ModuleId,
+                    TransactionId = notif.TransactionId,
+                    AssignId = notif.AssignId,
+                    URL = notif.URL,
+                    MarkRead = notif.MarkRead,
+                    CreatedBy = notif.CreatedBy,
+                    DateCreated = notif.DateCreated,
+                    IsActive = notif.IsActive,
+                })
+                .ToListAsync();
+
+            return query;
+        }
+
 
     }
 }

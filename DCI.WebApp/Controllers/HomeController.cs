@@ -119,6 +119,35 @@ namespace DCI.WebApp.Controllers
             return View();
         }
 
+        public async Task<IActionResult> Notification()
+        {
+            List<NotificationViewModel> model = new List<NotificationViewModel>();
+
+            using (var _httpclient = new HttpClient())
+            {
+                NotificationViewModel _filterRoleModel = new NotificationViewModel();
+                var currentUser = _userSessionHelper.GetCurrentUser();
+                if (currentUser == null)
+                {
+                    return RedirectToAction("Logout", "Account");
+                }
+                _filterRoleModel.AssignId = currentUser.UserId;
+
+                var stringContent = new StringContent(JsonConvert.SerializeObject(_filterRoleModel), Encoding.UTF8, "application/json");
+                var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Home/GetAllNotification");
+
+                request.Content = stringContent;
+                var response = await _httpclient.SendAsync(request);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    model = JsonConvert.DeserializeObject<List<NotificationViewModel>>(responseBody)!;
+                }
+            }
+            return View(model);
+        }
+
+
 
     }
 }

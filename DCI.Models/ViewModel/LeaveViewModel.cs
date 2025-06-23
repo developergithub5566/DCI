@@ -28,8 +28,10 @@ namespace DCI.Models.ViewModel
         public int CurrentUserId { get; set; } = 0;
 
         public string EmailBody { get; set; } = string.Empty;
+        public string RequestorEmail { get; set; } = string.Empty;
         public string ApproverEmail { get; set; } = string.Empty;
         public int? ApproverId { get; set; } = 0;
+        public string StatusName { get; set; } = string.Empty;
     }
 
     public class LeaveRequestHeaderViewModel

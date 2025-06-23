@@ -48,6 +48,7 @@ builder.Services.AddScoped<IDailyTimeRecordRepository, DailyTimeRecordRepository
 builder.Services.AddScoped<ILeaveRepository, LeaveRepository>();
 builder.Services.AddScoped<IAnnouncementRepository, AnnouncementRepository>();
 
+
 builder.Services.Configure<SMTPModel>(builder.Configuration.GetSection("SmtpSettings"));
 builder.Services.AddSingleton<AuthenticationModel>();
 builder.Services.Configure<AuthenticationModel>(builder.Configuration.GetSection("Authentication"));
