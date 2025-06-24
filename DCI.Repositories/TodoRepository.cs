@@ -16,14 +16,14 @@ namespace DCI.Repositories
         private DCIdbContext _dbContext;
         private IEmailRepository _emailRepository;
         private ILeaveRepository _leaveRepository;
+        private readonly IHomeRepository _homeRepository;
 
-
-        public TodoRepository(DCIdbContext context, IEmailRepository emailRepository, ILeaveRepository leaveRepository)
+        public TodoRepository(DCIdbContext context, IEmailRepository emailRepository, ILeaveRepository leaveRepository, IHomeRepository homeRepository)
         {
             this._dbContext = context;
             this._emailRepository = emailRepository;
             this._leaveRepository = leaveRepository;
-
+            this._homeRepository = homeRepository;
         }
         public void Dispose()
         {
@@ -135,6 +135,20 @@ namespace DCI.Repositories
                 await _emailRepository.SendToRequestor(entitiesToViewModel);
 
                 string status = param.Status == (int)EnumStatus.Approved ? "approved" : "disapproved";
+
+                NotificationViewModel notifvm = new NotificationViewModel();
+                notifvm.Title = "Leave";
+                notifvm.Description =  String.Format("Leave Request No {0} has been {1}", contextHdr.RequestNo , status);
+                notifvm.ModuleId = (int)EnumModulePage.Leave;
+                notifvm.TransactionId = param.TransactionId;
+                notifvm.AssignId = contextHdr.EmployeeId;
+                notifvm.URL = "/DailyTimeRecord/Leave/?leaveId=" + contextHdr.LeaveRequestHeaderId;
+                notifvm.MarkRead = false;
+                notifvm.CreatedBy = param.CreatedBy;
+                notifvm.IsActive = true;
+                await _homeRepository.SaveNotification(notifvm);
+
+        
 
                 return (StatusCodes.Status200OK, String.Format("Leave Request {0} has been {1}.", contextHdr.RequestNo, status));
             }

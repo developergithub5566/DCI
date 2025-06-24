@@ -28,6 +28,9 @@
 			<thead>
 				<tr>
 					<th>
+						<label>Date</label>
+					</th>
+					<th>
 						<label>Title</label>
 					</th>
 					<th>
@@ -40,9 +43,12 @@
 				</tr>
 			</thead>
 			<tbody>
-				@foreach (var item in Model)
+				@foreach (var item in Model.OrderByDescending(x => x.DateCreated))
 				{
 					<tr onclick="window.location.href='@item.URL'" style="cursor:pointer;">
+						<td>
+							@item.DateNotification
+						</td>
 						<td>
 							@item.Title
 						</td>

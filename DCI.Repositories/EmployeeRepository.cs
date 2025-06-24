@@ -55,8 +55,9 @@ namespace DCI.Repositories
             try
             {
                 var result = await (from emp in _dbContext.Employee
-                                    join dtl in _dbContext.EmployeeWorkDetails
-                                    on emp.EmployeeId equals dtl.EmployeeId
+                                    join dtl in _dbContext.EmployeeWorkDetails on emp.EmployeeId equals dtl.EmployeeId
+                                  //  join emptype in _dbContext.EmploymentType on dtl.EmploymentTypeId equals emptype.EmploymentTypeId
+                                    join dpt in _dbContext.Department on dtl.DepartmentId equals dpt.DepartmentId                                 
                                     where emp.EmployeeId == empId
                                     select new Form201ViewModel
                                     {
@@ -84,6 +85,7 @@ namespace DCI.Repositories
                                         TaxExemption = dtl.TaxExemption,
                                         MobileNoOffice = dtl.MobileNoOffice,
                                         DepartmentId = dtl.DepartmentId,
+                                        DepartmentName = dpt.DepartmentName,
                                         JobFunction = dtl.JobFunction,
                                         DateHired = dtl.DateHired,
                                         Position = dtl.Position,

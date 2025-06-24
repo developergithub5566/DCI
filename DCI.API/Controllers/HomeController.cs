@@ -32,5 +32,13 @@ namespace DCI.API.Controllers
             return Ok(await _homeRepository.GetAllNotification(model));
         }
 
+        [HttpPost]
+        [Route("MarkAsRead")]
+        public async Task<IActionResult> MarkAsRead([FromBody] NotificationViewModel model)
+        {
+            var markAsRead = _homeRepository.MarkAsRead(model);
+            return Ok();
+        }
+
     }
 }

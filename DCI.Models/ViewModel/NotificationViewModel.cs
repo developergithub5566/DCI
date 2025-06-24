@@ -1,4 +1,6 @@
 ﻿
+using System.Globalization;
+
 namespace DCI.Models.ViewModel
 {
     public class NotificationViewModel
@@ -19,6 +21,7 @@ namespace DCI.Models.ViewModel
 
         public bool IsActive { get; set; } = true;
         public DateTime DateCreated { get; set; } = DateTime.Now;
+        public string DateNotification { get; set; } = string.Empty;
         public int CreatedBy { get; set; } = 0;
         public int AssignId { get; set; } = 0;
     }

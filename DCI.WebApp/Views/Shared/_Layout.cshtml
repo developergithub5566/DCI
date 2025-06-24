@@ -207,12 +207,12 @@
 						        </h6>
 
 					
-						        <div class='dropdown-item d-flex align-items-center'>
-						            <div class='text-center full-width p10'>
-						                <div class='small'>
+						       
 						              @*   No notification available *@
                                       @* START*@
-                                         <div id="notification-container"></div>
+                                         <div class='headerNotifDiv'>
+                                             <div id="notification-container"></div>
+                                         </div>
                                          <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
 
                                 <script>
@@ -225,20 +225,25 @@
                                          const container = document.getElementById("notification-container");
                                         container.innerHTML = ""; // Clear existing
 
+                                                    // <a href="#" onclick="NotifMarkRead(${n.notificationId},'${n.url}')" class="dropdown-item preview-item ${n.markRead ?  ''  : 'bg-body-secondary' }">
+                                                       //       <div class="dropdown-divider"></div>
+
                                             notifications.forEach(n => {
                                                         const item = `
-                                                               <a href="#" onclick="NotifMarkRead(${n.notificationId},'${n.url}')" class="dropdown-item preview-item ${n.markRead ?  ''  : 'bg-body-secondary' }">
-                                                                <div class="preview-thumbnail">
-                                                                    <div class="preview-icon bg-success">
-                                                                        <i class="mdi mdi-file-document"></i>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="preview-item-content d-flex align-items-start flex-column justify-content-center">
-                                                                    <h6 class="preview-subject font-weight-normal mb-1">${n.title}</h6>
-                                                                    <p class="text-gray" style="font-size:small">${n.description}</p>
-                                                                </div>
-                                                            </a>
-                                                            <div class="dropdown-divider"></div>
+                                                              <a href="#" onclick="NotifMarkRead(${n.notificationId},'${n.url}')" class="dropdown-item d-flex align-items-center ${n.markRead ?  ''  : 'bg-body-secondary'}">                                                   
+                                                                    <div class='mr-3'>
+												                            <div class='icon-circle bg-primary'> 
+													                            <i class='fa-regular fa-file-lines text-white'></i>
+												                            </div>
+											                        </div>
+											                  <div>
+												                    <div class='small text-gray-500'>${n.dateNotification}</div> 
+												                            <div class='small'>
+													                            <span class="${n.markRead ?  ''  : 'font-weight-bold'}">${n.description}</span>
+												                            </div>
+											                        </div>
+                                                              </a>
+                                                  
                                                         `;
                                                         container.innerHTML += item;
                                                     });
@@ -263,16 +268,15 @@
                                                                     console.error("❌ SignalR error:", err.toString());
                                                                 });                                                                                                                                  
                                                               
-                                                                        window.location.href = window.location.origin + url;                                                                                 
-                                                            }  
+                                                                        window.location.href = window.location.origin + url;   
+                                                                           //  location.reload();   
+                                                          }  
                                 </script>
 
 
 
                                          @* END*@
-						                </div>
-						            </div>
-						        </div>
+						       
 						        <a class="dropdown-item text-center small text-gray-500" href="/Home/Notification">Show All Notifications</a>
 						    </div>
 						</li>

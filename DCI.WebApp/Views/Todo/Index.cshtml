@@ -261,6 +261,20 @@
             <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
             <script src="~/js/file-upload.js"></script>
 
+
+            
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+         console.log("bypass-" + urlParams);
+            const id = urlParams.get('leaveId');
+            if (id) {
+                editForm(id);
+            }
+        });
+    </script>
+
+
             <script type="text/javascript">
                 var js = jQuery.noConflict(true);
 

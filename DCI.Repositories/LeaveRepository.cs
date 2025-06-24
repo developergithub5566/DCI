@@ -17,11 +17,13 @@ namespace DCI.Repositories
     {
         private DCIdbContext _dbContext;
         private readonly IEmailRepository _emailRepository;
+        private readonly IHomeRepository _homeRepository;
 
-        public LeaveRepository(DCIdbContext dbContext, IEmailRepository emailRepository)
+        public LeaveRepository(DCIdbContext dbContext, IEmailRepository emailRepository, IHomeRepository homeRepository)
         {
             _dbContext = dbContext;
             _emailRepository = emailRepository;
+            _homeRepository = homeRepository;
         }
 
         public void Dispose()
@@ -40,7 +42,7 @@ namespace DCI.Repositories
 
             var leaveReqHeaderDbContext = _dbContext.LeaveRequestHeader.AsQueryable();
 
-            model.LeaveRequestHeaderList = (from lheader in _dbContext.LeaveRequestHeader
+            model.LeaveRequestHeaderList  = (from lheader in _dbContext.LeaveRequestHeader
                                                  join lvtype in _dbContext.LeaveType
                                                  on lheader.LeaveTypeId equals lvtype.LeaveTypeId
                                                  join stat in _dbContext.Status
@@ -73,11 +75,12 @@ namespace DCI.Repositories
                                                              Amount = ld.Amount,
                                                              IsActive = ld.IsActive
                                                          }).ToList()
-                                                 }).ToList();
+                                                 }).OrderByDescending(x => x.LeaveRequestHeaderId).ToList();
+
+     
 
 
-
-            var vlSummary = _dbContext.LeaveSummary
+          var vlSummary = _dbContext.LeaveSummary
                     .FromSqlInterpolated($"EXEC sp_GetVacationLeaveBalance @EmployeeId = {param.EmployeeId},@Year = {2025}, @LeaveType =  'VL'  ")
                     .ToList();
 
@@ -233,7 +236,22 @@ namespace DCI.Repositories
                     model.ApproverId = dept.ApproverId;
                     model.LeaveRequestHeader.Status = entity.Status;
                     model.LeaveRequestHeader.RequestNo = entity.RequestNo;
-                   await _emailRepository.SendToApproval(model);
+                    await _emailRepository.SendToApproval(model);
+
+
+
+                    NotificationViewModel notifvm = new NotificationViewModel();                   
+                    notifvm.Title = "Leave";
+                    notifvm.Description = String.Format("You have been assigned leave request {0} for review",entity.RequestNo);     
+                    notifvm.ModuleId = (int)EnumModulePage.Leave;
+                    notifvm.TransactionId = entity.LeaveRequestHeaderId;
+                    notifvm.AssignId = dept.ApproverId ?? 0;
+                    notifvm.URL = "/Todo/Index/?leaveId=" + model.LeaveRequestHeaderId;
+                    notifvm.MarkRead = false;        
+                    notifvm.CreatedBy = param.EmployeeId;
+                    notifvm.IsActive = true;
+                    await _homeRepository.SaveNotification(notifvm);
+                    
 
                     return (StatusCodes.Status200OK, "Successfully saved");
                 }              

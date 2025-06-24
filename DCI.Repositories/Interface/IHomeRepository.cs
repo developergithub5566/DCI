@@ -6,5 +6,7 @@ namespace DCI.Repositories.Interface
     {
         Task<DashboardViewModel> GetAllAnnouncement(DashboardViewModel mode);
         Task<IList<NotificationViewModel>> GetAllNotification(NotificationViewModel model);
+        Task SaveNotification(NotificationViewModel model);
+        Task MarkAsRead(NotificationViewModel model);
     }
 }

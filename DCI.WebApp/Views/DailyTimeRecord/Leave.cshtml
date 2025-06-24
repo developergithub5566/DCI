@@ -362,6 +362,20 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
 
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+         console.log("bypass-" + urlParams);
+            const id = urlParams.get('leaveId');
+            if (id) {
+                editForm(id);
+            }
+        });
+    </script>
+
+
+
     <script type="text/javascript">
                         var js = jQuery.noConflict(true);
                         $('.spinner-overlay').show();
@@ -372,9 +386,7 @@
             
                         
                        $(document).ready(function () {
-                             js('#tblDocument').DataTable({
-                         order: [[1, 'desc']]
-                     });
+                           
 
 
 
@@ -493,7 +505,10 @@
 
                     function editForm(leaveHdrId) {
                                 const my_fp = document.querySelector("#dateCovered")._flatpickr;
-                                     my_fp.clear();
+                                         if (typeof my_fp !== "undefined") {
+                                          my_fp.clear();
+                                         }
+                             
                                  let nodays = 0.0000;
                                  $('#NoOfDays').val(nodays.toFixed(4));
                                  $('#Reason').val('');

@@ -39,6 +39,7 @@ namespace DCI.Models.ViewModel
         public string? MobileNoOffice { get; set; }
         public int? EmploymentTypeId { get; set; }
         public int? DepartmentId { get; set; }
+        public string? DepartmentName { get; set; }
         public string? JobFunction { get; set; }
         public DateTime? DateHired { get; set; }
         public string? Position { get; set; }

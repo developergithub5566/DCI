@@ -3,7 +3,9 @@ using DCI.Data;
 using DCI.Models.Entities;
 using DCI.Models.ViewModel;
 using DCI.Repositories.Interface;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Serilog;
 
 namespace DCI.Repositories
@@ -11,9 +13,12 @@ namespace DCI.Repositories
     public class HomeRepository : IHomeRepository, IDisposable
     {
         private DCIdbContext _dbContext;
-        public HomeRepository(DCIdbContext context)
+        private readonly string _connectionString;
+
+        public HomeRepository(DCIdbContext context, IConfiguration configuration)
         {
             this._dbContext = context;
+            _connectionString = configuration.GetConnectionString("DCIConnection");
         }
         public void Dispose()
         {
@@ -75,7 +80,7 @@ namespace DCI.Repositories
         public async Task<IList<NotificationViewModel>> GetAllNotification(NotificationViewModel model)
         {
             var query = await _dbContext.Notification
-                .Where(notif => notif.IsActive == true)// && notif.AssignId == model.AssignId)
+                .Where(notif => notif.IsActive == true && notif.AssignId == model.AssignId)
                 .Select(notif => new NotificationViewModel
                 {
                     NotificationId = notif.NotificationId,
@@ -88,6 +93,7 @@ namespace DCI.Repositories
                     MarkRead = notif.MarkRead,
                     CreatedBy = notif.CreatedBy,
                     DateCreated = notif.DateCreated,
+                    DateNotification = notif.DateCreated.ToString("MMMM dd, yyyy h:mm tt"),
                     IsActive = notif.IsActive,
                 })
                 .ToListAsync();
@@ -95,6 +101,64 @@ namespace DCI.Repositories
             return query;
         }
 
+
+        public async Task SaveNotification(NotificationViewModel model)
+        {
+            try
+            {
+                Notification entity = new Notification();
+                entity.Title = model.Title;
+                entity.Description = model.Description;
+                entity.ModuleId = model.ModuleId;
+                entity.TransactionId = model.TransactionId;
+                entity.AssignId = model.AssignId;
+                entity.URL = model.URL;
+                entity.MarkRead = model.MarkRead;
+                entity.DateCreated = DateTime.Now;
+                entity.CreatedBy = model.CreatedBy;
+                entity.IsActive = true;
+                await _dbContext.Notification.AddAsync(entity);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        public async Task MarkAsRead(NotificationViewModel model)
+        {
+            try
+            {
+                using (var conn = new SqlConnection(_connectionString))
+                {
+                    await conn.OpenAsync();
+
+                    string sql = @"
+                    UPDATE Notification 
+                    SET MarkRead = 1 
+                    WHERE NotificationId = @NotificationId";
+
+                    using (var cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@NotificationId", model.NotificationId);
+                        await cmd.ExecuteNonQueryAsync();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
 
     }
 }
