@@ -20,10 +20,10 @@ namespace DCI.Models.ViewModel
         public List<LeaveRequestHeaderViewModel>? LeaveRequestHeaderList { get; set; } = new(); 
         public List<LeaveTypeViewModel>? LeaveTypeList { get; set; } = new();
 
-        public string SelectedDateJson { get; set; } = string.Empty;
+       // public string SelectedDateJson { get; set; } = string.Empty;
         public List<SelectListItem>? OptionsLeaveType { get; set; }
 
-        public List<DateTime> LeaveDateList { get; set; } = new();
+        public List<string> LeaveDateList { get; set; } = new();
 
         public int CurrentUserId { get; set; } = 0;
 
@@ -41,6 +41,7 @@ namespace DCI.Models.ViewModel
         public string EmployeeName { get; set; } = string.Empty;
         public string RequestNo { get; set; } = string.Empty;
         public DateTime DateFiled { get; set; }
+        public string DateFiledString { get; set; } = string.Empty;
         public int LeaveTypeId { get; set; }
         public string LeaveName { get; set; } = string.Empty;
         public int Status { get; set; }

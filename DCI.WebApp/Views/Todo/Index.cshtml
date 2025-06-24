@@ -92,7 +92,9 @@
         </div>
         <div class="card-body">
             <div class="table-responsive mt20">
-                <table class="table table-bordered nowrap" id="tblDocument" width="100%" cellspacing="0">
+
+             
+                        <table class="table table-bordered nowrap" id="tblDocument" width="100%" cellspacing="0">
                     <thead>
                         <tr>
                             @* 	<th>
@@ -130,7 +132,7 @@
                                     @item.RequestNo
                                 </td>
                                 <td>
-                                    @item.DateFiled
+                                    @item.DateFiled.ToString("MM/dd/yyyy hh:mm tt")
                                 </td>
                                 <td>
                                     @item.EmployeeName
@@ -151,8 +153,8 @@
                                 </td>   *@                            
 
                                 <td>
-                                    @* <a href="#" onclick="editForm(@item.LeaveRequestHeaderId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a> *@
-                                    <a href="#" onclick='editForm({
+                                    <a href="#" onclick="editForm(@item.LeaveRequestHeaderId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+                               @*      <a href="#" onclick='editForm({
                                                                 requestNo:"@item.RequestNo",
                                                                 dateFiled:"@item.DateFiled",
                                                                 empName :"@item.EmployeeName" ,
@@ -160,7 +162,7 @@
                                                                 noDays : "@item.NoofDays",
                                                                 status : "@item.StatusName",
                                                                 reason : "@item.Reason"
-                                                                })' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+                                                                })' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a> *@
                                     <a href="#" id="approved" onclick="approvalForm(@item.LeaveRequestHeaderId,@((int)EnumStatus.Approved))" title="Approve" class="btn btn-info"> <i class="fa fa-check"></i></a>
                                     <a href="#" id="disapproved" onclick="remarksForm(@item.LeaveRequestHeaderId,@((int)EnumStatus.Rejected))" class="btn btn-danger"> <i class="fa fa-remove"></i></a>
                                 </td>                            
@@ -168,6 +170,10 @@
                         }
                     </tbody>
                 </table>
+                 
+
+               
+
             </div>
             </<div>
             </div>
@@ -200,7 +206,7 @@
                                         </tr>
                                         <tr>
                                             <th>DTR Covered:</th>
-                                            <td class="tblSource"><span class="btnSuccess applicationStatus"><label id="lblSource"></label></span></td>
+                                            <td><div id="dateContainer"></div></td>
                                         </tr>
                                         <tr>
                                             <th>No. of Days:</th>
@@ -208,7 +214,8 @@
                                         </tr>
                                         <tr>
                                             <th>Status:</th>
-                                            <th class="tblTimeOut"><label id="lblStatus"></label></th>
+                                            <td class="tblStatus"><span class="btnSuccess applicationStatus"><label id="lblStatus"></label></span></td>
+                                            <th class="tblStatus"><label id="lblStatus"></label></th>
                                         </tr>
                                         <tr>
                                             <th>Reason:</th>
@@ -259,10 +266,7 @@
         @section scripts {
             @* <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script> *@
             <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
-            <script src="~/js/file-upload.js"></script>
-
-
-            
+                        
     <script>
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -285,35 +289,70 @@
                 }, 200);
 
                 $(document).ready(function () {
-                    js('#tblDocument').DataTable({
-                        order: [[4, 'desc']]
-                    });                  
+                               
 
-                    $('#fileUpload').on('change', function () {
-                        var fileName = this.files[0] ? this.files[0].name : 'No file chosen';
-                        document.querySelector('.file-name').textContent = '';
-
-                        const newrecord = $('#DocId').val();
-
-                        if (newrecord != 0) {
-                            $('.file-name').text(fileName);
-                        }
-                    });
+            
 
                   
                 });
 
 
-                function editForm(dtr) {
-                           document.getElementById('lblReq').textContent = dtr.requestNo;
-                                document.getElementById('lblDateFiled').textContent = dtr.dateFiled;
-                                 document.getElementById('lblName').textContent = dtr.empName;
-                                 document.getElementById('lblSource').textContent = dtr.dateCovered;
-                                 document.getElementById('lblNoDays').textContent = dtr.noDays;
-                                  document.getElementById('lblStatus').textContent = dtr.status
-                                     document.getElementById('lblReason').textContent = dtr.reason
-                                js('#createmodal').modal('show');
-                          
+                                           // document.getElementById('lblReq').textContent = dtr.requestNo;
+                           //      document.getElementById('lblDateFiled').textContent = dtr.dateFiled;
+                           //       document.getElementById('lblName').textContent = dtr.empName;
+                           //       document.getElementById('lblSource').textContent = dtr.dateCovered;
+                           //       document.getElementById('lblNoDays').textContent = dtr.noDays;
+                           //        document.getElementById('lblStatus').textContent = dtr.status
+                           //           document.getElementById('lblReason').textContent = dtr.reason
+
+                        function editForm(leaveHdrId) {
+                             const formData = new FormData();
+                                formData.append('LeaveRequestHeaderId', leaveHdrId);
+
+                                  $.ajax({
+                                      type: 'POST',
+                                      url: '@Url.Action("RequestLeave", "DailyTimeRecord")',
+                                      data: formData,
+                                      processData: false,
+                                      contentType: false,
+                                      success: function (response) {
+                                          if (response.success) {
+                                                 console.log(response);
+
+                                         document.getElementById('lblReq').textContent = response.data.leaveRequestHeader.requestNo;
+                                       document.getElementById('lblDateFiled').textContent = response.data.leaveRequestHeader.dateFiledString;
+                                        document.getElementById('lblName').textContent = response.data.leaveRequestHeader.employeeName;                                        
+                                        document.getElementById('lblNoDays').textContent = response.data.leaveRequestHeader.noofDays;
+                                         document.getElementById('lblStatus').textContent = response.data.leaveRequestHeader.statusName;
+                                            document.getElementById('lblReason').textContent = response.data.leaveRequestHeader.reason;
+
+                                              var container = $('#dateContainer');
+                                              container.empty(); 
+
+
+                                                  response.data.leaveDateList.forEach(function (date) {
+                                                         var span = `<span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>${date}</span>`;
+                                                         container.append(span);
+                                                     });
+
+                                              js('#createmodal').modal('show');
+                                          } else {
+                                              Swal.fire({
+                                                  text: response.message,
+                                                  icon: "error"
+                                              });
+                                          }
+                                          $('.spinner-overlay').hide();
+                                      },
+                                      error: function () {
+                                          $('.spinner-overlay').hide();
+                                          Swal.fire({
+                                              text: "An error occurred. Please try again.",
+                                              icon: "error"
+                                          });
+                                      }
+                                  });
+                               js('#createmodal').modal('show');
                 }
 
 

@@ -92,14 +92,29 @@
                    
                     @if (module.ModulePageId == (int)EnumModulePage.Todo)
                     {
-                        <hr class='sidebar-divider'>
+                      @*   <hr class='sidebar-divider'>
                         <a href="/Todo/Index/" class='mainModule'>
                             <div class='sidebar-heading mainModuleActive'>
                                 <i class='fa-solid fa-check'></i>
                                 <span>To Do</span>
                                 <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
                             </div>
-                        </a>
+                        </a> *@
+
+                    <hr class='sidebar-divider'>
+                        <div role="group">
+                            <a href="#" id="btnGroupDrop1" class="mainModule" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class='sidebar-heading mainModuleActive'>
+                                    <i class='fa-solid fa fa-book'></i>
+                                    <span>To Do</span>
+                                    <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">         
+                                    <li><a class="dropdown-item" href="/Todo/Index/">Leave</a></li>   
+                                    <li><a class="dropdown-item" href="/Todo/DTR/">DTR</a></li>     
+                            </ul>
+                        </div>
                     }                   
 
                     @if (module.ModulePageId == (int)EnumModulePage.Administration)
@@ -126,14 +141,29 @@
                     }
                     @if (module.ModulePageId == (int)EnumModulePage.DTRManagement)
                     {
-                        <hr class='sidebar-divider'>
+                        @* <hr class='sidebar-divider'>
                         <a href="/DailyTimeRecord/List" class='mainModule'>
                             <div class='sidebar-heading mainModuleActive'>
                                 <i class='fa-solid fa-file'></i>
                                 <span>DTR Management</span>
                                 <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
                             </div>
-                        </a>
+                        </a> *@
+                        
+                        <hr class='sidebar-divider'>
+                        <div role="group">
+                            <a href="#" id="btnGroupDrop1" class="mainModule" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class='sidebar-heading mainModuleActive'>
+                                    <i class='fa-solid fa fa-book'></i>
+                                    <span>DTR Management</span>
+                                    <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">         
+                                    <li><a class="dropdown-item" href="/DailyTimeRecord/List/">Time and Attendance</a></li>   
+                                    <li><a class="dropdown-item" href="/DailyTimeRecord/DTRCorrection/">DTR Correction</a></li>     
+                            </ul>
+                        </div>
                     }
                   @*   @if (module.ModulePageId == (int)EnumModulePage.DailyTimeRecord)
                     {

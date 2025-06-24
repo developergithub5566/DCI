@@ -60,6 +60,12 @@ namespace DCI.API.Controllers
             return Ok(await _leaveRepository.SaveLeave(model));
         }
 
+        [HttpPost]
+        [Route("GetAllDTRCorrection")]
+        public async Task<IActionResult> GetAllDTRCorrection([FromBody] DTRCorrectionViewModel model)
+        {
+            return Ok(await _dtrRepository.GetAllDTRCorrectionByEmpId(model.CreatedBy));
+        }
 
     }
 }

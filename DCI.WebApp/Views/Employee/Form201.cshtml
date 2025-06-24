@@ -249,7 +249,7 @@
                             </div>
                             <div class="col-lg-3">
                                 <div class="form-group mb10 text-center">
-                                    <label class="topLabelText">@Model.DateHired</label>
+                                <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.DateHired.ToString()) ? "-" : Model.DateHired)</label>
                                     <label class="bottomLabelText">Date Start</label>
                                 </div>
                             </div>

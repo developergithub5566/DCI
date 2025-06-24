@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection.PortableExecutable;
 
 namespace DCI.Repositories
 {
@@ -53,6 +54,7 @@ namespace DCI.Repositories
                                  EmployeeId = leave.EmployeeId,
                                  EmployeeName = emp.Firstname + " " + emp.Lastname,
                                  DateFiled = leave.DateFiled,
+                                 DateFiledString = leave.DateFiled.ToShortDateString(),
                                  Status = leave.Status,
                                  StatusName = stat.StatusName,
                                  Reason = leave.Reason,

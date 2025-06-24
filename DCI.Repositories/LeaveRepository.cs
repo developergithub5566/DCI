@@ -126,6 +126,8 @@ namespace DCI.Repositories
 
             var query = from lheader in _dbContext.LeaveRequestHeader
                         join lvtype in _dbContext.LeaveType on lheader.LeaveTypeId equals lvtype.LeaveTypeId
+                        join stat in _dbContext.Status on lheader.Status equals stat.StatusId
+                        join emp in _dbContext.Employee on lheader.EmployeeId equals emp.EmployeeId
                         where lheader.LeaveRequestHeaderId == param.LeaveRequestHeaderId
                         select new LeaveRequestHeaderViewModel
                         {
@@ -133,11 +135,14 @@ namespace DCI.Repositories
                             EmployeeId = lheader.EmployeeId,
                             RequestNo = lheader.RequestNo,
                             DateFiled = lheader.DateFiled,
+                            DateFiledString = lheader.DateFiled.ToString("MM/dd/yyyy hh:mm tt"),
                             LeaveTypeId = lheader.LeaveTypeId,
                             LeaveName = lvtype.Description,
                             Reason = lheader.Reason,
                             NoofDays = lheader.NoOfDays,
-                            Status = lheader.Status
+                            Status = lheader.Status,
+                            StatusName = stat.StatusName,
+                            EmployeeName = emp.Firstname + " " + emp.Lastname,
                         };
 
             model.LeaveRequestHeader = query.FirstOrDefault();
@@ -157,11 +162,11 @@ namespace DCI.Repositories
                 //                Amount = dtl.Amount                              
                 //            }).ToList();
 
-                var leaveDates = _dbContext.LeaveRequestDetails
+                model.LeaveDateList = _dbContext.LeaveRequestDetails
                                  .Where(dtl => dtl.LeaveRequestHeaderId == param.LeaveRequestHeaderId)
-                                 .Select(dtl => dtl.LeaveDate)
+                                 .Select(dtl => dtl.LeaveDate.Date.ToShortDateString())
                                  .ToList();
-                model.LeaveDateList = leaveDates;
+               // model.LeaveDateList = leaveDates;
                // model.LeaveRequestHeader.LeaveRequestDetailList = leaveDtl;
                // model.LeaveRequestHeader.LeaveRequestDetailList = _dbContext.LeaveRequestDetails.Where(x => x.LeaveRequestHeaderId == param.LeaveRequestHeaderId).ToList();
             }

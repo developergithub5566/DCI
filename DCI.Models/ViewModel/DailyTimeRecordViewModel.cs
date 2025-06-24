@@ -15,5 +15,20 @@
         public string TOTAL_HOURS { get; set; } = string.Empty;
         public string TOTAL_WORKING_HOURS { get; set; } = string.Empty;
     }
+    public class DTRCorrectionViewModel
+    {
+        public int DtrId { get; set; } = 0;
+        public DateTime DateFiled { get; set; }
+        public int DtrType { get; set; } = 0;
+        public DateTime DateTime { get; set; }
+        public int Status { get; set; } = 0;
+        public string Reason { get; set; } = string.Empty;
+        public string? Filename { get; set; } = string.Empty;
+        public string? FileLocation { get; set; } = string.Empty;
+        public int CreatedBy { get; set; } = 0;
+        public bool IsActive { get; set; } = true;
+    }
 
 }
+
+

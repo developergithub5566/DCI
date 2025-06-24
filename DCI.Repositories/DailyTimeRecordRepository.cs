@@ -69,5 +69,31 @@ namespace DCI.Repositories
 
             return query;
         }
+        public async Task<IList<DTRCorrectionViewModel>> GetAllDTRCorrectionByEmpId(int empId)
+        {
+           
+
+
+            var query = (from dtr in _dbContext.DTRCorrection.AsQueryable()
+                         where dtr.CreatedBy == empId
+                         select new DTRCorrectionViewModel
+                         {
+                             DtrId = dtr.DtrId,
+                             DateFiled = dtr.DateFiled,
+                             DtrType = dtr.DtrType,
+                             DateTime = dtr.DateTime,
+                             Reason = dtr.Reason,
+                             Filename = dtr.Filename,
+                             FileLocation = dtr.FileLocation,
+                             CreatedBy = dtr.CreatedBy,
+                             IsActive = dtr.IsActive
+                         }).ToList();
+
+
+            return query;
+        }
+
+
+        
     }
 }

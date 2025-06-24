@@ -35,6 +35,7 @@ namespace DCI.Data
         public DbSet<LeaveSummary> LeaveSummary { get; set; }
         public DbSet<Announcement> Announcement { get; set; }
         public DbSet<Notification> Notification { get; set; }
+        public DbSet<DTRCorrection> DTRCorrection { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

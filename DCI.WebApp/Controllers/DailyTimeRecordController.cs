@@ -183,9 +183,9 @@ namespace DCI.WebApp.Controllers
                                     }).ToList();
 
                         //model.SelectedDateJson = JsonConvert.SerializeObject(model.LeaveDateList);
-                        var dateList = new List<string> { "2025-06-09","2025-06-10" };
-                        var jsonDates = JsonConvert.SerializeObject(dateList);
-                        model.SelectedDateJson = jsonDates;
+                       // var dateList = new List<string> { "2025-06-09","2025-06-10" };
+                      // // var jsonDates = JsonConvert.SerializeObject(dateList);
+                      //  model.SelectedDateJson = jsonDates;
                         //string json = JsonConvert.SerializeObject(model.LeaveDateList);
                     }
                     return Json(new { success = true, data = model });
@@ -205,5 +205,36 @@ namespace DCI.WebApp.Controllers
             }
           //  return View(model);
         }
+
+        public async Task<IActionResult> DTRCorrection()
+        {
+            List<DTRCorrectionViewModel> model = new List<DTRCorrectionViewModel>();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    HttpResponseMessage response = await _httpclient.GetAsync(_apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllDTRCorrection");
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<List<DTRCorrectionViewModel>>(responseBody)!;
+                    }
+                }
+
+                return View(model);
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return View(model);
+        }
+
     }
 }
