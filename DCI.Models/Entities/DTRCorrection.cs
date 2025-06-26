@@ -7,12 +7,13 @@ namespace DCI.Models.Entities
     {
         [Key]
         public int DtrId { get; set; }
+        public string RequestNo { get; set; }
 
         public DateTime DateFiled { get; set; }
 
         public int DtrType { get; set; }
 
-        public DateTime DateTime { get; set; }
+        public DateTime DtrDateTime { get; set; }
          public int Status { get; set; }
 
         public string Reason { get; set; } = string.Empty;

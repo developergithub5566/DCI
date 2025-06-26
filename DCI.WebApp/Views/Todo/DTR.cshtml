@@ -3,12 +3,27 @@
 @using DCI.Core.Common;
 @using DCI.Models.ViewModel;
 
-<link href="~/css/dcicustom.css" rel="stylesheet" />
-<link href="~/css/ess/sb-admin-2.min.css?v0.0.3" rel="stylesheet" />
+<link href="~/css/DCIcustom.css" rel="stylesheet" />
+<style>
 
+    .custom-file-label {
+        padding: 8px 16px;
+        background-color: #007bff;
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .file-name {
+        margin-left: 10px;
+        font-style: italic;
+    }
+
+</style>
 
 @{
     var modulePageAccess = Context.Session.GetString("ModulePageAccess");
+
     var canView = false;
     var canAdd = false;
     var canEdit = false;
@@ -42,13 +57,12 @@
     else
     {
         var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
-                    .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Department);
+                        .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Document);
         canView = module?.View ?? false;
         canAdd = module?.Add ?? false;
         canEdit = module?.Update ?? false;
         canDelete = module?.Delete ?? false;
     }
-
 }
 
 <div class="container-fluid">
@@ -57,40 +71,42 @@
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
+
+
+
     <div class="d-sm-flex align-items-center justify-content-between mb-3">
-        <h6 class="m-0 font-weight-bold text-gray-800">DTR Management</h6>
-               <div class="upperRightDivBtn">
-            <a href="#" title="Add Department" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#" onclick="newForm()">
-                <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
-                <span class="text text-white"><small>File DTR Correction</small></span>
-            </a>
-        </div>
+        <h6 class="m-0 font-weight-bold text-gray-800">To Do</h6>
+
 
     </div>
     <div class="col-12 p0">
         <ul class="breadcrumb">
             <li><a href="~/Home/Index">Dashboard</a></li>
-            <li><a href="~/DailyTimeRecord/Management">DTR Management</a></li>
+            <li>To Do</li>
         </ul>
     </div>
 
     <div class="card shadow mb-4">
         <div class="card-header">
-            <label class="mb0">Data</label>
+            <label class="mb0">DTR</label>
         </div>
         <div class="card-body">
             <div class="table-responsive mt20">
-                <table class="table table-bordered" id="tblDTR">
+
+
+                <table class="table table-bordered nowrap" id="tblDocument" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                      
-
+                            @* 	<th>
+							<label>Id</label>
+							</th> *@
                             <th>
                                 <label>Request No</label>
                             </th>
                             <th>
                                 <label>DTR Date & Time</label>
                             </th>
+                           
                             <th>
                                 <label>Type</label>
                             </th>
@@ -100,6 +116,8 @@
                             <th>
                                 <label>Date Filed</label>
                             </th>
+                           
+                                
                             <th>
                                 Action
                             </th>
@@ -109,42 +127,77 @@
                         @foreach (var item in Model)
                         {
                             <tr>
+
                                 <td>
-                                  @item.RequestNo
-                                  
+                                    @item.RequestNo
                                 </td>
                                 <td>
-                                    @item.DtrDateTime.ToString("MM/dd/yyyy hh:mm tt")
+                                    @item.DtrDateTime.ToString("MM/dd/yyyy HH:mm")
                                 </td>
                                 <td>
-                                    @if (item.DtrType == 1)
+                                    @if(item.DtrType == 1)
                                     {
-                                        @("Time In");                                        
+                                        @("Time In");
                                     }
                                     else
                                     {
-                                        @("Time Out");                                        
+                                        @("Time Out");
                                     }
                                 </td>
                                 <td>
                                     @item.StatusName
                                 </td>
                                 <td>
-                                    @item.DateFiled.ToString("MM/dd/yyyy")
+                                    @item.DateFiled.ToString("MM/dd/yyyy hh:mm tt")
                                 </td>
-                              
-                                <td class="text-center">
-                                    <a href="#" onclick="editForm(@item.DtrId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>                   
+                               
+                           
+                                    <td>
+                                    <a href="#" onclick="editForm(@item.DtrId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+
+                                    <a href="#" id="approved" onclick="approvalForm(@item.DtrId,@((int)EnumStatus.Approved))" title="Approve" class="btn btn-info"> <i class="fa fa-check"></i></a>
+                                    <a href="#" id="disapproved" onclick="remarksForm(@item.DtrId,@((int)EnumStatus.Rejected))" class="btn btn-danger"> <i class="fa fa-remove"></i></a>
                                 </td>
                             </tr>
                         }
                     </tbody>
                 </table>
+
+
+
+
             </div>
-</<div>
-</div>
+            </<div>
+            </div>
 
 
+            <!-- Remarks modal -->
+            <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="remarksmodal" aria-hidden="true" id="remarksmodal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Required</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col">
+                                    <label for="Remarks" class="col-form-label required">Remarks:</label>
+                                    <textarea rows="2" class="form-control" id="Remarks_Approval" name="Remarks_Approval"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-info" onclick="approvalRemarksForm()" id="btnApprove">Submit</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+          
             <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
@@ -155,24 +208,7 @@
                             </button>
                         </div>
                         <form id="createForm">
-                            <div class="modal-body">
-                           @*      <table class="viewDetailsTbl table table-striped">
-                                    <tbody>
-                                       
-                                        <tr>
-                                            <th>DTR Date:</th>
-                                            <td class="tblDate">
-                                                <div class="input-group">
-                                                    <input type="text" name="COVERED_DATE" id="dateCovered" class="form-control frmField" autocomplete="off">
-                                                    <div class="input-group-prepend prependBtn">
-                                                        <i class="fa fa-calendar"></i>
-                                                    </div>
-                                                </div>
-                                                <label for="dateCovered" generated="true" class="error"></label>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table> *@
+                            <div class="modal-body">                    
 
                                 <form class="row" id="frmDTRCorrection" method="POST">
                                     <input type="hidden" name="DTR_DATE">
@@ -198,12 +234,7 @@
                                             </select>
                                         </div>
                                     </div>
-                                @*     <div class="col-lg-6">
-                                        <div class="form-group">
-                                            <label class="frmText"><span class="required">*</span> Time:</label>
-                                            <input class="form-control frmField" type="time" name="DtrTime" id="DtrTime">
-                                        </div>
-                                    </div> *@
+                           
 
                                     <div class="col-12">
                                         <div class="form-group">
@@ -230,7 +261,7 @@
 
                             <!-- Modal footer -->
                             <div class="modal-footer pt0">
-                           @*      <button class="btn btnPrimary btn-icon-split d-block" onclick="save()">
+                              @*   <button class="btn btnPrimary btn-icon-split d-block" onclick="save()">
                                     <span class="icon text-white-50">
                                         <i class="fa-regular fa-file-lines text-xs"></i>
                                     </span>
@@ -244,56 +275,53 @@
                                     <span class="text"><small>Close </small></span>
                                 </button>
                             </div>
-                   
+
                         </form>
                     </div>
                 </div>
             </div>
+            <input type="hidden" id="HiddenHeaderId" name="HiddenDocId" value="">
+            <input type="hidden" id="HiddenAction" name="HiddenAction" value="">
+        </div>
 
 @section scripts {
+    @* <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script> *@
+            <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
 
-                <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
-                <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
-                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
-                <script type="text/javascript">
-                        var js = jQuery.noConflict(true);
-
-                                $('.spinner-overlay').show();
-
-                    setTimeout(() => {
-                        $('.spinner-overlay').hide();
-                    }, 200);
-
-
-                        $(document).ready(function () {
-                            js('#tblDocument').DataTable({
-                            });
-                                     flatpickr("#dateCovered", {
-                                        enableTime: true,
-                                       dateFormat: "Y-m-d H:i",                                     
-                                            time_24hr: true,
-                                       onChange: function(selectedDates, dateStr, instance) {
-                                      }
-                                    });
+            <script>
+                window.addEventListener('DOMContentLoaded', () => {
+                    const urlParams = new URLSearchParams(window.location.search);
+                 console.log("bypass-" + urlParams);
+                    const id = urlParams.get('leaveId');
+                    if (id) {
+                        editForm(id);
+                    }
+                });
+            </script>
 
 
-                        });
+            <script type="text/javascript">
+                var js = jQuery.noConflict(true);
+
+                $('.spinner-overlay').show();
+
+                setTimeout(() => {
+                    $('.spinner-overlay').hide();
+                }, 200);
+
+                $(document).ready(function () {
 
 
-                        function newForm(dtr) {
-                                             const my_fp = document.querySelector("#dateCovered")._flatpickr;
-                                                 my_fp.clear();
-                                                   $('#Reason').val('');
-                                                    document.getElementById('deptHeadName').textContent = '';
-                                js('#createmodal').modal('show');
-                        }
 
 
-                              function editForm(dtrId) {
-                                      event.preventDefault();
-                                 // const formData = new FormData();
-                                 //    formData.append('DtrId', dtrId);
+
+                });
+
+
+                      
+
+                                  function editForm(dtrId) {
+                                      event.preventDefault();                                
 
                                       $.ajax({
                                           type: 'POST',
@@ -305,7 +333,7 @@
                                                          $('#dateCovered').val(response.data.dtrDateTime);
                                                           $('#DtrType').val(response.data.dtrType);
                                                           $('#Reason').val(response.data.reason);
-                   
+
                                                               document.getElementById('deptHeadName').textContent = response.data.departmentHead;
                                                   js('#createmodal').modal('show');
                                               } else {
@@ -324,70 +352,112 @@
                                               });
                                           }
                                       });
-                           
-                    }
-
-
-                           function save() {
-                         
-                                  const formData = new FormData();
-                       
-                                  formData.append('DtrType', $('#DtrType').val());
-                                   formData.append('DtrDateTime', $('#dateCovered').val());
-                                    formData.append('Reason', $('#Reason').val());
-
-                                    console.log(formData)
-
-                       Swal.fire({
-                           text: "Are you sure you want to save this record?",
-                           icon: "question",
-                           showCancelButton: true,
-                           confirmButtonText: "Ok"
-                       }).then((result) => {
-                           if (result.isConfirmed) {
-                               $('.spinner-overlay').show();
-
-                               $.ajax({
-                                   type: 'POST',
-                                   url: '@Url.Action("SaveDTRCorrection", "DailyTimeRecord")',
-                                   data: formData,
-                                       processData: false,
-                                          contentType: false,
-                                   success: function (response) {
-                                       if (response.success) {
-                                           $('#createForm')[0].reset();
-                                           js('#createmodal').modal('hide');
-
-                                           Swal.fire({
-                                               text: response.message,
-                                               icon: "success",
-                                               confirmButtonText: "Ok"
-                                           }).then((result) => {
-                                               location.reload();
-                                           });
-
-                                       } else {
-                                           Swal.fire({
-                                               text: response.message,
-                                               icon: "error"
-                                           });
-                                       }
-                                       $('.spinner-overlay').hide();
-                                   },
-                                   error: function () {
-                                       $('.spinner-overlay').hide();
-                                       Swal.fire({
-                                           text: "An error occurred. Please try again.",
-                                           icon: "error"
-                                       });
-                                   }
-                               });
-                           }
-                       });
 
                     }
 
 
 
-                </script>
+
+
+
+
+                function approvalForm(dtrId,status) {
+
+                             $('.spinner-overlay').show();
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("ApprovalDtr", "Todo")',
+                            data: { TransactionId : dtrId , Status: status, Remarks: $('#Remarks').val() },
+
+                            success: function (response) {
+                                if (response.success) {
+                                                        Swal.fire({
+                                                            text: response.message,
+                                                            icon: "success",
+                                                            confirmButtonText: "Ok"
+                                                        }).then((result) => {
+                                                            location.reload();
+                                                        });
+
+                                        } else {
+                                    Swal.fire({
+                                        text: response.message,
+                                        icon: "error"
+                                    });
+                                }
+                                 $('.spinner-overlay').hide();
+                            },
+                            error: function () {
+                                 $('.spinner-overlay').hide();
+                                Swal.fire({
+                                    text: "An error occurred. Please try again.",
+                                    icon: "error"
+                                });
+                            }
+                        });
+
+
+                }
+
+                 function remarksForm(dtrId,status) {
+                      $('#Remarks_Approval').val("");
+                      $('#HiddenHeaderId').val(dtrId);
+                      $('#HiddenAction').val(status);
+                       js('#remarksmodal').modal('show');
+                 }
+
+                 function approvalRemarksForm() {
+
+                  if($('#Remarks_Approval').val() == "")
+                  {
+                         Swal.fire({
+                                        text: "Please input remarks",
+                                        icon: "error"
+                                    });
+                  }
+                  else
+                  {
+
+
+                     const _transId =  $('#HiddenHeaderId').val();
+                      const _action =  $('#HiddenAction').val();
+
+                                          $('.spinner-overlay').show();
+
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("ApprovalDtr", "Todo")',
+                            data: { TransactionId: _transId , Status: _action, Remarks: $('#Remarks_Approval').val() },
+                            success: function (response) {
+                                if (response.success) {
+                                                        Swal.fire({
+                                                            text: response.message,
+                                                            icon: "success",
+                                                            confirmButtonText: "Ok"
+                                                        }).then((result) => {
+                                                            location.reload();
+                                                        });
+
+                                        } else {
+                                    Swal.fire({
+                                        text: response.message,
+                                        icon: "error"
+                                    });
+                                }
+                                      $('.spinner-overlay').hide();
+                            },
+                            error: function () {
+                                      $('.spinner-overlay').hide();
+                                Swal.fire({
+                                    text: "An error occurred. Please try again.",
+                                    icon: "error"
+                                });
+                            }
+                        });
+
+                   }
+                   }
+
+
+            </script>
 }

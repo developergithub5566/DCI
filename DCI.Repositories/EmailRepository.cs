@@ -228,7 +228,7 @@ namespace DCI.Repositories
                 <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
                 
                  <p>This is an automated message from DCI Application.</p>
-                 <p>Leave Request No {model.LeaveRequestHeader.RequestNo} has been {model.StatusName.ToLower()}.</p>   
+                 <p>Your Leave request no {model.LeaveRequestHeader.RequestNo} has been {model.StatusName.ToLower()}.</p>   
               
                 <p>If you encounter any issues, please contact our support team at [DCI Application Support].</p>            
                 <p>Thank you,<br />Your DCI</p>
@@ -238,6 +238,43 @@ namespace DCI.Repositories
 			return model;
 		}
 
-		#endregion
-	}
+
+        public async Task SendToRequestorDTR(DTRCorrectionViewModel model)
+        {
+            model.StatusName = model.Status == (int)EnumStatus.Approved ? Constants.Approval_Approved : Constants.Approval_Disapproved;
+
+            model = await RequestorNotificationBodyMessageDTR(model);
+
+            MailMessage mail = new MailMessage();
+            mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
+            mail.Subject = "DCI App - Your DTR No. " + model.RequestNo + " has been " + model.StatusName.ToLower();
+            mail.Body = model.EmailBody;
+            mail.IsBodyHtml = true;
+            mail.To.Add(model.RequestorEmail);
+            await SendMessage(mail);
+        }
+
+        async Task<DTRCorrectionViewModel> RequestorNotificationBodyMessageDTR(DTRCorrectionViewModel model)
+        {
+            var userEntity = await _userRepository.GetUserById(model.CreatedBy);
+            model.RequestorEmail = userEntity.Email;
+
+            model.EmailBody = $@"
+            <html>
+            <body>              
+                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
+                
+                 <p>This is an automated message from DCI Application.</p>
+                 <p>Your DTR correction request no {model.RequestNo} has been {model.StatusName.ToLower()}.</p>   
+              
+                <p>If you encounter any issues, please contact our support team at [DCI Application Support].</p>            
+                <p>Thank you,<br />Your DCI</p>
+            </body>
+            </html>";
+
+            return model;
+        }
+
+        #endregion
+    }
 }

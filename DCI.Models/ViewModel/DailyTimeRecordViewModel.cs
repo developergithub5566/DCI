@@ -18,15 +18,25 @@
     public class DTRCorrectionViewModel
     {
         public int DtrId { get; set; } = 0;
+        public string RequestNo { get; set; } = string.Empty;
         public DateTime DateFiled { get; set; }
         public int DtrType { get; set; } = 0;
-        public DateTime DateTime { get; set; }
+        public DateTime DtrDateTime { get; set; }
         public int Status { get; set; } = 0;
+        public string StatusName { get; set; } = string.Empty;
+        public string EmployeeName { get; set; } = string.Empty;        
         public string Reason { get; set; } = string.Empty;
         public string? Filename { get; set; } = string.Empty;
         public string? FileLocation { get; set; } = string.Empty;
+        public string DeptHead { get; set; } = string.Empty;
         public int CreatedBy { get; set; } = 0;
         public bool IsActive { get; set; } = true;
+        public string TimeIn { get; set; } = string.Empty;
+        public string TimeOut { get; set; } = string.Empty;
+        public string DepartmentHead { get; set; } = string.Empty;
+
+        public string RequestorEmail { get; set; } = string.Empty;
+        public string EmailBody { get; set; } = string.Empty;     
     }
 
 }

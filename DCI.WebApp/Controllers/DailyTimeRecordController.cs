@@ -89,10 +89,13 @@ namespace DCI.WebApp.Controllers
             {
                 using (var _httpclient = new HttpClient())
                 {
-                    model.EmployeeId = 2;
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+
+                    model.EmployeeId = 2;//currentUser.UserId;
+
                     //model.SLBalance = 0;
                     //model.VLBalance = 0;
-                  //  model.LeaveType = 1;
+                    //  model.LeaveType = 1;
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllLeave");
                     request.Content = stringContent;
@@ -207,22 +210,32 @@ namespace DCI.WebApp.Controllers
         }
 
         public async Task<IActionResult> DTRCorrection()
-        {
-            List<DTRCorrectionViewModel> model = new List<DTRCorrectionViewModel>();
+        {  
+            List<DTRCorrectionViewModel> list = new List<DTRCorrectionViewModel>();
             try
             {
                 using (var _httpclient = new HttpClient())
                 {
-                    HttpResponseMessage response = await _httpclient.GetAsync(_apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllDTRCorrection");
-                    string responseBody = await response.Content.ReadAsStringAsync();
+                    DTRCorrectionViewModel model = new DTRCorrectionViewModel();
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+
+                    model.CreatedBy = 2;//currentUser.UserId;
+
+                   
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllDTRCorrection");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
 
                     if (response.IsSuccessStatusCode == true)
                     {
-                        model = JsonConvert.DeserializeObject<List<DTRCorrectionViewModel>>(responseBody)!;
+                        list = JsonConvert.DeserializeObject<List<DTRCorrectionViewModel>>(responseBody)!;
+            
                     }
                 }
 
-                return View(model);
+                return View(list);
 
             }
             catch (Exception ex)
@@ -233,8 +246,84 @@ namespace DCI.WebApp.Controllers
             {
                 Log.CloseAndFlush();
             }
-            return View(model);
+            return View(list);
         }
+
+        public async Task<IActionResult> DTRCorrectionById(DTRCorrectionViewModel model)
+        {
+           // DTRCorrectionViewModel model = new DTRCorrectionViewModel();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                  
+                   // var currentUser = _userSessionHelper.GetCurrentUser();
+
+                  //  model.CreatedBy = 2;//currentUser.UserId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/DTRCorrectionById");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<DTRCorrectionViewModel>(responseBody)!;
+
+                    }
+                    return Json(new { success = true, data = model });
+                }
+              
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }          
+        }
+
+        public async Task<IActionResult> SaveDTRCorrection(DTRCorrectionViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    model.CreatedBy = 2;                    
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/SaveDTRCorrection");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = responseBody });
+                    }
+                    return Json(new { success = false, message = responseBody });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
+        
 
     }
 }

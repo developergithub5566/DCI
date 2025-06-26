@@ -9,5 +9,6 @@ namespace DCI.Repositories.Interface
         Task SendToApproval(LeaveViewModel model);
 		Task SendSetPassword(string email);
 		Task SendToRequestor(LeaveViewModel model);
+		Task SendToRequestorDTR(DTRCorrectionViewModel model);
     }
 }

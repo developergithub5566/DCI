@@ -1,4 +1,4 @@
-﻿@model IEnumerable<DCI.Models.ViewModel.LeaveRequestHeaderViewModel>
+﻿@model IEnumerable<DCI.Models.ViewModel.ApprovalHistoryViewModel>
 @using Newtonsoft.Json;
 @using DCI.Core.Common;
 @using DCI.Models.ViewModel;
@@ -108,11 +108,9 @@
                                 <label>Requestor</label>
                             </th>
                             <th>
-                                <label>Date Covered</label>
+                                <label>Module</label>
                             </th>
-                            <th>
-                                <label>No. of Days</label>
-                            </th>
+                           
                             <th>
                                 <label>Status</label>
                             </th>
@@ -130,27 +128,20 @@
                                     @item.RequestNo
                                 </td>
                                 <td>
-                                    @item.DateFiled
+                                    @item.DateCreated
                                 </td>
                                 <td>
-                                    @item.EmployeeName
-                                </td>
-                                <td>
-                                    <strong>
-                                        @foreach (var dtl in item.LeaveRequestDetailList)
-                                        {
-                                            <span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>@dtl.LeaveDate.ToShortDateString()</span>
-                                        }
-                                    </strong>
-                                </td>
-                                <td>
-                                    @item.NoofDays
+                                    @item.Requestor
                                 </td>
                                 <td>
                                     @item.StatusName
                                 </td>
+                              
                                 <td>
-                                    @item.DateApprovedDisapproved
+                                    @item.StatusName
+                                </td>
+                                <td>
+                                    @item.StatusDate
                                 </td>
 
                             </tr>

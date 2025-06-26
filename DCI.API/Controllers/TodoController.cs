@@ -35,6 +35,14 @@ namespace DCI.API.Controllers
              var result = await _todoRepository.Approval(model);
             return StatusCode(result.statuscode, result.message);
         }
+
+        [HttpPost]
+        [Route("ApprovalDtr")]
+        public async Task<IActionResult> ApprovalDtr([FromBody] ApprovalHistoryViewModel model)
+        {
+            var result = await _todoRepository.ApprovalDtr(model);
+            return StatusCode(result.statuscode, result.message);
+        }
         //[HttpPost]
         //[Route("GetAllTodo")]
         //public async Task<IActionResult> GetAllTodo([FromBody] DocumentViewModel model)
@@ -44,18 +52,26 @@ namespace DCI.API.Controllers
         //}
 
         [HttpPost]
-        [Route("GetAllTodo")]
-        public async Task<IActionResult> GetAllTodo([FromBody] LeaveViewModel model)
+        [Route("GetAllTodoLeave")]
+        public async Task<IActionResult> GetAllTodoLeave([FromBody] LeaveViewModel model)
         {
-            var result = await _todoRepository.GetAllTodo(model);
+            var result = await _todoRepository.GetAllTodoLeave(model);
             return Ok(result);
         }
 
         [HttpPost]
-        [Route("GetApprovalLog")]
-        public async Task<IActionResult> GetApprovalLog([FromBody] LeaveViewModel model)
+        [Route("GetAllTodoDtr")]
+        public async Task<IActionResult> GetAllTodoDtr([FromBody] DTRCorrectionViewModel model)
         {
-            var result = await _todoRepository.GetApprovalLog(model);
+            var result = await _todoRepository.GetAllTodoDtr(model);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("GetApprovalHistory")]
+        public async Task<IActionResult> GetApprovalHistory([FromBody] ApprovalHistoryViewModel model)
+        {
+            var result = await _todoRepository.GetApprovalHistory(model);
             return Ok(result);
         }
 

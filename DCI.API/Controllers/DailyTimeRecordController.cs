@@ -64,8 +64,21 @@ namespace DCI.API.Controllers
         [Route("GetAllDTRCorrection")]
         public async Task<IActionResult> GetAllDTRCorrection([FromBody] DTRCorrectionViewModel model)
         {
-            return Ok(await _dtrRepository.GetAllDTRCorrectionByEmpId(model.CreatedBy));
+            return Ok(await _dtrRepository.GetAllDTRCorrection(model.CreatedBy));
         }
 
+        [HttpPost]
+        [Route("DTRCorrectionById")]
+        public async Task<IActionResult> DTRCorrectionById([FromBody] DTRCorrectionViewModel model)
+        {
+            return Ok(await _dtrRepository.DTRCorrectionByDtrId(model.DtrId));
+        }
+
+        [HttpPost]
+        [Route("SaveDTRCorrection")]
+        public async Task<IActionResult> SaveDTRCorrection([FromBody] DTRCorrectionViewModel model)
+        {
+            return Ok(await _dtrRepository.SaveDTRCorrection(model));
+        }
     }
 }

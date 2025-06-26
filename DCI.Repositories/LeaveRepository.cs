@@ -36,6 +36,8 @@ namespace DCI.Repositories
             LeaveViewModel model = new LeaveViewModel();
             model.EmployeeId = param.EmployeeId;
 
+            int _currentYear = DateTime.Now.Year;
+
             var leaveinfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == param.EmployeeId).FirstOrDefault();
             model.VLBalance = leaveinfo.VLBalance;
             model.SLBalance = leaveinfo.SLBalance;
@@ -81,7 +83,7 @@ namespace DCI.Repositories
 
 
           var vlSummary = _dbContext.LeaveSummary
-                    .FromSqlInterpolated($"EXEC sp_GetVacationLeaveBalance @EmployeeId = {param.EmployeeId},@Year = {2025}, @LeaveType =  'VL'  ")
+                    .FromSqlInterpolated($"EXEC sp_GetVacationLeaveBalance @EmployeeId = {param.EmployeeId},@Year = {_currentYear.ToString()}, @LeaveType =  'VL'  ")
                     .ToList();
 
             model.vlSummaries = vlSummary
@@ -98,7 +100,7 @@ namespace DCI.Repositories
 
 
             var slSummary = _dbContext.LeaveSummary
-                      .FromSqlInterpolated($"EXEC sp_GetVacationLeaveBalance @EmployeeId = {param.EmployeeId},@Year = {2025}, @LeaveType =  'SL'  ")
+                      .FromSqlInterpolated($"EXEC sp_GetVacationLeaveBalance @EmployeeId = {param.EmployeeId},@Year = {_currentYear.ToString()}, @LeaveType =  'SL'  ")
                       .ToList();
 
             model.slSummaries = slSummary
@@ -278,18 +280,18 @@ namespace DCI.Repositories
 
             try
             {     
+                int _currentYear = DateTime.Now.Year;
+
                 var _leaveContext = await _dbContext.LeaveRequestHeader
-                                                .Where(x => x.IsActive == true)
+                                                .Where(x => x.IsActive == true && x.DateFiled.Date.Year == _currentYear)
                                                 .AsQueryable()
                                                 .ToListAsync();
     
 
-                int totalrecords = _leaveContext.Count() + 1;
-                string version = "0";
-                string finalSetRecords = GetFormattedRecord(totalrecords);
-                // DateTime now = DateTime.Now;
+                int totalrecords = _leaveContext.Count() + 1;           
+                string finalSetRecords = GetFormattedRecord(totalrecords);              
                 string yearMonth = DateTime.Now.ToString("yyyyMM");
-                string req = "REQ";
+                string req = "LEAVE";
          
                 return $"{req}-{yearMonth}-{finalSetRecords}";
             }

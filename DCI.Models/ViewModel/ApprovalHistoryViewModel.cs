@@ -5,15 +5,19 @@
 		public int ApprovalHistoryId { get; set; } = 0;
         public int ModulePageId { get; set; } = 0;
         public int TransactionId { get; set; } = 0;
-        //public string DocumentName { get; set; } = string.Empty;
+        public string RequestNo { get; set; } = string.Empty;
         public int ApproverId { get; set; } = 0;
 		public int Status { get; set; } = 0;
 		public DateTime DateCreated { get; set; } = DateTime.Now;
 		public int CreatedBy { get; set; } = 0;
 		public string? Remarks { get; set; } = string.Empty;
 		public bool IsActive { get; set; } = true;
-		public string CurrentStatus { get; set; } = string.Empty;
-	}
+		public string StatusName { get; set; } = string.Empty;
+        public string StatusDate { get; set; } = string.Empty;        
+         public int CurrentUserId { get; set; } = 0;
+        public string Requestor { get; set; } = string.Empty;
+        public string ModuleName { get; set; } = string.Empty;
+    }
 
 	public class ApprovalViewModel
 	{

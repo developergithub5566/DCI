@@ -59,7 +59,7 @@ namespace DCI.WebApp.Controllers
 
 
 
-		public async Task<IActionResult> Index()
+		public async Task<IActionResult> Leave()
 		{
 			List<LeaveRequestHeaderViewModel> model = new List<LeaveRequestHeaderViewModel>();
 
@@ -72,7 +72,7 @@ namespace DCI.WebApp.Controllers
 				//_filterRoleModel.CurrentUserId = currentUser.UserId;
 
 				var stringContent = new StringContent(JsonConvert.SerializeObject(_filterRoleModel), Encoding.UTF8, "application/json");
-				var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Todo/GetAllTodo");
+				var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Todo/GetAllTodoLeave");
 
 				request.Content = stringContent;
 				var response = await _httpclient.SendAsync(request);
@@ -85,7 +85,33 @@ namespace DCI.WebApp.Controllers
 			}
 			return View(model);
 		}
-		public async Task<IActionResult> Approval(ApprovalHistoryViewModel model)
+
+        public async Task<IActionResult> DTR()
+        {
+            List<DTRCorrectionViewModel> model = new List<DTRCorrectionViewModel>();
+
+            using (var _httpclient = new HttpClient())
+            {
+                DTRCorrectionViewModel _filterRoleModel = new DTRCorrectionViewModel();
+
+                var currentUser = _userSessionHelper.GetCurrentUser();
+
+
+                var stringContent = new StringContent(JsonConvert.SerializeObject(_filterRoleModel), Encoding.UTF8, "application/json");
+                var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Todo/GetAllTodoDtr");
+
+                request.Content = stringContent;
+                var response = await _httpclient.SendAsync(request);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    model = JsonConvert.DeserializeObject<List<DTRCorrectionViewModel>>(responseBody)!;
+                }
+
+            }
+            return View(model);
+        }
+        public async Task<IActionResult> Approval(ApprovalHistoryViewModel model)
 		{
 			try
 			{
@@ -119,9 +145,43 @@ namespace DCI.WebApp.Controllers
 			}
 		}
 
+        public async Task<IActionResult> ApprovalDtr(ApprovalHistoryViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    model.CreatedBy = currentUser.UserId;
+                    model.ApproverId = currentUser.UserId;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Todo/ApprovalDtr");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = responseBody });
+                    }
+                    return Json(new { success = false, message = responseBody });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
         public async Task<IActionResult> ApprovalLog()
         {
-            List<LeaveRequestHeaderViewModel> model = new List<LeaveRequestHeaderViewModel>();
+            List<ApprovalHistoryViewModel> model = new List<ApprovalHistoryViewModel>();
 
             using (var _httpclient = new HttpClient())
             {
@@ -132,14 +192,14 @@ namespace DCI.WebApp.Controllers
                 _filterModel.CurrentUserId = currentUser.UserId;
 
                 var stringContent = new StringContent(JsonConvert.SerializeObject(_filterModel), Encoding.UTF8, "application/json");
-                var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Todo/GetApprovalLog");
+                var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Todo/GetApprovalHistory");
 
                 request.Content = stringContent;
                 var response = await _httpclient.SendAsync(request);
                 var responseBody = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)
                 {
-                    model = JsonConvert.DeserializeObject<List<LeaveRequestHeaderViewModel>>(responseBody)!;
+                    model = JsonConvert.DeserializeObject<List<ApprovalHistoryViewModel>>(responseBody)!;
                 }
 
             }

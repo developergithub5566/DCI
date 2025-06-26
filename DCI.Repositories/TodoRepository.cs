@@ -17,14 +17,16 @@ namespace DCI.Repositories
         private DCIdbContext _dbContext;
         private IEmailRepository _emailRepository;
         private ILeaveRepository _leaveRepository;
+        private IDailyTimeRecordRepository _dtrRepository;
         private readonly IHomeRepository _homeRepository;
 
-        public TodoRepository(DCIdbContext context, IEmailRepository emailRepository, ILeaveRepository leaveRepository, IHomeRepository homeRepository)
+        public TodoRepository(DCIdbContext context, IEmailRepository emailRepository, ILeaveRepository leaveRepository, IHomeRepository homeRepository, IDailyTimeRecordRepository dtrRepository)
         {
             this._dbContext = context;
             this._emailRepository = emailRepository;
             this._leaveRepository = leaveRepository;
             this._homeRepository = homeRepository;
+            _dtrRepository = dtrRepository;
         }
         public void Dispose()
         {
@@ -32,7 +34,7 @@ namespace DCI.Repositories
         }
 
 
-        public async Task<IList<LeaveRequestHeaderViewModel>> GetAllTodo(LeaveViewModel model)
+        public async Task<IList<LeaveRequestHeaderViewModel>> GetAllTodoLeave(LeaveViewModel model)
         {
             try
             {
@@ -68,6 +70,46 @@ namespace DCI.Repositories
                                                                LeaveDate = dtl.LeaveDate,
                                                                Amount = dtl.Amount
                                                            }).ToList()
+                             }).ToList();
+
+
+                return query.ToList();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return null;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        public async Task<IList<DTRCorrectionViewModel>> GetAllTodoDtr(DTRCorrectionViewModel model)
+        {
+            try
+            {
+                var context = _dbContext.DTRCorrection.AsQueryable().ToList();                
+                var empList = _dbContext.Employee.AsQueryable().ToList();
+                var statusList = _dbContext.Status.AsQueryable().ToList();
+
+
+                var query = (from dtr in context                               
+                             join emp in empList on dtr.CreatedBy equals emp.EmployeeId
+                             join stat in statusList on dtr.Status equals stat.StatusId
+                             where dtr.IsActive == true && dtr.Status == (int)EnumStatus.ForApproval
+                             select new DTRCorrectionViewModel
+                             {
+                                 DtrId = dtr.DtrId,
+                                 RequestNo = dtr.RequestNo,
+                                 DateFiled = dtr.DateFiled,
+                                 DtrDateTime = dtr.DtrDateTime,
+                                 DtrType = dtr.DtrType,
+                                 EmployeeName = emp.Firstname + " " + emp.Lastname,  
+                                 Status = dtr.Status,
+                                 StatusName = stat.StatusName,
+                                 Reason = dtr.Reason,                                                   
                              }).ToList();
 
 
@@ -165,47 +207,162 @@ namespace DCI.Repositories
             }
         }
 
-        public async Task<IList<LeaveRequestHeaderViewModel>> GetApprovalLog(LeaveViewModel model)
+        public async Task<(int statuscode, string message)> ApprovalDtr(ApprovalHistoryViewModel param)
         {
             try
             {
-                var leaveHdr = _dbContext.LeaveRequestHeader.AsQueryable().ToList();
-                var contextDetail = _dbContext.LeaveRequestDetails.AsQueryable().ToList();
+                ApprovalHistory entity = new ApprovalHistory();
+                entity.ModulePageId = (int)EnumModulePage.DailyTimeRecord;
+                entity.TransactionId = param.TransactionId;
+                entity.ApproverId = param.ApproverId;
+                entity.Status = param.Status;
+                entity.Remarks = param.Remarks;
+                entity.CreatedBy = param.CreatedBy;
+                entity.DateCreated = DateTime.Now;
+                entity.IsActive = true;
+                await _dbContext.ApprovalHistory.AddAsync(entity);
+                await _dbContext.SaveChangesAsync();
+
+
+                var contextHdr = _dbContext.DTRCorrection.Where(x => x.DtrId == param.TransactionId).FirstOrDefault(); 
+                contextHdr.Status = param.Status;          
+                _dbContext.DTRCorrection.Entry(contextHdr).State = EntityState.Modified;
+                _dbContext.SaveChanges();
+
+                //DTRCorrectionViewModel dtr = new DTRCorrectionViewModel();
+                //dtr.DtrId = contextHdr.DtrId;
+
+                var entitiesToViewModel = await _dtrRepository.DTRCorrectionByDtrId(contextHdr.DtrId);
+
+                // Send Email Notif
+                await _emailRepository.SendToRequestorDTR(entitiesToViewModel);
+
+                string status = param.Status == (int)EnumStatus.Approved ? "approved" : "disapproved";
+
+                NotificationViewModel notifvm = new NotificationViewModel();
+                notifvm.Title = "DTR";
+                notifvm.Description = String.Format("DTR Correction Request No {0} has been {1}", contextHdr.RequestNo, status);
+                notifvm.ModuleId = (int)EnumModulePage.DailyTimeRecord;
+                notifvm.TransactionId = param.TransactionId;
+                notifvm.AssignId = contextHdr.CreatedBy;
+                notifvm.URL = "/DailyTimeRecord/DTRCorrectionById/?dtrId=" + contextHdr.DtrId;
+                notifvm.MarkRead = false;
+                notifvm.CreatedBy = param.CreatedBy;
+                notifvm.IsActive = true;
+                await _homeRepository.SaveNotification(notifvm);
+
+                return (StatusCodes.Status200OK, String.Format("DTR Request No {0} has been {1}.", contextHdr.RequestNo, status));
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return (StatusCodes.Status406NotAcceptable, ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        //public async Task<IList<LeaveRequestHeaderViewModel>> GetApprovalLog(LeaveViewModel model)
+        //{
+        //    try
+        //    {
+        //        var leaveHdr = _dbContext.LeaveRequestHeader.AsQueryable().ToList();
+        //        var contextDetail = _dbContext.LeaveRequestDetails.AsQueryable().ToList();
+        //        var empList = _dbContext.Employee.AsQueryable().ToList();
+        //        var statusList = _dbContext.Status.AsQueryable().ToList();
+        //        var approvalLog = _dbContext.ApprovalHistory.AsQueryable().ToList();
+
+
+        //        var query = from apprv in approvalLog
+        //                    join hdr in leaveHdr on apprv.TransactionId equals hdr.LeaveRequestHeaderId
+        //                    join emp in empList on hdr.EmployeeId equals emp.EmployeeId
+        //                    join stat in statusList on hdr.Status equals stat.StatusId
+        //                    where apprv.IsActive == true && apprv.ApproverId == model.CurrentUserId && apprv.ModulePageId == (int)EnumModulePage.Leave
+        //                    select new LeaveRequestHeaderViewModel
+        //                    {
+        //                        LeaveRequestHeaderId = hdr.LeaveRequestHeaderId,
+        //                        RequestNo = hdr.RequestNo,
+        //                        EmployeeId = hdr.EmployeeId,
+        //                        EmployeeName = emp.Firstname + " " + emp.Lastname,
+        //                        DateFiled = hdr.DateFiled,
+        //                        Status = hdr.Status,
+        //                        StatusName = stat.StatusName,
+        //                        Reason = hdr.Reason,
+        //                        NoofDays = hdr.NoOfDays,
+        //                        DateApprovedDisapproved = apprv.DateCreated,
+        //                        LeaveRequestDetailList = (from dtl in _dbContext.LeaveRequestDetails
+        //                                                  where dtl.LeaveRequestHeaderId == hdr.LeaveRequestHeaderId
+        //                                                  select new LeaveRequestDetailViewModel
+        //                                                  {
+        //                                                      LeaveRequestHeaderId = dtl.LeaveRequestHeaderId,
+        //                                                      LeaveRequestDetailId = dtl.LeaveRequestDetailId,
+        //                                                      LeaveDate = dtl.LeaveDate,
+        //                                                      Amount = dtl.Amount
+        //                                                  }).ToList()
+        //                    };
+
+
+        //        return query.ToList();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log.Error(ex.ToString());
+        //        return null;
+        //    }
+        //    finally
+        //    {
+        //        Log.CloseAndFlush();
+        //    }
+        //}
+
+        public async Task<IList<ApprovalHistoryViewModel>> GetApprovalHistory(ApprovalHistoryViewModel model)
+        {
+            try
+            {
+                var leaveHdr = _dbContext.LeaveRequestHeader.AsQueryable().ToList();    
                 var empList = _dbContext.Employee.AsQueryable().ToList();
                 var statusList = _dbContext.Status.AsQueryable().ToList();
                 var approvalLog = _dbContext.ApprovalHistory.AsQueryable().ToList();
+                var dtrcontext = _dbContext.DTRCorrection.AsQueryable().ToList();
 
-
-                var query = from apprv in approvalLog
+                var queryLeave = from apprv in approvalLog
                             join hdr in leaveHdr on apprv.TransactionId equals hdr.LeaveRequestHeaderId
                             join emp in empList on hdr.EmployeeId equals emp.EmployeeId
                             join stat in statusList on hdr.Status equals stat.StatusId
                             where apprv.IsActive == true && apprv.ApproverId == model.CurrentUserId && apprv.ModulePageId == (int)EnumModulePage.Leave
-                            select new LeaveRequestHeaderViewModel
+                            select new ApprovalHistoryViewModel
                             {
-                                LeaveRequestHeaderId = hdr.LeaveRequestHeaderId,
-                                RequestNo = hdr.RequestNo,
-                                EmployeeId = hdr.EmployeeId,
-                                EmployeeName = emp.Firstname + " " + emp.Lastname,
-                                DateFiled = hdr.DateFiled,
+                                ApprovalHistoryId = apprv.ApprovalHistoryId,
+                                RequestNo = hdr.RequestNo,                               
+                                Requestor = emp.Firstname + " " + emp.Lastname,                               
                                 Status = hdr.Status,
-                                StatusName = stat.StatusName,
-                                Reason = hdr.Reason,
-                                NoofDays = hdr.NoOfDays,
-                                DateApprovedDisapproved = apprv.DateCreated,
-                                LeaveRequestDetailList = (from dtl in _dbContext.LeaveRequestDetails
-                                                          where dtl.LeaveRequestHeaderId == hdr.LeaveRequestHeaderId
-                                                          select new LeaveRequestDetailViewModel
-                                                          {
-                                                              LeaveRequestHeaderId = dtl.LeaveRequestHeaderId,
-                                                              LeaveRequestDetailId = dtl.LeaveRequestDetailId,
-                                                              LeaveDate = dtl.LeaveDate,
-                                                              Amount = dtl.Amount
-                                                          }).ToList()
+                                StatusName = stat.StatusName,         
+                                StatusDate = apprv.DateCreated.ToString(),
+                                ModuleName = "Leave"
                             };
 
+                var queryDTR = from apprv in approvalLog
+                                 join dtr in dtrcontext on apprv.TransactionId equals dtr.DtrId
+                                 join emp in empList on dtr.CreatedBy equals emp.EmployeeId
+                                 join stat in statusList on dtr.Status equals stat.StatusId
+                                 where apprv.IsActive == true && apprv.ApproverId == model.CurrentUserId && apprv.ModulePageId == (int)EnumModulePage.DailyTimeRecord
+                               select new ApprovalHistoryViewModel
+                                 {
+                                     ApprovalHistoryId = apprv.ApprovalHistoryId,
+                                     RequestNo = dtr.RequestNo,
+                                     Requestor = emp.Firstname + " " + emp.Lastname,
+                                     Status = dtr.Status,
+                                     StatusName = stat.StatusName,
+                                     StatusDate = apprv.DateCreated.ToString(),
+                                     ModuleName = "DTR"
+                                 };
 
-                return query.ToList();
+                return queryLeave.Concat(queryDTR).ToList();
+
+
+              //  return query.ToList();
             }
             catch (Exception ex)
             {
