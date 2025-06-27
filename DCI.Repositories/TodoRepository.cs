@@ -340,7 +340,8 @@ namespace DCI.Repositories
                                 Status = hdr.Status,
                                 StatusName = stat.StatusName,         
                                 StatusDate = apprv.DateCreated.ToString(),
-                                ModuleName = "Leave"
+                                ModuleName = "Leave",
+                                DateCreated = hdr.DateFiled
                             };
 
                 var queryDTR = from apprv in approvalLog
@@ -356,8 +357,9 @@ namespace DCI.Repositories
                                      Status = dtr.Status,
                                      StatusName = stat.StatusName,
                                      StatusDate = apprv.DateCreated.ToString(),
-                                     ModuleName = "DTR"
-                                 };
+                                     ModuleName = "DTR",
+                                     DateCreated = dtr.DateFiled
+                               };
 
                 return queryLeave.Concat(queryDTR).ToList();
 
