@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DCI.WebApp", "DCI.WebApp\DC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DCI.Core", "DCI.Core\DCI.Core.csproj", "{913E3A13-28BF-428A-A54E-7C2A4382FFEC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCI.Trigger", "DCI.Trigger\DCI.Trigger.csproj", "{2D4CCA62-1A22-44BA-8434-DDCA4D82B106}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{913E3A13-28BF-428A-A54E-7C2A4382FFEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{913E3A13-28BF-428A-A54E-7C2A4382FFEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{913E3A13-28BF-428A-A54E-7C2A4382FFEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D4CCA62-1A22-44BA-8434-DDCA4D82B106}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D4CCA62-1A22-44BA-8434-DDCA4D82B106}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D4CCA62-1A22-44BA-8434-DDCA4D82B106}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D4CCA62-1A22-44BA-8434-DDCA4D82B106}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

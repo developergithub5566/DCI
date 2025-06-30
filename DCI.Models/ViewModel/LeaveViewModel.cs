@@ -25,6 +25,9 @@ namespace DCI.Models.ViewModel
 
         public List<string> LeaveDateList { get; set; } = new();
 
+        public List<int> YearList { get; set; } = new();
+        public int SelectedYear { get; set; }
+
         public int CurrentUserId { get; set; } = 0;
 
         public string EmailBody { get; set; } = string.Empty;

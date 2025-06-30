@@ -14,7 +14,7 @@
     <div class="d-sm-flex align-items-center justify-content-between mb-3">
         <h6 class="m-0 font-weight-bold text-gray-800">Leave Application & Balances</h6>
         <div class="upperRightDivBtn">
-         @*    <button class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#leaveRequestModal">
+            @*    <button class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#leaveRequestModal">
                 <span class="icon text-white"><i class="fa-solid fa-file-pen text-xs"></i></span>
                 <span class="text"><small>Request Leave</small></span>
             </button> *@
@@ -140,7 +140,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                             
+
                                 @foreach (var hdr in Model.LeaveRequestHeaderList)
                                 {
                                     <tr>
@@ -173,7 +173,7 @@
                                         <td class="text-center">
                                             <a href="#" onclick="editForm(@hdr.LeaveRequestHeaderId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
 
-                                       @*      <div class="dropdown">
+                                            @*      <div class="dropdown">
                                                 <a href="#" class="dropdown-toggl text-lg" data-toggle="dropdown">
                                                     <i class="fa-solid fa-ellipsis"></i>
                                                 </a>
@@ -192,7 +192,35 @@
             </div>
         </div>
 
+        <div class="col-xl-12">
+            <div class="card shadow mb-4">
+                <!-- Card Header -->
+        @*         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0  small font-weight-bold text-gray-800">Data</h6>
+                </div> *@
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div id="accordion">
+
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="frmText"><span class="required">*</span> Year</label>
+                                <select id="yearSelect" class="form-select" required asp-items="@(new SelectList(Model.YearList))">
+                                    <option value="">select year</option>
+                                    Model.vlSummaries
+                                </select>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
         <div class="col-xl-6">
+
             <div class="card shadow mb-4">
                 <!-- Card Header -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
@@ -201,6 +229,7 @@
 
                 <!-- Card Body -->
                 <div class="card-body">
+
                     <div class="table-responsive">
                         <table class="table table-bordered text-dark text-xs" width="100%" cellspacing="0">
                             <thead class="bg-light">
@@ -225,7 +254,6 @@
                                         <td>@vl.EndBal</td>
                                     </tr>
                                 }
-
                             </tbody>
                         </table>
                     </div>
@@ -284,12 +312,12 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form  id="createForm">
+                    <form id="createForm">
                         <input type="hidden" id="SelectedDatesJson" name="SelectedDates" />
                         <input type="hidden" id="dateSelected" name="dateSelected" />
-                        
+
                         <input type="hidden" id="SelectedLeaveTypeAmount" name="SelectedLeaveTypeAmount" value="0" />
-                        <input type="hidden" id="preloadedDates"  />
+                        <input type="hidden" id="preloadedDates" />
 
                         <div class="col-lg-6">
                             <div class="form-group">
@@ -297,14 +325,14 @@
                                 <select id="leaveTypeSelect" class="form-select" required onchange="GetLeaveTypeAmount()">
                                     <option value="">select type</option>
                                 </select>
-                    
+
                             </div>
                         </div>
 
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label class="frmText"><span class="required">*</span> No. of Days</label>
-                               @*  <input type="number" min="0" step="any" name="NO_DAYS" class="form-control frmField" autocomplete="off"> *@
+                                @*  <input type="number" min="0" step="any" name="NO_DAYS" class="form-control frmField" autocomplete="off"> *@
                                 <input type="text" min="0" step="any" id="NoOfDays" name="NoOfDays" class="form-control frmField" readonly="true">
                             </div>
                         </div>
@@ -325,7 +353,7 @@
                                 <label class="frmText"><span class="required">*</span> Period Covered: </label>
                                 <div class="input-group">
 
-                                   @*  <span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>June 24 2025</span> *@
+                                    @*  <span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>June 24 2025</span> *@
                                     <div id="dateContainer"></div>
 
                                 </div>
@@ -342,7 +370,7 @@
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer pt0"> 
+                <div class="modal-footer pt0">
                     <div id="btnSubmit">
                         <button class="btn btnPrimary btn-icon-split d-block" type="button" onclick="save()">
                             <span class="icon text-white-50">
@@ -359,13 +387,13 @@
                             <span class="text"><small>Cancel Request</small></span>
                         </button>
                     </div>
-                        <button class="btn btnSecondary btn-icon-split d-block" data-dismiss="modal">
-                            <span class="icon text-white-50">
-                                <i class="fa-solid fa-xmark text-xs"></i>
-                            </span>
-                            <span class="text"><small>Close </small></span>
-                        </button>
-                   
+                    <button class="btn btnSecondary btn-icon-split d-block" data-dismiss="modal">
+                        <span class="icon text-white-50">
+                            <i class="fa-solid fa-xmark text-xs"></i>
+                        </span>
+                        <span class="text"><small>Close </small></span>
+                    </button>
+
                 </div>
             </div>
         </div>
@@ -395,115 +423,231 @@
 
 
     <script type="text/javascript">
-                        var js = jQuery.noConflict(true);
-                        $('.spinner-overlay').show();
+                         var js = jQuery.noConflict(true);
+                         $('.spinner-overlay').show();
 
-                        setTimeout(() => {
-                            $('.spinner-overlay').hide();
-                        }, 200);
-            
-                        
-                       $(document).ready(function () {
-                             js('#tblDocument').DataTable({
-                            	//order: [[1, 'desc']]
-                             });
+                         setTimeout(() => {
+                             $('.spinner-overlay').hide();
+                         }, 200);
 
 
-
-                            let nodays = 0.0000;
-                                                 
-
-                                                               flatpickr("#dateCovered", {
-                                                                          mode: "multiple",
-                                                                          enableTime: false,
-                                                                          dateFormat: "Y-m-d",
-                                                                          onChange: function(selectedDates, dateStr, instance) {
-                                                                            // Update number of selected days
-                                                                            let nodays = selectedDates.length;
-                                                                                   let amount =     $('#SelectedLeaveTypeAmount').val();
-                                                                               console.log("select-amount-",amount);
-                                                                         let total = amount * nodays;
-                                                                       let formattedDays = total.toFixed(4);
-                                                                            $('#NoOfDays').val(formattedDays);
-
-                                                                       
-                                                                            let selectedDateStrings = selectedDates.map(date =>
-                                                                              instance.formatDate(date, "Y-m-d")
-                                                                            );
-
-                                                                                    // let selectedDatesXXX = flatpickr.selectedDates.map(date =>
-                                                                                    //   flatpickr.formatDate(date, "yyyy-MM-dd")
-                                                                                    // );
-                                                                                    // $('#dateSelected').val(selectedDatesXXX);
-                                                                                                                                               
-                                                                            $('#SelectedDatesJson').val(JSON.stringify(selectedDateStrings));
-                                                                          }
-                                                                        });
+                        $(document).ready(function () {
+                              js('#tblDocument').DataTable({
+                                 //order: [[1, 'desc']]
+                              });
 
 
-                 $('#createForm').submit(function (event) {
-                     event.preventDefault();
-                     alert("ok")    
 
-             }); //submit
-                          }); //end doc
+                             let nodays = 0.0000;
 
-                   function newForm() {
-                      const my_fp = document.querySelector("#dateCovered")._flatpickr;
-                                      my_fp.clear();
-                                  let nodays = 0.0000;     
-                                $('#NoOfDays').val(nodays.toFixed(4));
-                            $('#Reason').val('');
-                                  $('#datepickerDate').show();
-                                 $('#datepickerLabel').hide();
-                              $('#btnCancel').hide();
-                                $('#btnSubmit').show();
-                               
+
+                                                                flatpickr("#dateCovered", {
+                                                                           mode: "multiple",
+                                                                           enableTime: false,
+                                                                           dateFormat: "Y-m-d",
+                                                                           onChange: function(selectedDates, dateStr, instance) {
+                                                                             // Update number of selected days
+                                                                             let nodays = selectedDates.length;
+                                                                                    let amount =     $('#SelectedLeaveTypeAmount').val();
+                                                                                console.log("select-amount-",amount);
+                                                                          let total = amount * nodays;
+                                                                        let formattedDays = total.toFixed(4);
+                                                                             $('#NoOfDays').val(formattedDays);
+
+
+                                                                             let selectedDateStrings = selectedDates.map(date =>
+                                                                               instance.formatDate(date, "Y-m-d")
+                                                                             );
+
+                                                                                     // let selectedDatesXXX = flatpickr.selectedDates.map(date =>
+                                                                                     //   flatpickr.formatDate(date, "yyyy-MM-dd")
+                                                                                     // );
+                                                                                     // $('#dateSelected').val(selectedDatesXXX);
+
+                                                                             $('#SelectedDatesJson').val(JSON.stringify(selectedDateStrings));
+                                                                           }
+                                                                         });
+
+
+                  $('#createForm').submit(function (event) {
+                      event.preventDefault();
+                      alert("ok")
+
+              }); //submit
+                           }); //end doc
+
+                    function newForm() {
+                       const my_fp = document.querySelector("#dateCovered")._flatpickr;
+                                       my_fp.clear();
+                                   let nodays = 0.0000;
+                                 $('#NoOfDays').val(nodays.toFixed(4));
+                             $('#Reason').val('');
+                                   $('#datepickerDate').show();
+                                  $('#datepickerLabel').hide();
+                               $('#btnCancel').hide();
+                                 $('#btnSubmit').show();
+
+                          $.ajax({
+                              type: 'POST',
+                              url: '@Url.Action("RequestLeave", "DailyTimeRecord")',
+                              success: function (response) {
+                                  if (response.success) {
+
+                                      $('#createForm').find('input, select, textarea').prop('disabled', false);
+
+                                 var $select = $('#leaveTypeSelect');
+                                  $select.empty();
+                                  $select.append('<option value="">Select type</option>');
+
+                                  $.each(response.data.optionsLeaveType, function (index, item) {
+                                 if (item.value == response.data.leaveRequestHeader.leaveTypeId) {
+                                          $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+                                      } else {
+                                          $select.append('<option value="' + item.value + '">' + item.text + '</option>');
+                                      }
+                                  });
+
+                             console.log(response);
+
+                          // $('#dateCovered').val(response.data.selectedDateJson);
+                            $('#NoOfDays').val(response.data.leaveRequestHeader.noofDays);
+                                 $('#Reason').val(response.data.leaveRequestHeader.reason);
+                            //  $('#preloadedDates').val(response.data.leaveRequestHeader.selectedDateJson);
+
+        //  let preloaded = response.data.selectedDateJson;
+            // let preloaded = JSON.parse(raw);
+                                 // let preloaded = JSON.parse(document.getElementById("preloadedDates").value);
+                               //  let preloaded = document.getElementById("preloadedDates").value;
+
+
+                                    // let fp = flatpickr("#dateCovered", {
+                                    //        mode: "multiple",
+                                    //         dateFormat: "Y-m-d"
+                                    //      });
+
+
+                       // let preloaded = ["2025-06-10", "2025-06-15", "2025-06-20"];
+                                //    fp.setDate(["2025-06-10", "2025-06-15", "2025-06-20"]);
+                                       // console.log(preloaded);
+                                      //  fp.setDate(preloaded);
+
+                                      js('#createmodal').modal('show');
+                                  } else {
+                                      Swal.fire({
+                                          text: response.message,
+                                          icon: "error"
+                                      });
+                                  }
+                                  $('.spinner-overlay').hide();
+                              },
+                              error: function () {
+                                  $('.spinner-overlay').hide();
+                                  Swal.fire({
+                                      text: "An error occurred. Please try again.",
+                                      icon: "error"
+                                  });
+                              }
+                          });
+
+                     js('#createmodal').modal('show');
+
+                    }
+
+                     function editForm(leaveHdrId) {
+                                 $('#datepickerDate').hide();
+                                    $('#datepickerLabel').show();
+                                 const my_fp = document.querySelector("#dateCovered")._flatpickr;
+                                          if (typeof my_fp !== "undefined") {
+                                           my_fp.clear();
+                                          }
+
+                                  let nodays = 0.0000;
+                                  $('#NoOfDays').val(nodays.toFixed(4));
+                                  $('#Reason').val('');
+                                    const formData = new FormData();
+                                  formData.append('LeaveRequestHeaderId', leaveHdrId);
+
+
                          $.ajax({
                              type: 'POST',
-                             url: '@Url.Action("RequestLeave", "DailyTimeRecord")',                            
+                             url: '@Url.Action("RequestLeave", "DailyTimeRecord")',
+                             data: formData,
+                             processData: false,
+                             contentType: false,
                              success: function (response) {
                                  if (response.success) {
-                                
-                                     $('#createForm').find('input, select, textarea').prop('disabled', false);
 
-                                var $select = $('#leaveTypeSelect');
-                                 $select.empty();
-                                 $select.append('<option value="">Select type</option>');
+                                 var $select = $('#leaveTypeSelect');
+                                     $select.empty();
+                                     $select.append('<option value="">Select type</option>');
 
-                                 $.each(response.data.optionsLeaveType, function (index, item) {
-                                if (item.value == response.data.leaveRequestHeader.leaveTypeId) {
+                                     $.each(response.data.optionsLeaveType, function (index, item) {
+                                 if (item.value == response.data.leaveRequestHeader.leaveTypeId) {
                                          $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
                                      } else {
                                          $select.append('<option value="' + item.value + '">' + item.text + '</option>');
                                      }
                                  });
 
-                            console.log(response);
+                                    console.log(response);
 
-                         // $('#dateCovered').val(response.data.selectedDateJson);
-                           $('#NoOfDays').val(response.data.leaveRequestHeader.noofDays);
-                                $('#Reason').val(response.data.leaveRequestHeader.reason);
+                                   var container = $('#dateContainer'); // Make sure you have this container in your HTML
+                                      container.empty(); // Clear previous spans
+
+                                             // let dateArray = JSON.parse(response.data.leaveDateList); // turns string into array
+                                             // dateArray.forEach(function (date) {
+                                             //     var span = `<span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>${date}</span>`;
+                                             //     $('#dateContainer').append(span);
+                                             // });
+                                                  response.data.leaveDateList.forEach(function (date) {
+                                                  var span = `<span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>${date}</span>`;
+                                                  container.append(span);
+                                              });
+
+
+
+                                           //$('#dateCovered').val(response.data.selectedDateJson);
+                                          $('#NoOfDays').val(response.data.leaveRequestHeader.noofDays);
+                                                 $('#Reason').val(response.data.leaveRequestHeader.reason);
+
+                                            $('#btnCancel').hide();
+                                             $('#createForm').find('input, select, textarea').prop('disabled', true);
+                                   if(response.data.leaveRequestHeader.status == 2){  //pending
+                                                $('#btnCancel').show();
+                                                 $('#btnSubmit').hide();
+                                              }
+                                else if(response.data.leaveRequestHeader.status == 4){     //approved
+                                               $('#btnSubmit').hide();
+                                                   $('#btnCancel').hide();
+                                    }
+                                         else if(response.data.leaveRequestHeader.status == 5){     //Rejected
+                                                $('#btnSubmit').hide();
+                                                    $('#btnCancel').hide();
+                                     }
+
+
                            //  $('#preloadedDates').val(response.data.leaveRequestHeader.selectedDateJson);
 
-       //  let preloaded = response.data.selectedDateJson;
-           // let preloaded = JSON.parse(raw);
+                          let preloaded = response.data.selectedDateJson;
+                                     // let preloaded = JSON.parse(raw);
                                 // let preloaded = JSON.parse(document.getElementById("preloadedDates").value);
                               //  let preloaded = document.getElementById("preloadedDates").value;
 
 
-                                   // let fp = flatpickr("#dateCovered", {
-                                   //        mode: "multiple",
-                                   //         dateFormat: "Y-m-d"
-                                   //      });
 
 
-                      // let preloaded = ["2025-06-10", "2025-06-15", "2025-06-20"];
+                                   let fp = flatpickr("#dateCovered", {
+                                          mode: "multiple",
+                                           dateFormat: "Y-m-d"
+                                        });
+
+
+                                   // let preloaded = ["2025-06-10", "2025-06-15", "2025-06-20"];
                                //    fp.setDate(["2025-06-10", "2025-06-15", "2025-06-20"]);
-                                      // console.log(preloaded);
-                                     //  fp.setDate(preloaded);
+                                       console.log(preloaded);
+                                       fp.setDate(preloaded);
 
-                                     js('#createmodal').modal('show');                             
+                                     js('#createmodal').modal('show');
                                  } else {
                                      Swal.fire({
                                          text: response.message,
@@ -522,212 +666,96 @@
                          });
 
                     js('#createmodal').modal('show');
-                
+
                    }
 
-                    function editForm(leaveHdrId) {
-                                $('#datepickerDate').hide();
-                                   $('#datepickerLabel').show();
-                                const my_fp = document.querySelector("#dateCovered")._flatpickr;
-                                         if (typeof my_fp !== "undefined") {
-                                          my_fp.clear();
-                                         }
-                             
-                                 let nodays = 0.0000;
-                                 $('#NoOfDays').val(nodays.toFixed(4));
-                                 $('#Reason').val('');
-                                   const formData = new FormData();
-                                 formData.append('LeaveRequestHeaderId', leaveHdrId);     
-                           
-
-                        $.ajax({
-                            type: 'POST',
-                            url: '@Url.Action("RequestLeave", "DailyTimeRecord")',
-                            data: formData,
-                            processData: false,
-                            contentType: false,
-                            success: function (response) {
-                                if (response.success) {
-
-                                var $select = $('#leaveTypeSelect');
-                                    $select.empty();
-                                    $select.append('<option value="">Select type</option>');
-
-                                    $.each(response.data.optionsLeaveType, function (index, item) {
-                                if (item.value == response.data.leaveRequestHeader.leaveTypeId) {
-                                        $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
-                                    } else {
-                                        $select.append('<option value="' + item.value + '">' + item.text + '</option>');
-                                    }
-                                });
-
-                                   console.log(response);
-
-                                  var container = $('#dateContainer'); // Make sure you have this container in your HTML
-                                     container.empty(); // Clear previous spans
-                                
-                                            // let dateArray = JSON.parse(response.data.leaveDateList); // turns string into array
-                                            // dateArray.forEach(function (date) {
-                                            //     var span = `<span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>${date}</span>`;
-                                            //     $('#dateContainer').append(span);
-                                            // });
-                                                 response.data.leaveDateList.forEach(function (date) {
-                                                 var span = `<span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>${date}</span>`;
-                                                 container.append(span);
-                                             });
-
-                         
-
-                                          //$('#dateCovered').val(response.data.selectedDateJson);
-                                         $('#NoOfDays').val(response.data.leaveRequestHeader.noofDays);
-                                                $('#Reason').val(response.data.leaveRequestHeader.reason);
-                               
-                                           $('#btnCancel').hide();
-                                            $('#createForm').find('input, select, textarea').prop('disabled', true);
-                                  if(response.data.leaveRequestHeader.status == 2){  //pending
-                                               $('#btnCancel').show();
-                                                $('#btnSubmit').hide();
-                                             }
-                               else if(response.data.leaveRequestHeader.status == 4){     //approved                             
-                                              $('#btnSubmit').hide();
-                                                  $('#btnCancel').hide();                                              
-                                   }
-                                        else if(response.data.leaveRequestHeader.status == 5){     //Rejected
-                                               $('#btnSubmit').hide();
-                                                   $('#btnCancel').hide();
-                                    }
-                                     
-
-                          //  $('#preloadedDates').val(response.data.leaveRequestHeader.selectedDateJson);
-
-                         let preloaded = response.data.selectedDateJson;
-                                    // let preloaded = JSON.parse(raw);
-                               // let preloaded = JSON.parse(document.getElementById("preloadedDates").value);
-                             //  let preloaded = document.getElementById("preloadedDates").value;
+                function save() {
+                        const leaveTypeId = $('#leaveTypeSelect').val();
+                     const selectedDatesJson = $('#SelectedDatesJson').val();
 
 
 
+                         const noOfDays = $('#NoOfDays').val();
+                           const reason = $('#Reason').val();
 
-                                  let fp = flatpickr("#dateCovered", {
-                                         mode: "multiple",
-                                          dateFormat: "Y-m-d"
-                                       });
+                             const formData = new FormData();
+                            formData.append('LeaveTypeId', leaveTypeId);
+                             formData.append('NoOfDays', noOfDays);
+                              formData.append('SelectedDateJson', selectedDatesJson);
 
-
-                                  // let preloaded = ["2025-06-10", "2025-06-15", "2025-06-20"];
-                              //    fp.setDate(["2025-06-10", "2025-06-15", "2025-06-20"]);
-                                      console.log(preloaded);
-                                      fp.setDate(preloaded);
-
-                                    js('#createmodal').modal('show');
-                                } else {
-                                    Swal.fire({
-                                        text: response.message,
-                                        icon: "error"
-                                    });
-                                }
-                                $('.spinner-overlay').hide();
-                            },
-                            error: function () {
-                                $('.spinner-overlay').hide();
-                                Swal.fire({
-                                    text: "An error occurred. Please try again.",
-                                    icon: "error"
-                                });
-                            }
-                        });
-
-                   js('#createmodal').modal('show');
-
-                  }
-
-               function save() {
-                       const leaveTypeId = $('#leaveTypeSelect').val();
-                    const selectedDatesJson = $('#SelectedDatesJson').val();
-                         
-                
-                    
-                        const noOfDays = $('#NoOfDays').val();
-                          const reason = $('#Reason').val();    
-
-                            const formData = new FormData();
-                           formData.append('LeaveTypeId', leaveTypeId);
-                            formData.append('NoOfDays', noOfDays);
-                             formData.append('SelectedDateJson', selectedDatesJson);
-                                  
-                              formData.append('Reason', reason);                    
+                               formData.append('Reason', reason);
 
 
-                 Swal.fire({
-                     text: "Are you sure you want to save this record?",
-                     icon: "question",
-                     showCancelButton: true,
-                     confirmButtonText: "Ok"
-                 }).then((result) => {
-                     if (result.isConfirmed) {
-                         $('.spinner-overlay').show();
+                  Swal.fire({
+                      text: "Are you sure you want to save this record?",
+                      icon: "question",
+                      showCancelButton: true,
+                      confirmButtonText: "Ok"
+                  }).then((result) => {
+                      if (result.isConfirmed) {
+                          $('.spinner-overlay').show();
 
-                         $.ajax({
-                             type: 'POST',
-                             url: '@Url.Action("SaveLeave", "DailyTimeRecord")',
-                             data: formData,
-                                 processData: false,
-                                    contentType: false,
-                             success: function (response) {
-                                 if (response.success) {
-                                     $('#createForm')[0].reset();
-                                     js('#createmodal').modal('hide');
+                          $.ajax({
+                              type: 'POST',
+                              url: '@Url.Action("SaveLeave", "DailyTimeRecord")',
+                              data: formData,
+                                  processData: false,
+                                     contentType: false,
+                              success: function (response) {
+                                  if (response.success) {
+                                      $('#createForm')[0].reset();
+                                      js('#createmodal').modal('hide');
 
-                                     Swal.fire({
-                                         text: response.message,
-                                         icon: "success",
-                                         confirmButtonText: "Ok"
-                                     }).then((result) => {
-                                         location.reload();
-                                     });
+                                      Swal.fire({
+                                          text: response.message,
+                                          icon: "success",
+                                          confirmButtonText: "Ok"
+                                      }).then((result) => {
+                                          location.reload();
+                                      });
 
-                                 } else {
-                                     Swal.fire({
-                                         text: response.message,
-                                         icon: "error"
-                                     });
-                                 }
-                                 $('.spinner-overlay').hide();
-                             },
-                             error: function () {
-                                 $('.spinner-overlay').hide();
-                                 Swal.fire({
-                                     text: "An error occurred. Please try again.",
-                                     icon: "error"
-                                 });
-                             }
-                         });
-                     }
-                 });
+                                  } else {
+                                      Swal.fire({
+                                          text: response.message,
+                                          icon: "error"
+                                      });
+                                  }
+                                  $('.spinner-overlay').hide();
+                              },
+                              error: function () {
+                                  $('.spinner-overlay').hide();
+                                  Swal.fire({
+                                      text: "An error occurred. Please try again.",
+                                      icon: "error"
+                                  });
+                              }
+                          });
+                      }
+                  });
 
-              }
+               }
 
-              function GetLeaveTypeAmount(){
-                    let leave =  $('#leaveTypeSelect').val();
-                     console.log(leave);
-                    let  _amount = 0.0000;
-                   if(leave ==1){
-                      _amount = 0.5000;
-                      $('#SelectedLeaveTypeAmount').val(_amount);
-                   }else{
-                       _amount = 1.0000;
-                      $('#SelectedLeaveTypeAmount').val(_amount);
-                   }
+               function GetLeaveTypeAmount(){
+                     let leave =  $('#leaveTypeSelect').val();
+                      console.log(leave);
+                     let  _amount = 0.0000;
+                    if(leave ==1){
+                       _amount = 0.5000;
+                       $('#SelectedLeaveTypeAmount').val(_amount);
+                    }else{
+                        _amount = 1.0000;
+                       $('#SelectedLeaveTypeAmount').val(_amount);
+                    }
 
-                  //const clearDate = flatpickr("#dateCovered", {});
-                    // const clearDate = $("#dateCovered").flatpickr();
-                    //       clearDate.clear();
+                   //const clearDate = flatpickr("#dateCovered", {});
+                     // const clearDate = $("#dateCovered").flatpickr();
+                     //       clearDate.clear();
 
-                      const my_fp = document.querySelector("#dateCovered")._flatpickr;
-                       my_fp.clear();
-              }
+                       const my_fp = document.querySelector("#dateCovered")._flatpickr;
+                        my_fp.clear();
+               }
 
-     
+
 
     </script>
 }

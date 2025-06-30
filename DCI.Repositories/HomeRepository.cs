@@ -60,7 +60,10 @@ namespace DCI.Repositories
                                           Birthdate = usr.DateBirth.Value.ToString("MMM dd")
                                       }).ToList();
 
-                var dailyTime = _dbContext.vw_AttendanceSummary.Where(x => x.DATE == DateTime.Today).FirstOrDefault();
+                // model.CurrentUserId
+                var currentEmp = _dbContext.Employee.Where(x => x.EmployeeId == 2).FirstOrDefault();
+
+                var dailyTime = _dbContext.vw_AttendanceSummary.Where(x => x.DATE == DateTime.Today && x.EMPLOYEE_NO == currentEmp.EmployeeNo).FirstOrDefault();
                 model.FIRST_IN = dailyTime != null ? dailyTime.FIRST_IN : "--:--:--";
                 model.LAST_OUT = dailyTime != null ? dailyTime.LAST_OUT : "--:--:--";
 

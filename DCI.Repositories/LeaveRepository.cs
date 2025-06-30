@@ -10,6 +10,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection.PortableExecutable;
+using System.Runtime.CompilerServices;
 
 namespace DCI.Repositories
 {
@@ -79,8 +80,8 @@ namespace DCI.Repositories
                                                          }).ToList()
                                                  }).OrderByDescending(x => x.LeaveRequestHeaderId).ToList();
 
-     
 
+         await GetYearList(model, param.EmployeeId);
 
           var vlSummary = _dbContext.LeaveSummary
                     .FromSqlInterpolated($"EXEC sp_GetVacationLeaveBalance @EmployeeId = {param.EmployeeId},@Year = {_currentYear.ToString()}, @LeaveType =  'VL'  ")
@@ -116,6 +117,26 @@ namespace DCI.Repositories
                }).ToList();
 
 
+
+            return model;
+        }
+
+        private async Task<LeaveViewModel> GetYearList(LeaveViewModel model, int empId)
+        {
+            var workdtls = _dbContext.EmployeeWorkDetails.Where(x => x.EmployeeId == empId).FirstOrDefault();
+
+            int startYear = workdtls.DateHired?.Year ?? 2025;
+            int currentYear = DateTime.Now.Year;         
+
+            var _yearList = new LeaveViewModel
+            {
+                YearList = Enumerable.Range(startYear, currentYear - startYear + 1)
+                            .OrderByDescending(y => y) // 🔽 Order from latest to earliest
+                            .ToList(),
+                SelectedYear = currentYear
+            };
+
+            model.YearList = _yearList.YearList;
 
             return model;
         }
