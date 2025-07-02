@@ -14,6 +14,14 @@
         public string OVERTIME { get; set; } = string.Empty;
         public string TOTAL_HOURS { get; set; } = string.Empty;
         public string TOTAL_WORKING_HOURS { get; set; } = string.Empty;
+        public int TypeId { get; set; } = 0;
+        public int CurrentUserId { get; set; } = 0;
+
+        public string DATESTRING { get; set; } = string.Empty;
+        public string DATE_COVERED { get; set; } = string.Empty;
+        public string TOTAL_UNDERTIME { get; set; } = string.Empty;
+        public DateTime DateFrom { get; set; } = DateTime.Now;
+        public DateTime DateTo { get; set; } = DateTime.Now;
     }
     public class DTRCorrectionViewModel
     {
@@ -36,7 +44,17 @@
         public string DepartmentHead { get; set; } = string.Empty;
 
         public string RequestorEmail { get; set; } = string.Empty;
-        public string EmailBody { get; set; } = string.Empty;     
+        public string EmailBody { get; set; } = string.Empty;
+
+        public int TypeId { get; set; } = 0;
+        public int CurrentUserId { get; set; } = 0;
+    }
+
+    public class EmployeeUnderTimeSummary
+    {
+        public string EMPLOYEE_NO { get; set; }
+        public string NAME { get; set; }
+        public decimal? TotalUnderTime { get; set; }
     }
 
 }

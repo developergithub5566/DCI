@@ -84,7 +84,7 @@ namespace DCI.Core.Common
         Deleted = 8,
         Rejected = 9,
     }
-   
+
     public enum EnumDocumentCategory
     {
         [Description("Internal")]
@@ -142,5 +142,11 @@ namespace DCI.Core.Common
         OB = 8,
         VLMon = 9,
         SLMon = 10
+    }
+
+    public enum EnumTypeData
+    {
+        ALL = 0,
+        EMP = 1,
     }
 }

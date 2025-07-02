@@ -1,0 +1,465 @@
+﻿@model IEnumerable<DCI.Models.ViewModel.DailyTimeRecordViewModel>
+@using Newtonsoft.Json;
+@using DCI.Core.Common;
+@using DCI.Models.ViewModel;
+
+<link href="~/css/dcicustom.css" rel="stylesheet" />
+
+
+@{
+    var modulePageAccess = Context.Session.GetString("ModulePageAccess");
+    var canView = false;
+    var canAdd = false;
+    var canEdit = false;
+    var canDelete = false;
+
+    if (modulePageAccess == null)
+    {
+        <script>
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Logout", "Account")',
+                success: function (response) {
+
+                    Swal.fire({
+                        text: "Your session has timed out. Please log in again.",
+                        icon: "info",
+                        confirmButtonText: "Ok"
+                    }).then((result) => {
+                        window.location.href = '/Account/Logout';
+                    });
+                },
+                error: function () {
+                    Swal.fire({
+                        text: "An error occurred. Please try again.",
+                        icon: "error"
+                    });
+                }
+            })
+        </script>
+    }
+    else
+    {
+        var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
+                    .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Department);
+        canView = module?.View ?? false;
+        canAdd = module?.Add ?? false;
+        canEdit = module?.Update ?? false;
+        canDelete = module?.Delete ?? false;
+    }
+
+}
+
+<div class="container-fluid">
+    <div class="spinner-overlay">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <div class="d-sm-flex align-items-center justify-content-between mb-3">
+        <h6 class="m-0 font-weight-bold text-gray-800">Undertime</h6>
+        @*        <div class="upperRightDivBtn">
+            <a href="#" title="Add Department" class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")" data-toggle="modal" data-target="#" onclick="newForm()">
+                <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
+                <span class="text text-white"><small>Add Department</small></span>
+            </a>
+        </div> *@
+
+    </div>
+    <div class="col-12 p0">
+        <ul class="breadcrumb">
+            <li><a href="~/Home/Index">Dashboard</a></li>
+            <li><a href="#">Daily Time Record</a></li>
+            <li><a href="~/DailyTimeRecord/Undertime">Undertime</a></li>
+            @*         <li><a asp-controller="DailyTimeRecord" asp-action="Attendance" asp-route-id="1">Attendance</a></li> *@
+        </ul>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header">
+            <label class="mb0">Data</label>
+        </div>
+        <div class="card-body">
+
+            <div id="accordion">
+                <button type="button" class="btn btnSecondary btn-icon-split pr10" data-toggle="collapse" href="#collapseFilter">
+                    <span class="icon text-white">
+                        <i class="fa-solid fa-filter text-xs"></i>
+                    </span>
+                    <span class="text"><small>Filter</small></span>
+                </button>
+
+                <a href="http://192.168.1.100/DCI-ESS-STG/leave/" class="btn btnPrimary btn-icon-split">
+                    <span class="icon text-white">
+                        <i class="fa-solid fa-redo text-xs"></i>
+                    </span>
+                    <span class="text"><small>Reload</small></span>
+                </a>
+
+
+                <div id="collapseFilter" class="collapse  mt20" data-parent="#accordion">
+                    <form id="frmFilter" method="post" class="row">
+                        <div class="form-group col-3">
+                            <label class="frmText">Date Covered From: </label>
+                            <div class="input-group">
+                                <input type="text" name="dateFrom" id="dateFrom" class="form-control frmField" value="" autocomplete="off">
+                                <div class="input-group-prepend prependBtn">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-3">
+                            <label class="frmText">Date Covered To: </label>
+                            <div class="input-group">
+                                <input type="text" name="dateTo" id="dateTo" class="form-control frmField" value="" autocomplete="off">
+                                <div class="input-group-prepend prependBtn">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-6 col-md-4 col-lg-3 col-xl-2 mb0">
+                            <label>&nbsp;</label>
+                            <button class="btn btn-dark btn-icon-split d-block pl20" onclick="dateFilter()">
+                                <span class="text"><small>Apply </small></span>
+                                <span class="icon text-white-50"><i class="fa-solid fa-caret-right text-xs"></i></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+
+            <div class="table-responsive mt20">
+                <table class="display" id="tblDTR">
+                    <thead>
+                        <tr>
+                            <th>
+                                <input type="checkbox" id="selectAll" />
+                            </th>
+                            <th>
+                                <label>Employee No.</label>
+                            </th>
+                            <th>
+                                <label>Name</label>
+                            </th>
+                            <th>
+                                <label>Date Covered</label>
+                            </th>
+                            <th>
+                                <label>Total Undertime</label>
+                            </th>
+                     
+                            <th>
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="row-checkbox" />
+
+                                </td>
+                              
+                                <td>
+                                    @item.EMPLOYEE_NO
+                                </td>
+                                <td>
+                                    @item.NAME
+                                </td>
+                            
+                                <td class="text-center">
+                             @*    <td class="text-center"><strong><span class='btn-danger applicationStatus'>@hdr.StatusName</span></strong></td> *@
+                                    <strong><span class='btn-primary applicationStatus'>@item.DateFrom.ToString("MM/dd/yyyy")</span></strong>
+                                    <strong><span class='btn-secondary applicationStatus'>to</span></strong>
+                                    <strong><span class='btn-primary applicationStatus'>@item.DateTo.ToString("MM/dd/yyyy")</span></strong>
+                                </td>
+                                <td>
+                                    @item.TOTAL_UNDERTIME
+                                </td>
+                             
+                             
+                                <td class="text-center">
+                                    <a href="#" onclick='editForm("@item.EMPLOYEE_NO")' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+</<div>
+</div>
+
+
+            <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Daily Time Record</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="createForm">
+                            <div class="modal-body">
+                               <row>
+                                  <strong><label id="labelEmpName"></label></strong> 
+                               </row>
+                                <table class="table table-bordered text-dark text-xs">
+                                    <thead>
+                                        <tr>
+
+                                          
+                                            <th>
+                                                <label>Date</label>
+                                            </th>
+                                            <th>
+                                                <label>Time In</label>
+                                            </th>
+                                            <th>
+                                                <label>Time Out</label>
+                                            </th>
+                                            <th>
+                                                <label>Undertime</label>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dtrListTable">
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><small>Close</small></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+@section scripts {
+
+
+    @*       <script src="https://code.jquery.com/jquery-3.7.1.js"></script> *@
+@*              <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
+                 <script src="https://cdn.datatables.net/select/3.0.1/js/dataTables.select.js"></script>
+                <script src="https://cdn.datatables.net/select/3.0.1/js/select.dataTables.js"></script>                
+ 
+              <link href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.css" rel="stylesheet" />
+                <link href="https://cdn.datatables.net/select/3.0.1/css/select.dataTables.css" rel="stylesheet" />   *@
+
+
+                    <!-- jQuery -->
+              @*   <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+                <!-- DataTables CSS + JS -->
+                <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+                <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script> *@
+@* 
+    okay na to
+                <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+                <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+ *@
+
+
+                
+               
+
+
+
+
+
+
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.2/moment.min.js"></script>
+                <script src=" https://cdn.datatables.net/datetime/1.5.5/js/dataTables.dateTime.min.js"></script>
+
+
+
+
+
+
+                <script src="~/js/dci-validation.js"></script>
+
+                <script type="text/javascript">
+                        var js = jQuery.noConflict(true);
+
+                                $('.spinner-overlay').show();
+
+                    setTimeout(() => {
+                        $('.spinner-overlay').hide();
+                    }, 200);
+
+
+                        $(document).ready(function () {                           
+
+                    //                                      js('#tblDTR').DataTable({
+                    //                                           pageLength: 50
+
+                    //                                      });
+                   
+                    // js('#selectAll').on('click', function () {
+                    //     $('.row-checkbox').prop('checked', this.checked);
+                    // });
+
+                                        var minDate, maxDate;
+
+                    // Custom filtering function which will search data in column four between two values
+                    DataTable.ext.search.push(function (settings, data, dataIndex) {
+                        var min = minDate.val();
+                        var max = maxDate.val();
+                        var date = new Date(data[4]);
+
+                        if (
+                            (min === null && max === null) ||
+                            (min === null && date <= max) ||
+                            (min <= date && max === null) ||
+                            (min <= date && date <= max)
+                        ) {
+                            return true;
+                        }
+                        return false;
+                    });
+
+                    // Create date inputs
+                    minDate = new DateTime('#dateFrom', {
+                        format: 'MM/DD/YYYY'
+                    });
+                    maxDate = new DateTime('#dateTo', {
+                        format: 'MM/DD/YYYY'
+                    });
+
+                    // DataTables initialisation
+                    var table = $('#tblDTR').DataTable();
+
+                    // Refilter the table
+                    $('#dateFrom, #dateTo').on('change', function () {
+                        table.draw();
+                    });
+
+
+
+                          }); // end document
+
+
+
+                        function dateFilter() {
+                            alert("x")
+                                  
+                                       var min =  $('#dateFrom').val();
+                                     var max =$('#dateTo').val();
+
+
+
+                                        console.log(min,max)
+                                      $.ajax({
+                                          type: 'POST',
+                                          url: '@Url.Action("Undertime", "DailyTimeRecord")',
+                                           data: { DateFrom: min, DateTo :  max },
+                                          success: function (response) {
+                                              if (response.success) {
+                                                     console.log(response);
+                                                       //  $('#dateCovered').val(response.data.dtrDateTime);
+
+                                                         document.getElementById('labelEmpName').textContent =  response.emp;
+
+                                                    var tbodytable = $("#dtrListTable");
+                                                    tbodytable.empty();
+
+                                                    if (response.data.length > 0) {
+                                                        $.each(response.data, function(index, item) {
+                                                            var row = `<tr>
+
+                                                                                 <td>${item.datestring}</td>
+                                                                                    <td>${item.firsT_IN}</td>
+                                                                                    <td>${item.lasT_OUT}</td>
+                                                                                       <td>${item.undeR_TIME}</td>
+                                                                        </tr>`;
+                                                            tbodytable.append(row);
+                                                        });
+                                                    } else {
+                                                        tbodytable.html(`<tr><td colspan="4" class="text-center">No record found.</td></tr>`);
+                                                    }
+
+
+                                                  js('#createmodal').modal('show');
+                                              } else {
+                                                  Swal.fire({
+                                                      text: response.message,
+                                                      icon: "error"
+                                                  });
+                                              }
+                                              $('.spinner-overlay').hide();
+                                          },
+                                          error: function () {
+                                              $('.spinner-overlay').hide();
+                                              Swal.fire({
+                                                  text: "An error occurred. Please try again.",
+                                                  icon: "error"
+                                              });
+                                          }
+                                      });
+                        }
+
+
+
+                        function editForm(empNo) {
+                                //   event.preventDefault();
+                                     console.log(empNo);
+
+                                      $.ajax({
+                                          type: 'POST',
+                                          url: '@Url.Action("UndertimeById", "DailyTimeRecord")',
+                                           data: { EMPLOYEE_NO: empNo },
+                                          success: function (response) {
+                                              if (response.success) {
+                                                     console.log(response);
+                                                       //  $('#dateCovered').val(response.data.dtrDateTime);
+
+                                                         document.getElementById('labelEmpName').textContent =  response.emp;
+
+                                                    var tbodytable = $("#dtrListTable");
+                                                    tbodytable.empty();
+
+                                                    if (response.data.length > 0) {
+                                                        $.each(response.data, function(index, item) {
+                                                            var row = `<tr>
+                                                                            
+                                                                                 <td>${item.datestring}</td>
+                                                                                    <td>${item.firsT_IN}</td>
+                                                                                    <td>${item.lasT_OUT}</td>
+                                                                                       <td>${item.undeR_TIME}</td>
+                                                                        </tr>`;
+                                                            tbodytable.append(row);
+                                                        });
+                                                    } else {
+                                                        tbodytable.html(`<tr><td colspan="4" class="text-center">No record found.</td></tr>`);
+                                                    }
+
+
+                                                  js('#createmodal').modal('show');
+                                              } else {
+                                                  Swal.fire({
+                                                      text: response.message,
+                                                      icon: "error"
+                                                  });
+                                              }
+                                              $('.spinner-overlay').hide();
+                                          },
+                                          error: function () {
+                                              $('.spinner-overlay').hide();
+                                              Swal.fire({
+                                                  text: "An error occurred. Please try again.",
+                                                  icon: "error"
+                                              });
+                                          }
+                                      });                           
+                        }
+
+                    
+
+
+
+
+                </script>
+}

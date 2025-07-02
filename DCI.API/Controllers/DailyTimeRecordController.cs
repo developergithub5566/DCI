@@ -21,11 +21,11 @@ namespace DCI.API.Controllers
             _leaveRepository = leaveRepository;
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("GetAllDTR")]
-        public async Task<IActionResult> GetAllDTR()
+        public async Task<IActionResult> GetAllDTR(DailyTimeRecordViewModel model)
         {
-            var result = await _dtrRepository.GetAllDTR();
+            var result = await _dtrRepository.GetAllDTR(model);
             return Ok(result);
         }
 
@@ -64,7 +64,7 @@ namespace DCI.API.Controllers
         [Route("GetAllDTRCorrection")]
         public async Task<IActionResult> GetAllDTRCorrection([FromBody] DTRCorrectionViewModel model)
         {
-            return Ok(await _dtrRepository.GetAllDTRCorrection(model.CreatedBy));
+            return Ok(await _dtrRepository.GetAllDTRCorrection(model));
         }
 
         [HttpPost]
@@ -79,6 +79,21 @@ namespace DCI.API.Controllers
         public async Task<IActionResult> SaveDTRCorrection([FromBody] DTRCorrectionViewModel model)
         {
             return Ok(await _dtrRepository.SaveDTRCorrection(model));
+        }
+
+        [HttpPost]
+        [Route("GetAllUndertime")]
+        public async Task<IActionResult> GetAllUndertime(DailyTimeRecordViewModel model)
+        {
+            var result = await _dtrRepository.GetAllUndertime(model);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("UndertimeById")]
+        public async Task<IActionResult> UndertimeById([FromBody] DailyTimeRecordViewModel model)
+        {
+            return Ok(await _dtrRepository.UndertimeById(model));
         }
     }
 }

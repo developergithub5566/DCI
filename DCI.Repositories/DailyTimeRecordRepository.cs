@@ -22,13 +22,12 @@ namespace DCI.Repositories
             _dbContext.Dispose();
         }
 
-        public async Task<IList<DailyTimeRecordViewModel>> GetAllDTR()
+        public async Task<IList<DailyTimeRecordViewModel>> GetAllDTR(DailyTimeRecordViewModel model)
         {
             var context = _dbContext.vw_AttendanceSummary.AsQueryable();
 
 
-            var query = (from dtr in context
-                             // where dept.IsActive == true && dept.DepartmentId == deptId
+            var query = (from dtr in context                  
                          select new DailyTimeRecordViewModel
                          {
                              ID = dtr.ID,
@@ -45,6 +44,12 @@ namespace DCI.Repositories
                              TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS
                          }).ToList();
 
+            if((int)EnumTypeData.EMP == model.TypeId)
+            {
+                var emp = _dbContext.Employee.Where(x => x.EmployeeId == model.CurrentUserId).FirstOrDefault();
+                if(emp != null) 
+                query = query.Where(x => x.EMPLOYEE_NO == emp.EmployeeNo).ToList();
+            }
 
             return query;
         }
@@ -75,11 +80,11 @@ namespace DCI.Repositories
 
             return query;
         }
-        public async Task<IList<DTRCorrectionViewModel>> GetAllDTRCorrection(int empId)
+        public async Task<IList<DTRCorrectionViewModel>> GetAllDTRCorrection(DTRCorrectionViewModel model)
         {    
             var query = (from dtr in _dbContext.DTRCorrection.AsQueryable()
                          join stat in _dbContext.Status on dtr.Status equals stat.StatusId
-                         where dtr.CreatedBy == empId
+                         where dtr.CreatedBy == model.CreatedBy
                          select new DTRCorrectionViewModel
                          {
                              DtrId = dtr.DtrId,
@@ -95,6 +100,12 @@ namespace DCI.Repositories
                              CreatedBy = dtr.CreatedBy,
                              IsActive = dtr.IsActive
                          }).ToList();
+
+
+            if ((int)EnumTypeData.EMP == model.TypeId)
+            {           
+                    query = query.Where(x => x.CreatedBy == model.CreatedBy).ToList();
+            }
             return query;
         }
 
@@ -223,6 +234,121 @@ namespace DCI.Repositories
             string formattedA = setA.ToString("D4");
             string formattedB = setB.ToString("D4");
             return $"{formattedA}";
+        }
+
+
+        public async Task<IList<DailyTimeRecordViewModel>> GetAllUndertime(DailyTimeRecordViewModel model)
+        {
+            var context = _dbContext.vw_AttendanceSummary.AsQueryable();
+
+
+            var dateTo = model.DateTo.Date.AddDays(1).AddTicks(-1);
+
+
+            //var query = (from dtr in context
+            //             where dtr.DATE >= dateFrom && dtr.DATE <= dateTo
+            //             group dtr by new { dtr.EMPLOYEE_NO, dtr.NAME } into g
+            //             select new DailyTimeRecordViewModel
+            //             {
+            //                 EMPLOYEE_NO = g.Key.EMPLOYEE_NO,
+            //                 NAME = g.Key.NAME,
+            //                 TOTAL_UNDERTIME = g.Sum(x =>
+            //                     TimeSpan.TryParse(x.UNDER_TIME, out var t) ? (decimal?)t.TotalMinutes : 0m)
+            //             }).ToList();
+
+            //var rawData = context
+            //                .Where(dtr => dtr.DATE >= dateFrom && dtr.DATE <= dateTo)
+            //                .Select(dtr => new 
+            //                {
+            //                    dtr.EMPLOYEE_NO,
+            //                    dtr.NAME,
+            //                    dtr.UNDER_TIME
+            //                })
+            //                .ToList(); // ← materialize data to memory
+
+            //var query = rawData
+            //    .GroupBy(x => new { x.EMPLOYEE_NO, x.NAME })
+            //    .Select(g =>  
+            //    {
+            //        var totalMinutes = g.Sum(x =>
+            //            TimeSpan.TryParse(x.UNDER_TIME, out var t) ? t.TotalMinutes : 0);
+
+            //        return new DailyTimeRecordViewModel
+            //        {
+            //            EMPLOYEE_NO = g.Key.EMPLOYEE_NO,
+            //            NAME = g.Key.NAME,
+            //            TOTAL_UNDERTIME = (decimal)totalMinutes
+            //        };
+            //    })
+            //    .ToList();
+
+            var rawData = context
+                        .Where(dtr => dtr.DATE >= model.DateFrom.Date && dtr.DATE <= dateTo)
+                        .Select(dtr => new
+                        {
+                            dtr.EMPLOYEE_NO,                        
+                            dtr.NAME,
+                            dtr.UNDER_TIME
+                        })
+                        .ToList(); 
+
+            var query = rawData
+                .GroupBy(x => new { x.EMPLOYEE_NO, x.NAME })
+                .Select(g =>
+                {
+                    var totalUnderTime = g
+                        .Select(x => TimeSpan.TryParse(x.UNDER_TIME, out var t) ? t : TimeSpan.Zero)
+                        .Aggregate(TimeSpan.Zero, (sum, next) => sum + next);
+
+                    var totalMinutes = g.Sum(x =>
+                         TimeSpan.TryParse(x.UNDER_TIME, out var t) ? t.TotalMinutes : 0);
+
+                    return new DailyTimeRecordViewModel
+                    {
+                        EMPLOYEE_NO = g.Key.EMPLOYEE_NO,
+                        NAME = g.Key.NAME,          
+                        DateFrom = model.DateFrom,
+                        DateTo = model.DateTo,
+                        TOTAL_UNDERTIME =  string.Format("{0:0.0000}",totalMinutes) + " or " + totalUnderTime.ToString(@"hh\:mm\:ss") 
+                    };
+                })
+                .ToList();
+
+            return query;
+        }
+
+        public async Task<IList<DailyTimeRecordViewModel>> UndertimeById(DailyTimeRecordViewModel model)
+        {
+            var context = _dbContext.vw_AttendanceSummary.AsQueryable();
+
+
+            DateTime dateFrom = new DateTime(2024, 6, 1);
+           
+
+            var dateTo = model.DateTo.Date.AddDays(1).AddTicks(-1);
+
+            var query = (from dtr in context
+                         //join emp in _dbContext.Employee on dtr.EMPLOYEE_NO equals emp.EmployeeNo
+                         where dtr.DATE >= dateFrom && dtr.DATE <= dateTo && dtr.EMPLOYEE_NO == model.EMPLOYEE_NO // && emp.EmployeeId == model.ID
+                         select new DailyTimeRecordViewModel
+                         {
+                             ID = dtr.ID,
+                             EMPLOYEE_NO = dtr.EMPLOYEE_NO,
+                             NAME = dtr.NAME,
+                             DATE = dtr.DATE,
+                             FIRST_IN = dtr.FIRST_IN,
+                             LAST_OUT = dtr.LAST_OUT,
+                             LATE = dtr.LATE,
+                             CLOCK_OUT = dtr.CLOCK_OUT,
+                             UNDER_TIME = dtr.UNDER_TIME,
+                             OVERTIME = dtr.OVERTIME,
+                             TOTAL_HOURS = dtr.TOTAL_HOURS,
+                             TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS,
+                             DATESTRING = dtr.DATE.ToString("MM/dd/yyyy")
+                         }).ToList();
+
+
+            return query;
         }
 
     }

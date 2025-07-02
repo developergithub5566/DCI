@@ -139,16 +139,31 @@
                             </div>
                         </a>
                     }
-                    @if (module.ModulePageId == (int)EnumModulePage.DTRManagement)
-                    {
-                        @* <hr class='sidebar-divider'>
-                        <a href="/DailyTimeRecord/List" class='mainModule'>
-                            <div class='sidebar-heading mainModuleActive'>
-                                <i class='fa-solid fa-file'></i>
-                                <span>DTR Management</span>
-                                <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
-                            </div>
-                        </a> *@
+                    @if (module.ModulePageId == (int)EnumModulePage.DailyTimeRecord)
+                    {                  
+                        
+                        <hr class='sidebar-divider'>
+                        <div role="group">
+                            <a href="#" id="btnGroupDrop1" class="mainModule" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class='sidebar-heading mainModuleActive'>
+                                    <i class='fa-solid fa fa-book'></i>
+                                    <span>Daily Time Record</span>
+                                    <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">         
+                                   <li><a asp-controller="DailyTimeRecord" asp-action="Attendance" asp-route-id="1">Attendance</a></li>   
+                                        <li><a asp-controller="DailyTimeRecord" asp-action="DTRCorrection" asp-route-id="1">DTR Correction</a></li>   
+                                @*     <li><a class="dropdown-item" href="/DailyTimeRecord/Attendance/">Attendance</a></li>    *@
+                             @*        <li><a class="dropdown-item" href="/DailyTimeRecord/DTRCorrection/">DTR Correction</a></li>    *@  
+                                    <li><a class="dropdown-item" href="/DailyTimeRecord/WFH/">WFH</a></li>     
+                             
+                            </ul>
+                        </div>
+                    }
+
+                          @if (module.ModulePageId == (int)EnumModulePage.DTRManagement)
+                    {                  
                         
                         <hr class='sidebar-divider'>
                         <div role="group">
@@ -160,8 +175,12 @@
                                 </div>
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">         
-                                    <li><a class="dropdown-item" href="/DailyTimeRecord/List/">Time and Attendance</a></li>   
-                                    <li><a class="dropdown-item" href="/DailyTimeRecord/DTRCorrection/">DTR Correction</a></li>     
+                                   <li><a asp-controller="DailyTimeRecord" asp-action="Attendance" asp-route-id="0">Attendance Summary</a></li>   
+                                        <li><a asp-controller="DailyTimeRecord" asp-action="DTRCorrection" asp-route-id="0">DTR Correction Summary</a></li>   
+                                @*     <li><a class="dropdown-item" href="/DailyTimeRecord/Attendance/">Attendance</a></li>    *@
+                             @*        <li><a class="dropdown-item" href="/DailyTimeRecord/DTRCorrection/">DTR Correction</a></li>    *@  
+                                    <li><a class="dropdown-item" href="/DailyTimeRecord/WFH/">WFH Summary</a></li>     
+                                                <li><a class="dropdown-item" href="/DailyTimeRecord/Undertime/">Undertime</a></li>     
                             </ul>
                         </div>
                     }

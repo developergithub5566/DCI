@@ -1,4 +1,5 @@
-﻿using DCI.Models.Configuration;
+﻿using DCI.Core.Common;
+using DCI.Models.Configuration;
 using DCI.Models.ViewModel;
 using DCI.WebApp.Configuration;
 using Microsoft.AspNetCore.Mvc;
@@ -21,21 +22,38 @@ namespace DCI.WebApp.Controllers
         {
             this._apiconfig = apiconfig;
             this._userSessionHelper = userSessionHelper;
-        }   
+        }
 
-        public async Task<IActionResult> List()
+
+        public async Task<IActionResult> Attendance(int id)
         {
             List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();
+            DailyTimeRecordViewModel param = new DailyTimeRecordViewModel();
             try
             {
                 using (var _httpclient = new HttpClient())
                 {
-                    HttpResponseMessage response = await _httpclient.GetAsync(_apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllDTR");
-                    string responseBody = await response.Content.ReadAsStringAsync();
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    param.TypeId = id;
 
+                    param.CurrentUserId = 2;//currentUser.UserId;
+                    
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllDTR");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
                     if (response.IsSuccessStatusCode == true)
                     {
                         model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
+                    }
+                    ViewBag.BreadCrumbLabelA = "DTR Management";
+                    ViewBag.BreadCrumbLabelB = "Attendance Summary";
+                    if ((int)EnumTypeData.EMP == param.TypeId)
+                    {
+                        ViewBag.BreadCrumbLabelA = "Daily Time Record";
+                        ViewBag.BreadCrumbLabelB = "Attendance";
                     }
                 }
 
@@ -209,9 +227,10 @@ namespace DCI.WebApp.Controllers
           //  return View(model);
         }
 
-        public async Task<IActionResult> DTRCorrection()
+        public async Task<IActionResult> DTRCorrection(int id)
         {  
             List<DTRCorrectionViewModel> list = new List<DTRCorrectionViewModel>();
+           
             try
             {
                 using (var _httpclient = new HttpClient())
@@ -220,8 +239,8 @@ namespace DCI.WebApp.Controllers
                     var currentUser = _userSessionHelper.GetCurrentUser();
 
                     model.CreatedBy = 2;//currentUser.UserId;
+                    model.TypeId = id;
 
-                   
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllDTRCorrection");
                     request.Content = stringContent;
@@ -232,6 +251,11 @@ namespace DCI.WebApp.Controllers
                     {
                         list = JsonConvert.DeserializeObject<List<DTRCorrectionViewModel>>(responseBody)!;
             
+                    }
+                    ViewBag.BreadCrumbLabel = "DTR Correction Summary";
+                    if ((int)EnumTypeData.EMP == model.TypeId)
+                    {
+                        ViewBag.BreadCrumbLabel = "DTR Correction";
                     }
                 }
 
@@ -323,7 +347,94 @@ namespace DCI.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
-        
+        public async Task<IActionResult> Undertime(DailyTimeRecordViewModel param)
+        {
+            List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();
+            //DailyTimeRecordViewModel param = new DailyTimeRecordViewModel();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                   
+
+                    param.CurrentUserId = 2;//currentUser.UserId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllUndertime");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
+                    }
+
+                    if ((int)EnumTypeData.EMP == param.TypeId)
+                    {
+                 
+                    }
+                }
+
+                return View(model);
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return View(model);
+        }
+        public async Task<IActionResult> UndertimeById(DailyTimeRecordViewModel param)
+        {
+            List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+
+                    // var currentUser = _userSessionHelper.GetCurrentUser();
+
+                    //  model.CreatedBy = 2;//currentUser.UserId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/UndertimeById");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+
+                    string emp_name = string.Empty;
+                    string emp_no = string.Empty;
+                    string emp_info = string.Empty;
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
+                        emp_name = model.FirstOrDefault().NAME ?? string.Empty;
+                        emp_no = model.FirstOrDefault().EMPLOYEE_NO ?? string.Empty;
+                       
+                    }
+                    return Json(new { success = true, data = model ,emp  = String.Format("{0} - {1}",emp_no,emp_name)});
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
 
     }
 }

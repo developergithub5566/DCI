@@ -56,8 +56,8 @@
         </div>
     </div>
     <div class="d-sm-flex align-items-center justify-content-between mb-3">
-        <h6 class="m-0 font-weight-bold text-gray-800">Time and Attendance</h6>
- @*        <div class="upperRightDivBtn">
+        <h6 class="m-0 font-weight-bold text-gray-800">@ViewBag.BreadCrumbLabel</h6>
+        @*        <div class="upperRightDivBtn">
             <a href="#" title="Add Department" class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")" data-toggle="modal" data-target="#" onclick="newForm()">
                 <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
                 <span class="text text-white"><small>Add Department</small></span>
@@ -68,7 +68,9 @@
     <div class="col-12 p0">
         <ul class="breadcrumb">
             <li><a href="~/Home/Index">Dashboard</a></li>
-            <li><a href="~/DailyTimeRecord/List">Time and Attendance</a></li>
+            <li><a href="#">Daily Time Record</a></li>
+            <li><a href="#">@ViewBag.BreadCrumbLabel</a></li>
+    @*         <li><a asp-controller="DailyTimeRecord" asp-action="Attendance" asp-route-id="1">Attendance</a></li> *@
         </ul>
     </div>
 
@@ -80,7 +82,7 @@
             <div class="table-responsive mt20">
                 <table class="table table-bordered" id="tblDTR">
                     <thead>
-                        <tr>                       
+                        <tr>
                             <th>
                                 <label>Employee No.</label>
                             </th>
@@ -97,7 +99,10 @@
                                 <label>Time Out</label>
                             </th>
                             <th>
-                                <label>Source</label>
+                                <label>Late</label>
+                            </th>
+                            <th>
+                                <label>Undertime</label>
                             </th>
                             <th>
                                 Action
@@ -108,7 +113,7 @@
                         @foreach (var item in Model)
                         {
                             <tr>
-                        
+
                                 <td>
                                     @item.EMPLOYEE_NO
                                 </td>
@@ -122,12 +127,15 @@
                                     @item.FIRST_IN
                                 </td>
                                 <td>
-                                    @item.LAST_OUT
+                                    @item.LATE
                                 </td>
                                 <td>
-                                   Biometrics
+                                    @item.UNDER_TIME
                                 </td>
-                          @*       <td class="text-center">
+                                <td>
+                                    Biometrics
+                                </td>
+                                @*       <td class="text-center">
                                     <a href="#" onclick="newForm({
                                            date : @item.DATE.ToString(),
                                            emp : @item.EMPLOYEE_NO.ToString(),
@@ -137,28 +145,28 @@
                                           })" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
                                 </td> *@
                                 <td class="text-center">
-                                    <a href="#" onclick='newForm({ 
-                                                    date:"@item.DATE.ToString("MM/dd/yyyy")",   
-                                                    emp:"@item.EMPLOYEE_NO", 
-                                                    name :"@item.NAME" ,
-                                                    source : "BIOMETRICS",
-                                                    timein : "@item.FIRST_IN",
-                                                    timeout : "@item.LAST_OUT",
-                                                    clockout : "@item.CLOCK_OUT",
-                                                    Late : "@item.LATE",
-                                                    UnderTime : "@item.UNDER_TIME",
-                                                    OT : "@item.OVERTIME",
-                                                    Hours : "@item.TOTAL_HOURS",
-                                                    WorkingHours : "@item.TOTAL_WORKING_HOURS"
-                                                        })' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+                                    <a href="#" onclick='newForm({
+                                                        date:"@item.DATE.ToString("MM/dd/yyyy")",
+                                                        emp:"@item.EMPLOYEE_NO",
+                                                        name :"@item.NAME" ,
+                                                        source : "BIOMETRICS",
+                                                        timein : "@item.FIRST_IN",
+                                                        timeout : "@item.LAST_OUT",
+                                                        clockout : "@item.CLOCK_OUT",
+                                                        Late : "@item.LATE",
+                                                        UnderTime : "@item.UNDER_TIME",
+                                                        OT : "@item.OVERTIME",
+                                                        Hours : "@item.TOTAL_HOURS",
+                                                        WorkingHours : "@item.TOTAL_WORKING_HOURS"
+                                                            })' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
                                 </td>
                             </tr>
                         }
                     </tbody>
                 </table>
             </div>
-            </<div>
-            </div>
+</<div>
+</div>
 
 
             <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -226,7 +234,7 @@
 
                                 </table>
                             </div>
-                            <div class="modal-footer">                                
+                            <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal"><small>Close</small></button>
                             </div>
                         </form>
@@ -234,7 +242,7 @@
                 </div>
             </div>
 
-            @section scripts {
+@section scripts {
 
                 <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
                 <script src="~/js/dci-validation.js"></script>
@@ -250,10 +258,10 @@
 
 
                         $(document).ready(function () {
-                            js('#tblDepartment').DataTable({
+                            js('#tblDTR').DataTable({
                             });
 
-                           
+
                         });
 
 
@@ -264,7 +272,7 @@
                                  document.getElementById('lblName').textContent = dtr.name;
                                  document.getElementById('lblSource').textContent = dtr.source;
                                  document.getElementById('lblTimeIn').textContent = dtr.timein;
-                                  document.getElementById('lblTimeOut').textContent = dtr.timeout 
+                                  document.getElementById('lblTimeOut').textContent = dtr.timeout
                                 document.getElementById('lblClockOut').textContent = dtr.clockout;
                                 document.getElementById('lblLate').textContent = dtr.Late;
                                 document.getElementById('lblUnderTime').textContent = dtr.UnderTime;
@@ -282,7 +290,7 @@
                         //         document.getElementById('lblTimeIn').textContent = '08:27:43 AM';
                         //         document.getElementById('lblTimeOut').textContent = '--:--:--';
                         //         document.getElementById('lblClockOut').textContent = '05:27:43 PM';
-                        //         document.getElementById('lblLate').textContent = '00:00:00';                              
+                        //         document.getElementById('lblLate').textContent = '00:00:00';
                         //         document.getElementById('lblUnderTime').textContent = '09:00:00';
                         //         document.getElementById('lblOT').textContent = '00:00:00';
                         //         document.getElementById('lblHours').textContent = '00:00:00';
@@ -291,7 +299,7 @@
                         // }
 
 
-              
+
 
                 </script>
-            }
+}
