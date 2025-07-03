@@ -4,7 +4,10 @@
 @using DCI.Models.ViewModel;
 
 <link href="~/css/dcicustom.css" rel="stylesheet" />
-
+@{
+    var dateFrom = Model.FirstOrDefault()?.DateFrom;
+    var dateTo = Model.FirstOrDefault()?.DateTo;
+}
 
 @{
     var modulePageAccess = Context.Session.GetString("ModulePageAccess");
@@ -72,6 +75,8 @@
             <li><a href="#">Daily Time Record</a></li>
             <li><a href="~/DailyTimeRecord/Undertime">Undertime</a></li>
             @*         <li><a asp-controller="DailyTimeRecord" asp-action="Attendance" asp-route-id="1">Attendance</a></li> *@
+
+           
         </ul>
     </div>
 
@@ -80,16 +85,16 @@
             <label class="mb0">Data</label>
         </div>
         <div class="card-body">
-
+@* 
             <div id="accordion">
-                <button type="button" class="btn btnSecondary btn-icon-split pr10" data-toggle="collapse" href="#collapseFilter">
+                <button type="button" class="btn btnSecondary btn-icon-split pr10" data-toggle="collapse" href="#collapseFilter" id="collapseFilterBtn">
                     <span class="icon text-white">
                         <i class="fa-solid fa-filter text-xs"></i>
                     </span>
                     <span class="text"><small>Filter</small></span>
                 </button>
 
-                <a href="http://192.168.1.100/DCI-ESS-STG/leave/" class="btn btnPrimary btn-icon-split">
+                <a href="~/DailyTimeRecord/Undertime" class="btn btnPrimary btn-icon-split">
                     <span class="icon text-white">
                         <i class="fa-solid fa-redo text-xs"></i>
                     </span>
@@ -119,18 +124,58 @@
                         </div>
                         <div class="form-group col-sm-6 col-md-4 col-lg-3 col-xl-2 mb0">
                             <label>&nbsp;</label>
-                            <button class="btn btn-dark btn-icon-split d-block pl20" onclick="dateFilter()">
+                            <button class="btn btn-dark btn-icon-split d-block pl20" id="viewAttendanceBtn">
                                 <span class="text"><small>Apply </small></span>
                                 <span class="icon text-white-50"><i class="fa-solid fa-caret-right text-xs"></i></span>
                             </button>
+           
                         </div>
                     </form>
                 </div>
+            </div> *@
+            <div id="accordion">
+            <form id="frmFilter" method="post" class="row">
+                <div class="form-group col-3">
+                    <label class="frmText">Date Covered From: </label>
+                    <div class="input-group">
+                   @*      <input type="text" name="dateFrom" id="dateFrom" class="form-control frmField" value="@dateFrom?.ToString("yyyy-MM-dd")" autocomplete="off">
+                        <div class="input-group-prepend prependBtn">
+                            <i class="fa fa-calendar"></i>
+                        </div> *@
+
+                            <input type="text" name="dateFrom" id="dateFrom" class="form-control frmField" value="@dateFrom?.ToString("yyyy-MM-dd")" autocomplete="off">
+                            <div class="input-group-prepend prependBtn">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            <label for="dateFrom" generated="true" class="error"></label>
+                    </div>
+                </div>
+                <div class="form-group col-3">
+                    <label class="frmText">Date Covered To: </label>
+                    <div class="input-group">
+                   
+
+                            <input type="text" name="dateTo" id="dateTo" class="form-control frmField" value="@dateTo?.ToString("yyyy-MM-dd")" autocomplete="off">
+                            <div class="input-group-prepend prependBtn">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            <label for="dateTo" generated="true" class="error"></label>
+                    </div>
+                </div>
+                <div class="form-group col-sm-6 col-md-4 col-lg-3 col-xl-2 mb0">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-dark btn-icon-split d-block pl20" id="viewAttendanceBtn">
+                        <span class="text"><small>Apply </small></span>
+                        <span class="icon text-white-50"><i class="fa-solid fa-caret-right text-xs"></i></span>
+                    </button>
+                
+                </div>
+            </form>
             </div>
 
 
             <div class="table-responsive mt20">
-                <table class="display" id="tblDTR">
+                <table class="table table-bordered" id="tblDTR">
                     <thead>
                         <tr>
                             <th>
@@ -262,24 +307,52 @@
                 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
  *@
 
-
-                
-               
-
+        @*         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.2/moment.min.js"></script>
+                <script src=" https://cdn.datatables.net/datetime/1.5.5/js/dataTables.dateTime.min.js"></script> *@
 
 
+                <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
 
-
-
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.2/moment.min.js"></script>
-                <script src=" https://cdn.datatables.net/datetime/1.5.5/js/dataTables.dateTime.min.js"></script>
-
-
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 
 
 
                 <script src="~/js/dci-validation.js"></script>
+
+
+                <script>
+
+                    flatpickr("#dateFrom", {
+                                   dateFormat: "Y-m-d",
+
+                                   onChange: function(selectedDates, dateStr, instance) {
+                                  }
+                                });
+
+                                  flatpickr("#dateTo", {
+                                   dateFormat: "Y-m-d",
+
+                                   onChange: function(selectedDates, dateStr, instance) {
+                                  }
+                                });
+
+
+                                            $('#viewAttendanceBtn').on('click', function (event) {
+                         event.preventDefault();
+                        var dateFrom = $('#dateFrom').val();
+                        var dateTo = $('#dateTo').val();
+
+                        var url = `/DailyTimeRecord/Undertime?DateFrom=${encodeURIComponent(dateFrom)}&DateTo=${encodeURIComponent(dateTo)}`;
+                        window.location.href = url;
+                    });
+
+
+
+                      $('#selectAll').on('click', function () {
+                        $('.row-checkbox').prop('checked', this.checked);
+                    });
+                </script>
 
                 <script type="text/javascript">
                         var js = jQuery.noConflict(true);
@@ -291,51 +364,51 @@
                     }, 200);
 
 
-                        $(document).ready(function () {                           
+                        $(document).ready(function () {
+                
+                                                         js('#tblDTR').DataTable({
+                                                              pageLength: 50
 
-                    //                                      js('#tblDTR').DataTable({
-                    //                                           pageLength: 50
-
-                    //                                      });
+                                                         });
                    
-                    // js('#selectAll').on('click', function () {
-                    //     $('.row-checkbox').prop('checked', this.checked);
-                    // });
+                  
 
-                                        var minDate, maxDate;
+
+
+                                    //    var minDate, maxDate;
 
                     // Custom filtering function which will search data in column four between two values
-                    DataTable.ext.search.push(function (settings, data, dataIndex) {
-                        var min = minDate.val();
-                        var max = maxDate.val();
-                        var date = new Date(data[4]);
+                    // DataTable.ext.search.push(function (settings, data, dataIndex) {
+                    //     var min = minDate.val();
+                    //     var max = maxDate.val();
+                    //     var date = new Date(data[4]);
 
-                        if (
-                            (min === null && max === null) ||
-                            (min === null && date <= max) ||
-                            (min <= date && max === null) ||
-                            (min <= date && date <= max)
-                        ) {
-                            return true;
-                        }
-                        return false;
-                    });
+                    //     if (
+                    //         (min === null && max === null) ||
+                    //         (min === null && date <= max) ||
+                    //         (min <= date && max === null) ||
+                    //         (min <= date && date <= max)
+                    //     ) {
+                    //         return true;
+                    //     }
+                    //     return false;
+                    // });
 
-                    // Create date inputs
-                    minDate = new DateTime('#dateFrom', {
-                        format: 'MM/DD/YYYY'
-                    });
-                    maxDate = new DateTime('#dateTo', {
-                        format: 'MM/DD/YYYY'
-                    });
+                    // // Create date inputs
+                    // minDate = new DateTime('#dateFrom', {
+                    //     format: 'MM/DD/YYYY'
+                    // });
+                    // maxDate = new DateTime('#dateTo', {
+                    //     format: 'MM/DD/YYYY'
+                    // });
 
-                    // DataTables initialisation
-                    var table = $('#tblDTR').DataTable();
+                    // // DataTables initialisation
+                    // var table = $('#tblDTR').DataTable();
 
-                    // Refilter the table
-                    $('#dateFrom, #dateTo').on('change', function () {
-                        table.draw();
-                    });
+                    // // Refilter the table
+                    // $('#dateFrom, #dateTo').on('change', function () {
+                    //     table.draw();
+                    // });
 
 
 
@@ -344,12 +417,9 @@
 
 
                         function dateFilter() {
-                            alert("x")
-                                  
+                                       event.preventDefault();
                                        var min =  $('#dateFrom').val();
                                      var max =$('#dateTo').val();
-
-
 
                                         console.log(min,max)
                                       $.ajax({
@@ -359,28 +429,7 @@
                                           success: function (response) {
                                               if (response.success) {
                                                      console.log(response);
-                                                       //  $('#dateCovered').val(response.data.dtrDateTime);
-
-                                                         document.getElementById('labelEmpName').textContent =  response.emp;
-
-                                                    var tbodytable = $("#dtrListTable");
-                                                    tbodytable.empty();
-
-                                                    if (response.data.length > 0) {
-                                                        $.each(response.data, function(index, item) {
-                                                            var row = `<tr>
-
-                                                                                 <td>${item.datestring}</td>
-                                                                                    <td>${item.firsT_IN}</td>
-                                                                                    <td>${item.lasT_OUT}</td>
-                                                                                       <td>${item.undeR_TIME}</td>
-                                                                        </tr>`;
-                                                            tbodytable.append(row);
-                                                        });
-                                                    } else {
-                                                        tbodytable.html(`<tr><td colspan="4" class="text-center">No record found.</td></tr>`);
-                                                    }
-
+                                                 
 
                                                   js('#createmodal').modal('show');
                                               } else {
