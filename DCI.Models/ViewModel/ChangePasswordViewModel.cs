@@ -8,5 +8,6 @@ namespace DCI.Models.ViewModel
 		public string NewPassword { get; set; } = string.Empty;
 		public string ConfirmPassword { get; set; } = string.Empty;
 		public bool IsResetPassword { get; set; } = true;
-	}
+        public string Token { get; set; } = string.Empty;
+    }
 }

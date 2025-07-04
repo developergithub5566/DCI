@@ -91,41 +91,41 @@ namespace DCI.Repositories
 
 		public async Task<(int statuscode, string message)> ValidateToken(string token)
 		{
-			try
-			{
-				var tokenExist = await _dbContext.UserAccess.FirstOrDefaultAsync(x => x.PasswordResetToken == token);
-				var email =  _dbContext.User.FirstOrDefault(x => x.UserId == tokenExist.UserId).Email;
+            try
+            {
+                var tokenExist = await _dbContext.UserAccess.FirstOrDefaultAsync(x => x.PasswordResetToken == token);
+                var email = _dbContext.User.FirstOrDefault(x => x.UserId == tokenExist.UserId).Email;
 
-				if (tokenExist?.UserId > 0)
-				{
-					if (tokenExist.PasswordResetTokenExpiry > DateTime.UtcNow && tokenExist.IsActive == true)
-					{
-						return (StatusCodes.Status200OK, email);
-					}
-					else if (tokenExist.PasswordResetTokenExpiry > DateTime.UtcNow && tokenExist.IsActive == false)
-					{
+                if (tokenExist?.UserId > 0)
+                {
+                    if (tokenExist.PasswordResetTokenExpiry > DateTime.UtcNow && tokenExist.IsActive == true)
+                    {
+                        return (StatusCodes.Status200OK, email);
+                    }
+                    else if (tokenExist.PasswordResetTokenExpiry > DateTime.UtcNow && tokenExist.IsActive == false)
+                    {
                         return (StatusCodes.Status205ResetContent, "The token is already used.");
                     }
                     else
-					{
-						return (StatusCodes.Status401Unauthorized, "Your password has expired. Please reset your password.");
-					}
-				}
-				else
-				{
-					return (StatusCodes.Status400BadRequest, "The token is invalid.");
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex.ToString());
-			}
-			finally
-			{
-				Log.CloseAndFlush();
-			}
-			return (StatusCodes.Status401Unauthorized, "Your token does not exist");
-		}
+                    {
+                        return (StatusCodes.Status401Unauthorized, "Your password has expired. Please reset your password.");
+                    }
+                }
+                else
+                {
+                    return (StatusCodes.Status400BadRequest, "The token is invalid.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return (StatusCodes.Status401Unauthorized, "Your token does not exist");
+        }
 
 		public async Task<(int statuscode, string message)> ChangePassword(ChangePasswordViewModel pass)
 		{
