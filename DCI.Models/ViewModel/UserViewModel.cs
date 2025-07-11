@@ -3,7 +3,8 @@
 	public class UserViewModel
 	{
 		public int UserId { get; set; } = 0;
-		public string Firstname { get; set; } = string.Empty;
+        public int EmployeeId { get; set; } = 0;
+        public string Firstname { get; set; } = string.Empty;
 		public string? Middlename { get; set; } = string.Empty;
 		public string Lastname { get; set; } = string.Empty;
 		public string? ContactNo { get; set; } = string.Empty;
@@ -16,5 +17,6 @@
 		public DateTime? DateModified { get; set; } = null;
 		public int? ModifiedBy { get; set; } = null;
 		public bool IsActive { get; set; } = true;	
-	}
+		public int? IsAddEdit { get; set; } = 0;
+    }
 }

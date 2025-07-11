@@ -1,18 +1,19 @@
-﻿using DCI.Core.Helpers;
+﻿using DCI.Core.Common;
+using DCI.Core.Helpers;
 using DCI.Data;
 using DCI.Models.Configuration;
 using DCI.Models.Entities;
-using DCI.Core.Common;
+using DCI.Models.ViewModel;
 using DCI.Repositories.Interface;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.Identity.Client;
+using Serilog;
 using System.Net;
 using System.Net.Mail;
-using Serilog;
-using static System.Net.WebRequestMethods;
-using DCI.Models.ViewModel;
 using System.Reflection.Metadata;
-using Microsoft.Identity.Client;
+using static System.Net.WebRequestMethods;
 //using System.Reflection.Metadata;
 
 namespace DCI.Repositories
@@ -24,6 +25,7 @@ namespace DCI.Repositories
 		private IUserRepository _userRepository;
 		private IUserAccessRepository _userAccessRepository;
 		private readonly IOptions<APIConfigModel> _apiconfig;
+
 		public EmailRepository(DCIdbContext context, IOptions<SMTPModel> smtpSettings, IUserRepository userRepository, IUserAccessRepository userAccessRepository, IOptions<APIConfigModel> apiconfig)
 		{
 			this._dbContext = context;
@@ -126,32 +128,50 @@ namespace DCI.Repositories
 		}
 		async Task<string> SetPasswordBodyMessage(string email)
 		{
-			var token = TokenGeneratorHelper.GetToken();
+			try
+			{
+                var token = TokenGeneratorHelper.GetToken();
 
-			var userEntity = await _userRepository.GetUserByEmail(email);
+                var userEntity = await _userRepository.GetUserByEmail(email);
 
-			var userAccessEntity = await _userAccessRepository.GetUserAccessByUserId(userEntity.UserId);
+                //  var userAccessEntity = await _userAccessRepository.GetUserAccessByUserId(1);
+        
+				//var userAccessEntity = usraccssentity.FirstOrDefault();
 
-			//string link = "http://192.168.1.78:83/Account/ValidateToken?token=";
-			string link = _apiconfig.Value.WebAppConnection + "Account/ValidateToken?token=";
-			string emailBody = $@"
-            <html>
-            <body>
-                <h2>Set Password Request</h2>
-                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
-                <p>Your account has been successfully created! Please click the link below to set your password:</p>              
-                <a href='{link + token}'>Set Password</a>
-                <p>This link will expire on {DateTime.UtcNow.AddDays(1).ToShortDateString()}.</p>
-                <p>If you did not request a password reset, please ignore this email.</p>
-                <p>Thank you,<br />Your DCI</p>
-            </body>
-            </html>";
 
-			userAccessEntity.PasswordResetToken = token;
-			userAccessEntity.PasswordResetTokenExpiry = DateTime.UtcNow.AddDays(1);
-			await _userAccessRepository.UpdateUserAccess(userAccessEntity);
-			return emailBody;
-		}
+                //string link = "http://192.168.1.78:83/Account/ValidateToken?token=";
+                string link = _apiconfig.Value.WebAppConnection + "Account/ValidateToken?token=";
+                string emailBody = $@"
+				<html>
+				<body>
+					<h2>Welcome to DCI Employee Self-Service</h2>
+					<p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
+					<p>Your account has been successfully created. To activate your account, please click the link below to set your password::</p>              
+					<a href='{link + token}'>Set Password</a>
+					<p>Please note: This link will expire on {DateTime.UtcNow.AddDays(1).ToShortDateString()} for security purposes.</p>
+					<p>If you have any questions or need assistance, feel free to reach out to our support team.</p>
+					<p>Thank you and welcome aboard!</p>
+					<p>Best regards,<br />DocTrack System Administrator</p>
+				</body>
+				</html>";
+				UserAccess userAccessEntity = new UserAccess();
+				userAccessEntity.UserId = userEntity.UserId;
+                userAccessEntity.PasswordResetToken = token;
+                userAccessEntity.PasswordResetTokenExpiry = DateTime.UtcNow.AddDays(1);
+                await _userAccessRepository.UpdateUserEmployeeAccess(userAccessEntity);
+                return emailBody;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return ( string.Empty);
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+
+        }
 		#endregion
 
 		#region Approval

@@ -75,7 +75,9 @@ namespace DCI.Repositories
 		{
 			try
 			{
-				usr.ModifiedDate = DateTime.Now;
+                var usraccssentity = _dbContext.UserAccess.Where(x => x.UserId == usr.UserId && x.IsActive == true);
+
+                usr.ModifiedDate = DateTime.Now;
 				_dbContext.UserAccess.Entry(usr).State = EntityState.Modified;
 				await _dbContext.SaveChangesAsync();
 			}
@@ -89,7 +91,26 @@ namespace DCI.Repositories
 			}
 		}
 
-		public async Task<(int statuscode, string message)> ValidateToken(string token)
+        public async Task UpdateUserEmployeeAccess(UserAccess usr)
+        {
+            try
+            {
+
+                usr.ModifiedDate = DateTime.Now;
+                _dbContext.UserAccess.Entry(usr).State = EntityState.Modified;
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        public async Task<(int statuscode, string message)> ValidateToken(string token)
 		{
             try
             {

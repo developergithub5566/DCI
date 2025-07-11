@@ -32,17 +32,17 @@
                     <label class="employeeType">Full-time</label>
                     <img src="~/icon/default_male.png" class="profilePic">
                     <label class="employeeNo">@Model.EmployeeNo</label>
-                    <label class="employeeName">@Model.Firstname @Model.Middlename @Model.Lastname</label>
-                    <label class="employeePosition">@Model.DepartmentId</label>
+                    <label class="employeeName">@Model.Firstname  @Model.Lastname</label>
+                    <label class="employeePosition">@Model.DepartmentName</label>
                     <hr>
 
                     <ul class="ULBasicInfo">
                         <li>
-                            <label>Email Address</label>
+                            <label>Company Email</label>
                             <label>@Model.Email</label>
                         </li>
                         <li>
-                            <label>Office Mobile No.</label>
+                            <label>Company Mobile No.</label>
                             <label>@Model.MobileNoOffice</label>
                         </li>
                         <li>
@@ -112,7 +112,7 @@
 
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                    <label class="topLabelText">@Model.Sex</label>
+                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.Sex) ? "-" : Model.Sex)</label>
                                     <label class="bottomLabelText">Sex</label>
                                 </div>
                             </div>
@@ -147,17 +147,11 @@
                                     <label class="bottomLabelText">Pagibig(HDMF)</label>
                                 </div>
                             </div>
+                         
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.TaxExemption) ? "-" : Model.TaxExemption)</label>
-                                    <label class="bottomLabelText">Tax Exemption</label>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-4">
-                                <div class="form-group mb10 text-center">
-                                    <label class="topLabelText">Full-time</label>
-                                    <label class="bottomLabelText">Employment Type</label>
+                                    <label class="topLabelText">-</label>
+                                    <label class="bottomLabelText">National ID</label>
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -166,6 +160,13 @@
                                     <label class="bottomLabelText">Date Hired</label>
                                 </div>
                             </div>
+                            <div class="col-lg-4">
+                                <div class="form-group mb10 text-center">
+                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.TaxExemption) ? "-" : Model.TaxExemption)</label>
+                                    <label class="bottomLabelText">Tax Exemption</label>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </form>
@@ -193,21 +194,22 @@
                             <div class="col-lg-6">
                                 <div class="form-group mb10 text-center">
                                     <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.MobileNoOffice) ? "-" : Model.MobileNoOffice)</label>
-                                    <label class="bottomLabelText">Office Mobile No.</label>
+                                <label class="bottomLabelText">Company Mobile No.</label>
                                 </div>
                             </div>
+                        <div class="col-lg-6">    
+                            <div class="form-group mb10 text-center">
+                                <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="EmailPersonal" name="EmailPersonal" value="@(string.IsNullOrWhiteSpace(Model.EmailPersonal) ? "-" : Model.EmailPersonal)">
+                                <label class="bottomLabelText">Personal Email</label>
+                            </div>
+                        </div>
                             <div class="col-lg-6">
                                 <div class="form-group mb10 text-center">                             
                                 <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="MobileNoPersonal" name="MobileNoPersonal" value="@(string.IsNullOrWhiteSpace(Model.MobileNoPersonal) ? "-" : Model.MobileNoPersonal)">
                                     <label class="bottomLabelText">Personal Mobile No.</label>
                                 </div>
                             </div>
-                            <div class="col-lg-6">
-                                <div class="form-group mb10 text-center">
-                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.LandlineNo) ? "-" : Model.LandlineNo)</label>
-                                    <label class="bottomLabelText">Landline No.</label>
-                                </div>
-                            </div>
+                           
 
                             <div class="col-lg-12">
                                 <div class="form-group mb10 text-center">
@@ -235,9 +237,15 @@
                     <div class="card-body">
 
                         <div class="row">
+                            <div class="col-lg-3">
+                                <div class="form-group mb10 text-center">
+                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.EmployeeNo) ? "-" : Model.EmployeeNo)</label>
+                                    <label class="bottomLabelText">Employee No</label>
+                                </div>
+                            </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.Position) ? "-" : Model.Position)</label>
+                                <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.PositionName) ? "-" : Model.PositionName)</label>
                                     <label class="bottomLabelText">Position</label>
                                 </div>
                             </div>
@@ -247,18 +255,20 @@
                                     <label class="bottomLabelText">Department</label>
                                 </div>
                             </div>
+                            <div class="col-lg-5">
+                                <div class="form-group mb10 text-center">
+                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.EmployeeNo) ? "-" : Model.EmployeeNo)</label>
+                                    <label class="bottomLabelText">Employment Status</label>
+                                </div>
+                            </div>
                             <div class="col-lg-3">
                                 <div class="form-group mb10 text-center">
-                                <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.DateHired.ToString()) ? "-" : Model.DateHired)</label>
-                                    <label class="bottomLabelText">Date Start</label>
+                                <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.DateHired.ToString()) ? "-" : Model.DateHired?.ToString("MMMM dd, yyyy"))</label>
+                                <label class="bottomLabelText">Date Hired</label>
                                 </div>
                             </div>
-                            <div class="col-lg-8">
-                                <div class="form-group mb10 text-center">
-                                <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.JobFunction) ? "-" : Model.JobFunction)</label>
-                                    <label class="bottomLabelText">Job Function</label>
-                                </div>
-                            </div>
+                         
+                     
                             <div class="col-lg-2">
                                 <div class="form-group mb10 text-center">
                                   @*   <label class="topLabelText">P100,000.00</label> *@
@@ -274,7 +284,7 @@
                             </div>
                         </div>
 
-                        <div class="col-12 mt20">
+             @*            <div class="col-12 mt20">
                             <!-- Card Body -->
                             <div class="table-responsive ">
                                 <div id="dataTable_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
@@ -312,7 +322,7 @@
                                     </div><div class="row"><div class="col-sm-12 col-md-5"><div class="dataTables_info" id="dataTable_info" role="status" aria-live="polite">Showing 1 to 1 of 1 entries</div></div><div class="col-sm-12 col-md-7"></div></div>
                                 </div>
                             </div>
-                        </div>
+                        </div> *@
 
                     </div>
                 </div>

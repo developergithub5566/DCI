@@ -57,7 +57,8 @@ namespace DCI.Repositories
                 var result = await (from emp in _dbContext.Employee
                                     join dtl in _dbContext.EmployeeWorkDetails on emp.EmployeeId equals dtl.EmployeeId
                                   //  join emptype in _dbContext.EmploymentType on dtl.EmploymentTypeId equals emptype.EmploymentTypeId
-                                    join dpt in _dbContext.Department on dtl.DepartmentId equals dpt.DepartmentId                                 
+                                    join dpt in _dbContext.Department on dtl.DepartmentId equals dpt.DepartmentId
+                                    join post in _dbContext.Position on dtl.Position equals post.PositionId
                                     where emp.EmployeeId == empId
                                     select new Form201ViewModel
                                     {
@@ -77,7 +78,7 @@ namespace DCI.Repositories
                                         PermanentAddress = emp.PermanentAddress,
                                         EmailPersonal = emp.EmailPersonal,
                                     
-                                        Email = dtl.Email,
+                                        Email = emp.Email,
                                         SSSNo = dtl.SSSNo,
                                         Tin = dtl.Tin,
                                         Pagibig = dtl.Pagibig,
@@ -85,10 +86,11 @@ namespace DCI.Repositories
                                         TaxExemption = dtl.TaxExemption,
                                         MobileNoOffice = dtl.MobileNoOffice,
                                         DepartmentId = dtl.DepartmentId,
-                                        DepartmentName = dpt.DepartmentName,
+                                        DepartmentName = dpt.Description,
                                         JobFunction = dtl.JobFunction,
                                         DateHired = dtl.DateHired,
-                                        Position = dtl.Position,
+                                        Position = post.PositionId,
+                                        PositionName = post.Description,
 
                                         DateCreated = emp.DateCreated,
                                         CreatedBy = emp.CreatedBy,
@@ -117,6 +119,7 @@ namespace DCI.Repositories
                 {
                     Employee emp = new Employee();
                     emp.EmployeeNo = model.EmployeeNo;
+                    emp.Email = model.Email;
                     emp.Firstname = model.Firstname;
                     emp.Middlename = model.Middlename;
                     emp.Lastname = model.Lastname;
@@ -140,7 +143,7 @@ namespace DCI.Repositories
 
                     EmployeeWorkDetails dtl = new EmployeeWorkDetails();
                     dtl.EmployeeId = emp.EmployeeId;                   
-                    dtl.Email = model.Email;
+                  //  dtl.Email = model.Email;
                     dtl.SSSNo = model.SSSNo;
                     dtl.Tin = model.Tin;
                     dtl.Pagibig = model.Pagibig;
@@ -163,6 +166,7 @@ namespace DCI.Repositories
 
                     var emp = await _dbContext.Employee.FirstOrDefaultAsync(x => x.EmployeeId == model.EmployeeId);
                     emp.EmployeeNo = model.EmployeeNo;
+                    emp.Email = model.Email;
                     emp.Firstname = model.Firstname;
                     emp.Middlename = model.Middlename;
                     emp.Lastname = model.Lastname;
@@ -186,7 +190,7 @@ namespace DCI.Repositories
 
                     var dtl = await _dbContext.EmployeeWorkDetails.FirstOrDefaultAsync(x => x.EmployeeId == model.EmployeeId);
                    // dtl.EmployeeId = emp.EmployeeId;            
-                    dtl.Email = model.Email;
+                   // dtl.Email = model.Email;
                     dtl.SSSNo = model.SSSNo;
                     dtl.Tin = model.Tin;
                     dtl.Pagibig = model.Pagibig;

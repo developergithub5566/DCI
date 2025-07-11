@@ -59,8 +59,8 @@ namespace DCI.WebApp.Controllers
             {
                 using (var _httpclient = new HttpClient())
                 {
-                    model.EmployeeId = 2;
-      
+                    model.EmployeeId = 1335;
+
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Employee/GetEmployeeById");
                     request.Content = stringContent;

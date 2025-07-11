@@ -40,8 +40,8 @@ namespace DCI.Repositories
             int _currentYear = DateTime.Now.Year;
 
             var leaveinfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == param.EmployeeId).FirstOrDefault();
-            model.VLBalance = leaveinfo.VLBalance;
-            model.SLBalance = leaveinfo.SLBalance;
+            model.VLBalance = leaveinfo?.VLBalance ?? 0;
+            model.SLBalance = leaveinfo?.SLBalance ?? 0 ;
 
             var leaveReqHeaderDbContext = _dbContext.LeaveRequestHeader.AsQueryable();
 
@@ -125,7 +125,7 @@ namespace DCI.Repositories
         {
             var workdtls = _dbContext.EmployeeWorkDetails.Where(x => x.EmployeeId == empId).FirstOrDefault();
 
-            int startYear = workdtls.DateHired?.Year ?? 2025;
+            int startYear = workdtls?.DateHired?.Year ?? DateTime.Now.Year;
             int currentYear = DateTime.Now.Year;         
 
             var _yearList = new LeaveViewModel

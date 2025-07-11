@@ -13,7 +13,7 @@ namespace DCI.Models.ViewModel
         public string? Firstname { get; set; } = string.Empty;
         public string? Middlename { get; set; } = string.Empty;
         public string? Lastname { get; set; } = string.Empty;
-        public char? Sex { get; set; }
+        public string? Sex { get; set; }
         public string? Prefix { get; set; } = string.Empty;
         public string? Suffix { get; set; } = string.Empty;
         public string? Nickname { get; set; } = string.Empty;
@@ -42,6 +42,8 @@ namespace DCI.Models.ViewModel
         public string? DepartmentName { get; set; }
         public string? JobFunction { get; set; }
         public DateTime? DateHired { get; set; }
-        public string? Position { get; set; }
+        public int? Position { get; set; }
+        public string? PositionName { get; set; } = string.Empty;
+        public bool IsResigned { get; set; } = false;        
     }
 }

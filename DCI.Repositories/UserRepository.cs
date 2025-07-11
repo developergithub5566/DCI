@@ -1,16 +1,17 @@
 ﻿using DCI.Core.Common;
 using DCI.Data;
+using DCI.Models.Configuration;
 using DCI.Models.Entities;
 using DCI.Models.ViewModel;
-using DCI.Models.Configuration;
 using DCI.Repositories.Interface;
-using Microsoft.EntityFrameworkCore;
-using Serilog;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using Serilog;
+using System.Linq;
 using System.Reflection.Metadata;
+using static QRCoder.PayloadGenerator;
 
 namespace DCI.Repositories
 {
@@ -19,10 +20,11 @@ namespace DCI.Repositories
 		private readonly DCIdbContext _dbContext;
 		private readonly SMTPModel _smtpSettings;
 		IUserAccessRepository _useraccessrepository;
+
 		public UserRepository(DCIdbContext context, IUserAccessRepository useraccessrepository)
 		{
 			this._dbContext = context;
-			_useraccessrepository = useraccessrepository;
+			_useraccessrepository = useraccessrepository;		
 		}
 
 		public void Dispose()
@@ -49,15 +51,15 @@ namespace DCI.Repositories
 									Email = usr.Email,
 									ContactNo = usr.ContactNo,
 									RoleId = usr.RoleId,
-                                    DepartmentId = usr.DepartmentId,
+                                  //  DepartmentId = usr.DepartmentId,
                                     RoleList = null,
 									EmployeeList = null
 								}).FirstOrDefault() ?? new UserModel();
 
 				result.RoleList = _dbContext.Role.Where(x => x.IsActive).ToList();
 				result.EmployeeList = _dbContext.User.ToList();
-                result.DepartmentList = _dbContext.Department.Where(x => x.IsActive).ToList();
-
+               // result.DepartmentList = _dbContext.Department.Where(x => x.IsActive).ToList();
+				//result.Form201List = _dbContext.Employee.Where(x => x.IsActive).ToList();
                 return result;
 			}
 			catch (Exception ex)
@@ -79,7 +81,7 @@ namespace DCI.Repositories
 
 			var query = from usr in _dbContext.User
 						join role in _dbContext.Role on usr.RoleId equals role.RoleId
-						join depart in _dbContext.Department on usr.DepartmentId equals depart.DepartmentId
+						//join depart in _dbContext.Department on usr.DepartmentId equals depart.DepartmentId
 						where usr.IsActive == true
 						select new UserModel
 						{
@@ -91,8 +93,8 @@ namespace DCI.Repositories
 							ContactNo = usr.ContactNo,
 							RoleId = usr.RoleId,
 							RoleName = role.RoleName,
-							DepartmentId = usr.DepartmentId,
-							DepartmentName = depart.DepartmentName,
+							//DepartmentId = usr.DepartmentId,
+							//DepartmentName = depart.DepartmentName,
 							RoleList = null,
 							EmployeeList = null
 						};
@@ -297,5 +299,134 @@ namespace DCI.Repositories
 		{
 			return _dbContext.User.FirstOrDefault(x => x.Email == username);
 		}
-	}
+
+
+
+        public async Task<User> GetUserEmployeeByEmpId(UserViewModel model)
+        {
+            return await _dbContext.User.FirstOrDefaultAsync(x => x.EmployeeId == model.EmployeeId && x.IsActive);
+        }
+
+        public async Task<UserModel> GetUserEmployeeRoleListById(int userid)
+        {
+            try
+            {
+                var result = _dbContext.User.Where(usr => usr.UserId == userid)
+                                .Select(usr => new UserModel
+                                {
+                                    UserId = usr.UserId,
+									EmployeeId = usr.EmployeeId ?? 0,
+                                    Lastname = usr.Lastname,
+                                    Middlename = usr.Middlename,
+                                    Firstname = usr.Firstname,
+                                    Email = usr.Email,
+                                    ContactNo = usr.ContactNo,
+                                    RoleId = usr.RoleId,
+                                    //  DepartmentId = usr.DepartmentId,
+                                    RoleList = null,
+                                    EmployeeList = null
+                                }).FirstOrDefault() ?? new UserModel();
+
+                result.RoleList = _dbContext.Role.Where(x => x.IsActive).ToList();
+                result.EmployeeList = _dbContext.User.ToList();
+               // result.DepartmentList = _dbContext.Department.Where(x => x.IsActive).ToList();
+                result.EmployeeDropdownList = (from emp in _dbContext.Employee
+                                               join wrkdtls in _dbContext.EmployeeWorkDetails
+												on emp.EmployeeId equals wrkdtls.EmployeeId
+                                               where emp.IsActive == true && wrkdtls.IsResigned == false
+											  select new EmployeeDropdownModel
+											  {
+												  EmployeeId = emp.EmployeeId,
+												  Display = $"{emp.Lastname}, {emp.Firstname} ({emp.Email ?? "No email provided"})"
+											  }).ToList();
+
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return null;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+		public async Task<(int statuscode, string message, string email)> CreateUserAccount(UserViewModel model)
+		{
+			try
+			{
+				var employeeEntities = _dbContext.Employee.Where(x => x.EmployeeId == model.EmployeeId).FirstOrDefault();
+
+				if (employeeEntities != null)
+				{
+					User entities = new User();
+					entities.EmployeeId = employeeEntities.EmployeeId;
+					entities.Firstname = employeeEntities.Firstname;
+					entities.Middlename = employeeEntities.Middlename;
+					entities.Lastname = employeeEntities.Lastname;
+					entities.ContactNo = employeeEntities.MobileNoPersonal;
+					entities.Email = employeeEntities?.Email ?? null;
+					entities.RoleId = model.RoleId;
+					entities.DateCreated = DateTime.Now;
+					entities.CreatedBy = model.CreatedBy;
+					entities.DateModified = null;
+					entities.ModifiedBy = null;
+					entities.IsActive = true;
+					await _dbContext.User.AddAsync(entities);
+					await _dbContext.SaveChangesAsync();
+
+
+					return (StatusCodes.Status200OK, "Registration created successfully", employeeEntities.Email);
+				}
+				return (StatusCodes.Status406NotAcceptable, "Employee doesnt exists", string.Empty);
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex.ToString());
+				return (StatusCodes.Status406NotAcceptable, ex.ToString(), string.Empty);
+			}
+			finally
+			{
+				Log.CloseAndFlush();
+			}
+		}
+
+		public async Task<(int statuscode, string message)> UpdateUserAccount(UserViewModel model)
+        {
+            try
+            {
+                var entities = await _dbContext.User.FirstOrDefaultAsync(x => x.UserId == model.UserId);
+
+                entities.RoleId = model.RoleId;
+                entities.DateModified = DateTime.Now;
+                entities.ModifiedBy = model.ModifiedBy;
+                entities.Firstname = entities.Firstname;
+                entities.Middlename = entities.Middlename;
+                entities.Lastname = entities.Lastname;
+                entities.ContactNo = entities.ContactNo;
+                entities.Email = entities.Email;                
+				entities.DateCreated = entities.DateCreated;
+                entities.CreatedBy = entities.CreatedBy;		
+                entities.IsActive = true;
+                _dbContext.User.Entry(entities).State = EntityState.Modified;
+                await _dbContext.SaveChangesAsync();
+
+                return (StatusCodes.Status200OK, "Registration updated successfully");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return (StatusCodes.Status406NotAcceptable, ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+
+    }
 }

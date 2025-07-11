@@ -11,9 +11,10 @@ namespace DCI.Models.Entities
 		[Required(ErrorMessage = "Username is required")]
 		[EmailAddress(ErrorMessage = "Invalid email address")]
 		public string Email { get; set; } = string.Empty;
-		public string Firstname { get; set; } = string.Empty;
+        public int? EmployeeId { get; set; }
+		public string? Firstname { get; set; } = string.Empty;
 		public string? Middlename { get; set; } = string.Empty;
-		public string Lastname { get; set; } = string.Empty;
+		public string? Lastname { get; set; } = string.Empty;
 		public string? ContactNo { get; set; } = string.Empty;
 		public int RoleId { get; set; }
 		//public virtual Role RoleList { get; set; }
@@ -23,7 +24,7 @@ namespace DCI.Models.Entities
 		public int? ModifiedBy { get; set; }
 		public bool IsActive { get; set; }	
 		public virtual UserAccess UserAccess { get; set; }
-        public int DepartmentId { get; set; }
+      //  public int DepartmentId { get; set; }
         //public ICollection<Role> UserRolelist { get; set; }
     }
 }

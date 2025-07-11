@@ -1247,5 +1247,119 @@ namespace DCI.WebApp.Controllers
             }
         }
         #endregion
+
+
+        public async Task<IActionResult> UserEmployee()
+        {
+            List<UserModel> model = new List<UserModel>();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    HttpResponseMessage response = await _httpclient.GetAsync(_apiconfig.Value.apiConnection + "api/Maintenance/GetAllUsers");
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<List<UserModel>>(responseBody)!;
+                    }
+                }
+
+                return View(model);
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return View(model);
+        }
+        public async Task<IActionResult> EditUserEmployee(UserViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/GetUserEmployeeRoleListById");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    UserModel vm = JsonConvert.DeserializeObject<UserModel>(responseBody)!;
+
+                    vm.Options = vm.RoleList?.Select(x =>
+                                                   new SelectListItem
+                                                   {
+                                                       Value = x.RoleId.ToString(),
+                                                       Text = x.RoleName
+                                                   }).ToList();
+
+                    vm.OptionsForm201List = vm.EmployeeDropdownList?.Select(x =>
+                               new SelectListItem
+                               {
+                                   Value = x.EmployeeId.ToString(),
+                                   Text = x.Display
+                               }).ToList();
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, data = vm });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
+        public async Task<IActionResult> SaveUserEmployee(UserViewModel model)
+        {
+            try
+            {
+                var currentUser = _userSessionHelper.GetCurrentUser();
+                model.CreatedBy = currentUser.UserId;
+                model.ModifiedBy = currentUser.UserId;
+                
+                using (var _httpclient = new HttpClient())
+                {
+                    //var request = new HttpRequestMessage();
+                    //var stringContent = new StringContent("");
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/CreateUserAccount");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                 
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = responseBody });
+                    }
+                    return Json(new { success = false, message = responseBody });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
     }
 }

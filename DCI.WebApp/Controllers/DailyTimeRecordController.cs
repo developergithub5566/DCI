@@ -36,7 +36,7 @@ namespace DCI.WebApp.Controllers
                     var currentUser = _userSessionHelper.GetCurrentUser();
                     param.TypeId = id;
 
-                    param.CurrentUserId = 2;//currentUser.UserId;
+                    param.CurrentUserId = currentUser.UserId;
                     
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
@@ -109,7 +109,8 @@ namespace DCI.WebApp.Controllers
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
 
-                    model.EmployeeId = 2;//currentUser.UserId;
+                    model.EmployeeId = currentUser.UserId;
+                  
 
                     //model.SLBalance = 0;
                     //model.VLBalance = 0;

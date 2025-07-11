@@ -36,6 +36,7 @@ namespace DCI.Data
         public DbSet<Announcement> Announcement { get; set; }
         public DbSet<Notification> Notification { get; set; }
         public DbSet<DTRCorrection> DTRCorrection { get; set; }
+        public DbSet<Position> Position { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

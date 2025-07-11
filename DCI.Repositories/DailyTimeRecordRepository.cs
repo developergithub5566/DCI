@@ -46,7 +46,11 @@ namespace DCI.Repositories
 
             if((int)EnumTypeData.EMP == model.TypeId)
             {
-                var emp = _dbContext.Employee.Where(x => x.EmployeeId == model.CurrentUserId).FirstOrDefault();
+                //var emp = _dbContext.Employee.Where(x => x.EmployeeId == model.CurrentUserId).FirstOrDefault();
+                //if(emp != null) 
+                //query = query.Where(x => x.EMPLOYEE_NO == emp.EmployeeNo).ToList();
+                var usr = _dbContext.User.Where(x => x.UserId == model.CurrentUserId).FirstOrDefault();
+                var emp = _dbContext.Employee.Where(x => x.EmployeeId == usr.EmployeeId).FirstOrDefault();
                 if(emp != null) 
                 query = query.Where(x => x.EMPLOYEE_NO == emp.EmployeeNo).ToList();
             }

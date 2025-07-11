@@ -110,7 +110,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in Model)
+                        @foreach (var item in Model.OrderByDescending(x => x.DATE))
                         {
                             <tr>
 
@@ -127,10 +127,10 @@
                                     @item.FIRST_IN
                                 </td>
                                 <td>
-                                    @item.LATE
+                                    @item.LAST_OUT
                                 </td>
                                 <td>
-                                    @item.UNDER_TIME
+                                    @item.LATE
                                 </td>
                                 <td>
                                     Biometrics
@@ -259,6 +259,7 @@
 
                         $(document).ready(function () {
                             js('#tblDTR').DataTable({
+                               
                             });
 
 

@@ -53,17 +53,21 @@ namespace DCI.Repositories
                 int _currentMonth = DateTime.Now.Month;
 
                 model.BirthdayList = (from usr in _dbContext.Employee
-                                      where usr.IsActive == true && usr.DateBirth.HasValue && usr.DateBirth.Value.Month == _currentMonth
+                                      join wrkdtls in _dbContext.EmployeeWorkDetails on usr.EmployeeId equals wrkdtls.EmployeeId
+                                      where usr.IsActive == true && usr.DateBirth.HasValue && usr.DateBirth.Value.Month == _currentMonth && wrkdtls.IsResigned == false
                                       select new BirthdayViewModel
                                       {
                                           EmployeeName = usr.Lastname + ", " + usr.Firstname,
                                           Birthdate = usr.DateBirth.Value.ToString("MMM dd")
                                       }).ToList();
 
-                // model.CurrentUserId
-                var currentEmp = _dbContext.Employee.Where(x => x.EmployeeId == 2).FirstOrDefault();
+                var currentEmail = _dbContext.User.Where(x => x.UserId == model.CurrentUserId).FirstOrDefault();
 
-                var dailyTime = _dbContext.vw_AttendanceSummary.Where(x => x.DATE == DateTime.Today && x.EMPLOYEE_NO == currentEmp.EmployeeNo).FirstOrDefault();
+                // model.CurrentUserId
+                var currentEmp = _dbContext.Employee.Where(x => x.Email == currentEmail.Email).FirstOrDefault();
+                string _empNo = currentEmp != null ? currentEmp.EmployeeNo : string.Empty;
+
+                var dailyTime = _dbContext.vw_AttendanceSummary.Where(x => x.DATE == DateTime.Today && x.EMPLOYEE_NO == _empNo).FirstOrDefault();
                 model.FIRST_IN = dailyTime != null ? dailyTime.FIRST_IN : "--:--:--";
                 model.LAST_OUT = dailyTime != null ? dailyTime.LAST_OUT : "--:--:--";
 
