@@ -37,7 +37,8 @@ namespace DCI.Models.ViewModel
         public string? Philhealth { get; set; }
         public string? TaxExemption { get; set; }
         public string? MobileNoOffice { get; set; }
-        public int? EmploymentTypeId { get; set; }
+        public int? EmployeeStatusId { get; set; }
+        public string? EmployeeStatusName { get; set; }
         public int? DepartmentId { get; set; }
         public string? DepartmentName { get; set; }
         public string? JobFunction { get; set; }

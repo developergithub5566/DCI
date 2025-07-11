@@ -59,6 +59,7 @@ namespace DCI.Repositories
                                   //  join emptype in _dbContext.EmploymentType on dtl.EmploymentTypeId equals emptype.EmploymentTypeId
                                     join dpt in _dbContext.Department on dtl.DepartmentId equals dpt.DepartmentId
                                     join post in _dbContext.Position on dtl.Position equals post.PositionId
+                                    join empstat in _dbContext.EmployeeStatus on dtl.EmployeeStatusId equals empstat.EmployeeStatusId
                                     where emp.EmployeeId == empId
                                     select new Form201ViewModel
                                     {
@@ -77,7 +78,7 @@ namespace DCI.Repositories
                                         PresentAddress = emp.PresentAddress,
                                         PermanentAddress = emp.PermanentAddress,
                                         EmailPersonal = emp.EmailPersonal,
-                                    
+                                       
                                         Email = emp.Email,
                                         SSSNo = dtl.SSSNo,
                                         Tin = dtl.Tin,
@@ -91,7 +92,8 @@ namespace DCI.Repositories
                                         DateHired = dtl.DateHired,
                                         Position = post.PositionId,
                                         PositionName = post.Description,
-
+                                        EmployeeStatusId = empstat.EmployeeStatusId,
+                                        EmployeeStatusName = empstat.Description,
                                         DateCreated = emp.DateCreated,
                                         CreatedBy = emp.CreatedBy,
                                         DateModified = emp.DateModified,
