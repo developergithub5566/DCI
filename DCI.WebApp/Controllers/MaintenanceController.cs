@@ -1248,6 +1248,37 @@ namespace DCI.WebApp.Controllers
         }
         #endregion
 
+        #region User Employee
+
+        public async Task<IActionResult> EmployeeList()
+        {
+            List<Form201ViewModel> model = new List<Form201ViewModel>();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    HttpResponseMessage response = await _httpclient.GetAsync(_apiconfig.Value.apiConnection + "api/Maintenance/GetAllEmployee");
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<List<Form201ViewModel>>(responseBody)!;
+                    }
+                }
+
+                return View(model);
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return View(model);
+        }
 
         public async Task<IActionResult> UserEmployee()
         {
@@ -1366,16 +1397,29 @@ namespace DCI.WebApp.Controllers
         {
             try
             {
+				Form201ViewModel vm = new Form201ViewModel();
                 using (var _httpclient = new HttpClient())
                 {
-                    model.EmployeeId = 1335;
+                  //  model.EmployeeId = 1335;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Employee/GetEmployeeById");
                     request.Content = stringContent;
                     var response = await _httpclient.SendAsync(request);
                     var responseBody = await response.Content.ReadAsStringAsync();
-                    Form201ViewModel vm = JsonConvert.DeserializeObject<Form201ViewModel>(responseBody)!;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        model.OptionsEmployeeStatus = model.EmployeeStatusList.Select(x =>
+                                 new SelectListItem
+                                 {
+                                     Value = x.EmployeeStatusId.ToString(),
+                                     Text = x.EmployeeStatusName
+                                 }).ToList();
+
+
+                        vm =  JsonConvert.DeserializeObject<Form201ViewModel>(responseBody)!;
+                    }
+            
                     return View(vm);
                 }
             }
@@ -1390,6 +1434,6 @@ namespace DCI.WebApp.Controllers
             }
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
-
+        #endregion
     }
 }

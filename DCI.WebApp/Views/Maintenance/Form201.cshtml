@@ -21,6 +21,7 @@
         <ul class="breadcrumb">
             <li><a href="/Home/Index/">Home</a></li>
             <li><a href="/Maintenance/Index/">Maintenance</a></li>
+            <li><a href="/Maintenance/EmployeeList/">Employee List</a></li>
             <li>201 File</li>
         </ul>
     </div>
@@ -105,7 +106,14 @@
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
                                  
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Suffix" name="Suffix" value="@(string.IsNullOrWhiteSpace(Model.Suffix) ? "-" : Model.Suffix)">
+                                   @*  <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Suffix" name="Suffix" value="@(string.IsNullOrWhiteSpace(Model.Suffix) ? "-" : Model.Suffix)"> *@
+                                    <select id="SexSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" required>
+                                        <option value="">Select Suffix</option>
+                                        <option value="Jr.">Jr.</option>
+                                        <option value="II">II</option>
+                                        <option value="III">III</option>
+                                        <option value="IV">IV</option>
+                                    </select>
                                     <label class="bottomLabelText">Suffix</label>
                                 </div>
                             </div>
@@ -118,25 +126,33 @@
 
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">                            
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Sex" name="Sex" value="@(string.IsNullOrWhiteSpace(Model.Sex) ? "-" : Model.Sex)">
+                                    @* <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Sex" name="Sex" value="@(string.IsNullOrWhiteSpace(Model.Sex) ? "-" : Model.Sex)"> *@
+                                    <select id="SexSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" required>
+                                        <option value="">Select Sex</option>
+                                        <option value="1">MALE</option>
+                                        <option value="2">FEMALE</option>
+                                    </select>
                                     <label class="bottomLabelText">Sex</label>
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <div class="form-group mb10 text-center">
-                             
-                                    <input type="hidden" id="Sex" name="Sex" value="0" class="bg-gray-100 font-weight-bold form-control frmField text-center">
-                                    <select id="SexSelect" class="form-select" required>
-                                        <option value="">Select Sex</option>
-                                        <option value="1">MALE</option>
-                                        <option value="2">FEMALE</option>
+                                <div class="form-group mb10 text-center">                             
+                                    <input type="hidden" id="Civil" name="Sex" value="0" class="bg-gray-100 font-weight-bold form-control frmField text-center">
+                                    <select id="CivilSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" required>
+                                        <option value="">Select Civil Status</option>
+                                        <option value="1">SINGLE</option>
+                                        <option value="2">MARRIED</option>
+                                        <option value="3">DIVORCED</option>
+                                        <option value="4">WIDOWED</option>
                                     </select>
                                     <label class="bottomLabelText">Civil Status</label>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                    <label class="topLabelText">@(Model.DateBirth?.ToString("MMMM dd, yyyy") ?? "-") </label>
+                                 @*    <label class="topLabelText">@(Model.DateBirth?.ToString("MMMM dd, yyyy") ?? "-") </label> *@
+                                    <input type="text" name="DateBirth" id="DateBirth" class="bg-gray-100 font-weight-bold form-control frmField text-center" autocomplete="off">
+                              
                                     <label class="bottomLabelText">Date of Birth</label>
                                 </div>
                             </div>
@@ -165,19 +181,23 @@
 
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Sex" name="Sex" value="@(string.IsNullOrWhiteSpace(Model.Sex) ? "-" : Model.Sex)">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="NationalId" name="NationalId" value="@(string.IsNullOrWhiteSpace(Model.NationalId) ? "-" : Model.NationalId)">
                                     <label class="bottomLabelText">National ID</label>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                    <label class="topLabelText">@(Model.DateHired?.ToString("MMMM dd, yyyy") ?? "-") </label>
-                                    <label class="bottomLabelText">Date Hired</label>
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="ContactPerson" name="ContactPerson" value="@(string.IsNullOrWhiteSpace(Model.ContactPerson) ? "-" : Model.ContactPerson)">
+                                    <label class="bottomLabelText">Contact Person</label>
                                 </div>
+                          
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                               
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="ContactPersonNo" name="ContactPersonNo" value="@(string.IsNullOrWhiteSpace(Model.ContactPersonNo) ? "-" : Model.ContactPersonNo)">
+                                    <label class="bottomLabelText">Contact Person No.</label>
+                                </div>
+                       @*          <div class="form-group mb10 text-center">                               
                                     <input type="hidden" id="TaxExemption" name="TaxExemption" value="0" class="bg-gray-100 font-weight-bold form-control frmField text-center">
                                     <select id="SexSelect" class="form-select" required>
                                         <option value="">Select Tax Exemption</option>
@@ -190,7 +210,7 @@
                                         <option value="7">HEAD OF THE FAMILY (4) DEPENDENT</option>
                                     </select>
                                     <label class="bottomLabelText">Tax Exemption</label>
-                                </div>
+                                </div> *@
                             </div>
 
                         </div>
@@ -275,25 +295,40 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group mb10 text-center">
-                                <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.PositionName) ? "-" : Model.PositionName)</label>
+                                @* <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.PositionName) ? "-" : Model.PositionName)</label> *@
+
+                                <input type="hidden" id="Sex" name="Sex" value="0" class="bg-gray-100 font-weight-bold form-control frmField text-center">
+                                <select id="SexSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" required>
+                                    <option value="">Select Position</option>
+                                    <option value="1">MALE</option>
+                                    <option value="2">FEMALE</option>
+                                </select>                             
                                 <label class="bottomLabelText">Position</label>
                             </div>
                         </div>
                         <div class="col-lg-5">
                             <div class="form-group mb10 text-center">
-                                <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.DepartmentName) ? "-" : Model.DepartmentName)</label>
+                           @*      <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.DepartmentName) ? "-" : Model.DepartmentName)</label> *@
+                                <select id="SexSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" required>
+                                    <option value="">Select Department</option>
+                                    <option value="1">MALE</option>
+                                    <option value="2">FEMALE</option>
+                                </select>
                                 <label class="bottomLabelText">Department</label>
                             </div>
                         </div>
                         <div class="col-lg-5">
                             <div class="form-group mb10 text-center">
-                                <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.EmployeeStatusName) ? "-" : Model.EmployeeStatusName)</label>
+                         @*        <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.EmployeeStatusName) ? "-" : Model.EmployeeStatusName)</label> *@
+                                <select id="empStatusSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" required>                                  
+                                </select>
                                 <label class="bottomLabelText">Employment Status</label>
                             </div>
                         </div>
                         <div class="col-lg-3">
                             <div class="form-group mb10 text-center">
-                                <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.DateHired.ToString()) ? "-" : Model.DateHired?.ToString("MMMM dd, yyyy"))</label>
+                               @*  <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.DateHired.ToString()) ? "-" : Model.DateHired?.ToString("MMMM dd, yyyy"))</label> *@
+                                <input type="text" name="DateHired" id="DateHired" class="bg-gray-100 font-weight-bold form-control frmField text-center" autocomplete="off">
                                 <label class="bottomLabelText">Date Hired</label>
                             </div>
                         </div>
@@ -308,7 +343,17 @@
                         </div>
                         <div class="col-lg-2">
                             <div class="form-group mb10 text-center">
-                                <label class="topLabelText">5</label>
+                                <select id="SexSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" required>
+                                    <option value="">Select Band Level</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                </select>
                                 <label class="bottomLabelText">Band Level</label>
                             </div>
                         </div>
@@ -366,6 +411,10 @@
 
 @section scripts {
 
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
     <script type="text/javascript">
         var js = jQuery.noConflict(true);
 
@@ -377,6 +426,20 @@
 
         $(document).ready(function () {
 
+                   flatpickr("#DateBirth", {
+                                        enableTime: false,
+                                       dateFormat: "Y-m-d",
+                                            time_24hr: false,
+                                       onChange: function(selectedDates, dateStr, instance) {
+                                      }
+                                    });
+
+                                        flatpickr("#DateHired", {                                       
+                                       dateFormat: "Y-m-d",
+                                           
+                                       onChange: function(selectedDates, dateStr, instance) {
+                                      }
+                                    });
 
         });
 

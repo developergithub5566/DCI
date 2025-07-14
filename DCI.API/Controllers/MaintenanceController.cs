@@ -365,7 +365,15 @@ namespace DCI.API.Controllers
         }
         #endregion
 
-        #region User Employee
+        #region User Employee        
+
+        [HttpGet]
+        [Route("GetAllEmployee")]
+        public async Task<IActionResult> GetAllEmployee()
+        {
+            return Ok(await _employeeRepository.GetAllEmployee());
+        }
+
         [HttpPost]
         [Route("GetUserEmployeeRoleListById")]
         public async Task<IActionResult> GetUserEmployeeRoleListById(UserViewModel model)

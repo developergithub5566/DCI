@@ -10,7 +10,6 @@ namespace DCI.Models.Entities
         public string? Tin { get; set; }
         public string? Pagibig { get; set; }
         public string? Philhealth { get; set; }
-        public string? TaxExemption { get; set; }
         public string? MobileNoOffice { get; set; }
         public int? EmployeeStatusId { get; set; }
         public int? DepartmentId { get; set; }

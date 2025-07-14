@@ -24,43 +24,71 @@ namespace DCI.Repositories
 
         public async Task<IList<Form201ViewModel>> GetAllEmployee()
         {
-            return await _dbContext.Employee
-                .Where(emp => emp.IsActive)
-                .Select(emp => new Form201ViewModel
-                {
-                    EmployeeId = emp.EmployeeId,
-                    Firstname = emp.Firstname,
-                    Middlename = emp.Middlename,
-                    Lastname = emp.Lastname,
-                    Sex = emp.Sex,
-                    Prefix = emp.Prefix,
-                    Suffix = emp.Suffix,
-                    Nickname = emp.Nickname,
-                    DateBirth = emp.DateBirth,
-                    MobileNoPersonal = emp.MobileNoPersonal,
-                    LandlineNo = emp.LandlineNo,
-                    PresentAddress = emp.PresentAddress,
-                    PermanentAddress = emp.PermanentAddress,
-                    EmailPersonal = emp.EmailPersonal,
-                    DateCreated = emp.DateCreated,
-                    CreatedBy = emp.CreatedBy,
-                    DateModified = emp.DateModified,
-                    ModifiedBy = emp.ModifiedBy,
-                    IsActive = emp.IsActive
-                }).ToListAsync();
+         return await (from emp in _dbContext.Employee
+                          join dtl in _dbContext.EmployeeWorkDetails on emp.EmployeeId equals dtl.EmployeeId into dtlGroup
+                          from dtl in dtlGroup.DefaultIfEmpty()
+
+                          join dpt in _dbContext.Department on dtl.DepartmentId equals dpt.DepartmentId into dptGroup
+                          from dpt in dptGroup.DefaultIfEmpty()
+
+                          join post in _dbContext.Position on dtl.Position equals post.PositionId into postGroup
+                          from post in postGroup.DefaultIfEmpty()
+
+                          join empstat in _dbContext.EmployeeStatus on dtl.EmployeeStatusId equals empstat.EmployeeStatusId into empstatGroup
+                          from empstat in empstatGroup.DefaultIfEmpty()   
+
+                          where emp.IsActive == true
+                   
+                          orderby dtl.EmployeeStatusId descending, emp.Lastname  descending , emp.Firstname descending
+                           select new Form201ViewModel
+                              {
+                                  EmployeeId = emp.EmployeeId,
+                                  EmployeeNo = emp.EmployeeNo,
+                                  Email = emp.Email,
+                                  Firstname = emp.Firstname,
+                                  Middlename = emp.Middlename,
+                                  Lastname = emp.Lastname,
+                                  Sex = emp.Sex,
+                                  Prefix = emp.Prefix,
+                                  Suffix = emp.Suffix,
+                                  Nickname = emp.Nickname,
+                                  DateBirth = emp.DateBirth,
+                                  MobileNoPersonal = emp.MobileNoPersonal,
+                                  LandlineNo = emp.LandlineNo,
+                                  PresentAddress = emp.PresentAddress,
+                                  PermanentAddress = emp.PermanentAddress,
+                                  EmailPersonal = emp.EmailPersonal,
+                                  DateCreated = emp.DateCreated,
+                                  CreatedBy = emp.CreatedBy,
+                                  DateModified = emp.DateModified,
+                                  ModifiedBy = emp.ModifiedBy,
+                                  IsActive = emp.IsActive,
+
+                                  PositionName = post.PositionName,
+                                  DepartmentName = dpt.DepartmentName,
+                                  EmployeeStatusName = empstat.EmployeeStatusName,
+                                  DateHired = dtl.DateHired,
+
+                              }).ToListAsync();
+
         }
 
         public async Task<Form201ViewModel?> GetEmployeeById(int empId)
         {
             try
             {
-                var result = await (from emp in _dbContext.Employee
+               var result =  await (from emp in _dbContext.Employee
                                     join dtl in _dbContext.EmployeeWorkDetails on emp.EmployeeId equals dtl.EmployeeId
-                                  //  join emptype in _dbContext.EmploymentType on dtl.EmploymentTypeId equals emptype.EmploymentTypeId
-                                    join dpt in _dbContext.Department on dtl.DepartmentId equals dpt.DepartmentId
-                                    join post in _dbContext.Position on dtl.Position equals post.PositionId
-                                    join empstat in _dbContext.EmployeeStatus on dtl.EmployeeStatusId equals empstat.EmployeeStatusId
-                                    where emp.EmployeeId == empId
+                                     join dpt in _dbContext.Department on dtl.DepartmentId equals dpt.DepartmentId into dptGroup
+                                     from dpt in dptGroup.DefaultIfEmpty()
+
+                             join post in _dbContext.Position on dtl.Position equals post.PositionId into postGroup
+                             from post in postGroup.DefaultIfEmpty()
+
+                             join empstat in _dbContext.EmployeeStatus on dtl.EmployeeStatusId equals empstat.EmployeeStatusId into empstatGroup
+                             from empstat in empstatGroup.DefaultIfEmpty()
+
+                             where emp.EmployeeId == empId
                                     select new Form201ViewModel
                                     {
                                         EmployeeId = emp.EmployeeId,
@@ -78,13 +106,13 @@ namespace DCI.Repositories
                                         PresentAddress = emp.PresentAddress,
                                         PermanentAddress = emp.PermanentAddress,
                                         EmailPersonal = emp.EmailPersonal,
-                                       
+                                        ContactPerson = emp.ContactPerson,
+                                        ContactPersonNo = emp.ContactPersonNo,
                                         Email = emp.Email,
                                         SSSNo = dtl.SSSNo,
                                         Tin = dtl.Tin,
                                         Pagibig = dtl.Pagibig,
                                         Philhealth = dtl.Philhealth,
-                                        TaxExemption = dtl.TaxExemption,
                                         MobileNoOffice = dtl.MobileNoOffice,
                                         DepartmentId = dtl.DepartmentId,
                                         DepartmentName = dpt.Description,
@@ -100,6 +128,10 @@ namespace DCI.Repositories
                                         ModifiedBy = emp.ModifiedBy,
                                         IsActive = emp.IsActive
                                     }).FirstOrDefaultAsync();
+
+
+                result.EmployeeStatusList = _dbContext.EmployeeStatus.Where(x => x.IsActive).ToList();
+
                 return result;
             }
             catch (Exception ex)
@@ -135,6 +167,8 @@ namespace DCI.Repositories
                     emp.PresentAddress = model.PresentAddress;
                     emp.PermanentAddress = model.PermanentAddress;
                     emp.EmailPersonal = model.EmailPersonal;
+                    emp.ContactPerson = model.ContactPerson;
+                    emp.ContactPersonNo = model.ContactPersonNo;
                     emp.DateCreated = DateTime.Now;
                     emp.CreatedBy = model.CreatedBy;
                     emp.DateModified = null;
@@ -150,7 +184,7 @@ namespace DCI.Repositories
                     dtl.Tin = model.Tin;
                     dtl.Pagibig = model.Pagibig;
                     dtl.Philhealth = model.Philhealth;
-                    dtl.TaxExemption = model.TaxExemption;
+                  //  dtl.TaxExemption = model.TaxExemption;
                     dtl.MobileNoOffice = model.MobileNoOffice;
                     dtl.DepartmentId = model.DepartmentId;
                     dtl.JobFunction = model.JobFunction;
@@ -182,6 +216,8 @@ namespace DCI.Repositories
                     emp.PresentAddress = model.PresentAddress;
                     emp.PermanentAddress = model.PermanentAddress;
                     emp.EmailPersonal = model.EmailPersonal;
+                    emp.ContactPerson = model.ContactPerson;
+                    emp.ContactPersonNo = model.ContactPersonNo;
                     //emp.DateCreated = emp.DateCreated;
                     //emp.CreatedBy = emp.CreatedBy;
                     emp.DateModified = DateTime.Now;
@@ -197,7 +233,7 @@ namespace DCI.Repositories
                     dtl.Tin = model.Tin;
                     dtl.Pagibig = model.Pagibig;
                     dtl.Philhealth = model.Philhealth;
-                    dtl.TaxExemption = model.TaxExemption;
+                  //  dtl.TaxExemption = model.TaxExemption;
                     dtl.MobileNoOffice = model.MobileNoOffice;
                     dtl.DepartmentId = model.DepartmentId;
                     dtl.JobFunction = model.JobFunction;

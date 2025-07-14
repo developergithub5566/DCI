@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DCI.Models.Entities;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +25,8 @@ namespace DCI.Models.ViewModel
         public string? PresentAddress { get; set; } = string.Empty;
         public string? PermanentAddress { get; set; } = string.Empty;
         public string? EmailPersonal { get; set; } = string.Empty;
+        public string? ContactPerson { get; set; } = string.Empty;
+        public string? ContactPersonNo { get; set; } = string.Empty;
         public DateTime DateCreated { get; set; } = DateTime.Now;
         public int CreatedBy { get; set; } = 0;
         public DateTime? DateModified { get; set; }
@@ -35,7 +39,8 @@ namespace DCI.Models.ViewModel
         public string? Tin { get; set; }
         public string? Pagibig { get; set; }
         public string? Philhealth { get; set; }
-        public string? TaxExemption { get; set; }
+        public string? NationalId { get; set; }
+      //  public string? TaxExemption { get; set; }
         public string? MobileNoOffice { get; set; }
         public int? EmployeeStatusId { get; set; }
         public string? EmployeeStatusName { get; set; }
@@ -45,6 +50,15 @@ namespace DCI.Models.ViewModel
         public DateTime? DateHired { get; set; }
         public int? Position { get; set; }
         public string? PositionName { get; set; } = string.Empty;
-        public bool IsResigned { get; set; } = false;        
+        public bool IsResigned { get; set; } = false;
+
+        public IList<Position>? PositionList { get; set; }
+        public List<SelectListItem>? OptionsPosition { get; set; }
+
+        public IList<Department>? DepartmentList { get; set; }
+        public List<SelectListItem>? OptionsDepartment { get; set; }
+
+        public IList<EmployeeStatus>? EmployeeStatusList { get; set; }
+        public List<SelectListItem>? OptionsEmployeeStatus { get; set; }
     }
 }

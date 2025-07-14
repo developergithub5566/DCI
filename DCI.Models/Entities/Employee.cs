@@ -20,6 +20,8 @@ namespace DCI.Models.Entities
         public string? PresentAddress { get; set; }
         public string? PermanentAddress { get; set; }
         public string? EmailPersonal { get; set; }
+        public string? ContactPerson { get; set; }
+        public string? ContactPersonNo { get; set; }     
         public DateTime DateCreated { get; set; }
         public int CreatedBy { get; set; } 
         public DateTime? DateModified { get; set; }
