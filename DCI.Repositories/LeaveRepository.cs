@@ -50,6 +50,7 @@ namespace DCI.Repositories
                                                  on lheader.LeaveTypeId equals lvtype.LeaveTypeId
                                                  join stat in _dbContext.Status
                                                  on lheader.Status equals stat.StatusId
+                                                 where lheader.EmployeeId ==  param.EmployeeId
                                                  select new LeaveRequestHeaderViewModel
                                                  {
                                                      LeaveRequestHeaderId = lheader.LeaveRequestHeaderId,
@@ -302,9 +303,9 @@ namespace DCI.Repositories
             try
             {     
                 int _currentYear = DateTime.Now.Year;
-
+                int _currentMonth = DateTime.Now.Month;
                 var _leaveContext = await _dbContext.LeaveRequestHeader
-                                                .Where(x => x.IsActive == true && x.DateFiled.Date.Year == _currentYear)
+                                                .Where(x => x.IsActive == true && x.DateFiled.Date.Year == _currentYear && x.DateFiled.Date.Month == _currentMonth)
                                                 .AsQueryable()
                                                 .ToListAsync();
     
@@ -312,7 +313,7 @@ namespace DCI.Repositories
                 int totalrecords = _leaveContext.Count() + 1;           
                 string finalSetRecords = GetFormattedRecord(totalrecords);              
                 string yearMonth = DateTime.Now.ToString("yyyyMM");
-                string req = "LEAVE";
+                string req = "RQT";
          
                 return $"{req}-{yearMonth}-{finalSetRecords}";
             }

@@ -54,7 +54,8 @@ namespace DCI.Repositories
 
                 model.BirthdayList = (from usr in _dbContext.Employee
                                       join wrkdtls in _dbContext.EmployeeWorkDetails on usr.EmployeeId equals wrkdtls.EmployeeId
-                                      where usr.IsActive == true && usr.DateBirth.HasValue && usr.DateBirth.Value.Month == _currentMonth && wrkdtls.IsResigned == false
+                                      where usr.IsActive == true && usr.DateBirth.HasValue && usr.DateBirth.Value.Month == _currentMonth 
+                                      && wrkdtls.ResignedDate == null && wrkdtls.IsResigned == false
                                       select new BirthdayViewModel
                                       {
                                           EmployeeName = usr.Lastname + ", " + usr.Firstname,

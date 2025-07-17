@@ -40,7 +40,7 @@
     else
     {
         var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
-                    .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Department);
+                    .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Form201);
         canView = module?.View ?? false;
         canAdd = module?.Add ?? false;
         canEdit = module?.Update ?? false;
@@ -56,11 +56,15 @@
         </div>
     </div>
     <div class="d-sm-flex align-items-center justify-content-between mb-3">
-        <h6 class="m-0 font-weight-bold text-gray-800">Department</h6>
+        <h6 class="m-0 font-weight-bold text-gray-800">Employee List</h6>
         <div class="upperRightDivBtn">
-            <a href="#" title="Add Department" class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")" data-toggle="modal" data-target="#" onclick="newForm()">
+          @*   <a href="#" title="Add Department" class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")" data-toggle="modal" data-target="#" onclick="newForm()">
                 <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
-                <span class="text text-white"><small>Add Department</small></span>
+                <span class="text text-white"><small>Add Employee</small></span>
+            </a> *@
+            <a asp-controller="Maintenance" asp-action="Form201" asp-route-EmployeeId="0" class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")" >
+                <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
+                <span class="text text-white"><small>Add Employee</small></span>
             </a>
         </div>
 
@@ -138,8 +142,11 @@
                                     @item.EmployeeStatusName
                                 </td>
                               
-                                <td>                               
-                                    <a href="#" onclick="editForm(@item.EmployeeId,1)" title="View" class="btn btn-primary @(canView ? "" : "disabled") "><i class="fas fa-search"></i></a> |
+                                <td>
+                                    <a asp-controller="Maintenance" asp-action="Form201" asp-route-EmployeeId="@item.EmployeeId" class="btn btn-primary  @(canEdit ? "" : "disabled") ">
+                                        <i class="fa fa-search"></i>
+                                    </a>
+                               @*      <a href="#" onclick="editForm(@item.EmployeeId,1)" title="View" class="btn btn-primary @(canView ? "" : "disabled") "><i class="fas fa-search"></i></a> *@ |
                                  @*    <a href="#" id="editForm" onclick="editForm(@item.EmployeeId,0)" title="Update" class="btn btn-info @(canEdit ? "" : "disabled") "><i class="fa fa-edit"></i></a> | *@
                                     <a asp-controller="Maintenance" asp-action="Form201" asp-route-EmployeeId="@item.EmployeeId" class="btn btn-info  @(canEdit ? "" : "disabled") ">
                                         <i class="fa fa-edit"></i>                                     

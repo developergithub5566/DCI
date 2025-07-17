@@ -61,54 +61,54 @@
         </div>
 
         <div class="col-lg-9">
+            <form id="createForm">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex bg-light flex-row align-items-center justify-content-between">
+                        <h6 class="m-0  small font-weight-bold text-dark"><i class="fa-solid fa-user" aria-hidden="true"></i> &nbsp; Personal Information</h6>
+                        <button class="btn btnPrimary float-right text-xs" type="submit" onclick="saveForm()">
+                            <i class="fa-regular fa-floppy-disk" aria-hidden="true"></i> Save
+                        </button>
+                    </div>
 
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex bg-light flex-row align-items-center justify-content-between">
-                    <h6 class="m-0  small font-weight-bold text-dark"><i class="fa-solid fa-user" aria-hidden="true"></i> &nbsp; Personal Information</h6>
-                    <button class="btn btnPrimary float-right text-xs" type="submit" onclick="saveForm()">
-                        <i class="fa-regular fa-floppy-disk" aria-hidden="true"></i> Save
-                    </button>
-                </div>
+                    <!-- Card Body -->
 
-                <!-- Card Body -->
-                <form id="createForm">
                     <div class="card-body">
                         <div class="row">
                             <input type="hidden" id="EmployeeId" name="EmployeeId" value="@Model.EmployeeId">
                             <div class="col-lg-4">
                                 <div class="form-group mb0 text-center">
-                               
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Firstname" name="Firstname" value="@(string.IsNullOrWhiteSpace(Model.Firstname) ? "-" : Model.Firstname)">
+
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" asp-for="Firstname" id="Firstname" name="Firstname" value="@(string.IsNullOrWhiteSpace(Model.Firstname) ? "-" : Model.Firstname)">
                                     <label class="bottomLabelText">First Name</label>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                  
+
                                     <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Middlename" name="Firstname" value="@(string.IsNullOrWhiteSpace(Model.Middlename) ? "-" : Model.Middlename)">
                                     <label class="bottomLabelText">Middle Name</label>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                               
+
                                     <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Lastname" name="Lastname" value="@(string.IsNullOrWhiteSpace(Model.Lastname) ? "-" : Model.Lastname)">
                                     <label class="bottomLabelText">Last Name</label>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                              
+
                                     <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Prefix" name="Prefix" value="@(string.IsNullOrWhiteSpace(Model.Prefix) ? "-" : Model.Prefix)">
                                     <label class="bottomLabelText">Prefix</label>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                 
-                                   @*  <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Suffix" name="Suffix" value="@(string.IsNullOrWhiteSpace(Model.Suffix) ? "-" : Model.Suffix)"> *@
+
+                                    @*  <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Suffix" name="Suffix" value="@(string.IsNullOrWhiteSpace(Model.Suffix) ? "-" : Model.Suffix)"> *@
                                     <select id="SexSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" required>
-                                        <option value="">Select Suffix</option>
+                                        <option value="">SELECT SUFFIX</option>
                                         <option value="Jr.">Jr.</option>
                                         <option value="II">II</option>
                                         <option value="III">III</option>
@@ -125,10 +125,10 @@
                             </div>
 
                             <div class="col-lg-4">
-                                <div class="form-group mb10 text-center">                            
+                                <div class="form-group mb10 text-center">
                                     @* <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Sex" name="Sex" value="@(string.IsNullOrWhiteSpace(Model.Sex) ? "-" : Model.Sex)"> *@
                                     <select id="SexSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" required>
-                                        <option value="">Select Sex</option>
+                                        <option value="">SELECT SEX</option>
                                         <option value="1">MALE</option>
                                         <option value="2">FEMALE</option>
                                     </select>
@@ -136,10 +136,10 @@
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <div class="form-group mb10 text-center">                             
+                                <div class="form-group mb10 text-center">
                                     <input type="hidden" id="Civil" name="Sex" value="0" class="bg-gray-100 font-weight-bold form-control frmField text-center">
                                     <select id="CivilSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" required>
-                                        <option value="">Select Civil Status</option>
+                                        <option value="">SELECT CIVIL STATUS</option>
                                         <option value="1">SINGLE</option>
                                         <option value="2">MARRIED</option>
                                         <option value="3">DIVORCED</option>
@@ -150,30 +150,30 @@
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                 @*    <label class="topLabelText">@(Model.DateBirth?.ToString("MMMM dd, yyyy") ?? "-") </label> *@
+                                    @*    <label class="topLabelText">@(Model.DateBirth?.ToString("MMMM dd, yyyy") ?? "-") </label> *@
                                     <input type="text" name="DateBirth" id="DateBirth" class="bg-gray-100 font-weight-bold form-control frmField text-center" autocomplete="off">
-                              
+
                                     <label class="bottomLabelText">Date of Birth</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                          
+
                                     <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="SSSNo" name="SSSNo" value="@(string.IsNullOrWhiteSpace(Model.SSSNo) ? "-" : Model.SSSNo)">
                                     <label class="bottomLabelText">SSS</label>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-              
+
                                     <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Tin" name="Tin" value="@(string.IsNullOrWhiteSpace(Model.Tin) ? "-" : Model.Tin)">
                                     <label class="bottomLabelText">TIN</label>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-     
+
                                     <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Pagibig" name="Pagibig" value="@(string.IsNullOrWhiteSpace(Model.Pagibig) ? "-" : Model.Pagibig)">
                                     <label class="bottomLabelText">Pagibig(HDMF)</label>
                                 </div>
@@ -190,14 +190,14 @@
                                     <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="ContactPerson" name="ContactPerson" value="@(string.IsNullOrWhiteSpace(Model.ContactPerson) ? "-" : Model.ContactPerson)">
                                     <label class="bottomLabelText">Contact Person</label>
                                 </div>
-                          
+
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
                                     <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="ContactPersonNo" name="ContactPersonNo" value="@(string.IsNullOrWhiteSpace(Model.ContactPersonNo) ? "-" : Model.ContactPersonNo)">
                                     <label class="bottomLabelText">Contact Person No.</label>
                                 </div>
-                       @*          <div class="form-group mb10 text-center">                               
+                                @*          <div class="form-group mb10 text-center">                               
                                     <input type="hidden" id="TaxExemption" name="TaxExemption" value="0" class="bg-gray-100 font-weight-bold form-control frmField text-center">
                                     <select id="SexSelect" class="form-select" required>
                                         <option value="">Select Tax Exemption</option>
@@ -215,151 +215,144 @@
 
                         </div>
                     </div>
-                </form>
 
-            </div>
 
-            <div class="card shadow mb-4">
-
-                <div class="card-header py-3 d-flex bg-light flex-row align-items-center justify-content-between">
-                    <h6 class="m-0  small font-weight-bold text-dark"><i class="fa-regular fa-id-card" aria-hidden="true"></i> &nbsp; Contact Information</h6>
-                    <button class="btn btnPrimary float-right text-xs" type="submit">
-                        <i class="fa-regular fa-floppy-disk" aria-hidden="true"></i> Save
-                    </button>
                 </div>
 
-                <!-- Card Body -->
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="form-group mb10 text-center">
-                   
-                                <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Email" name="Email" value="@(string.IsNullOrWhiteSpace(Model.Email) ? "-" : Model.Email)">
-                                <label class="bottomLabelText">Company Email</label>
+                <div class="card shadow mb-4">
+
+                    <div class="card-header py-3 d-flex bg-light flex-row align-items-center justify-content-between">
+                        <h6 class="m-0  small font-weight-bold text-dark"><i class="fa-regular fa-id-card" aria-hidden="true"></i> &nbsp; Contact Information</h6>
+                        <button class="btn btnPrimary float-right text-xs" type="submit">
+                            <i class="fa-regular fa-floppy-disk" aria-hidden="true"></i> Save
+                        </button>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group mb10 text-center">
+
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Email" name="Email" value="@(string.IsNullOrWhiteSpace(Model.Email) ? "-" : Model.Email)">
+                                    <label class="bottomLabelText">Company Email</label>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group mb10 text-center">
-                           
-                                <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="MobileNoOffice" name="MobileNoOffice" value="@(string.IsNullOrWhiteSpace(Model.MobileNoOffice) ? "-" : Model.MobileNoOffice)">
-                                <label class="bottomLabelText">Company Mobile No.</label>
+                            <div class="col-lg-6">
+                                <div class="form-group mb10 text-center">
+
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="MobileNoOffice" name="MobileNoOffice" value="@(string.IsNullOrWhiteSpace(Model.MobileNoOffice) ? "-" : Model.MobileNoOffice)">
+                                    <label class="bottomLabelText">Company Mobile No.</label>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group mb10 text-center">
-                                <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="EmailPersonal" name="EmailPersonal" value="@(string.IsNullOrWhiteSpace(Model.EmailPersonal) ? "-" : Model.EmailPersonal)">
-                                <label class="bottomLabelText">Personal Email</label>
+                            <div class="col-lg-6">
+                                <div class="form-group mb10 text-center">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="EmailPersonal" name="EmailPersonal" value="@(string.IsNullOrWhiteSpace(Model.EmailPersonal) ? "-" : Model.EmailPersonal)">
+                                    <label class="bottomLabelText">Personal Email</label>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group mb10 text-center">
-                                <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="MobileNoPersonal" name="MobileNoPersonal" value="@(string.IsNullOrWhiteSpace(Model.MobileNoPersonal) ? "-" : Model.MobileNoPersonal)">
-                                <label class="bottomLabelText">Personal Mobile No.</label>
+                            <div class="col-lg-6">
+                                <div class="form-group mb10 text-center">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="MobileNoPersonal" name="MobileNoPersonal" value="@(string.IsNullOrWhiteSpace(Model.MobileNoPersonal) ? "-" : Model.MobileNoPersonal)">
+                                    <label class="bottomLabelText">Personal Mobile No.</label>
+                                </div>
                             </div>
-                        </div>
 
 
-                        <div class="col-lg-12">
-                            <div class="form-group mb10 text-center">
-     
-                                <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="PresentAddress" name="PresentAddress" value="@(string.IsNullOrWhiteSpace(Model.PresentAddress) ? "-" : Model.PresentAddress)">
-                                <label class="bottomLabelText">Present Address</label>
-                            </div>
-                        </div>
+                            <div class="col-lg-12">
+                                <div class="form-group mb10 text-center">
 
-                        <div class="col-lg-12">
-                            <div class="form-group mb10 text-center">                        
-                                <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="PermanentAddress" name="PermanentAddress" value="@(string.IsNullOrWhiteSpace(Model.PermanentAddress) ? "-" : Model.PermanentAddress)">
-                                <label class="bottomLabelText">Permanent/Provincial Address</label>
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="PresentAddress" name="PresentAddress" value="@(string.IsNullOrWhiteSpace(Model.PresentAddress) ? "-" : Model.PresentAddress)">
+                                    <label class="bottomLabelText">Present Address</label>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12">
+                                <div class="form-group mb10 text-center">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="PermanentAddress" name="PermanentAddress" value="@(string.IsNullOrWhiteSpace(Model.PermanentAddress) ? "-" : Model.PermanentAddress)">
+                                    <label class="bottomLabelText">Permanent/Provincial Address</label>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex bg-light flex-row align-items-center justify-content-between">
-                    <h6 class="m-0  small font-weight-bold text-dark"><i class="fa-solid fa-briefcase" aria-hidden="true"></i> &nbsp; Job Information</h6>
-                </div>
-
-                <!-- Card Body -->
-                <div class="card-body">
-
-                    <div class="row">
-                        <div class="col-lg-3">
-                            <div class="form-group mb10 text-center">
-                    
-                                <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="EmployeeNo" name="EmployeeNo" value="@(string.IsNullOrWhiteSpace(Model.EmployeeNo) ? "-" : Model.EmployeeNo)">
-                                <label class="bottomLabelText">Employee No</label>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group mb10 text-center">
-                                @* <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.PositionName) ? "-" : Model.PositionName)</label> *@
-
-                                <input type="hidden" id="Sex" name="Sex" value="0" class="bg-gray-100 font-weight-bold form-control frmField text-center">
-                                <select id="SexSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" required>
-                                    <option value="">Select Position</option>
-                                    <option value="1">MALE</option>
-                                    <option value="2">FEMALE</option>
-                                </select>                             
-                                <label class="bottomLabelText">Position</label>
-                            </div>
-                        </div>
-                        <div class="col-lg-5">
-                            <div class="form-group mb10 text-center">
-                           @*      <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.DepartmentName) ? "-" : Model.DepartmentName)</label> *@
-                                <select id="SexSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" required>
-                                    <option value="">Select Department</option>
-                                    <option value="1">MALE</option>
-                                    <option value="2">FEMALE</option>
-                                </select>
-                                <label class="bottomLabelText">Department</label>
-                            </div>
-                        </div>
-                        <div class="col-lg-5">
-                            <div class="form-group mb10 text-center">
-                         @*        <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.EmployeeStatusName) ? "-" : Model.EmployeeStatusName)</label> *@
-                                <select id="empStatusSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" required>                                  
-                                </select>
-                                <label class="bottomLabelText">Employment Status</label>
-                            </div>
-                        </div>
-                        <div class="col-lg-3">
-                            <div class="form-group mb10 text-center">
-                               @*  <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.DateHired.ToString()) ? "-" : Model.DateHired?.ToString("MMMM dd, yyyy"))</label> *@
-                                <input type="text" name="DateHired" id="DateHired" class="bg-gray-100 font-weight-bold form-control frmField text-center" autocomplete="off">
-                                <label class="bottomLabelText">Date Hired</label>
-                            </div>
-                        </div>
-
-
-                        <div class="col-lg-2">
-                            <div class="form-group mb10 text-center">
-                                @*   <label class="topLabelText">P100,000.00</label> *@
-                                <label class="topLabelText">******</label>
-                                <label class="bottomLabelText">Salary</label>
-                            </div>
-                        </div>
-                        <div class="col-lg-2">
-                            <div class="form-group mb10 text-center">
-                                <select id="SexSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" required>
-                                    <option value="">Select Band Level</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                    <option value="6">6</option>
-                                    <option value="7">7</option>
-                                    <option value="8">8</option>
-                                </select>
-                                <label class="bottomLabelText">Band Level</label>
-                            </div>
-                        </div>
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex bg-light flex-row align-items-center justify-content-between">
+                        <h6 class="m-0  small font-weight-bold text-dark"><i class="fa-solid fa-briefcase" aria-hidden="true"></i> &nbsp; Job Information</h6>
                     </div>
 
-                    @*            <div class="col-12 mt20">
+                    <!-- Card Body -->
+                    <div class="card-body">
+
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="form-group mb10 text-center">
+
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="EmployeeNo" name="EmployeeNo" value="@(string.IsNullOrWhiteSpace(Model.EmployeeNo) ? "-" : Model.EmployeeNo)">
+                                    <label class="bottomLabelText">Employee No</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group mb10 text-center">
+                                    @* <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.PositionName) ? "-" : Model.PositionName)</label> *@
+
+                                    <input type="hidden" id="Sex" name="Sex" value="0" class="bg-gray-100 font-weight-bold form-control frmField text-center">
+                                    @Html.DropDownListFor(model => model.PositionId, Model.OptionsPosition, "SELECT POSITION", new { @class = "bg-gray-100 font-weight-bold form-control frmField text-center" })
+                                    <label class="bottomLabelText">Position</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-5">
+                                <div class="form-group mb10 text-center">
+                                    @*      <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.DepartmentName) ? "-" : Model.DepartmentName)</label> *@
+                                    @Html.DropDownListFor(model => model.DepartmentId, Model.OptionsDepartment, "SELECT DEPARTMENT", new { @class = "bg-gray-100 font-weight-bold form-control frmField text-center" })
+                                    <label class="bottomLabelText">Department</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-5">
+                                <div class="form-group mb10 text-center">
+                                    @*        <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.EmployeeStatusName) ? "-" : Model.EmployeeStatusName)</label> *@
+                                    @*   <select id="empStatusSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" required>                                  
+                                </select> *@
+                                    @Html.DropDownListFor(model => model.EmployeeStatusId, Model.OptionsEmployeeStatus, "SELECT STATUS", new { @class = "bg-gray-100 font-weight-bold form-control frmField text-center" })
+                                    <label class="bottomLabelText">Employment Status</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group mb10 text-center">
+                                    @*  <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.DateHired.ToString()) ? "-" : Model.DateHired?.ToString("MMMM dd, yyyy"))</label> *@
+                                    <input type="text" name="DateHired" id="DateHired" class="bg-gray-100 font-weight-bold form-control frmField text-center" autocomplete="off">
+                                    <label class="bottomLabelText">Date Hired</label>
+                                </div>
+                            </div>
+
+
+                            <div class="col-lg-2">
+                                <div class="form-group mb10 text-center">
+                                    @*   <label class="topLabelText">P100,000.00</label> *@
+                                    <label class="topLabelText">******</label>
+                                    <label class="bottomLabelText">Salary</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="form-group mb10 text-center">
+                                    <select id="bandlevelSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" required>
+                                        <option value="">SELECT BAND LVL</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                    </select>
+                                    <label class="bottomLabelText">Band Level</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        @*            <div class="col-12 mt20">
                             <!-- Card Body -->
                             <div class="table-responsive ">
                                 <div id="dataTable_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
@@ -399,9 +392,9 @@
                             </div>
                         </div> *@
 
+                    </div>
                 </div>
-            </div>
-
+            </form>
 
         </div>
 
@@ -434,9 +427,9 @@
                                       }
                                     });
 
-                                        flatpickr("#DateHired", {                                       
+                                        flatpickr("#DateHired", {
                                        dateFormat: "Y-m-d",
-                                           
+
                                        onChange: function(selectedDates, dateStr, instance) {
                                       }
                                     });
@@ -445,13 +438,13 @@
 
         function saveForm() {
                 event.preventDefault();
-                //var formData = $(this).serialize();
+                  
+                var formData = $(this).serialize();
 
-
-                  const formData = new FormData();
-                    formData.append('EmployeeId', $('#EmployeeId').val());
-                    formData.append('Nickname',  $('#Nickname').val());
-                     formData.append('MobileNoPersonal', $('#MobileNoPersonal').val());
+                  // const formData = new FormData();
+                  //   formData.append('EmployeeId', $('#EmployeeId').val());
+                  //   formData.append('Nickname',  $('#Nickname').val());
+                  //    formData.append('MobileNoPersonal', $('#MobileNoPersonal').val());
 
                 console.log(formData);
                 Swal.fire({
@@ -465,8 +458,8 @@
                             type: 'POST',
                             url: '@Url.Action("Update201Form", "Employee")',
                             data: formData,
-                                        processData: false,
-                                    contentType: false,
+                                    //     processData: false,
+                                    // contentType: false,
                             success: function (response) {
                                 if (response.success) {
 

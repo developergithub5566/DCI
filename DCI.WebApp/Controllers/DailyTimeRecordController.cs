@@ -108,8 +108,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
-
-                    model.EmployeeId = currentUser.UserId;
+                    model.CurrentUserId = currentUser.UserId;
+                    model.EmployeeId = currentUser.EmployeeId;
                   
 
                     //model.SLBalance = 0;
@@ -147,8 +147,10 @@ namespace DCI.WebApp.Controllers
             {
                 using (var _httpclient = new HttpClient())
                 {
-                    model.EmployeeId = 2;
-        
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                  //  model.CurrentUserId = currentUser.UserId;
+                    model.EmployeeId = currentUser.EmployeeId;
+
                     model.SelectedDateList = JsonConvert.DeserializeObject<List<DateTime>>(model.SelectedDateJson);
 
 

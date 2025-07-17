@@ -156,14 +156,14 @@
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                    <label class="topLabelText">@(Model.DateHired?.ToString("MMMM dd, yyyy") ?? "-") </label>
-                                    <label class="bottomLabelText">Date Hired</label>
+                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.ContactPerson) ? "-" : Model.ContactPerson)</label>
+                                    <label class="bottomLabelText">Contact Person</label>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                 @*    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.TaxExemption) ? "-" : Model.TaxExemption)</label> *@
-                                    <label class="bottomLabelText">Tax Exemption</label>
+                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.ContactPersonNo) ? "-" : Model.ContactPersonNo)</label>
+                                    <label class="bottomLabelText">Contact Person No</label>
                                 </div>
                             </div>
 
@@ -177,9 +177,9 @@
 
                     <div class="card-header py-3 d-flex bg-light flex-row align-items-center justify-content-between">
                         <h6 class="m-0  small font-weight-bold text-dark"><i class="fa-regular fa-id-card" aria-hidden="true"></i> &nbsp; Contact Information</h6>
-                        <button class="btn btnPrimary float-right text-xs" type="submit">
+                      @*   <button class="btn btnPrimary float-right text-xs" type="submit">
                             <i class="fa-regular fa-floppy-disk" aria-hidden="true"></i> Save
-                        </button>
+                        </button> *@
                     </div>
 
                     <!-- Card Body -->
@@ -359,7 +359,7 @@
                     formData.append('EmployeeId', $('#EmployeeId').val());
                     formData.append('Nickname',  $('#Nickname').val());
                      formData.append('MobileNoPersonal', $('#MobileNoPersonal').val());
-
+                     formData.append('EmailPersonal', $('#EmailPersonal').val());
                 console.log(formData);
                 Swal.fire({
                     text: "Are you sure you want to save this record?",

@@ -118,7 +118,7 @@ namespace DCI.Repositories
                                         DepartmentName = dpt.Description,
                                         JobFunction = dtl.JobFunction,
                                         DateHired = dtl.DateHired,
-                                        Position = post.PositionId,
+                                        PositionId = post.PositionId,
                                         PositionName = post.Description,
                                         EmployeeStatusId = empstat.EmployeeStatusId,
                                         EmployeeStatusName = empstat.Description,
@@ -127,10 +127,12 @@ namespace DCI.Repositories
                                         DateModified = emp.DateModified,
                                         ModifiedBy = emp.ModifiedBy,
                                         IsActive = emp.IsActive
-                                    }).FirstOrDefaultAsync();
+                                    }).FirstOrDefaultAsync() ?? new Form201ViewModel() ;
 
 
                 result.EmployeeStatusList = _dbContext.EmployeeStatus.Where(x => x.IsActive).ToList();
+                result.DepartmentList = _dbContext.Department.Where(x => x.IsActive).ToList();
+                result.PositionList = _dbContext.Position.Where(x => x.IsActive).ToList();
 
                 return result;
             }
@@ -189,7 +191,8 @@ namespace DCI.Repositories
                     dtl.DepartmentId = model.DepartmentId;
                     dtl.JobFunction = model.JobFunction;
                     dtl.DateHired = model.DateHired;
-                    dtl.Position = model.Position;
+                    dtl.Position = model.PositionId;
+                    dtl.ResignedDate = model.ResignedDate;
                     dtl.DateModified = null;
                     dtl.DateModified = null;
                     dtl.IsActive = true;
@@ -238,7 +241,8 @@ namespace DCI.Repositories
                     dtl.DepartmentId = model.DepartmentId;
                     dtl.JobFunction = model.JobFunction;
                     dtl.DateHired = model.DateHired;
-                    dtl.Position = model.Position;
+                    dtl.Position = model.PositionId;
+                    dtl.ResignedDate = model.ResignedDate;
                     dtl.DateModified = DateTime.Now;
                     dtl.ModifiedBy = model.ModifiedBy;
                     dtl.IsActive = true;
@@ -266,7 +270,8 @@ namespace DCI.Repositories
 
                     var emp = await _dbContext.Employee.FirstOrDefaultAsync(x => x.EmployeeId == model.EmployeeId);               
                     emp.Nickname = model.Nickname;    
-                    emp.MobileNoPersonal = model.MobileNoPersonal;              
+                    emp.MobileNoPersonal = model.MobileNoPersonal;
+                emp.EmailPersonal = model.EmailPersonal;
                     emp.DateModified = DateTime.Now;
                     emp.ModifiedBy = model.ModifiedBy;
                     _dbContext.Employee.Entry(emp).State = EntityState.Modified;

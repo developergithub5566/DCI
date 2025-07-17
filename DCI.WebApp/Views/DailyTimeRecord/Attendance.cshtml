@@ -110,7 +110,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in Model.OrderByDescending(x => x.DATE))
+                        @foreach (var item in Model)
                         {
                             <tr>
 
@@ -259,7 +259,7 @@
 
                         $(document).ready(function () {
                             js('#tblDTR').DataTable({
-                               
+                                 order: [[2, 'desc']]
                             });
 
 

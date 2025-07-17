@@ -12,6 +12,7 @@ namespace DCI.Models.Configuration
     public class UserManager
     {
         public int UserId { get; set; }
+        public int EmployeeId { get; set; }
         public string Username { get; set; }
         public string Firstname { get; set; }
 		public string Middlename { get; set; }

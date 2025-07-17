@@ -1409,15 +1409,27 @@ namespace DCI.WebApp.Controllers
                     var responseBody = await response.Content.ReadAsStringAsync();
                     if (response.IsSuccessStatusCode)
                     {
-                        model.OptionsEmployeeStatus = model.EmployeeStatusList.Select(x =>
+                        vm = JsonConvert.DeserializeObject<Form201ViewModel>(responseBody)!;
+                        vm.OptionsEmployeeStatus = vm.EmployeeStatusList.Select(x =>
                                  new SelectListItem
                                  {
                                      Value = x.EmployeeStatusId.ToString(),
                                      Text = x.EmployeeStatusName
                                  }).ToList();
 
+                        vm.OptionsPosition = vm.PositionList.Select(x =>
+                               new SelectListItem
+                               {
+                                   Value = x.PositionId.ToString(),
+                                   Text = x.PositionName
+                               }).ToList();
 
-                        vm =  JsonConvert.DeserializeObject<Form201ViewModel>(responseBody)!;
+                        vm.OptionsDepartment = vm.DepartmentList.Select(x =>
+                               new SelectListItem
+                               {
+                                   Value = x.DepartmentId.ToString(),
+                                   Text = x.DepartmentName
+                               }).ToList();
                     }
             
                     return View(vm);

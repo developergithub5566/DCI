@@ -67,7 +67,8 @@ namespace DCI.API.Service
 				Middlename = usermodel.Middlename,
 				Firstname = usermodel.Firstname,
 				RoleId = usermodel.RoleId,
-				ModulePageList = null,  //remove ModulePageList
+                EmployeeId = usermodel.EmployeeId ?? 0,
+                ModulePageList = null,  //remove ModulePageList
 				ModulePageAccess = modulepageAccess,
 			};	
 		}

@@ -27,7 +27,9 @@ namespace DCI.Repositories
             var context = _dbContext.vw_AttendanceSummary.AsQueryable();
 
 
-            var query = (from dtr in context                  
+            var query = await (from dtr in context
+
+                         orderby dtr.DATE descending, dtr.NAME descending
                          select new DailyTimeRecordViewModel
                          {
                              ID = dtr.ID,
@@ -42,7 +44,7 @@ namespace DCI.Repositories
                              OVERTIME = dtr.OVERTIME,
                              TOTAL_HOURS = dtr.TOTAL_HOURS,
                              TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS
-                         }).ToList();
+                         }).ToListAsync();
 
             if((int)EnumTypeData.EMP == model.TypeId)
             {
@@ -207,8 +209,9 @@ namespace DCI.Repositories
             try
             {
                 int _currentYear = DateTime.Now.Year;
+                int _currentMonth = DateTime.Now.Month;
                 var _dtr = await _dbContext.DTRCorrection
-                                                .Where(x => x.IsActive == true && x.DateFiled.Date.Year == _currentYear)
+                                                .Where(x => x.IsActive == true && x.DateFiled.Date.Year == _currentYear && x.DateFiled.Date.Month == _currentMonth)
                                                 .AsQueryable()
                                                 .ToListAsync();
 
