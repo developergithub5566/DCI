@@ -10,6 +10,7 @@ namespace DCI.Models.Entities
         public string? Tin { get; set; }
         public string? Pagibig { get; set; }
         public string? Philhealth { get; set; }
+        public string? NationalId { get; set; }
         public string? MobileNoOffice { get; set; }
         public int? EmployeeStatusId { get; set; }
         public int? DepartmentId { get; set; }
@@ -17,6 +18,7 @@ namespace DCI.Models.Entities
         public DateTime? DateHired { get; set; }
         public int? Position { get; set; }
         public DateTime? ResignedDate { get; set; }
+        public int? BandLevel { get; set; }
         public DateTime? DateModified { get; set; }
         public int? ModifiedBy { get; set; }
         public bool IsResigned { get; set; }

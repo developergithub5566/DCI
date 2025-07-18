@@ -15,6 +15,7 @@ namespace DCI.Models.Entities
         public string? Suffix { get; set; }
         public string? Nickname { get; set; }
         public DateTime? DateBirth { get; set; }
+        public int? CivilStatus { get; set; }
         public string? MobileNoPersonal { get; set; }
         public string? LandlineNo { get; set; }
         public string? PresentAddress { get; set; }

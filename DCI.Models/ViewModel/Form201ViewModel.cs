@@ -20,6 +20,7 @@ namespace DCI.Models.ViewModel
         public string? Suffix { get; set; } = string.Empty;
         public string? Nickname { get; set; } = string.Empty;
         public DateTime? DateBirth { get; set; } = null;
+        public int? CivilStatus { get; set; }
         public string? MobileNoPersonal { get; set; } = string.Empty;
         public string? LandlineNo { get; set; } = string.Empty;
         public string? PresentAddress { get; set; } = string.Empty;
@@ -40,7 +41,6 @@ namespace DCI.Models.ViewModel
         public string? Pagibig { get; set; }
         public string? Philhealth { get; set; }
         public string? NationalId { get; set; }
-      //  public string? TaxExemption { get; set; }
         public string? MobileNoOffice { get; set; }
         public int? EmployeeStatusId { get; set; }
         public string? EmployeeStatusName { get; set; }
@@ -52,6 +52,7 @@ namespace DCI.Models.ViewModel
         public string? PositionName { get; set; } = string.Empty;
         public bool IsResigned { get; set; } = false;
          public DateTime? ResignedDate { get; set; }
+        public int? BandLevel { get; set; }
 
         public IList<Position>? PositionList { get; set; }
         public List<SelectListItem>? OptionsPosition { get; set; }
