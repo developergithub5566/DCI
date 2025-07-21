@@ -18,5 +18,7 @@ namespace DCI.Repositories.Interface
 		Task SaveExternalUserAccess(int userId);
         Task UpdateUserEmployeeAccess(UserAccess usr);
 
+       Task UpdateUserEmployeeAccessX(UserViewModel usr, string token);
+
     }
 }

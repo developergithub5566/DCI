@@ -5,21 +5,22 @@ using DCI.Models.ViewModel;
 using DCI.Repositories.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using Serilog;
 
 namespace DCI.Repositories
 {
-	public class UserAccessRepository : IUserAccessRepository, IDisposable
+	public class UserAccessRepository : IUserAccessRepository//, IDisposable
 	{
 		private DCIdbContext _dbContext;
 		public UserAccessRepository(DCIdbContext context)
 		{
 			this._dbContext = context;
 		}
-		public void Dispose()
-		{
-			_dbContext.Dispose();
-		}
+		//public void Dispose()
+		//{
+		//	_dbContext.Dispose();
+		//}
 
 		public async Task<UserAccess> GetUserAccessByUserId(int userId)
 		{
@@ -98,6 +99,30 @@ namespace DCI.Repositories
 
                 usr.ModifiedDate = DateTime.Now;
                 _dbContext.UserAccess.Entry(usr).State = EntityState.Modified;
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        public async Task UpdateUserEmployeeAccessX(UserViewModel usr, string token)
+        {
+            try
+            {
+                var entities = await _dbContext.UserAccess.FirstOrDefaultAsync(x => x.UserId == usr.UserId && x.IsActive == true);
+				//  UserAccess entities = new UserAccess();
+				//  entities.UserId = usr.UserId;
+
+				entities.PasswordResetToken = token;
+                entities.ModifiedDate = DateTime.Now;
+                entities.IsActive = true;
+                _dbContext.UserAccess.Entry(entities).State = EntityState.Modified;
                 await _dbContext.SaveChangesAsync();
             }
             catch (Exception ex)

@@ -397,11 +397,13 @@ namespace DCI.API.Controllers
             {
                 var result = await _userRepository.CreateUserAccount(model);
 
-                if (result.email != null)
+                if (result.UserId > 0)
                 {
-                    _emailRepository.SendSetPassword(result.email);
+                    _emailRepository.SendSetPassword(result);
+                    return StatusCode(StatusCodes.Status200OK, "Registration created successfully");
                 }
-                return StatusCode(result.statuscode, result.message);
+                return StatusCode(StatusCodes.Status200OK, "Registration created successfully");
+                // return StatusCode(result.statuscode, result.message);
             }           
             //update
             var updateUser = await _userRepository.UpdateUserAccount(model);

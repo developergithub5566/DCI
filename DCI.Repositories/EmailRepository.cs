@@ -108,35 +108,36 @@ namespace DCI.Repositories
 			return emailBody;
 		}
 
-		#endregion
+        #endregion
 
 
-		
 
 
-		#region Set Password
 
-		public async Task SendSetPassword(string email)
-		{
+        #region Set Password
+
+        public async Task SendSetPassword(UserViewModel model)     
+        {
 			MailMessage mail = new MailMessage();
 			mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
 			mail.Subject = Constants.Email_Subject_SetPassword;
-			mail.Body = await SetPasswordBodyMessage(email);
+			mail.Body = await SetPasswordBodyMessage(model);
 			mail.IsBodyHtml = true;
-			mail.To.Add(email);
+			mail.To.Add(model.Email);
 			await SendMessage(mail);
 		}
-		async Task<string> SetPasswordBodyMessage(string email)
+		async Task<string> SetPasswordBodyMessage(UserViewModel model)
 		{
 			try
 			{
+            
+
+               // var userEntity = await _userRepository.GetUserByEmail(email);
+
+                 var userAccessEntity = await _userAccessRepository.GetUserAccessByUserId(model.UserId);
+
                 var token = TokenGeneratorHelper.GetToken();
-
-                var userEntity = await _userRepository.GetUserByEmail(email);
-
-                //  var userAccessEntity = await _userAccessRepository.GetUserAccessByUserId(1);
-        
-				//var userAccessEntity = usraccssentity.FirstOrDefault();
+                //var userAccessEntity = usraccssentity.FirstOrDefault();
 
 
                 //string link = "http://192.168.1.78:83/Account/ValidateToken?token=";
@@ -145,7 +146,7 @@ namespace DCI.Repositories
 				<html>
 				<body>
 					<h2>Welcome to DCI Employee Self-Service</h2>
-					<p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
+					<p>Hi {model.Firstname + " " + model.Lastname},</p>
 					<p>Your account has been successfully created. To activate your account, please click the link below to set your password::</p>              
 					<a href='{link + token}'>Set Password</a>
 					<p>Please note: This link will expire on {DateTime.UtcNow.AddDays(1).ToShortDateString()} for security purposes.</p>
@@ -154,11 +155,11 @@ namespace DCI.Repositories
 					<p>Best regards,<br />DocTrack System Administrator</p>
 				</body>
 				</html>";
-				UserAccess userAccessEntity = new UserAccess();
-				userAccessEntity.UserId = userEntity.UserId;
+				//UserAccess userAccessEntity = new UserAccess();
+				//userAccessEntity.UserId = model.UserId;
                 userAccessEntity.PasswordResetToken = token;
                 userAccessEntity.PasswordResetTokenExpiry = DateTime.UtcNow.AddDays(1);
-                await _userAccessRepository.UpdateUserEmployeeAccess(userAccessEntity);
+                await _userAccessRepository.UpdateUserEmployeeAccess(userAccessEntity,token);
                 return emailBody;
             }
             catch (Exception ex)

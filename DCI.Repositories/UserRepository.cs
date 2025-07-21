@@ -333,8 +333,9 @@ namespace DCI.Repositories
                 result.EmployeeDropdownList = (from emp in _dbContext.Employee
                                                join wrkdtls in _dbContext.EmployeeWorkDetails
 												on emp.EmployeeId equals wrkdtls.EmployeeId
-                                               where emp.IsActive == true && wrkdtls.IsResigned == false
-											  select new EmployeeDropdownModel
+                                               where emp.IsActive == true && wrkdtls.IsResigned == false 
+											   && wrkdtls.EmployeeStatusId != (int)EnumEmploymentType.Resigned && wrkdtls.EmployeeStatusId != (int)EnumEmploymentType.AWOL
+                                               select new EmployeeDropdownModel
 											  {
 												  EmployeeId = emp.EmployeeId,
 												  Display = $"{emp.Lastname}, {emp.Firstname} ({emp.Email ?? "No email provided"})"
@@ -354,8 +355,10 @@ namespace DCI.Repositories
             }
         }
 
-		public async Task<(int statuscode, string message, string email)> CreateUserAccount(UserViewModel model)
-		{
+		//public async Task<(int statuscode, string message, string email)> CreateUserAccount(UserViewModel model)
+
+         public async Task<UserViewModel> CreateUserAccount(UserViewModel model)
+        {
 			try
 			{
 				var employeeEntities = _dbContext.Employee.Where(x => x.EmployeeId == model.EmployeeId).FirstOrDefault();
@@ -378,16 +381,23 @@ namespace DCI.Repositories
 					await _dbContext.User.AddAsync(entities);
 					await _dbContext.SaveChangesAsync();
 
+					model.UserId = entities.UserId;
+					model.Email = entities.Email;
+					model.Lastname = entities.Lastname;
+					model.Firstname = entities.Firstname;
+					//_useraccessrepository.SaveUserAccess
 
-					return (StatusCodes.Status200OK, "Registration created successfully", employeeEntities.Email);
+					//return (StatusCodes.Status200OK, "Registration created successfully", employeeEntities.Email);
 				}
-				return (StatusCodes.Status406NotAcceptable, "Employee doesnt exists", string.Empty);
+				return model;
+				//return (StatusCodes.Status406NotAcceptable, "Employee doesnt exists", string.Empty);
 			}
 			catch (Exception ex)
 			{
 				Log.Error(ex.ToString());
-				return (StatusCodes.Status406NotAcceptable, ex.ToString(), string.Empty);
-			}
+                return model;
+                //return (StatusCodes.Status406NotAcceptable, ex.ToString(), string.Empty);
+            }
 			finally
 			{
 				Log.CloseAndFlush();
