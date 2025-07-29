@@ -474,12 +474,12 @@ namespace DCI.WebApp.Controllers
 					DepartmentViewModel vm = JsonConvert.DeserializeObject<DepartmentViewModel>(responseBody)!;
 
 
-					vm.OptionsReviewer = vm.UserList.Select(x =>
-				   new SelectListItem
-				   {
-					   Value = x.UserId.ToString(),
-					   Text = x.Lastname + ", " + x.Firstname
-				   }).ToList();
+					//vm.OptionsReviewer = vm.UserList.Select(x =>
+				 //  new SelectListItem
+				 //  {
+					//   Value = x.UserId.ToString(),
+					//   Text = x.Lastname + ", " + x.Firstname
+				 //  }).ToList();
 
 					vm.OptionsApprover = vm.UserList.Select(x =>
 				   new SelectListItem

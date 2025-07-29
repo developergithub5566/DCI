@@ -73,17 +73,22 @@
 
 			<div class="form-group">
 				<label class="frmText">First Name:</label>
-				<input type="text" class="form-control frmField" id="Firstname" name="Firstname" value="@Model.Firstname">
+				<input type="text" class="form-control frmField" id="Firstname" name="Firstname" value="@Model.Firstname" readonly>
 			</div>
 
 			<div class="form-group">
 				<label class="frmText">Middle Name:</label>
-				<input type="text" class="form-control frmField" id="Middlename" name="Middlename" value="@Model.Middlename">
+				<input type="text" class="form-control frmField" id="Middlename" name="Middlename" value="@Model.Middlename" readonly>
 			</div>
 
 			<div class="form-group">
 				<label class="frmText">Last Name:</label>
-				<input type="text" class="form-control frmField" id="Lastname" name="Lastname" value="@Model.Lastname">
+				<input type="text" class="form-control frmField" id="Lastname" name="Lastname" value="@Model.Lastname" readonly>
+			</div>
+
+			<div class="form-group">
+				<label class="frmText">Role:</label>
+				<input type="text" class="form-control frmField" id="RoleName" name="RoleName" value="@Model.RoleName" readonly>
 			</div>
 
 	@* 		<div class="form-group">
@@ -95,7 +100,7 @@
 			</div> *@
 
 			<div class="form-group mt30">
-				<button type="submit" class="btn btn-primary" onclick="Save()"><small>Update</small></button>
+			@* 	<button type="submit" class="btn btn-primary" onclick="Save()"><small>Update</small></button> *@
 				@* 	<a href="~/Home/" class="btn btnSecondary pr30 pl30 pt10 pb10"><small>Back</small></a> *@
 				<a asp-controller="Home" asp-action="Index" class="btn btn-secondary"><small>Back</small></a>
 			</div>

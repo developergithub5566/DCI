@@ -133,8 +133,8 @@ namespace DCI.Repositories
             
 
                // var userEntity = await _userRepository.GetUserByEmail(email);
-
-                 var userAccessEntity = await _userAccessRepository.GetUserAccessByUserId(model.UserId);
+			   
+               //  var userAccessEntity = await _userAccessRepository.GetUserAccessByUserId(model.UserId);
 
                 var token = TokenGeneratorHelper.GetToken();
                 //var userAccessEntity = usraccssentity.FirstOrDefault();
@@ -147,7 +147,7 @@ namespace DCI.Repositories
 				<body>
 					<h2>Welcome to DCI Employee Self-Service</h2>
 					<p>Hi {model.Firstname + " " + model.Lastname},</p>
-					<p>Your account has been successfully created. To activate your account, please click the link below to set your password::</p>              
+					<p>Your account has been successfully created. To activate your account, please click the link below to set your password:</p>              
 					<a href='{link + token}'>Set Password</a>
 					<p>Please note: This link will expire on {DateTime.UtcNow.AddDays(1).ToShortDateString()} for security purposes.</p>
 					<p>If you have any questions or need assistance, feel free to reach out to our support team.</p>
@@ -155,11 +155,8 @@ namespace DCI.Repositories
 					<p>Best regards,<br />DocTrack System Administrator</p>
 				</body>
 				</html>";
-				//UserAccess userAccessEntity = new UserAccess();
-				//userAccessEntity.UserId = model.UserId;
-                userAccessEntity.PasswordResetToken = token;
-                userAccessEntity.PasswordResetTokenExpiry = DateTime.UtcNow.AddDays(1);
-                await _userAccessRepository.UpdateUserEmployeeAccess(userAccessEntity,token);
+				
+                await _userAccessRepository.UpdateUserEmployeeAccess(model, token);
                 return emailBody;
             }
             catch (Exception ex)

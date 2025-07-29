@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Reflection.PortableExecutable;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DCI.Repositories
 {
@@ -324,7 +325,7 @@ namespace DCI.Repositories
             return query;
         }
 
-        public async Task<IList<DailyTimeRecordViewModel>> UndertimeById(DailyTimeRecordViewModel model)
+        public async Task<IList<DailyTimeRecordViewModel>> GetUndertimeById(DailyTimeRecordViewModel model)
         {
             var context = _dbContext.vw_AttendanceSummary.AsQueryable();
 
@@ -358,5 +359,42 @@ namespace DCI.Repositories
             return query;
         }
 
+        public async Task<IList<WFHViewModel>> GetAllWFHById(WFHViewModel model)
+        {
+           // var context = _dbContext.tbl_wfh_logs.AsQueryable();
+
+            var query = (from dtr in _dbContext.tbl_wfh_logs
+
+                         select new WFHViewModel
+                         {
+                             ID = dtr.ID,
+                             EMPLOYEE_ID = dtr.EMPLOYEE_ID,
+                             FULL_NAME = dtr.FULL_NAME,
+                             DATE_TIME = dtr.DATE_TIME                        
+                           
+                         }).ToList();
+
+
+            return query;
+        }
+
+        public async Task<(int statuscode, string message)> SaveWFHTimeIn(WFHViewModel model)
+        {
+
+            model.EMPLOYEE_ID = "080343";
+            model.FULL_NAME = "John A Cabugao";
+            model.CREATED_BY = "SYSAD";
+
+            tbl_wfh_logs entity = new tbl_wfh_logs();
+            entity.EMPLOYEE_ID = model.EMPLOYEE_ID;
+            entity.FULL_NAME = model.FULL_NAME;
+            entity.DATE_TIME = DateTime.Now;
+            entity.CREATED_DATE = DateTime.Now;
+            entity.CREATED_BY = model.CREATED_BY;            
+            await _dbContext.tbl_wfh_logs.AddAsync(entity);
+            await _dbContext.SaveChangesAsync();
+
+            return (StatusCodes.Status200OK, "Successfully saved");
+        }
     }
 }

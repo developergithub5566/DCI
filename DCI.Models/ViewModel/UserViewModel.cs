@@ -10,7 +10,8 @@
 		public string? ContactNo { get; set; } = string.Empty;
 		public string Email { get; set; } = string.Empty;
 		public int RoleId { get; set; } = 0;
-		public string Password { get; set; } = string.Empty;
+        public string RoleName { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
 		public DateTime DateCreated { get; set; } = DateTime.Now;
 		public int CreatedBy { get; set; } = 0;
 		public string CreatedName { get; set; } = string.Empty;

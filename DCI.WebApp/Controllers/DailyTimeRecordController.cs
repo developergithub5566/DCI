@@ -37,7 +37,7 @@ namespace DCI.WebApp.Controllers
                     param.TypeId = id;
 
                     param.CurrentUserId = currentUser.UserId;
-                    
+
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllDTR");
@@ -102,7 +102,7 @@ namespace DCI.WebApp.Controllers
 
         public async Task<IActionResult> Leave(LeaveViewModel model)
         {
-         //   LeaveViewModel model = new LeaveViewModel();
+            //   LeaveViewModel model = new LeaveViewModel();
             try
             {
                 using (var _httpclient = new HttpClient())
@@ -110,7 +110,7 @@ namespace DCI.WebApp.Controllers
                     var currentUser = _userSessionHelper.GetCurrentUser();
                     model.CurrentUserId = currentUser.UserId;
                     model.EmployeeId = currentUser.EmployeeId;
-                  
+
 
                     //model.SLBalance = 0;
                     //model.VLBalance = 0;
@@ -148,7 +148,7 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
-                  //  model.CurrentUserId = currentUser.UserId;
+                    //  model.CurrentUserId = currentUser.UserId;
                     model.EmployeeId = currentUser.EmployeeId;
 
                     model.SelectedDateList = JsonConvert.DeserializeObject<List<DateTime>>(model.SelectedDateJson);
@@ -181,13 +181,13 @@ namespace DCI.WebApp.Controllers
 
         public async Task<IActionResult> RequestLeave(LeaveViewModel model)
         {
-           
+
             try
-            { 
+            {
                 using (var _httpclient = new HttpClient())
                 {
                     model.EmployeeId = 2;
-                  //  model.LeaveRequestHeaderId = 4;
+                    //  model.LeaveRequestHeaderId = 4;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/RequestLeave");
@@ -207,9 +207,9 @@ namespace DCI.WebApp.Controllers
                                     }).ToList();
 
                         //model.SelectedDateJson = JsonConvert.SerializeObject(model.LeaveDateList);
-                       // var dateList = new List<string> { "2025-06-09","2025-06-10" };
-                      // // var jsonDates = JsonConvert.SerializeObject(dateList);
-                      //  model.SelectedDateJson = jsonDates;
+                        // var dateList = new List<string> { "2025-06-09","2025-06-10" };
+                        // // var jsonDates = JsonConvert.SerializeObject(dateList);
+                        //  model.SelectedDateJson = jsonDates;
                         //string json = JsonConvert.SerializeObject(model.LeaveDateList);
                     }
                     return Json(new { success = true, data = model });
@@ -227,13 +227,13 @@ namespace DCI.WebApp.Controllers
             {
                 Log.CloseAndFlush();
             }
-          //  return View(model);
+            //  return View(model);
         }
 
         public async Task<IActionResult> DTRCorrection(int id)
-        {  
+        {
             List<DTRCorrectionViewModel> list = new List<DTRCorrectionViewModel>();
-           
+
             try
             {
                 using (var _httpclient = new HttpClient())
@@ -253,7 +253,7 @@ namespace DCI.WebApp.Controllers
                     if (response.IsSuccessStatusCode == true)
                     {
                         list = JsonConvert.DeserializeObject<List<DTRCorrectionViewModel>>(responseBody)!;
-            
+
                     }
                     ViewBag.BreadCrumbLabel = "DTR Correction Summary";
                     if ((int)EnumTypeData.EMP == model.TypeId)
@@ -278,15 +278,15 @@ namespace DCI.WebApp.Controllers
 
         public async Task<IActionResult> DTRCorrectionById(DTRCorrectionViewModel model)
         {
-           // DTRCorrectionViewModel model = new DTRCorrectionViewModel();
+            // DTRCorrectionViewModel model = new DTRCorrectionViewModel();
             try
             {
                 using (var _httpclient = new HttpClient())
                 {
-                  
-                   // var currentUser = _userSessionHelper.GetCurrentUser();
 
-                  //  model.CreatedBy = 2;//currentUser.UserId;
+                    // var currentUser = _userSessionHelper.GetCurrentUser();
+
+                    //  model.CreatedBy = 2;//currentUser.UserId;
 
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -302,7 +302,7 @@ namespace DCI.WebApp.Controllers
                     }
                     return Json(new { success = true, data = model });
                 }
-              
+
 
             }
             catch (Exception ex)
@@ -313,7 +313,7 @@ namespace DCI.WebApp.Controllers
             finally
             {
                 Log.CloseAndFlush();
-            }          
+            }
         }
 
         public async Task<IActionResult> SaveDTRCorrection(DTRCorrectionViewModel model)
@@ -323,7 +323,7 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
-                    model.CreatedBy = 2;                    
+                    model.CreatedBy = 2;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/SaveDTRCorrection");
@@ -359,7 +359,7 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
-                   
+
 
                     param.CurrentUserId = 2;//currentUser.UserId;
 
@@ -376,7 +376,7 @@ namespace DCI.WebApp.Controllers
 
                     if ((int)EnumTypeData.EMP == param.TypeId)
                     {
-                 
+
                     }
                 }
 
@@ -407,7 +407,7 @@ namespace DCI.WebApp.Controllers
 
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
-                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/UndertimeById");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetUndertimeById");
                     request.Content = stringContent;
                     var response = await _httpclient.SendAsync(request);
                     var responseBody = await response.Content.ReadAsStringAsync();
@@ -420,9 +420,9 @@ namespace DCI.WebApp.Controllers
                         model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
                         emp_name = model.FirstOrDefault().NAME ?? string.Empty;
                         emp_no = model.FirstOrDefault().EMPLOYEE_NO ?? string.Empty;
-                       
+
                     }
-                    return Json(new { success = true, data = model ,emp  = String.Format("{0} - {1}",emp_no,emp_name)});
+                    return Json(new { success = true, data = model, emp = String.Format("{0} - {1}", emp_no, emp_name) });
                 }
 
 
@@ -437,6 +437,88 @@ namespace DCI.WebApp.Controllers
                 Log.CloseAndFlush();
             }
         }
+
+        public async Task<IActionResult> WFH(WFHViewModel param)
+        {
+            List<WFHViewModel> model = new List<WFHViewModel>();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {      
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+
+
+                    param.CurrentUserId = 2;//currentUser.UserId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllWFHById");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<List<WFHViewModel>>(responseBody)!;
+                    }
+
+                }
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
+        public async Task<IActionResult> WFHTimeIn(WFHViewModel param)
+        {
+            //  List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();
+            try
+            {
+
+
+                using (var _httpclient = new HttpClient())
+                {
+
+                    // var currentUser = _userSessionHelper.GetCurrentUser();
+
+                    //  model.CreatedBy = 2;//currentUser.UserId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/SaveWFHTimeIn");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+
+                    string emp_name = string.Empty;
+                    string emp_no = string.Empty;
+                    string emp_info = string.Empty;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = responseBody });
+                    }
+                    return Json(new { success = false, message = responseBody });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
 
 
     }

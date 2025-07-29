@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using Serilog;
+using static QRCoder.PayloadGenerator;
 
 namespace DCI.Repositories
 {
@@ -92,14 +93,22 @@ namespace DCI.Repositories
 			}
 		}
 
-        public async Task UpdateUserEmployeeAccess(UserAccess usr)
+        public async Task UpdateUserEmployeeAccess(UserViewModel usr, string token)
         {
             try
             {
 
-                usr.ModifiedDate = DateTime.Now;
-                _dbContext.UserAccess.Entry(usr).State = EntityState.Modified;
-                await _dbContext.SaveChangesAsync();
+                //usr.ModifiedDate = DateTime.Now;
+                //_dbContext.UserAccess.Entry(usr).State = EntityState.Modified;
+                //await _dbContext.SaveChangesAsync();
+
+                await _dbContext.Database.ExecuteSqlInterpolatedAsync($@"
+						INSERT INTO UserAccess 
+						(UserId, Password, DateCreated, IsActive, PasswordResetToken, PasswordResetTokenExpiry, ModifiedDate)
+						VALUES
+						({usr.UserId}, {token}, {DateTime.Now}, {true}, {token}, {DateTime.UtcNow.AddDays(1)}, {DateTime.Now})
+					");
+
             }
             catch (Exception ex)
             {
@@ -115,15 +124,26 @@ namespace DCI.Repositories
         {
             try
             {
-                var entities = await _dbContext.UserAccess.FirstOrDefaultAsync(x => x.UserId == usr.UserId && x.IsActive == true);
-				//  UserAccess entities = new UserAccess();
-				//  entities.UserId = usr.UserId;
+                //var entities = await _dbContext.UserAccess.FirstOrDefaultAsync(x => x.UserId == usr.UserId && x.IsActive == true);		
+                //var entities = await _dbContext.UserAccess.Where(x => x.UserId == usr.UserId && x.IsActive == true).FirstOrDefaultAsync();
 
-				entities.PasswordResetToken = token;
-                entities.ModifiedDate = DateTime.Now;
-                entities.IsActive = true;
-                _dbContext.UserAccess.Entry(entities).State = EntityState.Modified;
-                await _dbContext.SaveChangesAsync();
+                await _dbContext.Database.ExecuteSqlInterpolatedAsync($@"
+						INSERT INTO UserAccess 
+						(UserId, Password, DateCreated, IsActive, PasswordResetToken, PasswordResetTokenExpiry, ModifiedDate)
+						VALUES
+						({usr.UserId}, {token }, {DateTime.Now}, {true}, {token}, {DateTime.UtcNow.AddDays(1)}, {DateTime.Now})
+					");
+
+                //int rowsAffected = _dbContext.Database.ExecuteSqlInterpolated(                        
+                //          $"UPDATE UserAccess SET PasswordResetToken = {token},PasswordResetTokenExpiry = {DateTime.UtcNow.AddDays(1)},ModifiedDate = { DateTime.Now } WHERE UserId = {usr.UserId}"						
+                //    );
+
+
+                //entities.PasswordResetToken = token;
+                //entities.ModifiedDate = DateTime.Now;
+                //entities.IsActive = true;
+                //_dbContext.UserAccess.Entry(entities).State = EntityState.Modified;
+                //await _dbContext.SaveChangesAsync();
             }
             catch (Exception ex)
             {

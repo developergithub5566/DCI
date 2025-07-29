@@ -41,22 +41,40 @@ namespace DCI.Repositories
 		{
 			try
 			{
-				var result = _dbContext.User.Where(usr => usr.UserId == userid)
-								.Select(usr => new UserModel
-								{
-									UserId = usr.UserId,
-									Lastname = usr.Lastname,
-									Middlename = usr.Middlename,
-									Firstname = usr.Firstname,
-									Email = usr.Email,
-									ContactNo = usr.ContactNo,
-									RoleId = usr.RoleId,
-                                  //  DepartmentId = usr.DepartmentId,
-                                    RoleList = null,
-									EmployeeList = null
-								}).FirstOrDefault() ?? new UserModel();
+                //var result = _dbContext.User.Where(usr => usr.UserId == userid)
+                //				.Select(usr => new UserModel
+                //				{
+                //					UserId = usr.UserId,
+                //					Lastname = usr.Lastname,
+                //					Middlename = usr.Middlename,
+                //					Firstname = usr.Firstname,
+                //					Email = usr.Email,
+                //					ContactNo = usr.ContactNo,
+                //					RoleId = usr.RoleId,                  
+                //                                RoleList = null,
+                //					EmployeeList = null
+                //				}).FirstOrDefault() ?? new UserModel();
 
-				result.RoleList = _dbContext.Role.Where(x => x.IsActive).ToList();
+                var result = (from usr in _dbContext.User
+                              join role in _dbContext.Role on usr.RoleId equals role.RoleId
+                              where usr.IsActive == true
+                              select new UserModel
+                              {
+                                  UserId = usr.UserId,
+                                  Lastname = usr.Lastname,
+                                  Middlename = usr.Middlename,
+                                  Firstname = usr.Firstname,
+                                  Email = usr.Email,
+                                  ContactNo = usr.ContactNo,
+                                  RoleId = usr.RoleId,
+                                  RoleName = role.RoleName,
+                                  EmployeeList = null,
+                                  RoleList = null
+                              }).FirstOrDefault() ?? new UserModel();
+
+
+
+                result.RoleList = _dbContext.Role.Where(x => x.IsActive).ToList();
 				result.EmployeeList = _dbContext.User.ToList();
                // result.DepartmentList = _dbContext.Department.Where(x => x.IsActive).ToList();
 				//result.Form201List = _dbContext.Employee.Where(x => x.IsActive).ToList();
@@ -385,10 +403,11 @@ namespace DCI.Repositories
 					model.Email = entities.Email;
 					model.Lastname = entities.Lastname;
 					model.Firstname = entities.Firstname;
-					//_useraccessrepository.SaveUserAccess
+                    //_useraccessrepository.SaveUserAccess
 
-					//return (StatusCodes.Status200OK, "Registration created successfully", employeeEntities.Email);
-				}
+             
+                    //return (StatusCodes.Status200OK, "Registration created successfully", employeeEntities.Email);
+                }
 				return model;
 				//return (StatusCodes.Status406NotAcceptable, "Employee doesnt exists", string.Empty);
 			}

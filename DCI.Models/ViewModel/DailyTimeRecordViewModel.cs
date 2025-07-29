@@ -56,7 +56,18 @@
         public string NAME { get; set; }
         public decimal? TotalUnderTime { get; set; }
     }
-
+    public class WFHViewModel
+    {
+        public int ID { get; set; } = 0;
+        public string EMPLOYEE_ID { get; set; } = string.Empty;
+        public string FULL_NAME { get; set; } = string.Empty;
+        public DateTime DATE_TIME { get; set; } = DateTime.Now;
+        public DateTime CREATED_DATE { get; set; } = DateTime.Now;
+        public string CREATED_BY { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public int CurrentUserId { get; set; } = 0;
+        
+    }
 }
 
 

@@ -175,12 +175,12 @@
                                 <hr />
 
                                 <div class="row">
-                                    <div class="col">
+                             @*        <div class="col">
                                         <label for="Reviewer" id="ReviewerLabel" class="col-form-label">Reviewer:</label>
                                         <select id="reviewerSelect" class="form-select">
                                             <option value="">select reviewer</option>
                                         </select>
-                                    </div>
+                                    </div> *@
                                     <div class="col">
                                         <label for="Approver" id="ApproverLabel" class="col-form-label">Approver:</label>
                                         <select id="approverSelect" class="form-select">
@@ -248,7 +248,7 @@
                         DepartmentName: '#DepartmentName',
                         Description: '#Description',
                         Reviewer: '#reviewerSelect',
-                        Approver: '#approverSelect'
+                        ApproverId: '#approverSelect'
                     };
 
                     $.each(fields, (key, selector) => {
@@ -324,24 +324,24 @@
                                     $('#DepartmentName').val("");
                                     $('#Description').val("");
 
-                                var $select = $('#reviewerSelect');
-                                $select.empty();
-                                $select.append('<option value="">select reviewer</option>');
+                                // var $select = $('#reviewerSelect');
+                                // $select.empty();
+                                // $select.append('<option value="">select reviewer</option>');
 
-                                $.each(response.data.optionsReviewer, function (index, item) {
-                                    if (item.value == response.data.reviewer) {
-                                        $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
-                                    } else {
-                                        $select.append('<option value="' + item.value + '">' + item.text + '</option>');
-                                    }
-                                });
+                                // $.each(response.data.optionsReviewer, function (index, item) {
+                                //     if (item.value == response.data.reviewer) {
+                                //         $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+                                //     } else {
+                                //         $select.append('<option value="' + item.value + '">' + item.text + '</option>');
+                                //     }
+                                // });
 
                                 var $select = $('#approverSelect');
                                 $select.empty();
                                 $select.append('<option value="">select approver</option>');
 
                                 $.each(response.data.optionsApprover, function (index, item) {
-                                    if (item.value == response.data.approver) {
+                                    if (item.value == response.data.approverId) {
                                         $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
                                     } else {
                                         $select.append('<option value="' + item.value + '">' + item.text + '</option>');
@@ -382,24 +382,24 @@
                                         $('#DepartmentName').val(response.data.departmentName);
                                         $('#Description').val(response.data.description);
 
-                                var $select = $('#reviewerSelect');
-                                $select.empty();
-                                $select.append('<option value="">select reviewer</option>');
+                                // var $select = $('#reviewerSelect');
+                                // $select.empty();
+                                // $select.append('<option value="">select reviewer</option>');
 
-                                $.each(response.data.optionsReviewer, function (index, item) {
-                                    if (item.value == response.data.reviewer) {
-                                        $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
-                                    } else {
-                                        $select.append('<option value="' + item.value + '">' + item.text + '</option>');
-                                    }
-                                });
+                                // $.each(response.data.optionsReviewer, function (index, item) {
+                                //     if (item.value == response.data.reviewer) {
+                                //         $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+                                //     } else {
+                                //         $select.append('<option value="' + item.value + '">' + item.text + '</option>');
+                                //     }
+                                // });
 
                                 var $select = $('#approverSelect');
                                 $select.empty();
                                 $select.append('<option value="">select approver</option>');
 
                                 $.each(response.data.optionsApprover, function (index, item) {
-                                    if (item.value == response.data.approver) {
+                                    if (item.value == response.data.approverId) {
                                         $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
                                     } else {
                                         $select.append('<option value="' + item.value + '">' + item.text + '</option>');

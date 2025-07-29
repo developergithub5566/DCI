@@ -16,9 +16,9 @@ namespace DCI.Repositories.Interface
         Task<(int statuscode, string message)> ValidateToken(string token);
         Task<(int statuscode, string message)> ChangePassword(ChangePasswordViewModel pass);
 		Task SaveExternalUserAccess(int userId);
-        Task UpdateUserEmployeeAccess(UserAccess usr);
+        Task UpdateUserEmployeeAccess(UserViewModel usr, string token);
 
-       Task UpdateUserEmployeeAccessX(UserViewModel usr, string token);
+
 
     }
 }

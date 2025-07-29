@@ -90,10 +90,25 @@ namespace DCI.API.Controllers
         }
 
         [HttpPost]
-        [Route("UndertimeById")]
-        public async Task<IActionResult> UndertimeById([FromBody] DailyTimeRecordViewModel model)
+        [Route("GetUndertimeById")]
+        public async Task<IActionResult> GetUndertimeById([FromBody] DailyTimeRecordViewModel model)
         {
-            return Ok(await _dtrRepository.UndertimeById(model));
+            return Ok(await _dtrRepository.GetUndertimeById(model));
         }
+
+        [HttpPost]
+        [Route("GetAllWFHById")]
+        public async Task<IActionResult> GetAllWFHById([FromBody] WFHViewModel model)
+        {
+            return Ok(await _dtrRepository.GetAllWFHById(model));
+        }
+
+        [HttpPost]
+        [Route("SaveWFHTimeIn")]
+        public async Task<IActionResult> SaveWFHTimeIn([FromBody] WFHViewModel model)
+        {
+            return Ok(await _dtrRepository.SaveWFHTimeIn(model));
+        }
+        
     }
 }
