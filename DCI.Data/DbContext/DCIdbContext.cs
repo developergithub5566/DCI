@@ -39,7 +39,9 @@ namespace DCI.Data
         public DbSet<DTRCorrection> DTRCorrection { get; set; }
         public DbSet<Position> Position { get; set; }
         public DbSet<tbl_wfh_logs> tbl_wfh_logs { get; set; }
-        
+        public DbSet<OvertimeHeader> OvertimeHeader { get; set; }
+        public DbSet<OvertimeDetail> OvertimeDetail { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<AuditLog>().Property(ae => ae.Changes).HasConversion(

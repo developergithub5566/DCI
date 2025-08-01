@@ -206,7 +206,17 @@
                             </div>
                         </a>
                     }
-
+                       @if (module.ModulePageId == (int)EnumModulePage.Overtime)
+                    {
+                        <hr class='sidebar-divider'>
+                        <a href="/DailyTimeRecord/Overtime" class='mainModule'>
+                            <div class='sidebar-heading mainModuleActive'>
+                                <i class='fa-solid fa-file'></i>
+                                <span>Overtime</span>
+                                <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
+                            </div>
+                        </a>
+                    }
                 }
                 <!-- Divider -->
                 <hr class="sidebar-divider">

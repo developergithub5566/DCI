@@ -32,7 +32,7 @@
         public DateTime DtrDateTime { get; set; }
         public int Status { get; set; } = 0;
         public string StatusName { get; set; } = string.Empty;
-        public string EmployeeName { get; set; } = string.Empty;        
+        public string EmployeeName { get; set; } = string.Empty;
         public string Reason { get; set; } = string.Empty;
         public string? Filename { get; set; } = string.Empty;
         public string? FileLocation { get; set; } = string.Empty;
@@ -59,15 +59,15 @@
     public class WFHViewModel
     {
         public int ID { get; set; } = 0;
-        public string EMPLOYEE_ID { get; set; } = string.Empty;
+        public int EMPLOYEE_ID { get; set; } = 0;
+        public string EMPLOYEE_NO { get; set; } = string.Empty;
         public string FULL_NAME { get; set; } = string.Empty;
         public DateTime DATE_TIME { get; set; } = DateTime.Now;
         public DateTime CREATED_DATE { get; set; } = DateTime.Now;
         public string CREATED_BY { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public int CurrentUserId { get; set; } = 0;
-        
-    }
+    }  
 }
 
 

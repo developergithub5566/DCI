@@ -448,7 +448,7 @@ namespace DCI.WebApp.Controllers
                     var currentUser = _userSessionHelper.GetCurrentUser();
 
 
-                    param.CurrentUserId = 2;//currentUser.UserId;
+                    param.CurrentUserId = currentUser.UserId;
 
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
@@ -486,9 +486,9 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
 
-                    // var currentUser = _userSessionHelper.GetCurrentUser();
+                    var currentUser = _userSessionHelper.GetCurrentUser();
 
-                    //  model.CreatedBy = 2;//currentUser.UserId;
+                    param.EMPLOYEE_ID = currentUser.EmployeeId;
 
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
@@ -519,7 +519,82 @@ namespace DCI.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
+        public async Task<IActionResult> Overtime(OvertimeViewModel param)
+        {
+            List<OvertimeViewModel> model = new List<OvertimeViewModel>();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
 
+
+                    param.CurrentUserId = currentUser.UserId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/Overtime");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<List<OvertimeViewModel>>(responseBody)!;
+                    }
+
+                }
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
+        public async Task<IActionResult> AddOvertime(OvertimeViewModel param)
+        {
+            OvertimeViewModel model = new OvertimeViewModel();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+
+
+                    param.CurrentUserId = currentUser.UserId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/AddOvertime");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        // model = JsonConvert.DeserializeObject<OvertimeViewModel>(responseBody)!;
+                        return View(model);
+                    }
+
+                }
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
 
     }
 }

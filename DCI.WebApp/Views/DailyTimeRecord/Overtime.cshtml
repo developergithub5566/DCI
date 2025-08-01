@@ -1,0 +1,345 @@
+﻿@model IEnumerable<DCI.Models.ViewModel.OvertimeViewModel>
+@using Newtonsoft.Json;
+@using DCI.Core.Common;
+@using DCI.Models.ViewModel;
+
+<link href="~/css/dcicustom.css" rel="stylesheet" />
+
+@{
+    var modulePageAccess = Context.Session.GetString("ModulePageAccess");
+    var canView = false;
+    var canAdd = false;
+    var canEdit = false;
+    var canDelete = false;
+
+    if (modulePageAccess == null)
+    {
+        <script>
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Logout", "Account")',
+                success: function (response) {
+
+                    Swal.fire({
+                        text: "Your session has timed out. Please log in again.",
+                        icon: "info",
+                        confirmButtonText: "Ok"
+                    }).then((result) => {
+                        window.location.href = '/Account/Logout';
+                    });
+                },
+                error: function () {
+                    Swal.fire({
+                        text: "An error occurred. Please try again.",
+                        icon: "error"
+                    });
+                }
+            })
+        </script>
+    }
+    else
+    {
+        var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
+                    .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Department);
+        canView = module?.View ?? false;
+        canAdd = module?.Add ?? false;
+        canEdit = module?.Update ?? false;
+        canDelete = module?.Delete ?? false;
+    }
+
+}
+
+<div class="container-fluid">
+    <div class="spinner-overlay">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <div class="d-sm-flex align-items-center justify-content-between mb-3">
+        <h6 class="m-0 font-weight-bold text-gray-800">@ViewBag.BreadCrumbLabel</h6>
+               <div class="upperRightDivBtn">
+    @*         <a href="#" title="Add Department" class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")" data-toggle="modal" data-target="#" onclick="newForm()">
+                <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
+                <span class="text text-white"><small>Add Overtime</small></span>
+            </a> *@
+
+            <a asp-controller="DailyTimeRecord" asp-action="AddOvertime" asp-route-OTHeaderId="0" class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")">
+                <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
+                <span class="text text-white"><small>File Overtime</small></span>
+            </a>
+        </div>
+
+    </div>
+    <div class="col-12 p0">
+        <ul class="breadcrumb">
+            <li><a href="~/Home/Index">Dashboard</a></li>
+            <li><a href="#">Daily Time Record</a></li>
+            <li><a href="#">Overtime</a></li>
+        
+        </ul>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header">
+            <label class="mb0">Data</label>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive mt20">
+                <table class="table table-bordered" id="tblDTR">
+                    <thead>
+                        <tr>
+                            <th>
+                                <label>RequestNo</label>
+                            </th>
+                            <th>
+                                <label>Name</label>
+                            </th>
+                            <th>
+                                <label>Total</label>
+                            </th>
+                            <th>
+                                <label>Status</label>
+                            </th>
+                            <th>
+                                <label>CreatedBy</label>
+                            </th>
+                            <th>
+                                <label>Date Filed</label>
+                            </th>
+                            
+                            <th>
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td>
+                                    @item.RequestNo
+                                </td>
+                                <td>
+                                    @item.Fullname
+                                </td>
+                                <td>
+                                    @item.Total
+                                </td>
+                                <td>
+                                    @item.StatusId
+                                </td>
+                                <td>
+                                    @item.CreatedBy
+                                </td>                               
+                                <td>
+                                    @item.DateCreated
+                                </td>
+
+                                <td>
+                                  
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+</<div>
+</div>
+
+
+            <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Overtime</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="createForm">
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label class="frmText"><span class="required">*</span> Type</label>
+                                    <select id="leaveTypeSelect" class="form-select" required onchange="GetLeaveTypeAmount()">
+                                        <option value="0">Select</option>
+                                        <option value="1">125% REGULAR (AFTER OFFICE HRS. /MON - FRI / EXCEPT HOLIDAY</option>
+                                        <option value="2">10% NIGHT DIFFERENTIAL (10PM - 6AM) MON - SUN / HOLIDAY</option>
+                                        <option value="3">130% SPECIAL HOLIDAY MON - SUN / SAT-SUN (FIRST 8 HRS.)</option>
+                                        <option value="4">169% AFTER 8 HRS OF 130%</option>
+                                        <option value="5">150% HOLIDAY ON REST DAY (SAT - SUN)</option>
+                                    </select>
+
+
+                                    <label class="frmText"><span class="required">*</span> Date: </label>
+                                    <div class="input-group">
+                                        <input type="text" name="OTDate" id="OTDate" class="form-control frmField" autocomplete="off">
+                                        <div class="input-group-prepend prependBtn">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                    </div>
+                                    <label for="OTDate" generated="true" class="error"></label>
+
+
+                                   
+                                    <label class="frmText"><span class="required">*</span> Time From: </label>
+                                    <div class="input-group">
+                                        <input type="text" name="OTTimeFrom" id="OTTimeFrom" class="form-control frmField" autocomplete="off">
+                                        <div class="input-group-prepend prependBtn">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                    </div>
+                                    <label for="OTTimeFrom" generated="true" class="error"></label>
+
+                                    <label class="frmText"><span class="required">*</span> Time To: </label>
+                                    <div class="input-group">
+                                        <input type="text" name="OTTimeTo" id="OTTimeTo" class="form-control frmField" autocomplete="off">
+                                        <div class="input-group-prepend prependBtn">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                    </div>
+                                    <label for="OTTimeTo" generated="true" class="error"></label>
+
+                                    @* <label class="frmText">Total: </label> *@
+                                    <div id="totalTime"></div>
+                                </div>
+
+
+
+
+                             @*    <table class="viewDetailsTbl table table-striped">
+                                    <tbody>                                     
+                                    </tbody>
+                                </table> *@
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><small>Close</small></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+@section scripts {
+                
+                <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
+                <script src="~/js/dci-validation.js"></script>
+                <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+
+
+                <script type="text/javascript">
+                        var js = jQuery.noConflict(true);
+                                           let fromTime = null;
+                    let toTime = null;
+
+                                $('.spinner-overlay').show();
+
+                    setTimeout(() => {
+                        $('.spinner-overlay').hide();
+                    }, 200);
+
+
+                        $(document).ready(function () {
+                            js('#tblDTR').DataTable({
+                                 order: [[2, 'desc']]
+                            });
+
+
+                                   flatpickr("#OTDate", {
+                                                enableTime: false,
+                                               dateFormat: "Y-m-d",
+                                                    time_24hr: true,
+                                                                 onChange: function(selectedDates, dateStr, instance) {
+                                                  }
+                                            });
+
+
+
+                                               flatpickr("#OTTimeFrom", {
+                                                         enableTime: true,
+                                                         noCalendar: true,
+                                                          dateFormat: "H:i",
+                                                          onChange: function(selectedDates) {
+                                                          fromTime = selectedDates[0];
+                                                          calculateDuration();
+                                                        }
+                                                    });
+
+                                                   flatpickr("#OTTimeTo", {
+                                                             enableTime: true,
+                                                     noCalendar: true,
+                                                    dateFormat: "H:i",
+                                                     onChange: function(selectedDates) {
+                                                  toTime = selectedDates[0];
+                                                  calculateDuration();
+                                                }
+                                            });
+                           
+
+
+                        });
+
+
+
+                function calculateDuration() {
+                      if (fromTime && toTime) {
+                        // Set both times on the same day
+                        const baseDate = new Date();
+                        const from = new Date(baseDate);
+                        from.setHours(fromTime.getHours(), fromTime.getMinutes(), 0, 0);
+
+                        const to = new Date(baseDate);
+                        to.setHours(toTime.getHours(), toTime.getMinutes(), 0, 0);
+
+                        // Handle crossing midnight
+                        if (to < from) {
+                          to.setDate(to.getDate() + 1);
+                        }
+
+                        const diffMs = to - from;
+                        const diffMins = Math.floor(diffMs / 60000);
+                        const hours = Math.floor(diffMins / 60);
+                        const minutes = diffMins % 60;
+
+                        document.getElementById("totalTime").innerText =
+                          `Total: ${hours} hour(s) and ${minutes} minute(s)`;
+                      }
+                    }
+
+                        function newForm(dtr) {
+                           // console.log(dtr)
+
+                              const timefrom = document.querySelector("#OTTimeFrom")._flatpickr;
+                                                 timefrom.clear();
+                              const timeto = document.querySelector("#OTTimeTo")._flatpickr;
+                                                                 timeto.clear();
+
+                            
+
+
+                                js('#createmodal').modal('show');
+                        }
+
+                        // function newForm() {
+                        //         document.getElementById('lblDate').textContent = 'May 15, 2025';
+                        //         document.getElementById('lblEmpNo').textContent = '080343';
+                        //         document.getElementById('lblName').textContent = 'Jc Cabugao';
+                        //         document.getElementById('lblSource').textContent = 'Remote';
+                        //         document.getElementById('lblTimeIn').textContent = '08:27:43 AM';
+                        //         document.getElementById('lblTimeOut').textContent = '--:--:--';
+                        //         document.getElementById('lblClockOut').textContent = '05:27:43 PM';
+                        //         document.getElementById('lblLate').textContent = '00:00:00';
+                        //         document.getElementById('lblUnderTime').textContent = '09:00:00';
+                        //         document.getElementById('lblOT').textContent = '00:00:00';
+                        //         document.getElementById('lblHours').textContent = '00:00:00';
+                        //         document.getElementById('lblWorkingHours').textContent = '00:00:00';
+                        //         js('#createmodal').modal('show');
+                        // }
+
+
+
+
+                </script>
+}

@@ -368,7 +368,7 @@ namespace DCI.Repositories
                          select new WFHViewModel
                          {
                              ID = dtr.ID,
-                             EMPLOYEE_ID = dtr.EMPLOYEE_ID,
+                             EMPLOYEE_NO = dtr.EMPLOYEE_ID,
                              FULL_NAME = dtr.FULL_NAME,
                              DATE_TIME = dtr.DATE_TIME                        
                            
@@ -380,13 +380,15 @@ namespace DCI.Repositories
 
         public async Task<(int statuscode, string message)> SaveWFHTimeIn(WFHViewModel model)
         {
+           
+            var empdtl = _dbContext.Employee.Where(x => x.EmployeeId == model.EMPLOYEE_ID).FirstOrDefault();
 
-            model.EMPLOYEE_ID = "080343";
-            model.FULL_NAME = "John A Cabugao";
+            model.EMPLOYEE_NO = empdtl.EmployeeNo ?? string.Empty;
+            model.FULL_NAME = empdtl.Firstname + empdtl.Lastname;
             model.CREATED_BY = "SYSAD";
 
             tbl_wfh_logs entity = new tbl_wfh_logs();
-            entity.EMPLOYEE_ID = model.EMPLOYEE_ID;
+            entity.EMPLOYEE_ID = model.EMPLOYEE_NO;
             entity.FULL_NAME = model.FULL_NAME;
             entity.DATE_TIME = DateTime.Now;
             entity.CREATED_DATE = DateTime.Now;
@@ -395,6 +397,50 @@ namespace DCI.Repositories
             await _dbContext.SaveChangesAsync();
 
             return (StatusCodes.Status200OK, "Successfully saved");
+        }
+
+        public async Task<IList<OvertimeViewModel>> Overtime(OvertimeViewModel model)
+        {                     
+
+            var query = (from ot in _dbContext.OvertimeHeader
+                         join emp in _dbContext.Employee on ot.EmployeeId equals emp.EmployeeId
+                         where ot.IsActive == true
+                         select new OvertimeViewModel
+                         {
+                             OTHeaderId = ot.OTHeaderId,
+                             RequestNo = ot.RequestNo,
+                             Fullname = emp.Firstname + emp.Lastname,
+                             EmployeeId = ot.EmployeeId ,
+                             //Total = ot.Total,
+                             StatusId = ot.StatusId,
+                             DateCreated = ot.DateCreated,
+                             CreatedBy = ot.CreatedBy,                       
+                         }).ToList();
+
+
+            return query;
+        }
+
+        public async Task<OvertimeViewModel> AddOvertime(OvertimeViewModel model)
+        {
+
+            var query = from ot in _dbContext.OvertimeHeader
+                         join emp in _dbContext.Employee on ot.EmployeeId equals emp.EmployeeId
+                         where ot.IsActive == true
+                         select new OvertimeViewModel
+                         {
+                             OTHeaderId = ot.OTHeaderId,
+                             RequestNo = ot.RequestNo,
+                             Fullname = emp.Firstname + emp.Lastname,
+                             EmployeeId = ot.EmployeeId,
+                             //Total = ot.Total,
+                             StatusId = ot.StatusId,
+                             DateCreated = ot.DateCreated,
+                             CreatedBy = ot.CreatedBy,
+                         };
+
+
+            return query.FirstOrDefault();
         }
     }
 }

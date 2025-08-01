@@ -109,6 +109,21 @@ namespace DCI.API.Controllers
         {
             return Ok(await _dtrRepository.SaveWFHTimeIn(model));
         }
-        
+
+
+        [HttpPost]
+        [Route("Overtime")]
+        public async Task<IActionResult> Overtime([FromBody] OvertimeViewModel model)
+        {
+            return Ok(await _dtrRepository.Overtime(model));
+        }
+
+        [HttpPost]
+        [Route("AddOvertime")]
+        public async Task<IActionResult> AddOvertime([FromBody] OvertimeViewModel model)
+        {
+            return Ok(await _dtrRepository.Overtime(model));
+        }
+
     }
 }
