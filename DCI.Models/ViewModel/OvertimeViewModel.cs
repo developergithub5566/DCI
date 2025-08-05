@@ -1,4 +1,5 @@
 ﻿using DCI.Models.Configuration;
+using Microsoft.VisualBasic;
 
 namespace DCI.Models.ViewModel
 {
@@ -50,4 +51,27 @@ namespace DCI.Models.ViewModel
         public bool IsActive { get; set; } = true;
 
     }
+
+    public class SubmitOvertimeViewModel
+    {
+        public List<OvertimeEntryDto> Entries { get; set; }
+        public int GrandTotalMinutes { get; set; } = 0;
+        //public int CurrentUserId { get; set; }
+
+    }
+
+    public class OvertimeEntryDto
+    {
+        public int OTType { get; set; } = 0;
+        public string OTTypeName { get; set; } = string.Empty;
+        public DateTime OTDate { get; set; } = DateTime.Now;
+        public string OTTimeFrom { get; set; } = string.Empty;
+        public string OTTimeTo { get; set; } = string.Empty;
+        public int TotalMinutes { get; set; } = 0;
+        public string EmployeeNo { get; set; } = string.Empty;
+    }
+
+
+
+
 }

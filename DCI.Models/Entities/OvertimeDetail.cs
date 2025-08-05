@@ -17,7 +17,7 @@ namespace DCI.Models.Entities
         public DateTime OTTimeFrom { get; set; }
 
         public DateTime OTTimeTo { get; set; }
-        public int Total { get; set; }
+        public int TotalMinutes { get; set; }
 
         public bool IsActive { get; set; }
 

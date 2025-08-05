@@ -108,12 +108,12 @@
 
                 <div class="row">
                     <div class="col-md-6">
-                        <div id="grandTotalText"><strong>Grand Total:</strong> 0h 0m</div>
-                        @*             <input name="TotalMinutes" id="TotalMinutes" value="0" > *@
+                    <div id="grandTotalText"><strong>Grand Total:</strong> 0h 0m</div>
+            @*             <input name="TotalMinutes" id="TotalMinutes" value="0" > *@
                     </div>
                 </div>
 
-
+              
 
                 <table id="otTable" class="table table-bordered mt-3">
                     <thead>
@@ -149,7 +149,7 @@
                             <div class="modal-body">
                                 <div class="form-group">
                                     <label class="frmText"><span class="required">*</span> Type</label>
-                                    <select id="otTypeSelect" class="form-select" required  style="font-size:small">
+                                    <select id="otTypeSelect" class="form-select" required onchange="GetLeaveTypeAmount()" style="font-size:small">
                                         <option value="0">Select</option>
                                         <option value="1">125% REGULAR (AFTER OFFICE HRS. /MON - FRI / EXCEPT HOLIDAY</option>
                                         <option value="2">10% NIGHT DIFFERENTIAL (10PM - 6AM) MON - SUN / HOLIDAY</option>
@@ -192,10 +192,10 @@
                                     <div id="totalTime"></div>
                                 </div>
 
-
+                      
                             </div>
                             <div class="modal-footer">
-                                 <button type="button" id="addBtn" class="btn btn-primary" >Add</button>                        
+                                <button type="button" id="addBtn" class="btn btn-primary">Add</button>
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal"><small>Close</small></button>
                             </div>
                         </form>
@@ -285,9 +285,9 @@
                                             if (result.isConfirmed) {
                                                 $('.spinner-overlay').show();
 
+                                                  
 
-
-
+                                                  
 
                                                 $.ajax({
                                                     type: 'POST',
@@ -378,226 +378,149 @@
 
 
                                     js('#createmodal').modal('show');
-                            }
+                            }  
                 </script>
 
                 <script>
-                       let entryIndex = 0;
+                      let entryIndex = 0;
 
-                     function parseTime(str) {
-                       const parts = str.split(':');
-                       if (parts.length !== 2) return null;
-                       const h = parseInt(parts[0], 10);
-                       const m = parseInt(parts[1], 10);
-                       if (isNaN(h) || isNaN(m) || h < 0 || h > 23 || m < 0 || m > 59) return null;
-                       return { h, m };
-                     }
+                    function parseTime(str) {
+                      const parts = str.split(':');
+                      if (parts.length !== 2) return null;
+                      const h = parseInt(parts[0], 10);
+                      const m = parseInt(parts[1], 10);
+                      if (isNaN(h) || isNaN(m) || h < 0 || h > 23 || m < 0 || m > 59) return null;
+                      return { h, m };
+                    }
 
-                     function computeDuration(fromStr, toStr) {
-                       const from = parseTime(fromStr);
-                       const to = parseTime(toStr);
-                       if (!from || !to) return null;
-                       let fromMinutes = from.h * 60 + from.m;
-                       let toMinutes = to.h * 60 + to.m;
-                       if (toMinutes < fromMinutes) {
-                         toMinutes += 24 * 60;
-                       }
-                       return toMinutes - fromMinutes; // minutes
-                     }
+                    function computeDuration(fromStr, toStr) {
+                      const from = parseTime(fromStr);
+                      const to = parseTime(toStr);
+                      if (!from || !to) return null;
+                      let fromMinutes = from.h * 60 + from.m;
+                      let toMinutes = to.h * 60 + to.m;
+                      if (toMinutes < fromMinutes) {
+                        toMinutes += 24 * 60;
+                      }
+                      return toMinutes - fromMinutes; // minutes
+                    }
 
-                     function formatMinutes(totalMinutes) {
-                       const h = Math.floor(totalMinutes / 60);
-                       const m = totalMinutes % 60;
-                       return `${h}h ${m}m`;
-                     }
+                    function formatMinutes(totalMinutes) {
+                      const h = Math.floor(totalMinutes / 60);
+                      const m = totalMinutes % 60;
+                      return `${h}h ${m}m`;
+                    }
 
-                     function updateGrandTotal() {
-                       const rows = document.querySelectorAll('#otTable tbody tr');
-                       let sumMinutes = 0;
-                       rows.forEach(r => {
-                         const cell = r.children[4]; // Total Hours column
-                         if (!cell) return;
-                         const text = cell.textContent.trim(); // e.g., "2h 30m"
-                         const match = text.match(/(\d+)h\s*(\d+)m/);
-                         if (match) {
-                           const h = parseInt(match[1], 10);
-                           const m = parseInt(match[2], 10);
-                           sumMinutes += h * 60 + m;
-                         }
-                       });
-                       document.getElementById('grandTotalText').innerHTML = `<strong>Grand Total:</strong> ${formatMinutes(sumMinutes)}`;
-                     }
+                    function updateGrandTotal() {
+                      const rows = document.querySelectorAll('#otTable tbody tr');
+                      let sumMinutes = 0;
+                      rows.forEach(r => {
+                        const cell = r.children[4]; // Total Hours column
+                        if (!cell) return;
+                        const text = cell.textContent.trim(); // e.g., "2h 30m"
+                        const match = text.match(/(\d+)h\s*(\d+)m/);
+                        if (match) {
+                          const h = parseInt(match[1], 10);
+                          const m = parseInt(match[2], 10);
+                          sumMinutes += h * 60 + m;
+                        }
+                      });
+                      document.getElementById('grandTotalText').innerHTML = `<strong>Grand Total:</strong> ${formatMinutes(sumMinutes)}`;
+                    }
 
-                    document.getElementById('addBtn').addEventListener('click', function () {
-                       document.querySelectorAll('.error').forEach(e => e.textContent = '');
+                   document.getElementById('addBtn').addEventListener('click', function () {
+                      document.querySelectorAll('.error').forEach(e => e.textContent = '');
 
-                       const typeSelect = document.getElementById('otTypeSelect');
-                       const typeVal = typeSelect.value;
-                       const typeText = typeSelect.options[typeSelect.selectedIndex].text.trim();
-                       const date = document.getElementById('OTDate').value.trim();
-                       const from = document.getElementById('OTTimeFrom').value.trim();
-                       const to = document.getElementById('OTTimeTo').value.trim();
+                      const typeSelect = document.getElementById('otTypeSelect');
+                      const typeVal = typeSelect.value;
+                      const typeText = typeSelect.options[typeSelect.selectedIndex].text.trim();
+                      const date = document.getElementById('OTDate').value.trim();
+                      const from = document.getElementById('OTTimeFrom').value.trim();
+                      const to = document.getElementById('OTTimeTo').value.trim();
 
-                       let hasError = false;
-                       if (typeVal === '0') {
-                         hasError = true;
-                         alert('Please select a Type.');
-                       }
-                       if (!date) {
-                         hasError = true;
-                         document.querySelector('label[for="OTDate"]').textContent = 'Required';
-                       }
-                       if (!from) {
-                         hasError = true;
-                         document.querySelector('label[for="OTTimeFrom"]').textContent = 'Required';
-                       }
-                       if (!to) {
-                         hasError = true;
-                         document.querySelector('label[for="OTTimeTo"]').textContent = 'Required';
-                       }
-                       if (hasError) return;
+                      let hasError = false;
+                      if (typeVal === '0') {
+                        hasError = true;
+                        alert('Please select a Type.');
+                      }
+                      if (!date) {
+                        hasError = true;
+                        document.querySelector('label[for="OTDate"]').textContent = 'Required';
+                      }
+                      if (!from) {
+                        hasError = true;
+                        document.querySelector('label[for="OTTimeFrom"]').textContent = 'Required';
+                      }
+                      if (!to) {
+                        hasError = true;
+                        document.querySelector('label[for="OTTimeTo"]').textContent = 'Required';
+                      }
+                      if (hasError) return;
 
-                       if (dateAlreadyExists(date)) {
-                         alert('An entry for that date already exists. You cannot add a duplicate date.');
-                         return;
-                       }
+                      if (dateAlreadyExists(date)) {
+                        alert('An entry for that date already exists. You cannot add a duplicate date.');
+                        return;
+                      }
 
-                       const durationMinutes = computeDuration(from, to);
-                       if (durationMinutes === null) {
-                         alert('Time format invalid. Use HH:mm.');
-                         return;
-                       }
-                       document.getElementById('totalTime').textContent = 'Total: ' + formatMinutes(durationMinutes);
+                      const durationMinutes = computeDuration(from, to);
+                      if (durationMinutes === null) {
+                        alert('Time format invalid. Use HH:mm.');
+                        return;
+                      }
+                      document.getElementById('totalTime').textContent = 'Total: ' + formatMinutes(durationMinutes);
 
+                      const tbody = document.querySelector('#otTable tbody');
+                      const tr = document.createElement('tr');
 
-                                   const datex =$('#OTDate').val();
-                           const timefromx =  $('#OTTimeFrom').val();
-                           const timetox = $('#OTTimeTo').val();
+                      tr.innerHTML = `
+                        <td>
+                          <input type="hidden" name="Entries[${entryIndex}].OTType" value="${typeVal}">
+                          ${typeText}
+                        </td>
+                        <td>
+                          <input type="hidden" name="Entries[${entryIndex}].OTDate" value="${date}">
+                          ${date}
+                        </td>
+                        <td>
+                          <input type="hidden" name="Entries[${entryIndex}].OTTimeFrom" value="${from}">
+                          ${from}
+                        </td>
+                        <td>
+                          <input type="hidden" name="Entries[${entryIndex}].OTTimeTo" value="${to}">
+                          ${to}
+                        </td>
+                        <td>${formatMinutes(durationMinutes)}</td>
+                        <td class="total-minutes-cell" hidden>
+                          ${durationMinutes}
+                          <input type="hidden" name="Entries[${entryIndex}].TotalMinutes" value="${durationMinutes}">
+                        </td>
+                        <td><button type="button" class="btn btn-sm btn-danger remove-row">Remove</button></td>
+                      `;
 
-                         // const formData = new FormData();
-                         //    formData.append('OTDate',  datex);
-                         //     formData.append('OTTimeFrom', timefromx);
-                         //      formData.append('OTTimeTo',  timetox);
-                         //       formData.append('OTType',  0);
-                         //        formData.append('TotalMinutes',  0);
-
-                         //      console.log(formData);
-
-
-                                                $.ajax({
-                                                    type: 'POST',
-                                                    url: '@Url.Action("CategorizeOvertime", "DailyTimeRecord")',
-                                                    data: { OTDate : datex, OTTimeFrom : timefromx, OTTimeTo : timetox},
-                                                    success: function (response) {
-                                                        if (response.success) {
-
-                                                            console.log(response)
-
-                                                        let tbodytable = $('#otTable tbody'); // define this first
-
-                                                        if (response.data && response.data.length > 0) {
-                                                            tbodytable.empty(); // clear existing rows (optional)
-
-                                                            response.data.forEach(function(item) {
-                                                              //  var durationMinutes = computeDuration(item.otTimeFrom, item.otTimeTo); // implement this function
-                                                                
-                                                                var row = `<tr>
-                                                                    <td>${item.otTypeName}</td>
-                                                                    <td>${item.otDate}</td>
-                                                                    <td>${item.otTimeFrom}</td>
-                                                                    <td>${item.otTimeTo}</td>
-                                                                    <td>${item.totalMinutes}</td>
-                                                                    <td hidden>${item.totalMinutes}</td>
-                                                                    <td></td>
-                                                                </tr>`;
-                                                                tbodytable.append(row);
-                                                            });
-                                                        } else {
-                                                            tbodytable.html(`<tr><td colspan="7" class="text-center">No record found.</td></tr>`);
-                                                        }
+                      tbody.appendChild(tr);
+                      entryIndex++;
+                      updateGrandTotal();
+                      js('#createmodal').modal('hide'); // assuming js(...) is your modal helper
+                    });
 
 
+                    // Delegate removal and update grand total
+                    document.querySelector('#otTable tbody').addEventListener('click', function (e) {
+                      if (e.target.matches('.remove-row')) {
+                        const row = e.target.closest('tr');
+                        row.remove();
+                        updateGrandTotal();
+                      }
+                    });
 
-
-
-                                                                              // const tbody = document.querySelector('#otTable tbody');
-                                                                              // const tr = document.createElement('tr');
-
-                                                                              // tr.innerHTML = `
-                                                                              //   <td>
-                                                                              //     <input type="hidden" name="Entries[${entryIndex}].OTType" value="${response.data.otType}">
-                                                                              //     ${response.data.otType}
-                                                                              //   </td>
-                                                                              //   <td>
-                                                                              //     <input type="hidden" name="Entries[${entryIndex}].OTDate" value="${response.data.otDate}">
-                                                                              //     ${response.data.otDate}
-                                                                              //   </td>
-                                                                              //   <td>
-                                                                              //     <input type="hidden" name="Entries[${entryIndex}].OTTimeFrom" value="${response.data.otTimeFrom}">
-                                                                              //     ${response.data.otTimeFrom}
-                                                                              //   </td>
-                                                                              //   <td>
-                                                                              //     <input type="hidden" name="Entries[${entryIndex}].OTTimeTo" value="${response.data.otTimeTo}">
-                                                                              //     ${response.data.otTimeTo}
-                                                                              //   </td>
-                                                                              //   <td>${formatMinutes(durationMinutes)}</td>
-                                                                              //   <td class="total-minutes-cell" hidden>
-                                                                              //     ${durationMinutes}
-                                                                              //     <input type="hidden" name="Entries[${entryIndex}].TotalMinutes" value="${durationMinutes}">
-                                                                              //   </td>
-                                                                              //   <td><button type="button" class="btn btn-sm btn-danger remove-row">Remove</button></td>
-                                                                              // `;
-                                                                              //       tbody.appendChild(tr);
-
-                                                                                      entryIndex++;
-                                                                                      updateGrandTotal();
-                                                                              js('#createmodal').modal('hide');
-
-                                                       
-
-                                                        } else {
-                                                            Swal.fire({
-                                                                text: response.message,
-                                                                icon: "error"
-                                                            });
-                                                        }
-                                                        $('.spinner-overlay').hide();
-                                                    },
-                                                    error: function () {
-                                                        $('.spinner-overlay').hide();
-                                                        Swal.fire({
-                                                            text: "An error occurred. Please try again.",
-                                                            icon: "error"
-                                                        });
-                                                    }
-                                                });
-                                        
-                                     
-                 
-                      // updateGrandTotal();
-                      // js('#createmodal').modal('hide');
-                     });
-
-
-                     // Delegate removal and update grand total
-                     document.querySelector('#otTable tbody').addEventListener('click', function (e) {
-                       if (e.target.matches('.remove-row')) {
-                         const row = e.target.closest('tr');
-                         row.remove();
-                         updateGrandTotal();
-                       }
-                     });
-
-                                         function dateAlreadyExists(dateStr) {
-                       const rows = document.querySelectorAll('#otTable tbody tr');
-                       for (const r of rows) {
-                         const existingDate = r.children[1]?.textContent.trim(); // Date column
-                         if (existingDate === dateStr) return true;
-                       }
-                       return false;
-                     }
-
-
+                                        function dateAlreadyExists(dateStr) {
+                      const rows = document.querySelectorAll('#otTable tbody tr');
+                      for (const r of rows) {
+                        const existingDate = r.children[1]?.textContent.trim(); // Date column
+                        if (existingDate === dateStr) return true;
+                      }
+                      return false;
+                    }
 
                 </script>
 

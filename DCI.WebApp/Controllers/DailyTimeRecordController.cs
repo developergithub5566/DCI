@@ -1,4 +1,5 @@
-﻿using DCI.Core.Common;
+﻿using AspNetCoreGeneratedDocument;
+using DCI.Core.Common;
 using DCI.Models.Configuration;
 using DCI.Models.ViewModel;
 using DCI.WebApp.Configuration;
@@ -593,8 +594,148 @@ namespace DCI.WebApp.Controllers
             {
                 Log.CloseAndFlush();
             }
+            return Json(new { success = false, message = "An error occurred. Please try again." }); 
+        }
+
+
+        public async Task<IActionResult> SaveOvertime([FromBody] SubmitOvertimeViewModel param)
+        {
+            OvertimeViewModel model = new OvertimeViewModel();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    //var currentUser = _userSessionHelper.GetCurrentUser();
+
+
+                    //param.CurrentUserId = currentUser.UserId;
+
+
+                    //var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    //var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/SaveOvertime");
+                    //request.Content = stringContent;
+                    //var response = await _httpclient.SendAsync(request);
+                    //var responseBody = await response.Content.ReadAsStringAsync();
+                    //if (response.IsSuccessStatusCode == true)
+                    //{
+                    //    // model = JsonConvert.DeserializeObject<OvertimeViewModel>(responseBody)!;
+                    //    return View(model);
+                    //}
+
+                }
+                return View(model);
+            }
+            catch (Exception ex)
+            { 
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
+        public async Task<IActionResult> CategorizeOvertime(OvertimeEntryDto param )
+        {
+            OvertimeViewModel model = new OvertimeViewModel();
+            DailyTimeRecordViewModel dtrmodel = new DailyTimeRecordViewModel();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    // var currentUser = _userSessionHelper.GetCurrentUser(); 
+                    param.OTType = 1;
+                    param.TotalMinutes = 100;
+                    param.EmployeeNo = "080343";
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllAttendanceByDate");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        dtrmodel = JsonConvert.DeserializeObject<DailyTimeRecordViewModel>(responseBody)!;
+
+
+                        if(dtrmodel != null)
+                        {
+                            var Outtime = Convert.ToDateTime(dtrmodel.DATE);
+                            TimeSpan firstin = TimeSpan.Parse(dtrmodel.FIRST_IN);
+                            TimeSpan lastout = TimeSpan.Parse(dtrmodel.LAST_OUT);
+                            TimeSpan clockout = TimeSpan.Parse(dtrmodel.CLOCK_OUT);                     
+                            var overtime =  Convert.ToDateTime(dtrmodel.OVERTIME);
+                            // var workingHrs = Convert.ToInt16(dtrmodel.TOTAL_WORKING_HOURS);
+
+
+                            //OvertimeEntryDto overtimeEntryDto = new OvertimeEntryDto();
+                            TimeSpan beforeNightDiff = new TimeSpan(22, 59, 0);    // 6:00 AM
+                            var xxsadasd = beforeNightDiff - clockout;
+                            param.TotalMinutes = (int)xxsadasd.TotalHours;
+
+
+                           List <OvertimeEntryDto> otList = new List<OvertimeEntryDto>();
+                            OvertimeEntryDto overtimeEntryDto = new OvertimeEntryDto();
+                            overtimeEntryDto.OTDate = param.OTDate;
+                            overtimeEntryDto.OTTimeFrom = clockout.ToString();
+                            overtimeEntryDto.OTTimeTo = lastout.ToString();
+                            overtimeEntryDto.TotalMinutes = param.TotalMinutes;
+                            overtimeEntryDto.OTType = 1 ;
+                            overtimeEntryDto.OTTypeName = "125% REGULAR (AFTER OFFICE HRS. /MON - FRI / EXCEPT HOLIDAY";
+                            otList.Add(overtimeEntryDto);
+                            //overtimeEntryDto.OTType = 1;
+
+
+                            if (TimeSpan.TryParse(dtrmodel.TOTAL_WORKING_HOURS, out TimeSpan time))
+                            {
+                                TimeSpan eightHours = TimeSpan.FromHours(8);
+
+                                if (time > eightHours)
+                                {
+                                    {
+                                        TimeSpan start = new TimeSpan(22, 0, 0); // 10:00 PM
+                                        TimeSpan end = new TimeSpan(6, 0, 0);    // 6:00 AM
+                                        TimeSpan totalNightdiff;
+
+                                        if (lastout > start)
+                                        {
+                                            totalNightdiff = lastout - start;
+
+                                            OvertimeEntryDto nightdiff = new OvertimeEntryDto();
+                                            nightdiff.OTDate = param.OTDate;
+                                            nightdiff.OTTimeFrom = clockout.ToString();
+                                            nightdiff.OTTimeTo = lastout.ToString();
+                                            nightdiff.TotalMinutes = (int)totalNightdiff.TotalHours;
+                                            nightdiff.OTType = 2;
+                                            nightdiff.OTTypeName = "10% NIGHT DIFFERENTIAL (10PM - 6AM) MON - SUN / HOLIDAY";
+                                            otList.Add(nightdiff);
+                                        }
+                                    }
+                                }
+
+                            }
+
+                            return Json(new { success = true, data = otList });
+                        }
+                       
+                    }
+
+                }
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
     }
 }

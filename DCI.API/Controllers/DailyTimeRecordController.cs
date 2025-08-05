@@ -14,11 +14,13 @@ namespace DCI.API.Controllers
         private readonly DCIdbContext _dcIdbContext;
         IDailyTimeRecordRepository _dtrRepository;
         ILeaveRepository _leaveRepository;
+        IOvertimeRepository _overtimeRepository;
 
-        public DailyTimeRecordController(IDailyTimeRecordRepository dtrRepository, ILeaveRepository leaveRepository)
+        public DailyTimeRecordController(IDailyTimeRecordRepository dtrRepository, ILeaveRepository leaveRepository, IOvertimeRepository overtimeRepository)
         {
             _dtrRepository = dtrRepository;
             _leaveRepository = leaveRepository;
+            _overtimeRepository = overtimeRepository;
         }
 
         [HttpPost]
@@ -123,6 +125,14 @@ namespace DCI.API.Controllers
         public async Task<IActionResult> AddOvertime([FromBody] OvertimeViewModel model)
         {
             return Ok(await _dtrRepository.Overtime(model));
+        }
+
+
+        [HttpPost]
+        [Route("GetAllAttendanceByDate")]
+        public async Task<IActionResult> GetAllAttendanceByDate([FromBody] OvertimeEntryDto model)
+        {
+            return Ok(await _overtimeRepository.GetAllAttendanceByDate(model.OTDate,model.EmployeeNo));
         }
 
     }
