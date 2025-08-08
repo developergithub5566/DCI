@@ -54,10 +54,11 @@ namespace DCI.Models.ViewModel
 
     public class SubmitOvertimeViewModel
     {
-        public List<OvertimeEntryDto> Entries { get; set; }
-        public int GrandTotalMinutes { get; set; } = 0;
+        public List<OvertimeEntryDto> Entries { get; set; } = new List<OvertimeEntryDto>();
+       // public int GrandTotalMinutes { get; set; } = 0;
+        public DateTime OTDate { get; set; } = DateTime.Now;
         //public int CurrentUserId { get; set; }
-
+        public string EmployeeNo { get; set; } = string.Empty;
     }
 
     public class OvertimeEntryDto
@@ -68,6 +69,7 @@ namespace DCI.Models.ViewModel
         public string OTTimeFrom { get; set; } = string.Empty;
         public string OTTimeTo { get; set; } = string.Empty;
         public int TotalMinutes { get; set; } = 0;
+        public string TotalHours { get; set; } = string.Empty;
         public string EmployeeNo { get; set; } = string.Empty;
     }
 

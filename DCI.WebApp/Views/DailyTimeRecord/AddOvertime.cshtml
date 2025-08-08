@@ -439,22 +439,22 @@
                        const to = document.getElementById('OTTimeTo').value.trim();
 
                        let hasError = false;
-                       if (typeVal === '0') {
-                         hasError = true;
-                         alert('Please select a Type.');
-                       }
+                       // if (typeVal === '0') {
+                       //   hasError = true;
+                       //   alert('Please select a Type.');
+                       // }
                        if (!date) {
                          hasError = true;
                          document.querySelector('label[for="OTDate"]').textContent = 'Required';
                        }
-                       if (!from) {
-                         hasError = true;
-                         document.querySelector('label[for="OTTimeFrom"]').textContent = 'Required';
-                       }
-                       if (!to) {
-                         hasError = true;
-                         document.querySelector('label[for="OTTimeTo"]').textContent = 'Required';
-                       }
+                       // if (!from) {
+                       //   hasError = true;
+                       //   document.querySelector('label[for="OTTimeFrom"]').textContent = 'Required';
+                       // }
+                       // if (!to) {
+                       //   hasError = true;
+                       //   document.querySelector('label[for="OTTimeTo"]').textContent = 'Required';
+                       // }
                        if (hasError) return;
 
                        if (dateAlreadyExists(date)) {
@@ -462,15 +462,16 @@
                          return;
                        }
 
-                       const durationMinutes = computeDuration(from, to);
-                       if (durationMinutes === null) {
-                         alert('Time format invalid. Use HH:mm.');
-                         return;
-                       }
-                       document.getElementById('totalTime').textContent = 'Total: ' + formatMinutes(durationMinutes);
+                       // const durationMinutes = computeDuration(from, to);
+                       // if (durationMinutes === null) {
+                       //   alert('Time format invalid. Use HH:mm.');
+                       //   return;
+                       // }
+                      // document.getElementById('totalTime').textContent = 'Total: ' + formatMinutes(durationMinutes);
+                       const entries = collectOvertimeEntries();
 
 
-                                   const datex =$('#OTDate').val();
+                                   const _otdate =$('#OTDate').val();
                            const timefromx =  $('#OTTimeFrom').val();
                            const timetox = $('#OTTimeTo').val();
 
@@ -482,36 +483,53 @@
                          //        formData.append('TotalMinutes',  0);
 
                          //      console.log(formData);
+                                             const payload = {
+                                                OTDate: _otdate,   // include your additional param
+                                                Entries: entries   // your list of entries
+                                            }
+                                                console.log(payload);
 
 
                                                 $.ajax({
                                                     type: 'POST',
                                                     url: '@Url.Action("CategorizeOvertime", "DailyTimeRecord")',
-                                                    data: { OTDate : datex, OTTimeFrom : timefromx, OTTimeTo : timetox},
+                                                   // data: { OTDate : _otdate },
+                                                      contentType: 'application/json; charset=utf-8',
+                                                      //    processData: false,
+                                                // contentType: false,
+                                                       data: JSON.stringify(payload),
+
                                                     success: function (response) {
                                                         if (response.success) {
 
-                                                            console.log(response)
+                                                            console.log(response.data)
 
                                                         let tbodytable = $('#otTable tbody'); // define this first
 
                                                         if (response.data && response.data.length > 0) {
                                                             tbodytable.empty(); // clear existing rows (optional)
 
-                                                            response.data.forEach(function(item) {
-                                                              //  var durationMinutes = computeDuration(item.otTimeFrom, item.otTimeTo); // implement this function
-                                                                
-                                                                var row = `<tr>
-                                                                    <td>${item.otTypeName}</td>
-                                                                    <td>${item.otDate}</td>
-                                                                    <td>${item.otTimeFrom}</td>
-                                                                    <td>${item.otTimeTo}</td>
-                                                                    <td>${item.totalMinutes}</td>
-                                                                    <td hidden>${item.totalMinutes}</td>
-                                                                    <td></td>
-                                                                </tr>`;
-                                                                tbodytable.append(row);
-                                                            });
+                                                                          response.data.forEach(function(item, index) {
+                                                                                var row = `<tr>
+                                                                                    <td>${item.otTypeName}</td>
+                                                                                    <td>${item.otDate}</td>
+                                                                                    <td>${item.otTimeFrom}</td>
+                                                                                    <td>${item.otTimeTo}</td>
+                                                                                    <td>${item.totalHours}</td>
+                                                                                    <td hidden>${item.totalMinutes}</td> 
+                                                                                    <td hidden>
+                                                                                        <input type="hidden" name="OvertimeEntries[${index}].OTTypeName" value="${item.otTypeName}">
+                                                                                        <input type="hidden" name="OvertimeEntries[${index}].OTDate" value="${item.otDate}">
+                                                                                        <input type="hidden" name="OvertimeEntries[${index}].OTTimeFrom" value="${item.otTimeFrom}">
+                                                                                        <input type="hidden" name="OvertimeEntries[${index}].OTTimeTo" value="${item.otTimeTo}">
+                                                                                           <input type="hidden" name="OvertimeEntries[${index}].TotalHours" value="${item.totalHours}">
+                                                                                        <input type="hidden" name="OvertimeEntries[${index}].TotalMinutes" value="${item.totalMinutes}">
+                                                                                    </td>
+                                                                                    <td><button type="button" class="btn btn-sm btn-danger remove-row">Remove</button></td>
+                                                                                </tr>`;
+                                                                                tbodytable.append(row);
+                                                                            });
+
                                                         } else {
                                                             tbodytable.html(`<tr><td colspan="7" class="text-center">No record found.</td></tr>`);
                                                         }
@@ -599,6 +617,26 @@
 
 
 
+                                                   function collectOvertimeEntries() {
+                        const entries = [];
+
+                        $('#otTable tbody tr').each(function () {
+                            const row = $(this);
+                            const entry = {
+                                otTypeName: row.find('input[name*=".OTTypeName"]').val(),
+                                otDate: row.find('input[name*=".OTDate"]').val(),
+                                otTimeFrom: row.find('input[name*=".OTTimeFrom"]').val(),
+                                otTimeTo: row.find('input[name*=".OTTimeTo"]').val(),
+                                totalHours: row.find('input[name*=".TotalHours"]').val(),
+                                totalMinutes: parseInt(row.find('input[name*=".TotalMinutes"]').val()) || 0
+                            };
+                            if (entry.otDate) {
+                                entries.push(entry);
+                            }
+                        });
+
+                        return entries;
+                    }
                 </script>
 
 
