@@ -1,9 +1,11 @@
 ﻿using DCI.Core.Common;
+using DCI.Core.Helpers;
 using DCI.Data;
 using DCI.Models.Entities;
 using DCI.Models.ViewModel;
 using DCI.Repositories.Interface;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System;
@@ -128,17 +130,25 @@ namespace DCI.Repositories
                     StatusName = stat.StatusName,
                     DateCreated = ot.DateCreated,
                     CreatedBy = ot.CreatedBy,
-                    OvertimeDetailViewModel = _dbContext.OvertimeDetail
-                        .Where(x => x.OTHeaderId == ot.OTHeaderId /* && x.IsActive */)
+                    OvertimeDetailViewModel = _dbContext.OvertimeDetail 
+                        .Where(x => x.OTHeaderId == ot.OTHeaderId && x.IsActive)
                         .OrderBy(x => x.OTDate).ThenBy(x => x.OTTimeFrom)
                         .Select(x => new OvertimeDetailViewModel
                         {
+                            OTTypeName = x.OTType == 1 ? "125% REGULAR (AFTER OFFICE HRS. /MON - FRI / EXCEPT HOLIDAY"
+                                       : x.OTType == 2 ? "10% NIGHT DIFFERENTIAL (10PM - 6AM) MON - SUN / HOLIDAY"
+                                       : x.OTType == 3 ? "130% SPECIAL HOLIDAY MON - SUN / SAT-SUN (FIRST 8 HRS.)"
+                                       : x.OTType == 4 ? "169% AFTER 8 HRS OF 130%"
+                                       : x.OTType == 5 ? "150% HOLIDAY ON REST DAY (SAT - SUN)"
+                                       : "",
                             OTHeaderId = x.OTHeaderId,
                             OTType = x.OTType,
                             OTDate = x.OTDate,
+                            OTDateString = x.OTDate.ToString("MM/dd/yyyy"),
                             OTTimeFrom = x.OTTimeFrom,
                             OTTimeTo = x.OTTimeTo,
-                            TotalMinutes = x.TotalMinutes
+                            TotalMinutes = x.TotalMinutes,
+                            TotalHours = TimeHelper.ConvertMinutesToHHMM((int)x.TotalMinutes)
                         })
                         .ToList()
                 };

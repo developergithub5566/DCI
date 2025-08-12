@@ -29,28 +29,33 @@ namespace DCI.Models.ViewModel
 
         public int CurrentUserId { get; set; } = 0;
 
-        public List<OvertimeDetailViewModel> OvertimeDetailViewModel { get; set; } = new();
+        public bool IsOfficialBuss { get; set; } = false;      
 
         public string Fullname { get; set; } = string.Empty;
         public string RecommendedBy { get; set; } = string.Empty;
         public string ApprovedBy { get; set; } = string.Empty;
+        public string EmployeeNo { get; set; } = string.Empty;
+        public List<OvertimeDetailViewModel> OvertimeDetailViewModel { get; set; } = new List<OvertimeDetailViewModel>();
     }
 
     public class OvertimeDetailViewModel
     {
+        public string EmployeeNo { get; set; } = string.Empty;
         public int OTDetailId { get; set; } = 0;
 
         public int OTHeaderId { get; set; } = 0;
 
         public int OTType { get; set; } = 0;
+        public string OTTypeName { get; set; } = string.Empty;
 
         public DateTime OTDate { get; set; } = DateTime.Now;
+        public string OTDateString { get; set; } = string.Empty;
 
         public DateTime OTTimeFrom { get; set; } = DateTime.Now;
 
         public DateTime OTTimeTo { get; set; } = DateTime.Now;
         public int TotalMinutes { get; set; } = 0;
-
+        public string TotalHours { get; set; } = string.Empty;
         public bool IsActive { get; set; } = true;
 
     }

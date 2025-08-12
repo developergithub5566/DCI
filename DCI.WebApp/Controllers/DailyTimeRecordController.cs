@@ -587,7 +587,7 @@ namespace DCI.WebApp.Controllers
                     var responseBody = await response.Content.ReadAsStringAsync();
                     if (response.IsSuccessStatusCode == true)
                     {
-                        // model = JsonConvert.DeserializeObject<OvertimeViewModel>(responseBody)!;
+                         model = JsonConvert.DeserializeObject<OvertimeViewModel>(responseBody)!;
                         return View(model);
                     }
 

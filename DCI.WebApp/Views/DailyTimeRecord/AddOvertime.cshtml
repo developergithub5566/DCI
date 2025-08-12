@@ -110,9 +110,9 @@
                         <label class="frmText">Remarks</label>
                         <input type="text" id="Remarks" name="Remarks" class="form-control frmField">
                     </div>
-                  
+
                 </div>
-        @*         <div class="row">
+                @*         <div class="row">
                     <div class="col-md-6">
                         <div id="grandTotalText"><strong>Grand Total:</strong> 0h 0m</div>
                        
@@ -134,7 +134,45 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- rows appended here -->
+                        @if (Model != null && Model.OvertimeDetailViewModel.Count >0 )
+                        {
+                            @foreach (var item in Model.OvertimeDetailViewModel)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @item.OTTypeName
+                                    </td>
+                                    <td>
+                                        @item.OTDateString
+                                    </td>
+                                    <td>
+                                       @*  @item.OTTimeFrom *@
+                                        @item.OTTimeFrom.ToString("HH:mm")                         
+                                    </td>
+                                    <td>
+                                       @*  @item.OTTimeTo *@
+                                        @item.OTTimeTo.ToString("HH:mm")
+                                    </td>
+
+                                    <td>
+                                        @item.TotalHours
+                                    </td>
+                                    <td hidden>
+                                        @item.TotalMinutes
+                                    </td>
+                                    <td hidden>
+                                        @item.TotalMinutes
+                                    </td>
+
+                                    <td>
+                                        @*  <a asp-controller="DailyTimeRecord" asp-action="AddOvertime" asp-route-OTHeaderId="@item.OTHeaderId" class="btn btn-primary">
+                                        <i class="fas fa-search"></i>
+                                    </a> *@
+                                    </td>
+                                </tr>
+                            }
+                        }
                     </tbody>
                 </table>
             </div>
@@ -154,7 +192,7 @@
                         <form id="createForm">
                             <div class="modal-body">
                                 <div class="form-group">
-                                  @*   <label class="frmText"><span class="required">*</span> Type</label>
+                                    @*   <label class="frmText"><span class="required">*</span> Type</label>
                                     <select id="otTypeSelect" class="form-select" required  style="font-size:small">
                                         <option value="0">Select</option>
                                         <option value="1">125% REGULAR (AFTER OFFICE HRS. /MON - FRI / EXCEPT HOLIDAY</option>
@@ -164,10 +202,10 @@
                                         <option value="5">150% HOLIDAY ON REST DAY (SAT - SUN)</option>
                                     </select> *@
 
-                                   
+
                                     <div class="input-group">
                                         <label class="frmText">Official Business:<input type="checkbox" class="form-check" id="chkOB" name="chkOB" /> </label>
-                                   
+
                                     </div>
 
                                     <label class="frmText"><span class="required">*</span> Date: </label>
@@ -181,33 +219,33 @@
 
 
                                     <div id="timeparam">
-                                            <label class="frmText"><span class="required">*</span> Time From: </label>
-                                            <div class="input-group">
-                                                <input type="text" name="OTTimeFrom" id="OTTimeFrom" class="form-control frmField" autocomplete="off">
-                                                <div class="input-group-prepend prependBtn">
-                                                    <i class="fa fa-calendar"></i>
-                                                </div>
+                                        <label class="frmText"><span class="required">*</span> Time From: </label>
+                                        <div class="input-group">
+                                            <input type="text" name="OTTimeFrom" id="OTTimeFrom" class="form-control frmField" autocomplete="off">
+                                            <div class="input-group-prepend prependBtn">
+                                                <i class="fa fa-calendar"></i>
                                             </div>
-                                            <label for="OTTimeFrom" generated="true" class="error"></label>
-                                            <label class="frmText"><span class="required">*</span> Time To: </label>
-                                            <div class="input-group">
-                                                <input type="text" name="OTTimeTo" id="OTTimeTo" class="form-control frmField" autocomplete="off">
-                                                <div class="input-group-prepend prependBtn">
-                                                    <i class="fa fa-calendar"></i>
-                                                </div>
+                                        </div>
+                                        <label for="OTTimeFrom" generated="true" class="error"></label>
+                                        <label class="frmText"><span class="required">*</span> Time To: </label>
+                                        <div class="input-group">
+                                            <input type="text" name="OTTimeTo" id="OTTimeTo" class="form-control frmField" autocomplete="off">
+                                            <div class="input-group-prepend prependBtn">
+                                                <i class="fa fa-calendar"></i>
                                             </div>
-                                            <label for="OTTimeTo" generated="true" class="error"></label>
+                                        </div>
+                                        <label for="OTTimeTo" generated="true" class="error"></label>
                                     </div>
 
 
                                     @* <label class="frmText">Total: </label> *@
-                                @*     <div id="totalTime"></div> *@
+                                    @*     <div id="totalTime"></div> *@
                                 </div>
 
 
                             </div>
                             <div class="modal-footer">
-                                 <button type="button" id="addBtn" class="btn btn-primary" >Add</button>                        
+                                <button type="button" id="addBtn" class="btn btn-primary">Add</button>
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal"><small>Close</small></button>
                             </div>
                         </form>
@@ -283,13 +321,13 @@
 
 
                              function save() {
-                                const entries = collectOvertimeEntries();
+                               const entries = collectOvertimeEntries();
 
 
-                                   const _otdate =$('#OTDate').val();
-                           const _timefrom =  $('#OTTimeFrom').val();
-                           const _timeto = $('#OTTimeTo').val();
-                           const ischkOB = document.getElementById("chkOB");
+                               const _otdate =$('#OTDate').val();
+                               const _timefrom =  $('#OTTimeFrom').val();
+                               const _timeto = $('#OTTimeTo').val();
+                               const ischkOB = document.getElementById("chkOB");
 
                                   const payload = {
                                                 OTDate: _otdate,
@@ -352,17 +390,17 @@
 
 
                                                  function collectEntries() {
-                      const rows = document.querySelectorAll('#otTable tbody tr');
-                      return Array.from(rows).map(r => {
-                        return {
-                          otType: r.querySelector('input[name^="Entries"][name$=".OTType"]')?.value,
-                          otDate: r.querySelector('input[name^="Entries"][name$=".OTDate"]')?.value,
-                          otTimeFrom: r.querySelector('input[name^="Entries"][name$=".OTTimeFrom"]')?.value,
-                          otTimeTo: r.querySelector('input[name^="Entries"][name$=".OTTimeTo"]')?.value,
-                          totalMinutes: parseInt(r.querySelector('input[name^="Entries"][name$=".TotalMinutes"]')?.value, 10) || 0
-                        };
-                      });
-                    }
+                                  const rows = document.querySelectorAll('#otTable tbody tr');
+                                  return Array.from(rows).map(r => {
+                                    return {
+                                      otType: r.querySelector('input[name^="Entries"][name$=".OTType"]')?.value,
+                                      otDate: r.querySelector('input[name^="Entries"][name$=".OTDate"]')?.value,
+                                      otTimeFrom: r.querySelector('input[name^="Entries"][name$=".OTTimeFrom"]')?.value,
+                                      otTimeTo: r.querySelector('input[name^="Entries"][name$=".OTTimeTo"]')?.value,
+                                      totalMinutes: parseInt(r.querySelector('input[name^="Entries"][name$=".TotalMinutes"]')?.value, 10) || 0
+                                    };
+                                  });
+                             }
 
                     // function calculateDuration() {
                     //       if (fromTime && toTime) {
@@ -450,179 +488,124 @@
                      }
 
                     document.getElementById('addBtn').addEventListener('click', function () {
-                       document.querySelectorAll('.error').forEach(e => e.textContent = '');
-
-                       // const typeSelect = document.getElementById('otTypeSelect');
-                       // const typeVal = typeSelect.value;
-                       // const typeText = typeSelect.options[typeSelect.selectedIndex].text.trim();
-                       const date = document.getElementById('OTDate').value.trim();
-                       const from = document.getElementById('OTTimeFrom').value.trim();
-                       const to = document.getElementById('OTTimeTo').value.trim();
-
-                       let hasError = false;
-                       // if (typeVal === '0') {
-                       //   hasError = true;
-                       //   alert('Please select a Type.');
-                       // }
-                       if (!date) {
-                         hasError = true;
-                         document.querySelector('label[for="OTDate"]').textContent = 'Required';
-                       }
-                       // if (!from) {
-                       //   hasError = true;
-                       //   document.querySelector('label[for="OTTimeFrom"]').textContent = 'Required';
-                       // }
-                       // if (!to) {
-                       //   hasError = true;
-                       //   document.querySelector('label[for="OTTimeTo"]').textContent = 'Required';
-                       // }
-                       if (hasError) return;
-
-                       if (dateAlreadyExists(date)) {
-                         alert('An entry for that date already exists. You cannot add a duplicate date.');
-                         return;
-                       }
-
-                       // const durationMinutes = computeDuration(from, to);
-                       // if (durationMinutes === null) {
-                       //   alert('Time format invalid. Use HH:mm.');
-                       //   return;
-                       // }
-                      // document.getElementById('totalTime').textContent = 'Total: ' + formatMinutes(durationMinutes);
-                       const entries = collectOvertimeEntries();
+                               document.querySelectorAll('.error').forEach(e => e.textContent = '');
 
 
-                                   const _otdate =$('#OTDate').val();
-                           const _timefrom =  $('#OTTimeFrom').val();
-                           const _timeto = $('#OTTimeTo').val();
-                           const ischkOB = document.getElementById("chkOB");
+                               const date = document.getElementById('OTDate').value.trim();
+                               const from = document.getElementById('OTTimeFrom').value.trim();
+                               const to = document.getElementById('OTTimeTo').value.trim();
 
-                          // alert(ischkOB.checked);
-                           
-                         // const formData = new FormData();
-                         //    formData.append('OTDate',  datex);
-                         //     formData.append('OTTimeFrom', timefromx);
-                         //      formData.append('OTTimeTo',  timetox);
-                         //       formData.append('OTType',  0);
-                         //        formData.append('TotalMinutes',  0);
+                               let hasError = false;
+                               // if (typeVal === '0') {
+                               //   hasError = true;
+                               //   alert('Please select a Type.');
+                               // }
+                               if (!date) {
+                                 hasError = true;
+                                 document.querySelector('label[for="OTDate"]').textContent = 'Required';
+                               }
 
-                         //      console.log(formData);
-                                             const payload = {
-                                                OTDate: _otdate,
-                                                OTTimeFrom : _timefrom,
-                                                OTTimeTo : _timeto,
-                                                IsOfficialBuss : ischkOB.checked,
-                                                Entries: entries   // your list of entries
-                                            }
-                                                console.log(payload);
+                               if (hasError) return;
 
+                               if (dateAlreadyExists(date)) {
+                                 alert('An entry for that date already exists. You cannot add a duplicate date.');
+                                 return;
+                               }
 
-                                                $.ajax({
-                                                    type: 'POST',
-                                                    url: '@Url.Action("CategorizeOvertime", "DailyTimeRecord")',
-                                                   // data: { OTDate : _otdate },
-                                                      contentType: 'application/json; charset=utf-8',
-                                                      //    processData: false,
-                                                // contentType: false,
-                                                       data: JSON.stringify(payload),
-
-                                                    success: function (response) {
-                                                        if (response.success) {
-
-                                                            console.log(response.data)
-
-                                                        let tbodytable = $('#otTable tbody'); // define this first
-
-                                                        if (response.data && response.data.length > 0) {
-                                                            tbodytable.empty(); // clear existing rows (optional)
-
-                                                                          response.data.forEach(function(item, index) {
-                                                                                var row = `<tr>
-                                                                                    <td>${item.otTypeName}</td>
-                                                                                    <td>${item.otDateString}</td>
-                                                                                    <td>${item.otTimeFrom}</td>
-                                                                                    <td>${item.otTimeTo}</td>
-                                                                                    <td>${item.totalHours}</td>
-                                                                                    <td hidden>${item.totalMinutes}</td> 
-                                                                                    <td hidden>
-                                                                                        <input type="hidden" name="OvertimeEntries[${index}].OTTypeName" value="${item.otTypeName}">
-                                                                                        <input type="hidden" name="OvertimeEntries[${index}].OTDate" value="${item.otDate}">
-                                                                                        <input type="hidden" name="OvertimeEntries[${index}].OTDateString" value="${item.otDateString}">
-                                                                                        <input type="hidden" name="OvertimeEntries[${index}].OTTimeFrom" value="${item.otTimeFrom}">
-                                                                                        <input type="hidden" name="OvertimeEntries[${index}].OTTimeTo" value="${item.otTimeTo}">
-                                                                                           <input type="hidden" name="OvertimeEntries[${index}].TotalHours" value="${item.totalHours}">
-                                                                                        <input type="hidden" name="OvertimeEntries[${index}].TotalMinutes" value="${item.totalMinutes}">
-                                                                                    </td>
-                                                                                    <td><button type="button" class="btn btn-sm btn-danger remove-row">Remove</button></td>
-                                                                                </tr>`;
-                                                                                tbodytable.append(row);
-                                                                            });
-
-                                                        } else {
-                                                            tbodytable.html(`<tr><td colspan="7" class="text-center">No record found.</td></tr>`);
-                                                        }
+                               const entries = collectOvertimeEntries();
 
 
+                                           const _otdate =$('#OTDate').val();
+                                   const _timefrom =  $('#OTTimeFrom').val();
+                                   const _timeto = $('#OTTimeTo').val();
+                                   const ischkOB = document.getElementById("chkOB");
 
 
-
-                                                                              // const tbody = document.querySelector('#otTable tbody');
-                                                                              // const tr = document.createElement('tr');
-
-                                                                              // tr.innerHTML = `
-                                                                              //   <td>
-                                                                              //     <input type="hidden" name="Entries[${entryIndex}].OTType" value="${response.data.otType}">
-                                                                              //     ${response.data.otType}
-                                                                              //   </td>
-                                                                              //   <td>
-                                                                              //     <input type="hidden" name="Entries[${entryIndex}].OTDate" value="${response.data.otDate}">
-                                                                              //     ${response.data.otDate}
-                                                                              //   </td>
-                                                                              //   <td>
-                                                                              //     <input type="hidden" name="Entries[${entryIndex}].OTTimeFrom" value="${response.data.otTimeFrom}">
-                                                                              //     ${response.data.otTimeFrom}
-                                                                              //   </td>
-                                                                              //   <td>
-                                                                              //     <input type="hidden" name="Entries[${entryIndex}].OTTimeTo" value="${response.data.otTimeTo}">
-                                                                              //     ${response.data.otTimeTo}
-                                                                              //   </td>
-                                                                              //   <td>${formatMinutes(durationMinutes)}</td>
-                                                                              //   <td class="total-minutes-cell" hidden>
-                                                                              //     ${durationMinutes}
-                                                                              //     <input type="hidden" name="Entries[${entryIndex}].TotalMinutes" value="${durationMinutes}">
-                                                                              //   </td>
-                                                                              //   <td><button type="button" class="btn btn-sm btn-danger remove-row">Remove</button></td>
-                                                                              // `;
-                                                                              //       tbody.appendChild(tr);
-
-                                                                                      entryIndex++;
-                                                                                      updateGrandTotal();
-                                                                              js('#createmodal').modal('hide');
-
-                                                       
-
-                                                        } else {
-                                                            Swal.fire({
-                                                                text: response.message,
-                                                                icon: "error"
-                                                            });
-                                                        }
-                                                        $('.spinner-overlay').hide();
-                                                    },
-                                                    error: function () {
-                                                        $('.spinner-overlay').hide();
-                                                        Swal.fire({
-                                                            text: "An error occurred. Please try again.",
-                                                            icon: "error"
-                                                        });
+                                                     const payload = {
+                                                        OTDate: _otdate,
+                                                        OTTimeFrom : _timefrom,
+                                                        OTTimeTo : _timeto,
+                                                        IsOfficialBuss : ischkOB.checked,
+                                                        Entries: entries   // your list of entries
                                                     }
-                                                });
-                                        
-                                     
-                 
-                      // updateGrandTotal();
-                      // js('#createmodal').modal('hide');
-                     });
+                                                        console.log(payload);
+
+
+                                                        $.ajax({
+                                                            type: 'POST',
+                                                            url: '@Url.Action("CategorizeOvertime", "DailyTimeRecord")',
+                                                           // data: { OTDate : _otdate },
+                                                              contentType: 'application/json; charset=utf-8',
+                                                              //    processData: false,
+                                                        // contentType: false,
+                                                               data: JSON.stringify(payload),
+
+                                                            success: function (response) {
+                                                                if (response.success) {
+
+                                                                    console.log(response.data)
+
+                                                                let tbodytable = $('#otTable tbody'); // define this first
+
+                                                                if (response.data && response.data.length > 0) {
+                                                                    tbodytable.empty(); // clear existing rows (optional)
+
+                                                                                  response.data.forEach(function(item, index) {
+                                                                                        var row = `<tr>
+                                                                                            <td>${item.otTypeName}</td>
+                                                                                            <td>${item.otDateString}</td>
+                                                                                            <td>${item.otTimeFrom}</td>
+                                                                                            <td>${item.otTimeTo}</td>
+                                                                                            <td>${item.totalHours}</td>
+                                                                                            <td hidden>${item.totalMinutes}</td>
+                                                                                            <td hidden>
+                                                                                                <input type="hidden" name="OvertimeEntries[${index}].OTTypeName" value="${item.otTypeName}">
+                                                                                                <input type="hidden" name="OvertimeEntries[${index}].OTDate" value="${item.otDate}">
+                                                                                                <input type="hidden" name="OvertimeEntries[${index}].OTDateString" value="${item.otDateString}">
+                                                                                                <input type="hidden" name="OvertimeEntries[${index}].OTTimeFrom" value="${item.otTimeFrom}">
+                                                                                                <input type="hidden" name="OvertimeEntries[${index}].OTTimeTo" value="${item.otTimeTo}">
+                                                                                                   <input type="hidden" name="OvertimeEntries[${index}].TotalHours" value="${item.totalHours}">
+                                                                                                <input type="hidden" name="OvertimeEntries[${index}].TotalMinutes" value="${item.totalMinutes}">
+                                                                                            </td>
+                                                                                            <td><button type="button" class="btn btn-sm btn-danger remove-row">Remove</button></td>
+                                                                                        </tr>`;
+                                                                                        tbodytable.append(row);
+                                                                                    });
+
+                                                                } else {
+                                                                    tbodytable.html(`<tr><td colspan="7" class="text-center">No record found.</td></tr>`);
+                                                                }
+
+
+
+                                                                                              entryIndex++;
+                                                                                              updateGrandTotal();
+                                                                                      js('#createmodal').modal('hide');
+
+
+
+                                                                } else {
+                                                                    Swal.fire({
+                                                                        text: response.message,
+                                                                        icon: "error"
+                                                                    });
+                                                                }
+                                                                $('.spinner-overlay').hide();
+                                                            },
+                                                            error: function () {
+                                                                $('.spinner-overlay').hide();
+                                                                Swal.fire({
+                                                                    text: "An error occurred. Please try again.",
+                                                                    icon: "error"
+                                                                });
+                                                            }
+                                                        });
+
+
+
+                              // updateGrandTotal();
+                              // js('#createmodal').modal('hide');
+                             });
 
 
                      // Delegate removal and update grand total
@@ -636,10 +619,10 @@
 
                                document.getElementById('chkOB').addEventListener('click', function () {
                                       document.getElementById("timeparam").style.display = this.checked ? 'block' : 'none';
-                             });     
+                             });
 
-                     
-                     
+
+
                      function dateAlreadyExists(dateStr) {
                        const rows = document.querySelectorAll('#otTable tbody tr');
                        for (const r of rows) {
