@@ -100,9 +100,9 @@
                             <th>
                                 <label>Status</label>
                             </th>
-                            <th>
+                   @*          <th>
                                 <label>CreatedBy</label>
-                            </th>
+                            </th> *@
                             <th>
                                 <label>Date Filed</label>
                             </th>
@@ -124,20 +124,22 @@
                                     @item.Fullname
                                 </td>
                                 <td>
-                                    @item.Total
+                                    @item.TotalString
                                 </td>
                                 <td>
-                                    @item.StatusId
+                                    @item.StatusName
                                 </td>
-                                <td>
+                           @*      <td>
                                     @item.CreatedBy
-                                </td>                               
+                                </td>   *@                             
                                 <td>
                                     @item.DateCreated
                                 </td>
 
                                 <td>
-                                  
+                                    <a asp-controller="DailyTimeRecord" asp-action="AddOvertime" asp-route-OTHeaderId="@item.OTHeaderId" class="btn btn-primary">
+                                        <i class="fas fa-search"></i>
+                                    </a>                                  
                                 </td>
                             </tr>
                         }

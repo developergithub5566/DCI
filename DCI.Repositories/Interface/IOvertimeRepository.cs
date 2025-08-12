@@ -5,5 +5,8 @@ namespace DCI.Repositories.Interface
     public interface IOvertimeRepository : IDisposable
     {
         Task<DailyTimeRecordViewModel> GetAllAttendanceByDate(DateTime date, string empno);
+        Task<IList<OvertimeViewModel>> Overtime(OvertimeViewModel model);
+        Task<OvertimeViewModel> AddOvertime(OvertimeViewModel model);
+        Task<(int statuscode, string message)> SaveOvertime(SubmitOvertimeViewModel param);
     }
 }

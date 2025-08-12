@@ -117,14 +117,14 @@ namespace DCI.API.Controllers
         [Route("Overtime")]
         public async Task<IActionResult> Overtime([FromBody] OvertimeViewModel model)
         {
-            return Ok(await _dtrRepository.Overtime(model));
+            return Ok(await _overtimeRepository.Overtime(model));
         }
 
         [HttpPost]
         [Route("AddOvertime")]
         public async Task<IActionResult> AddOvertime([FromBody] OvertimeViewModel model)
         {
-            return Ok(await _dtrRepository.Overtime(model));
+            return Ok(await _overtimeRepository.AddOvertime(model));
         }
 
 
@@ -133,6 +133,13 @@ namespace DCI.API.Controllers
         public async Task<IActionResult> GetAllAttendanceByDate([FromBody] OvertimeEntryDto model)
         {
             return Ok(await _overtimeRepository.GetAllAttendanceByDate(model.OTDate,model.EmployeeNo));
+        }
+
+        [HttpPost]
+        [Route("SaveOvertime")]
+        public async Task<IActionResult> SaveOvertime([FromBody] SubmitOvertimeViewModel param)
+        {
+            return Ok(await _overtimeRepository.SaveOvertime(param));
         }
 
     }

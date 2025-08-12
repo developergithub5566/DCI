@@ -399,48 +399,8 @@ namespace DCI.Repositories
             return (StatusCodes.Status200OK, "Successfully saved");
         }
 
-        public async Task<IList<OvertimeViewModel>> Overtime(OvertimeViewModel model)
-        {                     
+ 
 
-            var query = (from ot in _dbContext.OvertimeHeader
-                         join emp in _dbContext.Employee on ot.EmployeeId equals emp.EmployeeId
-                         where ot.IsActive == true
-                         select new OvertimeViewModel
-                         {
-                             OTHeaderId = ot.OTHeaderId,
-                             RequestNo = ot.RequestNo,
-                             Fullname = emp.Firstname + emp.Lastname,
-                             EmployeeId = ot.EmployeeId ,
-                             //Total = ot.Total,
-                             StatusId = ot.StatusId,
-                             DateCreated = ot.DateCreated,
-                             CreatedBy = ot.CreatedBy,                       
-                         }).ToList();
-
-
-            return query;
-        }
-
-        public async Task<OvertimeViewModel> AddOvertime(OvertimeViewModel model)
-        {
-
-            var query = from ot in _dbContext.OvertimeHeader
-                         join emp in _dbContext.Employee on ot.EmployeeId equals emp.EmployeeId
-                         where ot.IsActive == true
-                         select new OvertimeViewModel
-                         {
-                             OTHeaderId = ot.OTHeaderId,
-                             RequestNo = ot.RequestNo,
-                             Fullname = emp.Firstname + emp.Lastname,
-                             EmployeeId = ot.EmployeeId,
-                             //Total = ot.Total,
-                             StatusId = ot.StatusId,
-                             DateCreated = ot.DateCreated,
-                             CreatedBy = ot.CreatedBy,
-                         };
-
-
-            return query.FirstOrDefault();
-        }
+    
     }
 }

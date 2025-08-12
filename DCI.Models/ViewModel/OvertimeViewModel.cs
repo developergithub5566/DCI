@@ -12,8 +12,10 @@ namespace DCI.Models.ViewModel
         public int EmployeeId { get; set; } = 0;
 
         public int Total { get; set; } = 0;
+        public string TotalString { get; set; } = string.Empty;
 
         public int StatusId { get; set; } = 0;
+        public string StatusName { get; set; } = string.Empty;
 
         public DateTime DateCreated { get; set; } = DateTime.Now;
 
@@ -47,6 +49,7 @@ namespace DCI.Models.ViewModel
         public DateTime OTTimeFrom { get; set; } = DateTime.Now;
 
         public DateTime OTTimeTo { get; set; } = DateTime.Now;
+        public int TotalMinutes { get; set; } = 0;
 
         public bool IsActive { get; set; } = true;
 
@@ -57,8 +60,14 @@ namespace DCI.Models.ViewModel
         public List<OvertimeEntryDto> Entries { get; set; } = new List<OvertimeEntryDto>();
        // public int GrandTotalMinutes { get; set; } = 0;
         public DateTime OTDate { get; set; } = DateTime.Now;
+        public string OTTimeFrom { get; set; } = string.Empty;
+        public string OTTimeTo { get; set; } = string.Empty;
         //public int CurrentUserId { get; set; }
         public string EmployeeNo { get; set; } = string.Empty;
+        public bool IsOfficialBuss { get; set; } = false;
+        public int CurrentUserId { get; set; } = 0;
+        public int EmployeeId { get; set; } = 0;
+        public string RequestNo { get; set; } = string.Empty;
     }
 
     public class OvertimeEntryDto
@@ -66,6 +75,7 @@ namespace DCI.Models.ViewModel
         public int OTType { get; set; } = 0;
         public string OTTypeName { get; set; } = string.Empty;
         public DateTime OTDate { get; set; } = DateTime.Now;
+        public string OTDateString { get; set; } = string.Empty;
         public string OTTimeFrom { get; set; } = string.Empty;
         public string OTTimeTo { get; set; } = string.Empty;
         public int TotalMinutes { get; set; } = 0;
