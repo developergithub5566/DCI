@@ -130,14 +130,14 @@ namespace DCI.API.Controllers
 
         [HttpPost]
         [Route("GetAllAttendanceByDate")]
-        public async Task<IActionResult> GetAllAttendanceByDate([FromBody] OvertimeEntryDto model)
+        public async Task<IActionResult> GetAllAttendanceByDate([FromBody] OvertimeViewModel model)
         {
-            return Ok(await _overtimeRepository.GetAllAttendanceByDate(model.OTDate,model.EmployeeNo));
+            return Ok(await _overtimeRepository.GetAllAttendanceByDate(model));
         }
 
         [HttpPost]
         [Route("SaveOvertime")]
-        public async Task<IActionResult> SaveOvertime([FromBody] SubmitOvertimeViewModel param)
+        public async Task<IActionResult> SaveOvertime([FromBody] OvertimeViewModel param)
         {
             return Ok(await _overtimeRepository.SaveOvertime(param));
         }

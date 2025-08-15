@@ -205,5 +205,32 @@ namespace DCI.WebApp.Controllers
             }
             return View(model);
         }
+
+        public async Task<IActionResult> Overtime()
+        {
+            List<OvertimeViewModel> model = new List<OvertimeViewModel>();
+
+            using (var _httpclient = new HttpClient())
+            {
+                OvertimeViewModel _filterRoleModel = new OvertimeViewModel();
+
+                var currentUser = _userSessionHelper.GetCurrentUser();
+                //_filterRoleModel = currentUser.RoleId;
+                //_filterRoleModel.CurrentUserId = currentUser.UserId;
+
+                var stringContent = new StringContent(JsonConvert.SerializeObject(_filterRoleModel), Encoding.UTF8, "application/json");
+                var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Todo/GetAllTodoOvertime");
+
+                request.Content = stringContent;
+                var response = await _httpclient.SendAsync(request);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    model = JsonConvert.DeserializeObject<List<OvertimeViewModel>>(responseBody)!;
+                }
+
+            }
+            return View(model);
+        }
     }
 }

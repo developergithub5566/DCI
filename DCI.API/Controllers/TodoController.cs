@@ -75,6 +75,13 @@ namespace DCI.API.Controllers
             return Ok(result);
         }
 
-       
+        [HttpPost]
+        [Route("GetAllTodoOvertime")]
+        public async Task<IActionResult> GetAllTodoOvertime([FromBody] OvertimeViewModel model)
+        {
+            var result = await _todoRepository.GetAllTodoOvertime(model);
+            return Ok(result);
+        }
+
     }
 }

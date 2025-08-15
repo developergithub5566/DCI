@@ -1,0 +1,416 @@
+﻿@model IEnumerable<DCI.Models.ViewModel.HolidayViewModel>
+@using Newtonsoft.Json;
+@using DCI.Core.Common;
+@using DCI.Models.ViewModel;
+
+<link href="~/css/dcicustom.css" rel="stylesheet" />
+
+@{
+    var modulePageAccess = Context.Session.GetString("ModulePageAccess");
+    var canView = false;
+    var canAdd = false;
+    var canEdit = false;
+    var canDelete = false;
+
+    if (modulePageAccess == null)
+    {
+        <script>
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Logout", "Account")',
+                success: function (response) {
+
+                    Swal.fire({
+                        text: "Your session has timed out. Please log in again.",
+                        icon: "info",
+                        confirmButtonText: "Ok"
+                    }).then((result) => {
+                        window.location.href = '/Account/Logout';
+                    });
+                },
+                error: function () {
+                    Swal.fire({
+                        text: "An error occurred. Please try again.",
+                        icon: "error"
+                    });
+                }
+            })
+        </script>
+    }
+    else
+    {
+        var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
+                    .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Department);
+        canView = module?.View ?? false;
+        canAdd = module?.Add ?? false;
+        canEdit = module?.Update ?? false;
+        canDelete = module?.Delete ?? false;
+    }
+
+}
+
+<div class="container-fluid">
+    <div class="spinner-overlay">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <div class="d-sm-flex align-items-center justify-content-between mb-3">
+        <h6 class="m-0 font-weight-bold text-gray-800">Department</h6>
+        <div class="upperRightDivBtn">
+            <a href="#" title="Add Department" class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")" data-toggle="modal" data-target="#" onclick="newForm()">
+                <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
+                <span class="text text-white"><small>Add Holiday</small></span>
+            </a>
+        </div>
+
+    </div>
+    <div class="col-12 p0">
+        <ul class="breadcrumb">
+            <li><a href="~/Home/Index">Dashboard</a></li>
+            <li><a href="~/Maintenance/Index">Administration</a></li>
+            <li>Holiday</li>
+        </ul>
+    </div>
+
+
+
+
+    <div class="card shadow mb-4">
+        <div class="card-header">
+            <label class="mb0">Data</label>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive mt20">
+                <table class="table table-bordered" id="tblHoliday">
+                    <thead>
+                        <tr>
+
+                            <th>
+                                <label>Holiday Date </label>
+                            </th>
+                            <th>
+                                <label>Holiday Name</label>
+                            </th>
+                            <th>
+                                <label>Description</label>
+                            </th>
+                            <th>
+                                <label>Date Created</label>
+                            </th>
+                            <th>
+                                <label>Created By</label>
+                            </th>
+                            <th>
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                @*  <td>
+                                    @item.DepartmentId
+                                </td> *@
+                                <td>
+                                    @item.HolidayDate.ToShortDateString()
+                                </td>
+                                <td>
+                                    @item.HolidayName
+                                </td>
+                                <td>
+                                    @item.Description
+                                </td>
+                                <td>
+                                    @item.DateCreated.ToShortDateString()
+                                </td>
+                                <td>
+                                    @item.CreatedName
+                                </td>
+
+                                <td>
+
+                                    <a href="#" onclick="editForm(@item.HolidayId,1)" title="View" class="btn btn-primary @(canView ? "" : "disabled") "><i class="fas fa-search"></i></a> |
+                                    <a href="#" id="editForm" onclick="editForm(@item.HolidayId,0)" title="Update" class="btn btn-info @(canEdit ? "" : "disabled") "><i class="fa fa-edit"></i></a> |
+                                    <a href="#" id="deleteform" onclick="deleteform(@item.HolidayId)" title="Delete" class="btn btn-danger @(canDelete ? "" : "disabled") "><i class="far fa-trash-alt"></i></a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+</<div>
+</div>
+
+            <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Holiday</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="createForm">
+                            <div class="modal-body">
+                                <input type="hidden" id="HolidayId" name="HolidayId" value="0">
+                                @* <input type="text" class="form-control" id="HolidayDate" name="HolidayDate"  required> *@      
+                                <label for="HolidayDate" class="col-form-label required">Holiday Date:</label>
+                                <div class="input-group">
+
+                                    <input type="text" name="HolidayDate" id="HolidayDate" class="form-control" autocomplete="off">
+                                    <div class="input-group-prepend prependBtn">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <label for="HolidayDate" generated="true" class="error"></label>
+                                </div>
+                                <div class="form-group">
+                                    <label for="HolidayName" class="col-form-label required">Holiday Name:</label>
+                                    <input type="text" class="form-control" id="HolidayName" name="HolidayName" maxlength="100" onkeypress="return alphaNumericOnly(event);" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="Description" class="col-form-label">Description:</label>
+                                    <textarea class="form-control" id="Description" name="Description" maxlength="255"></textarea>
+                                </div>
+
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary" id="btnSave">Save</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+
+
+
+@section scripts {
+
+                <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
+                <script src="~/js/dci-validation.js"></script>
+                <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+
+                <script type="text/javascript">
+                        var js = jQuery.noConflict(true);
+
+                                $('.spinner-overlay').show();
+
+                    setTimeout(() => {
+                        $('.spinner-overlay').hide();
+                    }, 200);
+
+
+                        $(document).ready(function () {
+                            js('#tblHoliday').DataTable({
+                            });
+
+
+                                flatpickr("#HolidayDate", {
+                                                enableTime: false,
+                                               dateFormat: "Y-m-d",
+                                                    time_24hr: true,
+                                                                 onChange: function(selectedDates, dateStr, instance) {
+                                                  }
+                                            });
+
+
+                            $('#createForm').submit(function (event) {
+                                event.preventDefault();
+
+
+
+
+                    const formData = new FormData();
+                    const fields = {
+                        HolidayId: '#HolidayId',
+                        HolidayDate: '#HolidayDate',
+                        HolidayName: '#HolidayName',
+                        Description: '#Description'
+                    };
+
+                    $.each(fields, (key, selector) => {
+                        formData.append(key, $(selector).val());
+                    });
+
+                                Swal.fire({
+                                    text: "Are you sure you want to save this record?",
+                                    icon: "question",
+                                    showCancelButton: true,
+                                    confirmButtonText: "Ok"
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        $.ajax({
+                                            type: 'POST',
+                                            url: '@Url.Action("SaveHoliday", "Maintenance")',
+                                            data: formData,
+                                             processData: false,
+                                    contentType: false,
+                                            success: function (response) {
+                                                if (response.success) {
+                                                    $('#createForm')[0].reset();
+                                                    js('#createmodal').modal('hide');
+
+                                                    Swal.fire({
+                                                        text: response.message,
+                                                        icon: "success",
+                                                        confirmButtonText: "Ok"
+                                                    }).then((result) => {
+                                                        location.reload();
+                                                    });
+
+                                                } else {
+                                                    Swal.fire({
+                                                        text: response.message,
+                                                        icon: "error"
+                                                    });
+                                                }
+                                            },
+                                            error: function () {
+                                                Swal.fire({
+                                                    text: "An error occurred. Please try again.",
+                                                    icon: "error"
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                            }); //submit
+
+                        });
+
+                        // function newForm() {
+                        //     $('#DepartmentId').val("0");
+                        //     $('#DepartmentCode').val("");
+                        //     $('#DepartmentName').val("");
+                        //     $('#Description').val("");
+                        //     $('#btnSave').show();
+                        //     $('#createForm').find('input, select, textarea').prop('disabled', false);
+                        //     js('#createmodal').modal('show');
+                        // }
+
+                        function newForm() {
+
+                           $.ajax({
+                                type: 'POST',
+                                url: '@Url.Action("EditHoliday", "Maintenance")',
+
+                                success: function (response) {
+                                    if (response.success) {
+                                    $('#HolidayId').val("0");
+                                    $('#HolidayDate').val("");
+                                    $('#HolidayName').val("");
+                                    $('#Description').val("");
+
+
+
+
+                                           $('#btnSave').show();
+                                        $('#createForm').find('input, select, textarea').prop('disabled', false);
+                                        js('#createmodal').modal('show');
+
+                                    } else {
+                                        Swal.fire({
+                                            text: response.message,
+                                            icon: "error"
+                                        });
+                                    }
+                                },
+                                error: function () {
+                                    Swal.fire({
+                                        text: "An error occurred. Please try again.",
+                                        icon: "error"
+                                    });
+                                }
+                            });
+                        }
+
+
+                        function editForm(id, view) {
+                            $.ajax({
+                                type: 'POST',
+                                url: '@Url.Action("EditHoliday", "Maintenance")',
+                                data: { HolidayId: id },
+                                success: function (response) {
+                                    if (response.success) {
+                                        $('#HolidayId').val(response.data.holidayId);
+                                        $('#HolidayDate').val(response.data.holidayDate);
+                                        $('#HolidayName').val(response.data.holidayName);
+                                        $('#Description').val(response.data.description);
+
+
+
+
+                                        if (view == 1) {	//View button
+                                            $('#createForm').find('input, select, textarea').prop('disabled', true);
+                                            $('#btnSave').hide();
+                                        }
+                                        else {  //Edit button
+                                            $('#createForm').find('input, select, textarea').prop('disabled', false);
+                                            $('#btnSave').show();
+                                        }
+
+                                        js('#createmodal').modal('show');
+                                    } else {
+                                        Swal.fire({
+                                            text: response.message,
+                                            icon: "error"
+                                        });
+                                    }
+                                },
+                                error: function () {
+                                    Swal.fire({
+                                        text: "An error occurred. Please try again.",
+                                        icon: "error"
+                                    });
+                                }
+                            });
+                        }
+
+                        function deleteform(id) {
+
+                            Swal.fire({
+                                text: "Are you sure you want to delete this record?",
+                                icon: "warning",
+                                showCancelButton: true,
+                                confirmButtonText: "Yes, delete it!"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: '@Url.Action("DeleteHoliday", "Maintenance")',
+                                        data: { HolidayId: id },
+                                        success: function (response) {
+                                            if (response.success) {
+                                                Swal.fire({
+                                                    text: response.message,
+                                                    icon: "success",
+                                                    confirmButtonText: "Ok"
+                                                }).then((result) => {
+                                                    location.reload();
+                                                });
+                                            } else {
+                                                Swal.fire({
+                                                    text: response.message,
+                                                    icon: "error"
+                                                });
+                                            }
+                                        },
+                                        error: function () {
+                                            Swal.fire({
+                                                text: "An error occurred. Please try again.",
+                                                icon: "error"
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+
+                        }
+                </script>
+}

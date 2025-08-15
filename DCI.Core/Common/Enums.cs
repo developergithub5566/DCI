@@ -42,7 +42,8 @@ namespace DCI.Core.Common
         DTRManagement = 16,
         DailyTimeRecord = 17,
         Leave = 18,
-        Overtime = 19
+        Overtime = 19,
+        Holiday = 20
     }
     public enum EnumRole
     {

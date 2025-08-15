@@ -3,6 +3,7 @@ using Aspose.Words.Saving;
 using DCI.Core.Common;
 using DCI.Core.Helpers;
 using DCI.Models.Configuration;
+using DCI.Models.Entities;
 using DCI.Models.ViewModel;
 using DCI.WebApp.Configuration;
 using DocumentFormat.OpenXml.Drawing.Charts;
@@ -535,7 +536,7 @@ namespace DCI.WebApp.Controllers
 
 
                     param.CurrentUserId = currentUser.UserId;
-     
+
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/Overtime");
@@ -546,9 +547,9 @@ namespace DCI.WebApp.Controllers
                     {
                         model = JsonConvert.DeserializeObject<List<OvertimeViewModel>>(responseBody)!;
 
-                        foreach(var x in model)
+                        foreach (var x in model)
                         {
-                            x.TotalString =  TimeHelper.ConvertMinutesToHHMM((int)x.Total);                      
+                            x.TotalString = TimeHelper.ConvertMinutesToHHMM((int)x.Total);
                         }
                     }
 
@@ -587,7 +588,7 @@ namespace DCI.WebApp.Controllers
                     var responseBody = await response.Content.ReadAsStringAsync();
                     if (response.IsSuccessStatusCode == true)
                     {
-                         model = JsonConvert.DeserializeObject<OvertimeViewModel>(responseBody)!;
+                        model = JsonConvert.DeserializeObject<OvertimeViewModel>(responseBody)!;
                         return View(model);
                     }
 
@@ -607,7 +608,7 @@ namespace DCI.WebApp.Controllers
         }
 
 
-        public async Task<IActionResult> SaveOvertime([FromBody] SubmitOvertimeViewModel param)
+        public async Task<IActionResult> SaveOvertime([FromBody] OvertimeViewModel param)
         {
             OvertimeViewModel model = new OvertimeViewModel();
             try
@@ -618,7 +619,7 @@ namespace DCI.WebApp.Controllers
 
 
                     param.CurrentUserId = currentUser.UserId;
-                   
+
 
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
@@ -633,7 +634,7 @@ namespace DCI.WebApp.Controllers
                     return Json(new { success = false, message = responseBody });
 
                 }
-               
+
             }
             catch (Exception ex)
             {
@@ -644,18 +645,21 @@ namespace DCI.WebApp.Controllers
             {
                 Log.CloseAndFlush();
             }
-          //  return Json(new { success = false, message = "An error occurred. Please try again." });
+            //  return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
-        public async Task<IActionResult> CategorizeOvertime([FromBody] SubmitOvertimeViewModel param)
+     
+        public async Task<IActionResult> CategorizeOvertime([FromBody] OvertimeViewModel param)
         {
+            //OvertimeViewModel param = new OvertimeViewModel();
             OvertimeViewModel model = new OvertimeViewModel();
             DailyTimeRecordViewModel dtrmodel = new DailyTimeRecordViewModel();
             try
             {
                 using (var _httpclient = new HttpClient())
                 {
-                    param.EmployeeNo = "080343";
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    param.CurrentUserId = currentUser.UserId;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllAttendanceByDate");
@@ -696,7 +700,7 @@ namespace DCI.WebApp.Controllers
                         TimeSpan totalNightdiff;
                         TimeSpan beforeNightDiff = new TimeSpan(22, 59, 0);
                         TimeSpan morethan1hr = TimeSpan.FromHours(1);
-                        List<OvertimeEntryDto> otList = new List<OvertimeEntryDto>();
+                        List<OvertimeDetailViewModel> otList = new List<OvertimeDetailViewModel>();
 
                         TimeSpan totalWorkingHours = lastout - firstin;
 
@@ -708,49 +712,49 @@ namespace DCI.WebApp.Controllers
 
                             if (totalWorkingHours > eightHours)
                             {
-                                OvertimeEntryDto otSpecialHoliday = new OvertimeEntryDto();
-                                otSpecialHoliday.OTDate = param.OTDate;
-                                otSpecialHoliday.OTDateString = param.OTDate.ToString("MM/dd/yyyy");
+                                OvertimeDetailViewModel otSpecialHoliday = new OvertimeDetailViewModel();
+                                otSpecialHoliday.OTDate = param.OTDate.ToString();
+                                otSpecialHoliday.OTDateString = param.OTDate.ToString("yyyy-MM-dd");
                                 otSpecialHoliday.OTTimeFrom = clockout.ToString();
                                 otSpecialHoliday.OTTimeTo = lastout.ToString();
                                 otSpecialHoliday.TotalMinutes = (int)eightHours.TotalMinutes;
                                 otSpecialHoliday.TotalHours = TimeHelper.ConvertMinutesToHHMM((int)eightHours.TotalMinutes);
                                 otSpecialHoliday.OTType = 3;
                                 otSpecialHoliday.OTTypeName = "130% SPECIAL HOLIDAY MON - SUN / SAT-SUN (FIRST 8 HRS.)";
-                                param.Entries.Add(otSpecialHoliday);
+                                param.otDetails.Add(otSpecialHoliday);
 
                                 TimeSpan spcHolidayAfter8hrs = lastout - clockout;
-                               
+
 
 
                                 if (spcHolidayAfter8hrs > morethan1hr)
                                 {
-                                    OvertimeEntryDto otAfter8hrs = new OvertimeEntryDto();
-                                    otAfter8hrs.OTDate = param.OTDate;
-                                    otAfter8hrs.OTDateString = param.OTDate.ToString("MM/dd/yyyy");
+                                    OvertimeDetailViewModel otAfter8hrs = new OvertimeDetailViewModel();
+                                    otAfter8hrs.OTDate = param.OTDate.ToString();
+                                    otAfter8hrs.OTDateString = param.OTDate.ToString("yyyy-MM-dd");
                                     otAfter8hrs.OTTimeFrom = clockout.ToString();
                                     otAfter8hrs.OTTimeTo = lastout.ToString();
                                     otAfter8hrs.TotalMinutes = (int)spcHolidayAfter8hrs.TotalMinutes;
                                     otAfter8hrs.TotalHours = TimeHelper.ConvertMinutesToHHMM((int)spcHolidayAfter8hrs.TotalMinutes);
                                     otAfter8hrs.OTType = 4;
                                     otAfter8hrs.OTTypeName = "169% AFTER 8 HRS OF 130%";
-                                    param.Entries.Add(otAfter8hrs);
+                                    param.otDetails.Add(otAfter8hrs);
                                 }
 
                                 if (lastout > nightDiffStartTime)
                                 {
                                     totalNightdiff = lastout - nightDiffStartTime;
 
-                                    OvertimeEntryDto nightdiff = new OvertimeEntryDto();
-                                    nightdiff.OTDate = param.OTDate;
-                                    nightdiff.OTDateString = param.OTDate.ToString("MM/dd/yyyy");
+                                    OvertimeDetailViewModel nightdiff = new OvertimeDetailViewModel();
+                                    nightdiff.OTDate = param.OTDate.ToString();
+                                    nightdiff.OTDateString = param.OTDate.ToString("yyyy-MM-dd");
                                     nightdiff.OTTimeFrom = clockout.ToString();
                                     nightdiff.OTTimeTo = lastout.ToString();
                                     nightdiff.TotalMinutes = (int)totalNightdiff.TotalMinutes;
                                     nightdiff.TotalHours = TimeHelper.ConvertMinutesToHHMM((int)totalNightdiff.TotalMinutes);
                                     nightdiff.OTType = 2;
                                     nightdiff.OTTypeName = "10% NIGHT DIFFERENTIAL (10PM - 6AM) MON - SUN / HOLIDAY";
-                                    param.Entries.Add(nightdiff);
+                                    param.otDetails.Add(nightdiff);
                                 }
                             }
 
@@ -760,76 +764,123 @@ namespace DCI.WebApp.Controllers
                         {
 
                             TimeSpan eightHours = TimeSpan.FromHours(8);
-                            if(totalWorkingHours > eightHours)
+                            if (totalWorkingHours > eightHours)
                             {
                                 totalWorkingHours = totalWorkingHours - morethan1hr; // lunch break
                             }
 
-                            OvertimeEntryDto otSpecialHoliday = new OvertimeEntryDto();
-                            otSpecialHoliday.OTDate = param.OTDate;
-                            otSpecialHoliday.OTDateString = param.OTDate.ToString("MM/dd/yyyy");
+                            OvertimeDetailViewModel otSpecialHoliday = new OvertimeDetailViewModel();
+                            otSpecialHoliday.OTDate = param.OTDate.ToString();
+                            otSpecialHoliday.OTDateString = param.OTDate.ToString("yyyy-MM-dd");
                             otSpecialHoliday.OTTimeFrom = firstin.ToString();
                             otSpecialHoliday.OTTimeTo = lastout.ToString();
                             otSpecialHoliday.TotalMinutes = (int)totalWorkingHours.TotalMinutes; //(int)holidayOnRestday.TotalMinutes;
                             otSpecialHoliday.TotalHours = TimeHelper.ConvertMinutesToHHMM((int)totalWorkingHours.TotalMinutes);  //TimeHelper.ConvertMinutesToHHMM((int)holidayOnRestday.TotalMinutes);
                             otSpecialHoliday.OTType = 5;
                             otSpecialHoliday.OTTypeName = "150% HOLIDAY ON REST DAY (SAT - SUN)";
-                            param.Entries.Add(otSpecialHoliday);
+                            param.otDetails.Add(otSpecialHoliday);
 
                             if (lastout > nightDiffStartTime)
                             {
                                 totalNightdiff = lastout - nightDiffStartTime;
 
-                                OvertimeEntryDto nightdiff = new OvertimeEntryDto();
-                                nightdiff.OTDate = param.OTDate;
-                                nightdiff.OTDateString = param.OTDate.ToString("MM/dd/yyyy");
+                                OvertimeDetailViewModel nightdiff = new OvertimeDetailViewModel();
+                                nightdiff.OTDate = param.OTDate.ToString();
+                                nightdiff.OTDateString = param.OTDate.ToString("yyyy-MM-dd");
                                 nightdiff.OTTimeFrom = clockout.ToString();
                                 nightdiff.OTTimeTo = lastout.ToString();
                                 nightdiff.TotalMinutes = (int)totalNightdiff.TotalMinutes;
                                 nightdiff.TotalHours = TimeHelper.ConvertMinutesToHHMM((int)totalNightdiff.TotalMinutes);
                                 nightdiff.OTType = 2;
                                 nightdiff.OTTypeName = "10% NIGHT DIFFERENTIAL (10PM - 6AM) MON - SUN / HOLIDAY";
-                                param.Entries.Add(nightdiff);
+                                param.otDetails.Add(nightdiff);
+                            }
+                        }
+                        else if (isHoliday == false && isRestDay == true)
+                        {
+
+                            //TimeSpan eightHours = TimeSpan.FromHours(8);
+
+                            //if (totalWorkingHours > eightHours)
+                            //{
+                            //    OvertimeDetailViewModel otSpecialHoliday = new OvertimeDetailViewModel();
+                            //    otSpecialHoliday.OTDate = param.OTDate;
+                            //    otSpecialHoliday.OTDateString = param.OTDate.ToString("yyyy-MM-dd");
+                            //    otSpecialHoliday.OTTimeFrom = clockout.ToString();
+                            //    otSpecialHoliday.OTTimeTo = lastout.ToString();
+                            //    otSpecialHoliday.TotalMinutes = (int)eightHours.TotalMinutes;
+                            //    otSpecialHoliday.TotalHours = TimeHelper.ConvertMinutesToHHMM((int)eightHours.TotalMinutes);
+                            //    otSpecialHoliday.OTType = 3;
+                            //    otSpecialHoliday.OTTypeName = "130% SPECIAL HOLIDAY MON - SUN / SAT-SUN (FIRST 8 HRS.)";
+                            //    param.otDetails.Add(otSpecialHoliday);
+
+                            TimeSpan spcHolidayAfter8hrs = lastout - clockout;
+                            OvertimeDetailViewModel otAfter8hrs = new OvertimeDetailViewModel();
+                            otAfter8hrs.OTDate = param.OTDate.ToString();
+                            otAfter8hrs.OTDateString = param.OTDate.ToString("yyyy-MM-dd");
+                            otAfter8hrs.OTTimeFrom = clockout.ToString();
+                            otAfter8hrs.OTTimeTo = lastout.ToString();
+                            otAfter8hrs.TotalMinutes = (int)spcHolidayAfter8hrs.TotalMinutes;
+                            otAfter8hrs.TotalHours = TimeHelper.ConvertMinutesToHHMM((int)spcHolidayAfter8hrs.TotalMinutes);
+                            otAfter8hrs.OTType = 4;
+                            otAfter8hrs.OTTypeName = "169% AFTER 8 HRS OF 130%";
+                            param.otDetails.Add(otAfter8hrs);
+
+
+                            if (lastout > nightDiffStartTime)
+                            {
+                                totalNightdiff = lastout - nightDiffStartTime;
+
+                                OvertimeDetailViewModel nightdiff = new OvertimeDetailViewModel();
+                                nightdiff.OTDate = param.OTDate.ToString();
+                                nightdiff.OTDateString = param.OTDate.ToString("yyyy-MM-dd");
+                                nightdiff.OTTimeFrom = clockout.ToString();
+                                nightdiff.OTTimeTo = lastout.ToString();
+                                nightdiff.TotalMinutes = (int)totalNightdiff.TotalMinutes;
+                                nightdiff.TotalHours = TimeHelper.ConvertMinutesToHHMM((int)totalNightdiff.TotalMinutes);
+                                nightdiff.OTType = 2;
+                                nightdiff.OTTypeName = "10% NIGHT DIFFERENTIAL (10PM - 6AM) MON - SUN / HOLIDAY";
+                                param.otDetails.Add(nightdiff);
                             }
                         }
                         else
-                        {                       
+                        {
                             TimeSpan eightHours = TimeSpan.FromHours(8);
                             var regOt = lastout - clockout;
                             if (totalWorkingHours > eightHours)
                             {
-                                OvertimeEntryDto overtimeEntryDto = new OvertimeEntryDto();
-                                overtimeEntryDto.OTDate = param.OTDate;
-                                overtimeEntryDto.OTDateString = param.OTDate.ToString("MM/dd/yyyy");
+                                OvertimeDetailViewModel overtimeEntryDto = new OvertimeDetailViewModel();
+                                overtimeEntryDto.OTDate = param.OTDate.ToString();
+                                overtimeEntryDto.OTDateString = param.OTDate.ToString("yyyy-MM-dd");
                                 overtimeEntryDto.OTTimeFrom = clockout.ToString();
                                 overtimeEntryDto.OTTimeTo = lastout.ToString();
                                 overtimeEntryDto.TotalMinutes = (int)regOt.TotalMinutes;
                                 overtimeEntryDto.TotalHours = TimeHelper.ConvertMinutesToHHMM((int)regOt.TotalMinutes);
                                 overtimeEntryDto.OTType = 1;
                                 overtimeEntryDto.OTTypeName = "125% REGULAR (AFTER OFFICE HRS. /MON - FRI / EXCEPT HOLIDAY";
-                                param.Entries.Add(overtimeEntryDto);
+                                param.otDetails.Add(overtimeEntryDto);
 
 
                                 if (lastout > nightDiffStartTime)
                                 {
                                     totalNightdiff = lastout - nightDiffStartTime;
 
-                                    OvertimeEntryDto nightdiff = new OvertimeEntryDto();
-                                    nightdiff.OTDate = param.OTDate;
-                                    nightdiff.OTDateString = param.OTDate.ToString("MM/dd/yyyy");
+                                    OvertimeDetailViewModel nightdiff = new OvertimeDetailViewModel();
+                                    nightdiff.OTDate = param.OTDate.ToString();
+                                    nightdiff.OTDateString = param.OTDate.ToString("yyyy-MM-dd");
                                     nightdiff.OTTimeFrom = clockout.ToString();
                                     nightdiff.OTTimeTo = lastout.ToString();
                                     nightdiff.TotalMinutes = (int)totalNightdiff.TotalMinutes;
                                     nightdiff.TotalHours = TimeHelper.ConvertMinutesToHHMM((int)totalNightdiff.TotalMinutes);
                                     nightdiff.OTType = 2;
                                     nightdiff.OTTypeName = "10% NIGHT DIFFERENTIAL (10PM - 6AM) MON - SUN / HOLIDAY";
-                                    param.Entries.Add(nightdiff);
+                                    param.otDetails.Add(nightdiff);
 
                                 }
                             }
-                            
+
                         }
-                        return Json(new { success = true, data = param.Entries.ToList() });
+                        return Json(new { success = true, data = param.otDetails.ToList() });
                     }
                 }
 

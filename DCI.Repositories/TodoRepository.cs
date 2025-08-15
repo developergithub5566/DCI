@@ -377,5 +377,29 @@ namespace DCI.Repositories
             }
         }
 
+        public async Task<IList<OvertimeViewModel>> GetAllTodoOvertime(OvertimeViewModel model)
+        {
+
+            var query = from ot in _dbContext.OvertimeHeader
+                        join usr in _dbContext.User on ot.CreatedBy equals usr.UserId
+                        join emp in _dbContext.Employee on usr.EmployeeId equals emp.EmployeeId
+                        join stat in _dbContext.Status on ot.StatusId equals stat.StatusId
+                        where ot.IsActive && ot.CreatedBy == model.CurrentUserId
+                        select new OvertimeViewModel
+                        {
+                            OTHeaderId = ot.OTHeaderId,
+                            RequestNo = ot.RequestNo,
+                            Fullname = emp.Firstname + " " + emp.Lastname,
+                            EmployeeId = ot.EmployeeId,
+                            StatusId = ot.StatusId,
+                            StatusName = stat.StatusName,
+                            DateCreated = ot.DateCreated,
+                            CreatedBy = ot.CreatedBy,
+                            Total = _dbContext.OvertimeDetail.Where(x => x.OTHeaderId == ot.OTHeaderId).Sum(x => x.TotalMinutes)
+                        };
+
+            return await query.ToListAsync();
+        }
+
     }
 }

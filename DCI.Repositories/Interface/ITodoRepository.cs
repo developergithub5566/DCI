@@ -11,6 +11,6 @@ namespace DCI.Repositories.Interface
         Task<(int statuscode, string message)> Approval(ApprovalHistoryViewModel model);
         Task<IList<ApprovalHistoryViewModel>> GetApprovalHistory(ApprovalHistoryViewModel model);
         Task<(int statuscode, string message)> ApprovalDtr(ApprovalHistoryViewModel param);
-
+        Task<IList<OvertimeViewModel>> GetAllTodoOvertime(OvertimeViewModel model);
     }
 }

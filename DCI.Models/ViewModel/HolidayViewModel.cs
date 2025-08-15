@@ -2,13 +2,15 @@
 {
     public class HolidayViewModel 
     {
-        public int HolidayId { get; set; }
-        public DateTime HolidayDate { get; set; }
-        public string? Description { get; set; }
-        public DateTime DateCreated { get; set; }
-        public int CreatedBy { get; set; }
-        public DateTime? DateModified { get; set; }
-        public int? ModifiedBy { get; set; }
-        public bool IsActive { get; set; }
+        public int HolidayId { get; set; } = 0;
+        public DateTime HolidayDate { get; set; } = DateTime.Now;
+        public string HolidayName { get; set; } = string.Empty;
+        public string? Description { get; set; } = string.Empty;
+        public DateTime DateCreated { get; set; } = DateTime.Now;
+        public int CreatedBy { get; set; } = 0;
+        public DateTime? DateModified { get; set; } = DateTime.Now;
+        public int? ModifiedBy { get; set; } = 0;
+        public bool IsActive { get; set; } = true;
+        public string CreatedName { get; set; } = string.Empty;
     }
 }

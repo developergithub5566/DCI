@@ -1,4 +1,5 @@
 ﻿using DCI.Models.ViewModel;
+using System.Threading.Tasks;
 
 namespace DCI.Repositories.Interface
 {
@@ -11,6 +12,6 @@ namespace DCI.Repositories.Interface
         Task SendSetPassword(UserViewModel model);
         Task SendToRequestor(LeaveViewModel model);
 		Task SendToRequestorDTR(DTRCorrectionViewModel model);
-		
+        Task SentToOvertime(OvertimeViewModel model);
     }
 }

@@ -40,7 +40,7 @@
     else
     {
         var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
-                    .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Department);
+                    .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.DailyTimeRecord);
         canView = module?.View ?? false;
         canAdd = module?.Add ?? false;
         canEdit = module?.Update ?? false;
@@ -58,11 +58,11 @@
     <div class="d-sm-flex align-items-center justify-content-between mb-3">
         <h6 class="m-0 font-weight-bold text-gray-800">@ViewBag.BreadCrumbLabel</h6>
         <div class="upperRightDivBtn">
-            <a href="#" title="Add Department" class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")" data-toggle="modal" data-target="#" onclick="newForm()">
+            <a href="#" title="Add Overtime" class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")" data-toggle="modal" data-target="#" onclick="newForm()" id="AddOvertime">
                 <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
                 <span class="text text-white"><small>Add Overtime</small></span>
             </a>
-            <a href="#" title="Add Department" class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")" data-toggle="modal" data-target="#" onclick="save()">
+            <a href="#" title="Submit" class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")" data-toggle="modal" data-target="#" onclick="save()" id="Submit">
                 <span class="icon text-white"><i class="fa fa-paper-plane" aria-hidden="true"></i></span>
                 <span class="text text-white"><small>Submit</small></span>
             </a>
@@ -80,35 +80,39 @@
 
     <div class="card shadow mb-4">
         <div class="card-header">
-            <label class="mb0">Data</label>
+            <label class="mb0">Details</label>
         </div>
         <div class="card-body">
             <div class="table-responsive mt20">
+                <div id="otinfo" hidden>
+                    <div class="row">
+                        <input type="hidden" id="OTHeaderId" name="OTHeaderId"  value="@Model.OTHeaderId"/>
+                        <input type="hidden" id="EmployeeId" name="EmployeeId" value="@Model.EmployeeId" />
+                        <div class="col-md-6">
+                            <label class="frmText">Request No</label>
+                            <input type="text" min="0" step="any" id="RequestNo" name="RequestNo" class="form-control frmField" readonly="true" value="@Model.RequestNo">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="frmText">Status</label>
+                            <input type="text" min="0" step="any" id="StatusId" name="StatusId" class="form-control frmField" readonly="true" value="@Model.StatusName">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="frmText">Recommended By</label>
+                            <input type="text" min="0" step="any" id="RecommendedBy" name="RecommendedBy" class="form-control frmField" readonly="true" value="@Model.RecommendedBy">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="frmText">Approved By</label>
+                            <input type="text" min="0" step="any" id="ApprovedBy" name="ApprovedBy" class="form-control frmField" readonly="true" value="@Model.ApprovedBy">
+                        </div>
+                    </div>
+                </div>
 
                 <div class="row">
                     <div class="col-md-6">
-                        <label class="frmText">Request No</label>
-                        <input type="text" min="0" step="any" id="RequestNo" name="NoOfDays" class="form-control frmField" readonly="true">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="frmText">Status</label>
-                        <input type="text" min="0" step="any" id="StatusId" name="StatusId" class="form-control frmField" readonly="true">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <label class="frmText">Recommended By</label>
-                        <input type="text" min="0" step="any" id="RecommendedBy" name="RecommendedBy" class="form-control frmField" readonly="true">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="frmText">Approved By</label>
-                        <input type="text" min="0" step="any" id="ApprovedBy" name="ApprovedBy" class="form-control frmField" readonly="true">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
                         <label class="frmText">Remarks</label>
-                        <input type="text" id="Remarks" name="Remarks" class="form-control frmField">
+                        <input type="text" id="Remarks" name="Remarks" class="form-control frmField" value="@Model.Remarks">
                     </div>
 
                 </div>
@@ -123,7 +127,7 @@
 
                 <table id="otTable" class="table table-bordered mt-3">
                     <thead>
-                        <tr>
+                        <tr>                 
                             <th>Overtime Type</th>
                             <th>Date</th>
                             <th>Time From</th>
@@ -134,41 +138,50 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if (Model != null && Model.OvertimeDetailViewModel.Count >0 )
+                        @if (Model != null && Model.otDetails.Count > 0)
                         {
-                            @foreach (var item in Model.OvertimeDetailViewModel)
+                            //  @foreach (var item in Model.otDetails)
+                            @foreach (var item in Model.otDetails.Select((value, index) => new { value, index }))
                             {
                                 <tr>
+                                  
+                                    <td>
+                                        @item.value.OTTypeName
+                                    </td>
+                                    <td>
+                                        @item.value.OTDateString
+                                    </td>
+                                    <td>
+                                        @*  @item.OTTimeFrom *@
+                                        @item.value.OTTimeFrom
+                                    </td>
+                                    <td>
+                                        @*  @item.OTTimeTo *@
+                                        @item.value.OTTimeTo
+                                        @*  .ToString("HH:mm") *@
+                                    </td>
 
                                     <td>
-                                        @item.OTTypeName
-                                    </td>
-                                    <td>
-                                        @item.OTDateString
-                                    </td>
-                                    <td>
-                                       @*  @item.OTTimeFrom *@
-                                        @item.OTTimeFrom.ToString("HH:mm")                         
-                                    </td>
-                                    <td>
-                                       @*  @item.OTTimeTo *@
-                                        @item.OTTimeTo.ToString("HH:mm")
-                                    </td>
-
-                                    <td>
-                                        @item.TotalHours
+                                        @item.value.TotalHours
                                     </td>
                                     <td hidden>
-                                        @item.TotalMinutes
-                                    </td>
-                                    <td hidden>
-                                        @item.TotalMinutes
+                                        @item.value.TotalMinutes
                                     </td>
 
+                                    <td hidden>
+                                        <input type="hidden" name="OvertimeEntries[@item.index].OTHeaderId" value="@item.value.OTHeaderId" />
+                                        <input type="hidden" name="OvertimeEntries[@item.index].OTDetailId" value="@item.value.OTDetailId" />
+                                        <input type="hidden" name="OvertimeEntries[@item.index].OTType" value="@item.value.OTType" />
+                                        <input type="hidden" name="OvertimeEntries[@item.index].OTTypeName" value="@item.value.OTTypeName" />
+                                        <input type="hidden" name="OvertimeEntries[@item.index].OTDate" value="@item.value.OTDate" />
+                                        <input type="hidden" name="OvertimeEntries[@item.index].OTDateString" value="@item.value.OTDateString" />
+                                        <input type="hidden" name="OvertimeEntries[@item.index].OTTimeFrom" value="@item.value.OTTimeFrom" />
+                                        <input type="hidden" name="OvertimeEntries[@item.index].OTTimeTo" value="@item.value.OTTimeTo" />
+                                        <input type="hidden" name="OvertimeEntries[@item.index].TotalHours" value="@item.value.TotalHours" />
+                                        <input type="hidden" name="OvertimeEntries[@item.index].TotalMinutes" value="@item.value.TotalMinutes" />
+                                    </td>
                                     <td>
-                                        @*  <a asp-controller="DailyTimeRecord" asp-action="AddOvertime" asp-route-OTHeaderId="@item.OTHeaderId" class="btn btn-primary">
-                                        <i class="fas fa-search"></i>
-                                    </a> *@
+                                        <button type="button" class="btn btn-sm btn-danger remove-row">Remove</button>
                                     </td>
                                 </tr>
                             }
@@ -180,7 +193,7 @@
 </div>
 
 
-            <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -191,16 +204,7 @@
                         </div>
                         <form id="createForm">
                             <div class="modal-body">
-                                <div class="form-group">
-                                    @*   <label class="frmText"><span class="required">*</span> Type</label>
-                                    <select id="otTypeSelect" class="form-select" required  style="font-size:small">
-                                        <option value="0">Select</option>
-                                        <option value="1">125% REGULAR (AFTER OFFICE HRS. /MON - FRI / EXCEPT HOLIDAY</option>
-                                        <option value="2">10% NIGHT DIFFERENTIAL (10PM - 6AM) MON - SUN / HOLIDAY</option>
-                                        <option value="3">130% SPECIAL HOLIDAY MON - SUN / SAT-SUN (FIRST 8 HRS.)</option>
-                                        <option value="4">169% AFTER 8 HRS OF 130%</option>
-                                        <option value="5">150% HOLIDAY ON REST DAY (SAT - SUN)</option>
-                                    </select> *@
+                                <div class="form-group">                           
 
 
                                     <div class="input-group">
@@ -275,6 +279,20 @@
 
 
                             $(document).ready(function () {
+                             
+                                  var otHeaderId = $('#OTHeaderId').val();
+                                   var statusName = $('#StatusId').val();
+                                 
+                                  if(otHeaderId > 0){
+                                         $("#otinfo").prop("hidden", false);
+                                  }else{
+                                         $("#otinfo").prop("hidden", true);
+                                  }
+                                  if(statusName== "Pending"){
+                                         $("#AddOvertime").prop("hidden", true);
+                                               $("#Submit").prop("hidden", true);
+                                  }
+                                  
 
 
                                   document.getElementById("timeparam").style.display = 'none';
@@ -323,18 +341,26 @@
                              function save() {
                                const entries = collectOvertimeEntries();
 
+                               if(entries.length ==0){
+                                   alert("Please add Overtime");
+                                   return;
+                               }
 
+                               const _otHeaderId =$('#OTHeaderId').val();
                                const _otdate =$('#OTDate').val();
                                const _timefrom =  $('#OTTimeFrom').val();
                                const _timeto = $('#OTTimeTo').val();
+                               const _remarks = $('#Remarks').val();
                                const ischkOB = document.getElementById("chkOB");
 
                                   const payload = {
+                                                 OTHeaderId: _otHeaderId,
                                                 OTDate: _otdate,
                                                 OTTimeFrom : _timefrom,
                                                 OTTimeTo : _timeto,
                                                 IsOfficialBuss : ischkOB.checked,
-                                                Entries: entries   // your list of entries
+                                                Remarks : _remarks,
+                                                otDetails : entries   // your list of entries
                                             }
 
                                    console.log(payload)
@@ -484,7 +510,7 @@
                            sumMinutes += h * 60 + m;
                          }
                        });
-                       document.getElementById('grandTotalText').innerHTML = `<strong>Grand Total:</strong> ${formatMinutes(sumMinutes)}`;
+                       // document.getElementById('grandTotalText').innerHTML = `<strong>Grand Total:</strong> ${formatMinutes(sumMinutes)}`;
                      }
 
                     document.getElementById('addBtn').addEventListener('click', function () {
@@ -494,16 +520,32 @@
                                const date = document.getElementById('OTDate').value.trim();
                                const from = document.getElementById('OTTimeFrom').value.trim();
                                const to = document.getElementById('OTTimeTo').value.trim();
+                            //   const ischkOB = $("#chkOB").val(); //document.getElementById("chkOB");
+                             //  let ischeckbox = ischkOB.checked;
 
+
+                             //  console.log(ischeckbox);
                                let hasError = false;
                                // if (typeVal === '0') {
                                //   hasError = true;
                                //   alert('Please select a Type.');
                                // }
-                               if (!date) {
-                                 hasError = true;
-                                 document.querySelector('label[for="OTDate"]').textContent = 'Required';
-                               }
+                                if (!date) {
+                                  hasError = true;
+                                  document.querySelector('label[for="OTDate"]').textContent = 'Required';
+                                }
+
+
+
+                                    // if (!from) {
+                                    //   hasError = true;
+                                    //   document.querySelector('label[for="OTTimeFrom"]').textContent = 'Required';
+                                    // }
+                                    // if (!to) {
+                                    //   hasError = true;
+                                    //   document.querySelector('label[for="OTTimeTo"]').textContent = 'Required';
+                                    // }
+
 
                                if (hasError) return;
 
@@ -521,15 +563,26 @@
                                    const ischkOB = document.getElementById("chkOB");
 
 
+                                       // EmployeeNo: '',
+                                       //                   OTDetailId: 0 ,
+                                       //                   OTHeaderId: 0,
+                                       //                   OTType : 0,
+                                       //                   OTTypeName : '',
+                                       //                   OTDateString : '',
+                                       //                   TotalMinutes: 0,
+                                       //                   TotalHours : '',
+
+
                                                      const payload = {
                                                         OTDate: _otdate,
                                                         OTTimeFrom : _timefrom,
                                                         OTTimeTo : _timeto,
                                                         IsOfficialBuss : ischkOB.checked,
-                                                        Entries: entries   // your list of entries
+                                                        otDetails: entries
+                                                        //otDetails: null
                                                     }
                                                         console.log(payload);
-
+                                                         console.log(entries);
 
                                                         $.ajax({
                                                             type: 'POST',
@@ -539,6 +592,7 @@
                                                               //    processData: false,
                                                         // contentType: false,
                                                                data: JSON.stringify(payload),
+                                                               //data: { entriesx : entries },
 
                                                             success: function (response) {
                                                                 if (response.success) {
@@ -559,12 +613,15 @@
                                                                                             <td>${item.totalHours}</td>
                                                                                             <td hidden>${item.totalMinutes}</td>
                                                                                             <td hidden>
+                                                                                                <input type="hidden" name="OvertimeEntries[${index}].OTHeaderId" value="${item.otHeaderId}">
+                                                                                                <input type="hidden" name="OvertimeEntries[${index}].OTDetailId" value="${item.otDetailId}">
+                                                                                                <input type="hidden" name="OvertimeEntries[${index}].OTType" value="${item.otType}">
                                                                                                 <input type="hidden" name="OvertimeEntries[${index}].OTTypeName" value="${item.otTypeName}">
                                                                                                 <input type="hidden" name="OvertimeEntries[${index}].OTDate" value="${item.otDate}">
                                                                                                 <input type="hidden" name="OvertimeEntries[${index}].OTDateString" value="${item.otDateString}">
                                                                                                 <input type="hidden" name="OvertimeEntries[${index}].OTTimeFrom" value="${item.otTimeFrom}">
                                                                                                 <input type="hidden" name="OvertimeEntries[${index}].OTTimeTo" value="${item.otTimeTo}">
-                                                                                                   <input type="hidden" name="OvertimeEntries[${index}].TotalHours" value="${item.totalHours}">
+                                                                                                <input type="hidden" name="OvertimeEntries[${index}].TotalHours" value="${item.totalHours}">
                                                                                                 <input type="hidden" name="OvertimeEntries[${index}].TotalMinutes" value="${item.totalMinutes}">
                                                                                             </td>
                                                                                             <td><button type="button" class="btn btn-sm btn-danger remove-row">Remove</button></td>
@@ -625,6 +682,10 @@
 
                      function dateAlreadyExists(dateStr) {
                        const rows = document.querySelectorAll('#otTable tbody tr');
+
+
+
+
                        for (const r of rows) {
                          const existingDate = r.children[1]?.textContent.trim(); // Date column
                          if (existingDate === dateStr) return true;
@@ -634,15 +695,30 @@
 
 
 
-                                                   function collectOvertimeEntries() {
+                     function collectOvertimeEntries() {
                         const entries = [];
 
                         $('#otTable tbody tr').each(function () {
                             const row = $(this);
                             const entry = {
-                                otTypeName: row.find('input[name*=".OTTypeName"]').val(),
-                                otDate: row.find('input[name*=".OTDate"]').val(),
-                                otDateString: row.find('input[name*=".OTDateString"]').val(),
+                                //                          employeeNo: '',
+                                //                          otDetailId: 0 ,
+                                //                          otHeaderId: 0,
+                                //                          otType : 0,
+                                // otTypeName: row.find('input[name*=".OTTypeName"]').val(),
+                                // otDate: row.find('input[name*=".OTDate"]').val(),
+                                // otDateString: row.find('input[name*=".OTDateString"]').val(),
+                                // otTimeFrom: row.find('input[name*=".OTTimeFrom"]').val(),
+                                // otTimeTo: row.find('input[name*=".OTTimeTo"]').val(),
+                                // totalHours: row.find('input[name*=".TotalHours"]').val(),
+                                // totalMinutes: parseInt(row.find('input[name*=".TotalMinutes"]').val()) || 0
+                                                                    employeeNo: '',
+                                                         otDetailId:  row.find('input[name*=".OTDetailId"]').val() ,
+                                                         otHeaderId: row.find('input[name*=".OTHeaderId"]').val() ,
+                                                         otType : row.find('input[name*=".OTType"]').val(),
+                               otDate: row.find('input[name*=".OTDate"]').val(),
+                               otTypeName: row.find('input[name*=".OTTypeName"]').val(),
+                                    otDateString: row.find('input[name*=".OTDateString"]').val(),
                                 otTimeFrom: row.find('input[name*=".OTTimeFrom"]').val(),
                                 otTimeTo: row.find('input[name*=".OTTimeTo"]').val(),
                                 totalHours: row.find('input[name*=".TotalHours"]').val(),

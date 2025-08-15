@@ -26,11 +26,13 @@ namespace DCI.API.Controllers
         IAnnouncementRepository _announcementRepository;
         IEmailRepository _emailRepository;
         IEmployeeRepository _employeeRepository;
+        IHolidayRepository _holidayRepository;
 
 
         public MaintenanceController(IModulePageRepository modulePageRepository, IModuleInRoleRepository moduleInRoleRepository,
             IRoleRepository roleRepository, IUserRepository userRepository, IDepartmentRepository DepartmentRepository, IEmploymentTypeRepository employmentTypeRepository,
-            IUserRoleRepository userRoleRepository, IAuditLogRepository auditLogRepository, IAnnouncementRepository announcementRepository,IEmailRepository emailRepository, IEmployeeRepository employeeRepository)
+            IUserRoleRepository userRoleRepository, IAuditLogRepository auditLogRepository, IAnnouncementRepository announcementRepository,IEmailRepository emailRepository,
+            IEmployeeRepository employeeRepository, IHolidayRepository holidayRepository)
         {
             this._userRepository = userRepository;
             this._moduleInRoleRepository = moduleInRoleRepository;
@@ -44,6 +46,7 @@ namespace DCI.API.Controllers
             this._announcementRepository = announcementRepository;
             this._emailRepository = emailRepository;
             this._employeeRepository = employeeRepository;
+            _holidayRepository = holidayRepository;
         }
 
 
@@ -411,6 +414,37 @@ namespace DCI.API.Controllers
 
         }
 
+        #endregion
+
+        #region Holiday
+        [HttpGet]
+        [Route("GetAllHoliday")]
+        public async Task<IActionResult> GetAllHoliday()
+        {
+            return Ok(await _holidayRepository.GetAllHoliday());
+        }
+
+        [HttpPost]
+        [Route("GetHolidayById")]
+        public async Task<IActionResult> GetHolidayById([FromBody] HolidayViewModel model)
+        {         
+            return Ok(await _holidayRepository.GetHolidayById(model.HolidayId));
+        }
+
+        [HttpPost]
+        [Route("SaveHoliday")]
+        public async Task<IActionResult> SaveHoliday([FromBody] HolidayViewModel model)
+        {
+            var result = await _holidayRepository.Save(model);
+            return StatusCode(result.statuscode, result.message);
+        }
+        [HttpPost]
+        [Route("DeleteHoliday")]
+        public async Task<IActionResult> DeleteHoliday([FromBody] HolidayViewModel model)
+        {
+            var result = await _holidayRepository.Delete(model);
+            return StatusCode(result.statuscode, result.message);
+        }
         #endregion
     }
 }

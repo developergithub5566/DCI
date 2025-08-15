@@ -14,6 +14,7 @@ namespace DCI.Models.Entities
       //  public int Total { get; set; }
 
         public int StatusId { get; set; }
+         public string Remarks { get; set; }
 
         public DateTime DateCreated { get; set; }
 

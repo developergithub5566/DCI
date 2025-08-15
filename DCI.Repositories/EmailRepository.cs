@@ -294,5 +294,59 @@ namespace DCI.Repositories
         }
 
         #endregion
+
+        #region Overtime
+
+        public async Task SentToOvertime(OvertimeViewModel model)
+        {
+            model = await OvertimeNotificationBodyMessage(model);
+
+
+            MailMessage mail = new MailMessage();
+            mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
+            mail.Subject = "Action Required: Please check the Overtime Request no. " + model.RequestNo;
+            mail.Body = model.EmailBody;
+            mail.IsBodyHtml = true;
+            mail.To.Add(model.ApproverEmail);
+            await SendMessage(mail);
+        }
+
+        async Task<OvertimeViewModel> OvertimeNotificationBodyMessage(OvertimeViewModel model)
+        {
+            var userEntity = new User();
+            string statusName = string.Empty;
+
+
+            if (model.StatusId == (int)EnumStatus.Pending)
+            {
+                userEntity = await _userRepository.GetUserById(model.RecommendedById);
+                statusName = "for approval";
+            }
+            if (model.StatusId == (int)EnumStatus.ForApproval)
+            {
+                userEntity = await _userRepository.GetUserById(model.ApproverId);
+                statusName = "for approval";
+            }
+
+            model.ApproverEmail = userEntity.Email;
+            model.EmailBody = $@"
+            <html>
+            <body>              
+                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
+                
+                <p>This is an automated message from DCI Application.</p>
+                 
+				<p>You have been assigned overtime request {model.RequestNo} {statusName}. Kindly review and proceed accordingly. </p> 
+            
+                <p>If you encounter any issues, please contact our support team at [DCI Application Support].</p>            
+                <p>Thank you,<br />Your DCI</p>
+            </body>
+            </html>";
+
+            return model;
+        }
+
+
+        #endregion
     }
 }

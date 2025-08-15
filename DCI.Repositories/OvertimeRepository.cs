@@ -21,38 +21,44 @@ namespace DCI.Repositories
     public class OvertimeRepository : IOvertimeRepository, IDisposable
     {
         private DCIdbContext _dbContext;
-        public OvertimeRepository(DCIdbContext dbContext)
+        private IEmailRepository _emailRepository;
+        public OvertimeRepository(DCIdbContext dbContext, IEmailRepository emailRepository)
         {
             _dbContext = dbContext;
+            _emailRepository = emailRepository;
         }
         public void Dispose()
         {
             _dbContext.Dispose();
         }
 
-        public async Task<DailyTimeRecordViewModel> GetAllAttendanceByDate(DateTime date, string empno)
+        public async Task<DailyTimeRecordViewModel> GetAllAttendanceByDate(OvertimeViewModel model)
         {
-                 var context = _dbContext.vw_AttendanceSummary.Where(x => x.DATE == date);
+            //var date = model.OTDate;
 
-                var query = (from dtr in context
-                             where dtr.DATE == date && dtr.EMPLOYEE_NO == empno
-                             select new DailyTimeRecordViewModel
-                             {
-                                 ID = dtr.ID,
-                                 EMPLOYEE_NO = dtr.EMPLOYEE_NO,
-                                 NAME = dtr.NAME,
-                                 DATE = dtr.DATE,
-                                 FIRST_IN = dtr.FIRST_IN,
-                                 LAST_OUT = dtr.LAST_OUT,
-                                 LATE = dtr.LATE,
-                                 CLOCK_OUT = dtr.CLOCK_OUT,
-                                 UNDER_TIME = dtr.UNDER_TIME,
-                                 OVERTIME = dtr.OVERTIME,
-                                 TOTAL_HOURS = dtr.TOTAL_HOURS,
-                                 TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS,
-                                 DATESTRING = dtr.DATE.ToString("MM/dd/yyyy")
-                             }).FirstOrDefault();
-            return query;                  
+            var context = _dbContext.vw_AttendanceSummary.Where(x => x.DATE == model.OTDate);
+            var user = _dbContext.User.Where(x => x.UserId == model.CurrentUserId).FirstOrDefault();
+            var employee = _dbContext.Employee.Where(x => x.EmployeeId == user.EmployeeId).FirstOrDefault();
+
+            var query = (from dtr in context                      
+                         where dtr.DATE == model.OTDate && dtr.EMPLOYEE_NO == employee.EmployeeNo
+                         select new DailyTimeRecordViewModel
+                         {
+                             ID = dtr.ID,
+                             EMPLOYEE_NO = dtr.EMPLOYEE_NO,
+                             NAME = dtr.NAME,
+                             DATE = dtr.DATE,
+                             FIRST_IN = dtr.FIRST_IN,
+                             LAST_OUT = dtr.LAST_OUT,
+                             LATE = dtr.LATE,
+                             CLOCK_OUT = dtr.CLOCK_OUT,
+                             UNDER_TIME = dtr.UNDER_TIME,
+                             OVERTIME = dtr.OVERTIME,
+                             TOTAL_HOURS = dtr.TOTAL_HOURS,
+                             TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS,
+                             DATESTRING = dtr.DATE.ToString("MM/dd/yyyy")
+                         }).FirstOrDefault();
+            return query;
         }
 
         public async Task<IList<OvertimeViewModel>> Overtime(OvertimeViewModel model)
@@ -114,12 +120,20 @@ namespace DCI.Repositories
         //}
         public async Task<OvertimeViewModel?> AddOvertime(OvertimeViewModel model)
         {
+
+
             var query =
                 from ot in _dbContext.OvertimeHeader.AsNoTracking()
-                join usr in _dbContext.User.AsNoTracking() on ot.CreatedBy equals usr.UserId
+                join usr in _dbContext.User.AsNoTracking() on ot.CreatedBy equals model.CurrentUserId
                 join emp in _dbContext.Employee.AsNoTracking() on usr.EmployeeId equals emp.EmployeeId
+                join empWork in _dbContext.EmployeeWorkDetails.AsNoTracking() on emp.EmployeeId equals empWork.EmployeeId
+                join dept in _dbContext.Department.AsNoTracking() on empWork.DepartmentId equals dept.DepartmentId
+
+                join usrApprover in _dbContext.User.AsNoTracking() on dept.ApproverId equals usrApprover.UserId into usrApproverGroup
+                from usrApprover in usrApproverGroup.DefaultIfEmpty()
+
                 join stat in _dbContext.Status.AsNoTracking() on ot.StatusId equals stat.StatusId
-                where ot.IsActive && ot.OTHeaderId == model.OTHeaderId
+                where ot.IsActive && ot.OTHeaderId == model.OTHeaderId 
                 select new OvertimeViewModel
                 {
                     OTHeaderId = ot.OTHeaderId,
@@ -128,9 +142,13 @@ namespace DCI.Repositories
                     EmployeeId = ot.EmployeeId,
                     StatusId = ot.StatusId,
                     StatusName = stat.StatusName,
+                    Remarks = ot.Remarks,
                     DateCreated = ot.DateCreated,
                     CreatedBy = ot.CreatedBy,
-                    OvertimeDetailViewModel = _dbContext.OvertimeDetail 
+                   
+                    RecommendedBy = usrApprover != null ? usrApprover.Firstname + " " + usrApprover.Lastname : string.Empty,
+                    ApprovedBy = "MARCO USTARIS",
+                    otDetails = _dbContext.OvertimeDetail
                         .Where(x => x.OTHeaderId == ot.OTHeaderId && x.IsActive)
                         .OrderBy(x => x.OTDate).ThenBy(x => x.OTTimeFrom)
                         .Select(x => new OvertimeDetailViewModel
@@ -142,35 +160,37 @@ namespace DCI.Repositories
                                        : x.OTType == 5 ? "150% HOLIDAY ON REST DAY (SAT - SUN)"
                                        : "",
                             OTHeaderId = x.OTHeaderId,
+                            OTDetailId = x.OTDetailId,
                             OTType = x.OTType,
-                            OTDate = x.OTDate,
-                            OTDateString = x.OTDate.ToString("MM/dd/yyyy"),
-                            OTTimeFrom = x.OTTimeFrom,
-                            OTTimeTo = x.OTTimeTo,
+                            OTDate = x.OTDate.ToString(),
+                            OTDateString = x.OTDate.ToString("yyyy-MM-dd"),
+                            OTTimeFrom = x.OTTimeFrom.ToString("HH:mm:ss"),
+                            OTTimeTo = x.OTTimeTo.ToString("HH:mm:ss"),
                             TotalMinutes = x.TotalMinutes,
                             TotalHours = TimeHelper.ConvertMinutesToHHMM((int)x.TotalMinutes)
                         })
                         .ToList()
                 };
 
-            return await query.FirstOrDefaultAsync();
+            return await query.FirstOrDefaultAsync() ?? new OvertimeViewModel();
         }
 
 
-        public async Task<(int statuscode, string message)> SaveOvertime(SubmitOvertimeViewModel param)
+        public async Task<(int statuscode, string message)> SaveOvertime(OvertimeViewModel param)
         {
 
-      
+
 
             try
             {
-                if (param.RequestNo ==  string.Empty)
+                if (param.OTHeaderId == 0)
                 {
                     OvertimeHeader entity = new OvertimeHeader();
-                   
+
                     entity.RequestNo = await GenereteRequestNo();
                     entity.StatusId = (int)EnumStatus.Pending;
                     entity.EmployeeId = param.CurrentUserId;
+                    entity.Remarks = param.Remarks;
                     entity.DateCreated = DateTime.Now;
                     entity.CreatedBy = param.CurrentUserId;
                     entity.ModifiedBy = null;
@@ -181,26 +201,66 @@ namespace DCI.Repositories
 
                     //int count = param.Entries.Count();
 
-                    foreach (var dtl in param.Entries)
+                    foreach (var dtl in param.otDetails)
                     {
-                        DateTime combined = dtl.OTDate.Date + TimeSpan.Parse(dtl.OTTimeFrom);
+                        // DateTime combined = date.Parse(dtl.OTDate.Date) + TimeSpan.Parse(dtl.OTTimeFrom);
 
                         OvertimeDetail entityDtl = new OvertimeDetail();
                         entityDtl.OTHeaderId = entity.OTHeaderId;
                         entityDtl.OTType = dtl.OTType;
-                        entityDtl.OTDate = dtl.OTDate;
-                        entityDtl.OTTimeFrom = dtl.OTDate.Date + TimeSpan.Parse(dtl.OTTimeFrom);
-                        entityDtl.OTTimeTo = dtl.OTDate.Date + TimeSpan.Parse(dtl.OTTimeTo);
+                        entityDtl.OTDate = DateTime.Parse(dtl.OTDate);
+                        entityDtl.OTTimeFrom = DateTime.Parse(dtl.OTDate) + TimeSpan.Parse(dtl.OTTimeFrom);
+                        entityDtl.OTTimeTo = DateTime.Parse(dtl.OTDate) + TimeSpan.Parse(dtl.OTTimeTo);
                         entityDtl.IsActive = true;
                         await _dbContext.OvertimeDetail.AddAsync(entityDtl);
                         await _dbContext.SaveChangesAsync();
                     }
+
+                    var result =                           
+                            from b in _dbContext.User.AsNoTracking()   
+                            join c in _dbContext.EmployeeWorkDetails.AsNoTracking()
+                                on b.EmployeeId equals c.EmployeeId into cGroup
+                            from c in cGroup.DefaultIfEmpty()
+
+                            join d in _dbContext.Department.AsNoTracking()
+                                on c.DepartmentId equals d.DepartmentId into dGroup
+                            from d in dGroup.DefaultIfEmpty()                            
+
+                            where b.UserId == param.CurrentUserId
+                            select new
+                            {
+                                RecommendedById = d.ApproverId                               
+                            };
+
+                    var hrHead = _dbContext.Department.AsNoTracking().Where(x => x.DepartmentCode == "HR").FirstOrDefault();
+
+                    param.RecommendedById = result.FirstOrDefault().RecommendedById ?? 0;
+                    param.ApproverId = hrHead.ApproverId ?? 0;
+                    param.RequestNo = entity.RequestNo;
+                    param.StatusId = entity.StatusId;
+                    await _emailRepository.SentToOvertime(param);
+
                     return (StatusCodes.Status200OK, "Successfully saved");
                 }
                 else
                 {
+                    var entity = await _dbContext.OvertimeHeader.FirstOrDefaultAsync(x => x.OTHeaderId == param.OTHeaderId);
+
+                    entity.StatusId = (int)EnumStatus.Pending;
+                    entity.EmployeeId = param.CurrentUserId;
+                    entity.Remarks = param.Remarks;
+                    entity.DateCreated = DateTime.Now;
+                    entity.CreatedBy = param.CurrentUserId;
+                    entity.ModifiedBy = null;
+                    entity.DateModified = null;
+                    entity.IsActive = true;
+                    _dbContext.OvertimeHeader.Entry(entity).State = EntityState.Modified;
+                    await _dbContext.SaveChangesAsync();
+
+                    await SaveOTDetail(param);
+
                     return (StatusCodes.Status200OK, "Successfully updated");
-                }                    
+                }
             }
             catch (Exception ex)
             {
@@ -212,6 +272,71 @@ namespace DCI.Repositories
                 Log.CloseAndFlush();
             }
         }
+
+        private async Task SaveOTDetail(OvertimeViewModel model)
+        {
+            // Get all existing reviewers for the WorkflowId
+            var overtime = await _dbContext.OvertimeDetail
+                .Where(x => x.OTHeaderId == model.OTHeaderId)
+                .ToListAsync();
+
+            // Get the new UserIds from the model
+            var newApproverUserIds = model.otDetails.Select(r => r.OTDetailId).ToHashSet();
+
+            var apprverToAdd = new List<OvertimeDetail>();
+            var apprverToUpdate = new List<OvertimeDetail>();
+
+            foreach (var ot in model.otDetails)
+            {
+                var existingAppr = overtime.FirstOrDefault(x => x.OTDetailId == ot.OTDetailId);
+
+                if (existingAppr == null)
+                {
+
+                    apprverToAdd.Add(new OvertimeDetail
+                    {
+                        OTHeaderId = model.OTHeaderId,
+                        OTType = ot.OTType,
+                        OTDate = DateTime.Parse(ot.OTDate),
+                        OTTimeFrom = DateTime.Parse(ot.OTDate) + TimeSpan.Parse(ot.OTTimeFrom),
+                        OTTimeTo = DateTime.Parse(ot.OTDate) + TimeSpan.Parse(ot.OTTimeTo),
+                        // TotalMinutes = ot.TotalMinutes,                       
+                        IsActive = true
+                    });
+                }
+
+                else
+                {
+                    existingAppr.IsActive = true;
+                    _dbContext.OvertimeDetail.Update(existingAppr);
+                }
+            }
+
+            var approverToDeactivate = overtime
+                .Where(x => !newApproverUserIds.Contains(x.OTDetailId) && x.IsActive)
+                .ToList();
+
+            foreach (var apprver in approverToDeactivate)
+            {
+                apprver.IsActive = false;
+                apprverToUpdate.Add(apprver);
+            }
+
+            // Batch insert for new reviewers
+            if (apprverToAdd.Any())
+            {
+                await _dbContext.OvertimeDetail.AddRangeAsync(apprverToAdd);
+            }
+
+            // Save changes for both new and updated records
+            if (apprverToAdd.Any() || apprverToUpdate.Any())
+            {
+                await _dbContext.SaveChangesAsync();
+            }
+        }
+
+
+
         private async Task<string> GenereteRequestNo()
         {
 
@@ -219,10 +344,15 @@ namespace DCI.Repositories
             {
                 int _currentYear = DateTime.Now.Year;
                 int _currentMonth = DateTime.Now.Month;
-                var _dtr = await _dbContext.DTRCorrection
-                                                .Where(x => x.IsActive == true && x.DateFiled.Date.Year == _currentYear && x.DateFiled.Date.Month == _currentMonth)
-                                                .AsQueryable()
-                                                .ToListAsync();
+
+                var startDate = new DateTime(_currentYear, _currentMonth, 1);
+                var endDate = startDate.AddMonths(1);
+
+                var _dtr = await _dbContext.OvertimeHeader
+                    .Where(x => x.IsActive == true
+                        && x.DateCreated >= startDate
+                        && x.DateCreated < endDate)
+                    .ToListAsync();
 
 
                 int totalrecords = _dtr.Count() + 1;
