@@ -57,7 +57,10 @@ namespace DCI.Repositories
                              TOTAL_HOURS = dtr.TOTAL_HOURS,
                              TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS,
                              DATESTRING = dtr.DATE.ToString("MM/dd/yyyy")
-                         }).FirstOrDefault();
+                         }).FirstOrDefault() ?? new DailyTimeRecordViewModel();
+
+            query.IsHoliday = _dbContext.Holiday.Any(x => x.HolidayDate == model.OTDate);
+
             return query;
         }
 

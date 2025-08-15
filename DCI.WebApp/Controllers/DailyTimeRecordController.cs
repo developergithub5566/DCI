@@ -675,7 +675,7 @@ namespace DCI.WebApp.Controllers
                         TimeSpan clockout = new TimeSpan();
 
 
-                        if (dtrmodel != null)
+                        if (dtrmodel != null && dtrmodel.ID > 0)
                         {
                             firstin = TimeSpan.Parse(dtrmodel.FIRST_IN);
                             lastout = TimeSpan.Parse(dtrmodel.LAST_OUT);
@@ -689,7 +689,7 @@ namespace DCI.WebApp.Controllers
                         }
 
                         /* FILTER */
-                        bool isHoliday = false;
+                        bool isHoliday = dtrmodel.IsHoliday;
                         bool isRestDay = param.OTDate.DayOfWeek == DayOfWeek.Saturday || param.OTDate.DayOfWeek == DayOfWeek.Sunday;
                         // bool isRestDay = dtrmodel.DATE.DayOfWeek == DayOfWeek.Saturday || dtrmodel.DATE.DayOfWeek == DayOfWeek.Sunday;
 

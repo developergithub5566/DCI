@@ -22,6 +22,8 @@
         public string TOTAL_UNDERTIME { get; set; } = string.Empty;
         public DateTime DateFrom { get; set; } = DateTime.Now;
         public DateTime DateTo { get; set; } = DateTime.Now;
+
+        public bool IsHoliday { get; set; } = false;
     }
     public class DTRCorrectionViewModel
     {
