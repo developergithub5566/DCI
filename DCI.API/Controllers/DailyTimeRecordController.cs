@@ -99,10 +99,10 @@ namespace DCI.API.Controllers
         }
 
         [HttpPost]
-        [Route("GetAllWFHById")]
-        public async Task<IActionResult> GetAllWFHById([FromBody] WFHViewModel model)
+        [Route("GetAllWFH")]
+        public async Task<IActionResult> GetAllWFH([FromBody] WFHViewModel model)
         {
-            return Ok(await _dtrRepository.GetAllWFHById(model));
+            return Ok(await _dtrRepository.GetAllWFH(model));
         }
 
         [HttpPost]

@@ -47,7 +47,7 @@ namespace DCI.Repositories
                              TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS
                          }).ToListAsync();
 
-            if((int)EnumTypeData.EMP == model.TypeId)
+            if((int)EnumEmployeeScope.PerEmployee == model.ScopeTypeEmp)
             {
                 //var emp = _dbContext.Employee.Where(x => x.EmployeeId == model.CurrentUserId).FirstOrDefault();
                 //if(emp != null) 
@@ -109,7 +109,7 @@ namespace DCI.Repositories
                          }).ToList();
 
 
-            if ((int)EnumTypeData.EMP == model.TypeId)
+            if ((int)EnumEmployeeScope.PerEmployee == model.ScopeTypeEmp)
             {           
                     query = query.Where(x => x.CreatedBy == model.CreatedBy).ToList();
             }
@@ -359,24 +359,63 @@ namespace DCI.Repositories
             return query;
         }
 
-        public async Task<IList<WFHViewModel>> GetAllWFHById(WFHViewModel model)
+        public async Task<IList<WFHViewModel>> GetAllWFH(WFHViewModel model)
         {
-           // var context = _dbContext.tbl_wfh_logs.AsQueryable();
-
             var query = (from dtr in _dbContext.tbl_wfh_logs
-
                          select new WFHViewModel
                          {
                              ID = dtr.ID,
                              EMPLOYEE_NO = dtr.EMPLOYEE_ID,
                              FULL_NAME = dtr.FULL_NAME,
-                             DATE_TIME = dtr.DATE_TIME                        
-                           
+                             DATE_TIME = dtr.DATE_TIME
+
                          }).ToList();
-
-
+            if ((int)EnumEmployeeScope.PerEmployee == model.ScopeTypeEmp)
+            {
+                //var usr = _dbContext.User.Where(x => x.UserId == model.CurrentUserId).FirstOrDefault();
+                var emp = _dbContext.Employee.Where(x => x.EmployeeId == model.EMPLOYEE_ID).FirstOrDefault();
+                if (emp != null)
+                    query = query.Where(x => x.EMPLOYEE_NO == emp.EmployeeNo).ToList();
+            }
             return query;
         }
+
+        //public async Task<IList<WFHViewModel>> GetAllWFHByEmpId(WFHViewModel model)
+        //{
+        //    var context = _dbContext.vw_AttendanceSummary_WFH.AsQueryable();
+
+
+        //    var query = await (from dtr in context
+
+        //                       orderby dtr.DATE descending, dtr.NAME descending
+        //                       select new DailyTimeRecordViewModel
+        //                       {
+        //                           ID = dtr.ID,
+        //                           EMPLOYEE_NO = dtr.EMPLOYEE_NO,
+        //                           NAME = dtr.NAME,
+        //                           DATE = dtr.DATE,
+        //                           FIRST_IN = dtr.FIRST_IN,
+        //                           LAST_OUT = dtr.LAST_OUT,
+        //                           LATE = dtr.LATE,
+        //                           CLOCK_OUT = dtr.CLOCK_OUT,
+        //                           UNDER_TIME = dtr.UNDER_TIME,
+        //                           OVERTIME = dtr.OVERTIME,
+        //                           TOTAL_HOURS = dtr.TOTAL_HOURS,
+        //                           TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS
+        //                       }).ToListAsync();
+
+        //    if ((int)EnumTypeData.EMP == model.TypeId)
+        //    {       
+        //        //var usr = _dbContext.User.Where(x => x.UserId == model.CurrentUserId).FirstOrDefault();
+        //        var emp = _dbContext.Employee.Where(x => x.EmployeeId == model.em).FirstOrDefault();
+        //        if (emp != null)
+        //            query = query.Where(x => x.EMPLOYEE_NO == emp.EmployeeNo).ToList();
+        //    }
+
+        //    return query;
+        //}
+
+
 
         public async Task<(int statuscode, string message)> SaveWFHTimeIn(WFHViewModel model)
         {
@@ -384,7 +423,7 @@ namespace DCI.Repositories
             var empdtl = _dbContext.Employee.Where(x => x.EmployeeId == model.EMPLOYEE_ID).FirstOrDefault();
 
             model.EMPLOYEE_NO = empdtl.EmployeeNo ?? string.Empty;
-            model.FULL_NAME = empdtl.Firstname + empdtl.Lastname;
+            model.FULL_NAME = empdtl.Firstname + " " + empdtl.Lastname;
             model.CREATED_BY = "SYSAD";
 
             tbl_wfh_logs entity = new tbl_wfh_logs();
@@ -399,8 +438,8 @@ namespace DCI.Repositories
             return (StatusCodes.Status200OK, "Successfully saved");
         }
 
- 
+   
 
-    
+
     }
 }

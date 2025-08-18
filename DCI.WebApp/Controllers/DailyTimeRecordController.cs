@@ -40,7 +40,7 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
-                    param.TypeId = id;
+                    param.ScopeTypeEmp = id;
 
                     param.CurrentUserId = currentUser.UserId;
 
@@ -56,7 +56,7 @@ namespace DCI.WebApp.Controllers
                     }
                     ViewBag.BreadCrumbLabelA = "DTR Management";
                     ViewBag.BreadCrumbLabelB = "Attendance Summary";
-                    if ((int)EnumTypeData.EMP == param.TypeId)
+                    if ((int)EnumEmployeeScope.PerEmployee == param.ScopeTypeEmp)
                     {
                         ViewBag.BreadCrumbLabelA = "Daily Time Record";
                         ViewBag.BreadCrumbLabelB = "Attendance";
@@ -248,7 +248,7 @@ namespace DCI.WebApp.Controllers
                     var currentUser = _userSessionHelper.GetCurrentUser();
 
                     model.CreatedBy = 2;//currentUser.UserId;
-                    model.TypeId = id;
+                    model.ScopeTypeEmp = id;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllDTRCorrection");
@@ -262,7 +262,7 @@ namespace DCI.WebApp.Controllers
 
                     }
                     ViewBag.BreadCrumbLabel = "DTR Correction Summary";
-                    if ((int)EnumTypeData.EMP == model.TypeId)
+                    if ((int)EnumEmployeeScope.PerEmployee == model.ScopeTypeEmp)
                     {
                         ViewBag.BreadCrumbLabel = "DTR Correction";
                     }
@@ -380,7 +380,7 @@ namespace DCI.WebApp.Controllers
                         model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
                     }
 
-                    if ((int)EnumTypeData.EMP == param.TypeId)
+                    if ((int)EnumEmployeeScope.PerEmployee == param.ScopeTypeEmp)
                     {
 
                     }
@@ -454,11 +454,11 @@ namespace DCI.WebApp.Controllers
                     var currentUser = _userSessionHelper.GetCurrentUser();
 
 
-                    param.CurrentUserId = currentUser.UserId;
+                    param.EMPLOYEE_ID = currentUser.EmployeeId;
 
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
-                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllWFHById");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllWFH");
                     request.Content = stringContent;
                     var response = await _httpclient.SendAsync(request);
                     var responseBody = await response.Content.ReadAsStringAsync();

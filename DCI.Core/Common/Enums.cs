@@ -146,10 +146,10 @@ namespace DCI.Core.Common
         SLMon = 10
     }
 
-    public enum EnumTypeData
+    public enum EnumEmployeeScope
     {
         ALL = 0,
-        EMP = 1,
+        PerEmployee = 1,
     }
 
     public enum EnumOvertime

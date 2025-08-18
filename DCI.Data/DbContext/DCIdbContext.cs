@@ -28,6 +28,7 @@ namespace DCI.Data
         public DbSet<EmployeeStatus> EmployeeStatus { get; set; }
         public DbSet<Status> Status { get; set; }
         public DbSet<vw_AttendanceSummary> vw_AttendanceSummary { get; set; }
+        public DbSet<vw_AttendanceSummary_WFH> vw_AttendanceSummary_WFH { get; set; }
         public DbSet<ApprovalHistory> ApprovalHistory { get; set; }
         public DbSet<LeaveInfo> LeaveInfo { get; set; }
         public DbSet<LeaveType> LeaveType { get; set; }

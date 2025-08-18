@@ -84,13 +84,19 @@
                     <thead>
                         <tr>
                             <th>
+                                <label>Date</label>
+                            </th>
+                            <th>
+                                <label>Time In</label>
+                            </th>
+                            <th>
                                 <label>Employee No.</label>
                             </th>
                             <th>
                                 <label>Name</label>
                             </th>
                             <th>
-                                <label>Date</label>
+                                <label>Source</label>
                             </th>
                         
                             <th>
@@ -102,19 +108,22 @@
                         @foreach (var item in Model)
                         {
                             <tr>
-
+                                <td>
+                                    @item.DATE_TIME.ToShortDateString()
+                                </td>
+                                <td>
+                                    @item.DATE_TIME.ToShortTimeString()
+                                </td>
                                 <td>
                                     @item.EMPLOYEE_NO
                                 </td>
                                 <td>
                                     @item.FULL_NAME
                                 </td>
-                                <td>
-                                    @item.DATE_TIME.ToShortDateString()
-                                </td>
-                              
-                              
-                         
+                                <td class="text-center"><span class='btnSuccess applicationStatus'>Remote</span></td>
+
+
+
                                 <td class="text-center">
                                     <a href="#" onclick="editForm(@item.ID)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
                                 </td>
