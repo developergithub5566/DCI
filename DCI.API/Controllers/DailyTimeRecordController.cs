@@ -100,7 +100,7 @@ namespace DCI.API.Controllers
 
         [HttpPost]
         [Route("GetAllWFH")]
-        public async Task<IActionResult> GetAllWFH([FromBody] WFHViewModel model)
+        public async Task<IActionResult> GetAllWFH([FromBody] DailyTimeRecordViewModel model)
         {
             return Ok(await _dtrRepository.GetAllWFH(model));
         }

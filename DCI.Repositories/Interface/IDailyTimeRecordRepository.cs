@@ -12,7 +12,7 @@ namespace DCI.Repositories.Interface
         Task<IList<DailyTimeRecordViewModel>> GetAllUndertime(DailyTimeRecordViewModel model);
         Task<IList<DailyTimeRecordViewModel>> GetUndertimeById(DailyTimeRecordViewModel model);
         //Task<IList<WFHViewModel>> GetAllWFHById(WFHViewModel model);
-        Task<IList<WFHViewModel>> GetAllWFH(WFHViewModel model);
+        Task<IList<DailyTimeRecordViewModel>> GetAllWFH(DailyTimeRecordViewModel model);
         Task<(int statuscode, string message)> SaveWFHTimeIn(WFHViewModel model);
 
     }

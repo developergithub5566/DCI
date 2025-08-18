@@ -1,4 +1,4 @@
-﻿@model IEnumerable<DCI.Models.ViewModel.WFHViewModel>
+﻿@model IEnumerable<DCI.Models.ViewModel.DailyTimeRecordViewModel>
 @using Newtonsoft.Json;
 @using DCI.Core.Common;
 @using DCI.Models.ViewModel;
@@ -57,7 +57,11 @@
     </div>
     <div class="d-sm-flex align-items-center justify-content-between mb-3">
         <h6 class="m-0 font-weight-bold text-gray-800">@ViewBag.BreadCrumbLabel</h6>
-               <div class="upperRightDivBtn">
+        <div class="upperRightDivBtn">
+            <a href="#" title="Add Overtime" class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")" data-toggle="modal" data-target="#" onclick="filewfhmodal()" id="AddOvertime">
+                <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
+                <span class="text text-white"><small>File WFH</small></span>
+            </a>
             <a href="#" class="btn btnSuccess btn-icon-split" data-toggle="modal" data-target="#createmodal">
                 <span class="icon text-white"><i class="fa-regular fa-clock text-xs"></i></span>
                 <span class="text"><small>Time Clock</small></span>
@@ -84,21 +88,30 @@
                     <thead>
                         <tr>
                             <th>
-                                <label>Date</label>
-                            </th>
-                            <th>
-                                <label>Time In</label>
-                            </th>
-                            <th>
                                 <label>Employee No.</label>
                             </th>
                             <th>
                                 <label>Name</label>
                             </th>
                             <th>
+                                <label>Date</label>
+                            </th>
+                            <th>
+                                <label>Time In</label>
+                            </th>
+                            <th>
+                                <label>Time Out</label>
+                            </th>
+                            <th>
+                                <label>Total Working Hours</label>
+                            </th>
+
+                            <th>
                                 <label>Source</label>
                             </th>
-                        
+                            <th>
+                                <label>Status</label>
+                            </th>
                             <th>
                                 Action
                             </th>
@@ -108,35 +121,60 @@
                         @foreach (var item in Model)
                         {
                             <tr>
-                                <td>
-                                    @item.DATE_TIME.ToShortDateString()
-                                </td>
-                                <td>
-                                    @item.DATE_TIME.ToShortTimeString()
-                                </td>
+
                                 <td>
                                     @item.EMPLOYEE_NO
                                 </td>
                                 <td>
-                                    @item.FULL_NAME
+                                    @item.NAME
                                 </td>
-                                <td class="text-center"><span class='btnSuccess applicationStatus'>Remote</span></td>
+                                <td>
+                                    @item.DATE.ToShortDateString()
+                                </td>
+                                <td>
+                                    @item.FIRST_IN
+                                </td>
+                                <td>
+                                    @item.LAST_OUT
+                                </td>
+                                <td>
+                                    @item.TOTAL_WORKING_HOURS
+                                </td>
 
-
-
+                                <td>
+                                    <span class="btnSuccess applicationStatus">REMOTE</span>
+                                </td>
+                                <td>
+                                    @item.STATUSNAME
+                                </td>
                                 <td class="text-center">
-                                    <a href="#" onclick="editForm(@item.ID)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+                                    <a href="#" onclick='newForm({
+                                                                date:"@item.DATE.ToString("MM/dd/yyyy")",
+                                                                emp:"@item.EMPLOYEE_NO",
+                                                                name :"@item.NAME" ,
+                                                                    source : "REMOTE",
+                                                                timein : "@item.FIRST_IN",
+                                                                timeout : "@item.LAST_OUT",
+                                                                clockout : "@item.CLOCK_OUT",
+                                                                Late : "@item.LATE",
+                                                                UnderTime : "@item.UNDER_TIME",
+                                                                OT : "@item.OVERTIME",
+                                                                Hours : "@item.TOTAL_HOURS",
+                                                                WorkingHours : "@item.TOTAL_WORKING_HOURS"
+                                                                    })' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+
+                                    <a href="#" title="logs" class="btn btn-secondary"><i class="fas fa-history"></i></a>
                                 </td>
                             </tr>
                         }
                     </tbody>
                 </table>
             </div>
-</<div>
-</div>
+            </<div>
+            </div>
 
 
-            <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
                 <div class="modal-dialog modal-sm">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -147,49 +185,239 @@
                         </div>
                         <div class="modal-body">
                             <div class="divTimeClock">
-                            <i class="fa-regular fa-clock"></i>
-                            <label>@DateTime.Now.ToLongDateString()</label>
-                         @*    <div id="clock"> *@
+                                <i class="fa-regular fa-clock"></i>
+                                <label>@DateTime.Now.ToLongDateString()</label>
+                                @*    <div id="clock"> *@
 
                                 <div id="clock" style="display: flex; align-items: center;">
-                                        <h2 id="h">12</h2>
-                                        <h2>:</h2>
-                                        <h2 id="m">20</h2>
-                                        <h2>:</h2>
-                                        <h2 id="s">00</h2>
-                                        <h2 id="ap">AM</h2>
-                                    </div>
-                                   @*  <div class="clock"> <div class="bg"> <h2 id="h">12</h2> </div> <h2>:</h2> <div class="bg"> <h2 id="m">20</h2> </div> <h2>:</h2> <div class="bg"> <h2 id="s">00</h2> </div> <div class="bg"> <h2 id="ap">AM</h2> </div> </div> *@
+                                    <h2 id="h">12</h2>
+                                    <h2>:</h2>
+                                    <h2 id="m">20</h2>
+                                    <h2>:</h2>
+                                    <h2 id="s">00</h2>
+                                    <h2 id="ap">AM</h2>
+                                </div>
+                                @*  <div class="clock"> <div class="bg"> <h2 id="h">12</h2> </div> <h2>:</h2> <div class="bg"> <h2 id="m">20</h2> </div> <h2>:</h2> <div class="bg"> <h2 id="s">00</h2> </div> <div class="bg"> <h2 id="ap">AM</h2> </div> </div> *@
                             </div>
-                      
-                        <form id="createForm">
-                           	<div class="input-group mb-3">
-						        <div class="input-group-prepend">
-							        <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
-						        </div>
-						        <input type="password" name="Password" id="Password" class="form-control frmField" placeholder="Password">
-                                
-					        </div>
 
-                                <button  class="btn btn-primary d-block w-100 mb-2" onclick="submitTimeClock()"><small>Submit</small></button>
-                            <button type="button" class="btn btn-secondary d-block w-100" data-dismiss="modal"><small>Close</small></button>
-                        </form>
-                        </div>
+                            <form id="createForm">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
+                                    </div>
+                                    <input type="password" name="Password" id="Password" class="form-control frmField" placeholder="Password">
+
+                                </div>
+
+                                <button class="btn btn-primary d-block w-100 mb-2" onclick="submitTimeClock()"><small>Submit</small></button>
+                                <button type="button" class="btn btn-secondary d-block w-100" data-dismiss="modal"><small>Close</small></button>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
 
+
+            <div class="modal fade" id="detailsmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Daily Time Record</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="createForm">
+                            <div class="modal-body">
+                                <table class="viewDetailsTbl table table-striped">
+                                    <tbody>
+                                        <tr>
+                                            <th>Date:</th>
+                                            <th class="tblDate">  <label id="lblDate"></label>  </th>
+                                        </tr>
+                                        <tr>
+                                            <th>Employee No.:</th>
+                                            <th class="tblEmNo">  <label id="lblEmpNo"></label></th>
+                                        </tr>
+                                        <tr>
+                                            <th>Name:</th>
+                                            <th class="tblName"> <label id="lblName"></label> </th>
+                                        </tr>
+                                        <tr>
+                                            <th>DTR Source:</th>
+                                            <td class="tblSource"><span class="btnSuccess applicationStatus"><label id="lblSource"></label></span></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Time In:</th>
+                                            <th class="tblTimeIn"><label id="lblTimeIn"></label></th>
+                                        </tr>
+                                        <tr>
+                                            <th>Time Out:</th>
+                                            <th class="tblTimeOut"><label id="lblTimeOut"></label></th>
+                                        </tr>
+                                        <tr>
+                                            <th>Clock Out:</th>
+                                            <td class="tblClockOut"><label id="lblClockOut"></label></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Late:</th>
+                                            <td class="tblLate"><label id="lblLate"></label></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Under Time:</th>
+                                            <td class="tblUnderTime"><label id="lblUnderTime"></label></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Overtime:</th>
+                                            <td class="tblOT"><label id="lblOT"></label></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total Hours:</th>
+                                            <td class="tblHours"><label id="lblHours"></label></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total Working Hours:</th>
+                                            <th class="tblWorkingHours"><label id="lblWorkingHours"></label></th>
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><small>Close</small></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            <div class="modal fade" id="filewfhmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">File WFH</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="wfhInfo">
+                            <div class="modal-body">
+
+                                <table class="viewDetailsTbl table table-striped">
+                                    <tbody>
+                                        <tr>
+                                            <th>Request No:</th>
+                                            <th class="tblDate">  <label id="lblDate"></label>  </th>
+                                        </tr>
+                                        <tr>
+                                            <th>Approver :</th>
+                                            <th class="tblEmNo">  <label id="lblEmpNo"></label></th>
+                                        </tr>
+                                @*         <tr>
+                                            <th>Name:</th>
+                                            <th class="tblName"> <label id="lblName"></label> </th>
+                                        </tr> *@
+                                        <tr>
+                                            <th>Status:</th>
+                                            <td class="tblSource"><span class="btnSuccess applicationStatus"><label id="lblSource">Draft</label></span></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Remarks:</th>
+                                            <th class="tblName"> <textarea id="remarks" rows="3"></textarea></th>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
+
+                                <table class="table table-bordered text-dark text-xs" id="tblDTR">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <input type="checkbox" id="selectAll" />
+                                            </th>
+                                            <th>
+                                                <label>Date</label>
+                                            </th>
+                                            <th>
+                                                <label>Time In</label>
+                                            </th>
+                                            <th>
+                                                <label>Time Out</label>
+                                            </th>
+                                            <th>
+                                                <label>Total Working Hours</label>
+                                            </th>
+
+                                            <th>
+                                                <label>Source</label>
+                                            </th>
+                                            <th>
+                                                <label>Status</label>
+                                            </th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.Where(x => x.STATUS == 1) )
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox" class="row-checkbox" />
+                                                </td>
+                                                <td>
+                                                    @item.DATE.ToShortDateString()
+                                                </td>
+                                                <td>
+                                                    @item.FIRST_IN
+                                                </td>
+                                                <td>
+                                                    @item.LAST_OUT
+                                                </td>
+                                                <td>
+                                                    @item.TOTAL_WORKING_HOURS
+                                                </td>
+
+                                                <td>
+                                                    <span class="btnSuccess applicationStatus">REMOTE</span>
+                                                </td>
+                                                <td>
+                                                    @item.STATUSNAME
+                                                </td>
+
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary"><small>Submit</small></button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><small>Close</small></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+
+
 @section scripts {
 
-                <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
-                <script src="~/js/dci-validation.js"></script>
+            <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
+            <script src="~/js/dci-validation.js"></script>
 
-     @*            <link href='https://192.168.1.100/DCI-ESS-STG/CSS/TEMPLATE/THEME/bootstrap-datepicker.standalone.min.css' rel='stylesheet'>
+    @*            <link href='https://192.168.1.100/DCI-ESS-STG/CSS/TEMPLATE/THEME/bootstrap-datepicker.standalone.min.css' rel='stylesheet'>
                 <script src='https://192.168.1.100/DCI-ESS-STG/JS/TEMPLATE/THEME/bootstrap-datepicker.min.js'></script> *@
-    
 
-                <script type="text/javascript">
+
+            <script type="text/javascript">
                         var js = jQuery.noConflict(true);
 
                                 $('.spinner-overlay').show();
@@ -205,6 +433,10 @@
                             });
                             realTime();
 
+
+                                 $('#selectAll').on('click', function () {
+                                      $('.row-checkbox').prop('checked', this.checked);
+                                 });
                         });
 
 
@@ -222,7 +454,7 @@
                                 document.getElementById('lblOT').textContent = dtr.OT;
                                 document.getElementById('lblHours').textContent = dtr.Hours;
                                 document.getElementById('lblWorkingHours').textContent = dtr.WorkingHours;
-                                js('#createmodal').modal('show');
+                                js('#detailsmodal').modal('show');
                         }
 
 
@@ -289,5 +521,11 @@
                                               }
                                           });
                 }
-                </script>
+
+
+                   function filewfhmodal() {
+
+                                js('#filewfhmodal').modal('show');
+                        }
+            </script>
 }

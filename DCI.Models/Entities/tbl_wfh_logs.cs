@@ -10,5 +10,6 @@ namespace DCI.Models.Entities
         public DateTime DATE_TIME { get; set; }
         public DateTime CREATED_DATE {  get; set; }
         public string CREATED_BY { get; set; }
+        public int STATUS { get; set; }
     }
 }

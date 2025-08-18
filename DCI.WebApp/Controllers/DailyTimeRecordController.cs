@@ -444,16 +444,16 @@ namespace DCI.WebApp.Controllers
             }
         }
 
-        public async Task<IActionResult> WFH(WFHViewModel param)
+        public async Task<IActionResult> WFH(DailyTimeRecordViewModel param)
         {
-            List<WFHViewModel> model = new List<WFHViewModel>();
+            List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();
             try
             {
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
 
-
+                    param.ScopeTypeEmp = (int)EnumEmployeeScope.PerEmployee;
                     param.EMPLOYEE_ID = currentUser.EmployeeId;
 
 
@@ -464,7 +464,7 @@ namespace DCI.WebApp.Controllers
                     var responseBody = await response.Content.ReadAsStringAsync();
                     if (response.IsSuccessStatusCode == true)
                     {
-                        model = JsonConvert.DeserializeObject<List<WFHViewModel>>(responseBody)!;
+                        model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
                     }
 
                 }

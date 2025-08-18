@@ -359,17 +359,53 @@ namespace DCI.Repositories
             return query;
         }
 
-        public async Task<IList<WFHViewModel>> GetAllWFH(WFHViewModel model)
-        {
-            var query = (from dtr in _dbContext.tbl_wfh_logs
-                         select new WFHViewModel
-                         {
-                             ID = dtr.ID,
-                             EMPLOYEE_NO = dtr.EMPLOYEE_ID,
-                             FULL_NAME = dtr.FULL_NAME,
-                             DATE_TIME = dtr.DATE_TIME
+        //public async Task<IList<WFHViewModel>> GetAllWFH(WFHViewModel model)
+        //{
+        //    var query = (from dtr in _dbContext.tbl_wfh_logs
+        //                 select new WFHViewModel
+        //                 {
+        //                     ID = dtr.ID,
+        //                     EMPLOYEE_NO = dtr.EMPLOYEE_ID,
+        //                     FULL_NAME = dtr.FULL_NAME,
+        //                     DATE_TIME = dtr.DATE_TIME
 
-                         }).ToList();
+        //                 }).ToList();
+        //    if ((int)EnumEmployeeScope.PerEmployee == model.ScopeTypeEmp)
+        //    {
+        //        //var usr = _dbContext.User.Where(x => x.UserId == model.CurrentUserId).FirstOrDefault();
+        //        var emp = _dbContext.Employee.Where(x => x.EmployeeId == model.EMPLOYEE_ID).FirstOrDefault();
+        //        if (emp != null)
+        //            query = query.Where(x => x.EMPLOYEE_NO == emp.EmployeeNo).ToList();
+        //    }
+        //    return query;
+        //}
+
+        public async Task<IList<DailyTimeRecordViewModel>> GetAllWFH(DailyTimeRecordViewModel model)
+        {
+            var context = _dbContext.vw_AttendanceSummary_WFH.AsQueryable();
+
+
+            var query = await (from dtr in context
+                               join stat in _dbContext.Status on dtr.STATUS equals stat.StatusId
+                               orderby dtr.DATE descending, dtr.NAME descending
+                               select new DailyTimeRecordViewModel
+                               {
+                                   ID = dtr.ID,
+                                   EMPLOYEE_NO = dtr.EMPLOYEE_NO,
+                                   NAME = dtr.NAME,
+                                   DATE = dtr.DATE,
+                                   FIRST_IN = dtr.FIRST_IN,
+                                   LAST_OUT = dtr.LAST_OUT,
+                                   LATE = dtr.LATE,
+                                   CLOCK_OUT = dtr.CLOCK_OUT,
+                                   UNDER_TIME = dtr.UNDER_TIME,
+                                   OVERTIME = dtr.OVERTIME,
+                                   TOTAL_HOURS = dtr.TOTAL_HOURS,
+                                   TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS,
+                                   STATUS = dtr.STATUS,
+                                   STATUSNAME = stat.StatusName
+                               }).ToListAsync();
+
             if ((int)EnumEmployeeScope.PerEmployee == model.ScopeTypeEmp)
             {
                 //var usr = _dbContext.User.Where(x => x.UserId == model.CurrentUserId).FirstOrDefault();
@@ -377,43 +413,9 @@ namespace DCI.Repositories
                 if (emp != null)
                     query = query.Where(x => x.EMPLOYEE_NO == emp.EmployeeNo).ToList();
             }
+
             return query;
         }
-
-        //public async Task<IList<WFHViewModel>> GetAllWFHByEmpId(WFHViewModel model)
-        //{
-        //    var context = _dbContext.vw_AttendanceSummary_WFH.AsQueryable();
-
-
-        //    var query = await (from dtr in context
-
-        //                       orderby dtr.DATE descending, dtr.NAME descending
-        //                       select new DailyTimeRecordViewModel
-        //                       {
-        //                           ID = dtr.ID,
-        //                           EMPLOYEE_NO = dtr.EMPLOYEE_NO,
-        //                           NAME = dtr.NAME,
-        //                           DATE = dtr.DATE,
-        //                           FIRST_IN = dtr.FIRST_IN,
-        //                           LAST_OUT = dtr.LAST_OUT,
-        //                           LATE = dtr.LATE,
-        //                           CLOCK_OUT = dtr.CLOCK_OUT,
-        //                           UNDER_TIME = dtr.UNDER_TIME,
-        //                           OVERTIME = dtr.OVERTIME,
-        //                           TOTAL_HOURS = dtr.TOTAL_HOURS,
-        //                           TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS
-        //                       }).ToListAsync();
-
-        //    if ((int)EnumTypeData.EMP == model.TypeId)
-        //    {       
-        //        //var usr = _dbContext.User.Where(x => x.UserId == model.CurrentUserId).FirstOrDefault();
-        //        var emp = _dbContext.Employee.Where(x => x.EmployeeId == model.em).FirstOrDefault();
-        //        if (emp != null)
-        //            query = query.Where(x => x.EMPLOYEE_NO == emp.EmployeeNo).ToList();
-        //    }
-
-        //    return query;
-        //}
 
 
 

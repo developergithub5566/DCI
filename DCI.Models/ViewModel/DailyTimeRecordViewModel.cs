@@ -14,6 +14,9 @@
         public string OVERTIME { get; set; } = string.Empty;
         public string TOTAL_HOURS { get; set; } = string.Empty;
         public string TOTAL_WORKING_HOURS { get; set; } = string.Empty;
+        public int STATUS { get; set; } = 0;
+        public string STATUSNAME { get; set; } = string.Empty;
+
         public int ScopeTypeEmp { get; set; } = 0;
         public int CurrentUserId { get; set; } = 0;
 
