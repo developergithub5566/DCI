@@ -43,6 +43,8 @@ namespace DCI.Data
         public DbSet<OvertimeHeader> OvertimeHeader { get; set; }
         public DbSet<OvertimeDetail> OvertimeDetail { get; set; }
         public DbSet<Holiday> Holiday { get; set; }
+        public DbSet<WfhHeader> WfhHeader { get; set; }
+        public DbSet<WfhDetail> WfhDetail { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
