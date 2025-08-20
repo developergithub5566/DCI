@@ -309,6 +309,7 @@
                                 <table class="viewDetailsTbl table table-striped">
                                     <tbody>
                                         <tr>
+                                            <input type="hidden" id="WfhHeaderId" name="WfhHeaderId" value="" />
                                             <th>Request No:</th>
                                             <th class="tblDate">  <label id="lblDate"></label>  </th>
                                         </tr>
@@ -394,7 +395,7 @@
                                 </table>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-primary"><small>Submit</small></button>
+                                <button class="btn btn-primary" onclick="submitWFHApplication()"><small>Submit</small></button>
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal"><small>Close</small></button>
                             </div>
                         </form>
@@ -526,6 +527,37 @@
                    function filewfhmodal() {
 
                                 js('#filewfhmodal').modal('show');
+                        }
+
+
+                        function submitWFHApplication(){
+                                let data = {}; 
+                             
+                                let mainModulesChecked = document.querySelectorAll('input[name="mainModule[]"]:checked');
+
+                                let headerId = document.getElementById("WfhHeaderId").value;
+                                let roleName = document.getElementById("RoleName").value;
+                                let description = document.getElementById("Description").value;
+
+                                          mainModulesChecked.forEach((checkbox) => {
+                                                let moduleId = checkbox.value; // Main module ID
+                                                let subModulesChecked = document.querySelectorAll('input[name="subModule' + moduleId + '[]"]:checked');
+
+                                                // Collect checked submodules
+                                                let subModuleValues = [];
+                                                subModulesChecked.forEach((subCheckbox) => {
+                                                    subModuleValues.push(subCheckbox.value);
+                                                });
+
+                                                // Add main module and its submodules to the data object
+                                                data[moduleId] = {
+                                                    "roleId": roleId,
+                                                    "roleName": roleName,
+                                                    "description": description,
+                                                    "mainModule": moduleId,
+                                                    "subModules": subModuleValues
+                                                };
+                                        });
                         }
             </script>
 }
