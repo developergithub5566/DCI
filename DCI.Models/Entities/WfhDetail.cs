@@ -6,7 +6,9 @@ namespace DCI.Models.Entities
     {
         public int WfhDetailId { get; set; }
         public int WfhHeaderId { get; set; }
-        public DateTime WFHDate { get; set; }
+        public int AttendanceId { get; set; }
+        
+        //public DateTime WFHDate { get; set; }
         public bool IsActive { get; set; }
 
         // Optional navigation property if using EF

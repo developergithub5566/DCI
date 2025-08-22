@@ -15,12 +15,15 @@ namespace DCI.API.Controllers
         IDailyTimeRecordRepository _dtrRepository;
         ILeaveRepository _leaveRepository;
         IOvertimeRepository _overtimeRepository;
+        IWfhRepository _wfhRepository;
 
-        public DailyTimeRecordController(IDailyTimeRecordRepository dtrRepository, ILeaveRepository leaveRepository, IOvertimeRepository overtimeRepository)
+        public DailyTimeRecordController(IDailyTimeRecordRepository dtrRepository, ILeaveRepository leaveRepository,
+            IOvertimeRepository overtimeRepository, IWfhRepository wfhRepository)
         {
             _dtrRepository = dtrRepository;
             _leaveRepository = leaveRepository;
             _overtimeRepository = overtimeRepository;
+            _wfhRepository = wfhRepository;
         }
 
         [HttpPost]
@@ -102,16 +105,22 @@ namespace DCI.API.Controllers
         [Route("GetAllWFH")]
         public async Task<IActionResult> GetAllWFH([FromBody] DailyTimeRecordViewModel model)
         {
-            return Ok(await _dtrRepository.GetAllWFH(model));
+            return Ok(await _wfhRepository.GetAllWFH(model));
         }
 
         [HttpPost]
         [Route("SaveWFHTimeIn")]
         public async Task<IActionResult> SaveWFHTimeIn([FromBody] WFHViewModel model)
         {
-            return Ok(await _dtrRepository.SaveWFHTimeIn(model));
+            return Ok(await _wfhRepository.SaveWFHTimeIn(model));
         }
 
+        [HttpPost]
+        [Route("SaveWFHApplication")]
+        public async Task<IActionResult> SaveWFHApplication([FromBody] WfhApplicationViewModel param)
+        {
+            return Ok(await _wfhRepository.SaveWFHApplication(param));
+        }
 
         [HttpPost]
         [Route("Overtime")]
@@ -141,6 +150,9 @@ namespace DCI.API.Controllers
         {
             return Ok(await _overtimeRepository.SaveOvertime(param));
         }
+
+      
+
 
     }
 }

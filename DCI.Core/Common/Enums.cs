@@ -43,8 +43,10 @@ namespace DCI.Core.Common
         DailyTimeRecord = 17,
         Leave = 18,
         Overtime = 19,
-        Holiday = 20
+        Holiday = 20,
+        WFH = 21
     }
+
     public enum EnumRole
     {
         Admin = 1,

@@ -1,6 +1,11 @@
-﻿namespace DCI.Repositories.Interface
+﻿using DCI.Models.ViewModel;
+
+namespace DCI.Repositories.Interface
 {
     public interface IWfhRepository : IDisposable
     {
+        Task<IList<DailyTimeRecordViewModel>> GetAllWFH(DailyTimeRecordViewModel model);
+        Task<(int statuscode, string message)> SaveWFHTimeIn(WFHViewModel model);
+        Task<(int statuscode, string message)> SaveWFHApplication(WfhApplicationViewModel model);
     }
 }

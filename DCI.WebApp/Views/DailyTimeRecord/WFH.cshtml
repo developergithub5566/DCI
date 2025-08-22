@@ -309,7 +309,7 @@
                                 <table class="viewDetailsTbl table table-striped">
                                     <tbody>
                                         <tr>
-                                            <input type="hidden" id="WfhHeaderId" name="WfhHeaderId" value="" />
+                                            <input type="hidden" id="WfhHeaderId" name="WfhHeaderId" value="0" />
                                             <th>Request No:</th>
                                             <th class="tblDate">  <label id="lblDate"></label>  </th>
                                         </tr>
@@ -327,18 +327,21 @@
                                         </tr>
                                         <tr>
                                             <th>Remarks:</th>
-                                            <th class="tblName"> <textarea id="remarks" rows="3"></textarea></th>
+                                            <th class="tblName"> <textarea id="Remarks" name="Remarks" rows="3"></textarea></th>
                                         </tr>
                                     </tbody>
                                 </table>
 
 
 
-                                <table class="table table-bordered text-dark text-xs" id="tblDTR">
+                                <table class="table table-bordered text-dark text-xs" id="tblFileforWFH">
                                     <thead>
                                         <tr>
                                             <th>
                                                 <input type="checkbox" id="selectAll" />
+                                            </th>
+                                            <th>
+                                                <label>ID</label>
                                             </th>
                                             <th>
                                                 <label>Date</label>
@@ -365,9 +368,12 @@
                                     <tbody>
                                         @foreach (var item in Model.Where(x => x.STATUS == 1) )
                                         {
-                                            <tr>
+                                            <tr>                                                
                                                 <td>
                                                     <input type="checkbox" class="row-checkbox" />
+                                                </td>
+                                                <td>
+                                                    @item.ID
                                                 </td>
                                                 <td>
                                                     @item.DATE.ToShortDateString()
@@ -395,7 +401,7 @@
                                 </table>
                             </div>
                             <div class="modal-footer">
-                                <button class="btn btn-primary" onclick="submitWFHApplication()"><small>Submit</small></button>
+                                <button class="btn btn-primary" onclick="SubmitWFHApplication()"><small>Submit</small></button>
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal"><small>Close</small></button>
                             </div>
                         </form>
@@ -530,34 +536,77 @@
                         }
 
 
-                        function submitWFHApplication(){
-                                let data = {}; 
-                             
-                                let mainModulesChecked = document.querySelectorAll('input[name="mainModule[]"]:checked');
 
-                                let headerId = document.getElementById("WfhHeaderId").value;
-                                let roleName = document.getElementById("RoleName").value;
-                                let description = document.getElementById("Description").value;
+                                                        function SubmitWFHApplication() {
+                                                let header = {
+                                                    wfhHeaderId: document.getElementById("WfhHeaderId").value,
+                                                    remarks: document.getElementById("Remarks").value
+                                                   // ,requestNo: document.getElementById("RequestNo").value
+                                                };
+                                                debugger;
+                                                let details = [];
 
-                                          mainModulesChecked.forEach((checkbox) => {
-                                                let moduleId = checkbox.value; // Main module ID
-                                                let subModulesChecked = document.querySelectorAll('input[name="subModule' + moduleId + '[]"]:checked');
+                                                // get all checked rows
+                                                let checkedRows = document.querySelectorAll('#tblFileforWFH .row-checkbox:checked');
 
-                                                // Collect checked submodules
-                                                let subModuleValues = [];
-                                                subModulesChecked.forEach((subCheckbox) => {
-                                                    subModuleValues.push(subCheckbox.value);
+                                                checkedRows.forEach((checkbox) => {
+                                                    let row = checkbox.closest('tr');
+                                                    let cells = row.querySelectorAll('td');
+
+                                                    details.push({
+                                                        id: cells[1].innerText.trim(),
+                                                        date: cells[2].innerText.trim(),
+                                                        timeIn: cells[3].innerText.trim(),
+                                                        timeOut: cells[4].innerText.trim()
+                                                    });
                                                 });
 
-                                                // Add main module and its submodules to the data object
-                                                data[moduleId] = {
-                                                    "roleId": roleId,
-                                                    "roleName": roleName,
-                                                    "description": description,
-                                                    "mainModule": moduleId,
-                                                    "subModules": subModuleValues
+                                                // combine header + details
+                                                let datax = {
+                                                    header: header,
+                                                    details: details
                                                 };
-                                        });
-                        }
+
+                                                console.log(datax); // send this object via AJAX
+
+
+                                                          $.ajax({
+                                                              type: 'POST',
+                                                              url: '@Url.Action("SaveWFHApplication", "DailyTimeRecord")',
+                                                                data: JSON.stringify(datax), 
+                                                                        contentType: 'application/json; charset=utf-8',
+                                                              success: function (response) {
+                                                                  if (response.success) {
+
+                                                                          $('#filewfhmodal')[0].reset();
+                                                                    js('#filewfhmodal').modal('hide');
+
+                                                                   Swal.fire({
+                                                                       text: response.message,
+                                                                       icon: "success",
+                                                                       confirmButtonText: "Ok"
+                                                                   }).then((result) => {
+                                                                       location.reload();
+                                                                   });
+                                                                  } else {
+                                                                      Swal.fire({
+                                                                          text: response.message,
+                                                                          icon: "error"
+                                                                      });
+                                                                  }
+                                                                  $('.spinner-overlay').hide();
+                                                              },
+                                                              error: function () {
+                                                                  $('.spinner-overlay').hide();
+                                                                  Swal.fire({
+                                                                      text: "An error occurred. Please try again.",
+                                                                      icon: "error"
+                                                                  });
+                                                              }
+                                                          });
+
+                                            }
+
+
             </script>
 }

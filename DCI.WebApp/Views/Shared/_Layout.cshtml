@@ -157,7 +157,7 @@
                                         <li><a asp-controller="DailyTimeRecord" asp-action="DTRCorrection" asp-route-id="1">DTR Correction</a></li>   
                                 @*     <li><a class="dropdown-item" href="/DailyTimeRecord/Attendance/">Attendance</a></li>    *@
                              @*        <li><a class="dropdown-item" href="/DailyTimeRecord/DTRCorrection/">DTR Correction</a></li>    *@  
-                                    <li><a class="dropdown-item" href="/DailyTimeRecord/WFH/">WFH</a></li>     
+                    
                              
                             </ul>
                         </div>
@@ -218,6 +218,26 @@
                             </div>
                         </a>
                     }
+                              @if (module.ModulePageId == (int)EnumModulePage.WFH)
+                    {                  
+                        
+                        <hr class='sidebar-divider'>
+                        <div role="group">
+                            <a href="#" id="btnGroupDrop1" class="mainModule" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class='sidebar-heading mainModuleActive'>
+                                    <i class='fa-solid fa fa-book'></i>
+                                    <span>WFH</span>
+                                    <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">         
+                              
+                                                    <li><a class="dropdown-item" href="/DailyTimeRecord/WFH/">WFH Logs</a></li>     
+                                                <li><a class="dropdown-item" href="/DailyTimeRecord/WFH/">WFH Application</a></li>     
+                            </ul>
+                        </div>
+                    }
+
                 }
                 <!-- Divider -->
                 <hr class="sidebar-divider">
