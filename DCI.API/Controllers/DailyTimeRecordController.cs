@@ -116,6 +116,28 @@ namespace DCI.API.Controllers
         }
 
         [HttpPost]
+        [Route("GetAllWFHApplication")]
+        public async Task<IActionResult> GetAllWFHApplication([FromBody] WFHHeaderViewModel model)
+        {
+            return Ok(await _wfhRepository.GetAllWFHApplication(model));
+        }
+
+
+        [HttpPost]
+        [Route("GetWFHApplicationDetailByWfhHeaderId")]
+        public async Task<IActionResult> GetWFHApplicationDetailByWfhHeaderId([FromBody] WFHHeaderViewModel model)
+        {
+            return Ok(await _wfhRepository.GetWFHApplicationDetailByWfhHeaderId(model));
+        }
+     
+        [HttpPost]
+        [Route("GetWFHLogsByEmployeeId")]
+        public async Task<IActionResult> GetWFHLogsByEmployeeId([FromBody] WFHViewModel model)
+        {
+            return Ok(await _wfhRepository.GetWFHLogsByEmployeeId(model));
+        }
+
+        [HttpPost]
         [Route("SaveWFHApplication")]
         public async Task<IActionResult> SaveWFHApplication([FromBody] WfhApplicationViewModel param)
         {

@@ -5,6 +5,7 @@ using DCI.Models.ViewModel;
 using DCI.Repositories.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace DCI.Repositories
 {
@@ -78,11 +79,72 @@ namespace DCI.Repositories
             return (StatusCodes.Status200OK, "Successfully saved");
         }
 
+
+        public async Task<IList<WFHHeaderViewModel>> GetAllWFHApplication(WFHHeaderViewModel model)
+        {
+           // var context = _dbContext.WfhHeader.AsQueryable();
+
+
+            var query = await (from hdr in _dbContext.WfhHeader.AsQueryable()
+                               join emp in _dbContext.Employee.AsNoTracking() on hdr.EmployeeId equals emp.EmployeeId
+                               join stat in _dbContext.Status on hdr.Status equals stat.StatusId
+                               //orderby hdr.DateCreated descending, hdr.NAME descending
+                               select new WFHHeaderViewModel
+                               {                                  
+                                       WfhHeaderId = hdr.WfhHeaderId,
+                                       RequestNo = hdr.RequestNo,
+                                       Fullname = emp.Lastname + " " + emp.Firstname,
+                                       StatusId = hdr.Status,
+                                       Remarks = hdr.Remarks,   
+                                       DateCreated = hdr.DateCreated,
+                                       StatusName = stat.StatusName,                   
+                       
+                               }).ToListAsync();
+            return query;
+        }
+
+        public async Task<IList<WfhDetailViewModel>> GetWFHApplicationDetailByWfhHeaderId(WFHHeaderViewModel model)
+        {
+            // var context = _dbContext.WfhHeader.AsQueryable();
+
+
+            var query = await (from hdr in _dbContext.WfhDetail.AsQueryable()                           
+                               join att in _dbContext.vw_AttendanceSummary_WFH.AsNoTracking() on hdr.AttendanceId equals att.ID
+                               where hdr.WfhHeaderId == model.WfhHeaderId
+                               select new WfhDetailViewModel
+                               {
+                                   WfhHeaderId = hdr.WfhHeaderId,
+                                   Date = att.DATE.ToString(),
+                                   TimeIn = att.FIRST_IN,
+                                   TimeOut = att.LAST_OUT,
+                                   TotalWorkingHours = att.TOTAL_WORKING_HOURS                                
+
+                               }).ToListAsync();
+            return query;
+        }
+
+        public async Task<IList<WFHViewModel>> GetWFHLogsByEmployeeId(WFHViewModel model)
+        {
+            var _emp = await _dbContext.Employee.AsQueryable().Where(x => x.EmployeeId == model.EMPLOYEE_ID).FirstOrDefaultAsync();
+            var empNO = _emp.EmployeeNo;
+
+            var query = await (from logs in _dbContext.tbl_wfh_logs.AsQueryable()                         
+                               where logs.EMPLOYEE_ID == empNO && logs.DATE_TIME.Date == model.DATE_TIME.Date
+                               select new WFHViewModel
+                               {
+                                   DATE_TIME = logs.DATE_TIME,
+                                   EMPLOYEE_NO = logs.EMPLOYEE_ID                                
+
+                               }).ToListAsync();
+            return query;
+        }
+
+
         public async Task<(int statuscode, string message)> SaveWFHApplication(WfhApplicationViewModel model)
         {
             WfhHeader entity = new WfhHeader();
             entity.WfhHeaderId = model.Header.WfhHeaderId;
-            entity.RequestNo = model.Header.RequestNo;
+            entity.RequestNo = await GenereteRequestNo();
             entity.EmployeeId = model.Header.EmployeeId;
             entity.Status = (int)EnumStatus.ForApproval;
             entity.ApproverId = 1;
@@ -91,6 +153,7 @@ namespace DCI.Repositories
             entity.CreatedBy = model.Header.CurrentUserId;
             entity.DateModified = null;
             entity.ModifiedBy = null;
+            entity.IsActive = true;
             await _dbContext.WfhHeader.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
 
@@ -107,6 +170,51 @@ namespace DCI.Repositories
             return (StatusCodes.Status200OK, "Successfully saved");
         }
 
+
+        private async Task<string> GenereteRequestNo()
+        {
+
+            try
+            {
+                int _currentYear = DateTime.Now.Year;
+                int _currentMonth = DateTime.Now.Month;
+
+                var startDate = new DateTime(_currentYear, _currentMonth, 1);
+                var endDate = startDate.AddMonths(1);
+
+                var _dtr = await _dbContext.WfhHeader
+                    .Where(x => x.IsActive == true
+                        && x.DateCreated >= startDate
+                        && x.DateCreated < endDate)
+                    .ToListAsync();
+
+
+                int totalrecords = _dtr.Count() + 1;
+                string finalSetRecords = GetFormattedRecord(totalrecords);
+                string yearMonth = DateTime.Now.ToString("yyyyMM");
+                string req = "WFH";
+
+                return $"{req}-{yearMonth}-{finalSetRecords}";
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return string.Empty;
+        }
+
+        private string GetFormattedRecord(int totalRecords)
+        {
+            int setA = totalRecords % 1000;
+            int setB = totalRecords / 1000;
+            string formattedA = setA.ToString("D4");
+            string formattedB = setB.ToString("D4");
+            return $"{formattedA}";
+        }
 
     }
 }

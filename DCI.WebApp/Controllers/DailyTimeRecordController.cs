@@ -482,6 +482,43 @@ namespace DCI.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
+        public async Task<IActionResult> WFHLogs([FromBody] WFHViewModel param)
+        {
+            List<WFHViewModel> model = new List<WFHViewModel>();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+
+                    // param.ScopeTypeEmp = (int)EnumEmployeeScope.PerEmployee;
+                     param.EMPLOYEE_ID = currentUser.EmployeeId;
+                  
+                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetWFHLogsByEmployeeId");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<List<WFHViewModel>>(responseBody)!;
+                    }
+
+                }
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
         public async Task<IActionResult> WFHTimeIn(WFHViewModel param)
         {
             //  List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();
@@ -525,8 +562,8 @@ namespace DCI.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
-        
-        public async Task<IActionResult> SaveWFHApplication([FromBody]  WfhApplicationViewModel param)
+
+        public async Task<IActionResult> SaveWFHApplication([FromBody] WfhApplicationViewModel param)
         {
             try
             {
@@ -534,8 +571,8 @@ namespace DCI.WebApp.Controllers
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
 
-                  //  param.EMPLOYEE_ID = currentUser.EmployeeId;
-
+                    param.Header.CurrentUserId = currentUser.UserId;
+                    param.Header.EmployeeId = currentUser.EmployeeId;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/SaveWFHApplication");
@@ -552,6 +589,77 @@ namespace DCI.WebApp.Controllers
                     }
                     return Json(new { success = false, message = responseBody });
                 }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
+        public async Task<IActionResult> WFHApplication(WFHHeaderViewModel param)
+        {
+            List<WFHHeaderViewModel> model = new List<WFHHeaderViewModel>();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+
+                    //  param.ScopeTypeEmp = (int)EnumEmployeeScope.PerEmployee;
+                    //param.EMPLOYEE_ID = currentUser.EmployeeId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllWFHApplication");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<List<WFHHeaderViewModel>>(responseBody)!;
+                    }
+
+                }
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
+        public async Task<IActionResult> WFHApplicationDetails(WFHHeaderViewModel param)
+        {
+            List<WfhDetailViewModel> model = new List<WfhDetailViewModel>();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetWFHApplicationDetailByWfhHeaderId");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<List<WfhDetailViewModel>>(responseBody)!;
+                    }
+
+                }
+                return Json(new { success = true, data = model });
             }
             catch (Exception ex)
             {
@@ -688,7 +796,7 @@ namespace DCI.WebApp.Controllers
             //  return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
-     
+
         public async Task<IActionResult> CategorizeOvertime([FromBody] OvertimeViewModel param)
         {
             //OvertimeViewModel param = new OvertimeViewModel();
