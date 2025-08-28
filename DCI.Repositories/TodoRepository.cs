@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Reflection.PortableExecutable;
 
 namespace DCI.Repositories
@@ -90,12 +91,12 @@ namespace DCI.Repositories
         {
             try
             {
-                var context = _dbContext.DTRCorrection.AsQueryable().ToList();                
+                var context = _dbContext.DTRCorrection.AsQueryable().ToList();
                 var empList = _dbContext.Employee.AsQueryable().ToList();
                 var statusList = _dbContext.Status.AsQueryable().ToList();
 
 
-                var query = (from dtr in context                               
+                var query = (from dtr in context
                              join emp in empList on dtr.CreatedBy equals emp.EmployeeId
                              join stat in statusList on dtr.Status equals stat.StatusId
                              where dtr.IsActive == true && dtr.Status == (int)EnumStatus.ForApproval
@@ -106,10 +107,10 @@ namespace DCI.Repositories
                                  DateFiled = dtr.DateFiled,
                                  DtrDateTime = dtr.DtrDateTime,
                                  DtrType = dtr.DtrType,
-                                 EmployeeName = emp.Firstname + " " + emp.Lastname,  
+                                 EmployeeName = emp.Firstname + " " + emp.Lastname,
                                  Status = dtr.Status,
                                  StatusName = stat.StatusName,
-                                 Reason = dtr.Reason,                                                   
+                                 Reason = dtr.Reason,
                              }).ToList();
 
 
@@ -127,7 +128,7 @@ namespace DCI.Repositories
         }
 
 
-        public async Task<(int statuscode, string message)> Approval(ApprovalHistoryViewModel param)
+        public async Task<(int statuscode, string message)> ApprovalLeave(ApprovalHistoryViewModel param)
         {
             try
             {
@@ -182,7 +183,7 @@ namespace DCI.Repositories
 
                 NotificationViewModel notifvm = new NotificationViewModel();
                 notifvm.Title = "Leave";
-                notifvm.Description =  String.Format("Leave Request No {0} has been {1}", contextHdr.RequestNo , status);
+                notifvm.Description = String.Format("Leave Request No {0} has been {1}", contextHdr.RequestNo, status);
                 notifvm.ModuleId = (int)EnumModulePage.Leave;
                 notifvm.TransactionId = param.TransactionId;
                 notifvm.AssignId = contextHdr.EmployeeId;
@@ -192,7 +193,7 @@ namespace DCI.Repositories
                 notifvm.IsActive = true;
                 await _homeRepository.SaveNotification(notifvm);
 
-        
+
 
                 return (StatusCodes.Status200OK, String.Format("Leave Request {0} has been {1}.", contextHdr.RequestNo, status));
             }
@@ -224,8 +225,8 @@ namespace DCI.Repositories
                 await _dbContext.SaveChangesAsync();
 
 
-                var contextHdr = _dbContext.DTRCorrection.Where(x => x.DtrId == param.TransactionId).FirstOrDefault(); 
-                contextHdr.Status = param.Status;          
+                var contextHdr = _dbContext.DTRCorrection.Where(x => x.DtrId == param.TransactionId).FirstOrDefault();
+                contextHdr.Status = param.Status;
                 _dbContext.DTRCorrection.Entry(contextHdr).State = EntityState.Modified;
                 _dbContext.SaveChanges();
 
@@ -252,6 +253,123 @@ namespace DCI.Repositories
                 await _homeRepository.SaveNotification(notifvm);
 
                 return (StatusCodes.Status200OK, String.Format("DTR Request No {0} has been {1}.", contextHdr.RequestNo, status));
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return (StatusCodes.Status406NotAcceptable, ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        public async Task<(int statuscode, string message)> ApprovalWFH(ApprovalHistoryViewModel param)
+        {
+            try
+            {
+                ApprovalHistory entity = new ApprovalHistory();
+                entity.ModulePageId = (int)EnumModulePage.WFH;
+                entity.TransactionId = param.TransactionId;
+                entity.ApproverId = param.ApproverId;
+                entity.Status = param.Status;
+                entity.Remarks = param.Remarks;
+                entity.CreatedBy = param.CreatedBy;
+                entity.DateCreated = DateTime.Now;
+                entity.IsActive = true;
+                await _dbContext.ApprovalHistory.AddAsync(entity);
+                await _dbContext.SaveChangesAsync();
+
+
+                //var contextHdr = _dbContext.WfhHeader.Where(x => x.WfhHeaderId == param.TransactionId).FirstOrDefault();
+                //contextHdr.Status = param.Status;
+                //_dbContext.WfhHeader.Entry(contextHdr).State = EntityState.Modified;
+                //_dbContext.SaveChanges();
+
+                //var contextDtl = _dbContext.WfhDetail.Where(x => x.WfhHeaderId == param.TransactionId).ToList();
+
+                //foreach (var dtl in contextDtl)
+                //{
+                //    var _attendance = _dbContext.vw_AttendanceSummary_WFH.Where(x => x.ID == dtl.AttendanceId).FirstOrDefault();
+                //    var wfhDate = _attendance?.DATE;
+                //    var empNo = _attendance?.EMPLOYEE_NO;
+
+                //    var _wfhlogs = _dbContext.tbl_wfh_logs.Where(x => x.EMPLOYEE_ID == empNo && x.DATE_TIME == wfhDate).FirstOrDefault();
+                //    _wfhlogs.STATUS = param.Status;
+                //    _dbContext.tbl_wfh_logs.Entry(_wfhlogs).State = EntityState.Modified;
+                //    await _dbContext.SaveChangesAsync();
+                //}
+
+                //OPTIMIZED CODE CHATGPT START
+                var contextHdr = await _dbContext.WfhHeader
+                                        .FindAsync(param.TransactionId);
+
+                if (contextHdr != null)
+                {
+                    contextHdr.Status = param.Status;
+                }
+
+                var contextDtl = await _dbContext.WfhDetail
+                    .Where(x => x.WfhHeaderId == param.TransactionId)
+                    .ToListAsync();
+
+                var attendanceIds = contextDtl.Select(d => d.AttendanceId).ToList();
+
+                var attendanceList = await _dbContext.vw_AttendanceSummary_WFH
+                    .Where(x => attendanceIds.Contains((int)x.ID))
+                    .ToListAsync();
+
+                var empNoDatePairs = attendanceList
+                    .Select(a => new { a.EMPLOYEE_NO, a.DATE })
+                    .ToList();
+
+                //var wfhLogs = await _dbContext.tbl_wfh_logs
+                //    .Where(x => empNoDatePairs.Any(p => p.EMPLOYEE_NO == x.EMPLOYEE_ID && p.DATE == x.DATE_TIME))
+                //    .ToListAsync();
+                //var empNoDateKeys = empNoDatePairs
+                //    .Select(p => new { p.EMPLOYEE_NO, p.DATE })
+                //    .ToList();
+
+                var empNos = empNoDatePairs.Select(p => p.EMPLOYEE_NO).Distinct().ToList();
+                var dates = empNoDatePairs.Select(p => p.DATE).Distinct().ToList();
+
+                var wfhLogs = await _dbContext.tbl_wfh_logs
+                    .Where(x => empNos.Contains(x.EMPLOYEE_ID) && dates.Contains(x.DATE_TIME.Date))
+                    .ToListAsync();
+
+                foreach (var log in wfhLogs)
+                {
+                    log.STATUS = param.Status;
+                }
+
+
+                await _dbContext.SaveChangesAsync();
+                //OPTIMIZED CODE CHATGPT END
+
+
+
+
+                // var entitiesToViewModel = await _dtrRepository.DTRCorrectionByDtrId(contextHdr.DtrId);
+
+                // Send Email Notif
+                //   await _emailRepository.SendToRequestorDTR(entitiesToViewModel);
+
+                string status = param.Status == (int)EnumStatus.Approved ? "approved" : "disapproved";
+
+                NotificationViewModel notifvm = new NotificationViewModel();
+                notifvm.Title = "WFH";
+                notifvm.Description = String.Format("WFH Request No {0} has been {1}", contextHdr.RequestNo, status);
+                notifvm.ModuleId = (int)EnumModulePage.WFH;
+                notifvm.TransactionId = param.TransactionId;
+                notifvm.AssignId = contextHdr.CreatedBy;
+                notifvm.URL = "/DailyTimeRecord/WFH/?wfhHeader=" + contextHdr.WfhHeaderId;
+                notifvm.MarkRead = false;
+                notifvm.CreatedBy = param.CreatedBy;
+                notifvm.IsActive = true;
+                await _homeRepository.SaveNotification(notifvm);
+
+                return (StatusCodes.Status200OK, String.Format("WFH Request No {0} has been {1}.", contextHdr.RequestNo, status));
             }
             catch (Exception ex)
             {
@@ -321,50 +439,50 @@ namespace DCI.Repositories
         {
             try
             {
-                var leaveHdr = _dbContext.LeaveRequestHeader.AsQueryable().ToList();    
+                var leaveHdr = _dbContext.LeaveRequestHeader.AsQueryable().ToList();
                 var empList = _dbContext.Employee.AsQueryable().ToList();
                 var statusList = _dbContext.Status.AsQueryable().ToList();
                 var approvalLog = _dbContext.ApprovalHistory.AsQueryable().ToList();
                 var dtrcontext = _dbContext.DTRCorrection.AsQueryable().ToList();
 
                 var queryLeave = from apprv in approvalLog
-                            join hdr in leaveHdr on apprv.TransactionId equals hdr.LeaveRequestHeaderId
-                            join emp in empList on hdr.EmployeeId equals emp.EmployeeId
-                            join stat in statusList on hdr.Status equals stat.StatusId
-                            where apprv.IsActive == true && apprv.ApproverId == model.CurrentUserId && apprv.ModulePageId == (int)EnumModulePage.Leave
-                            select new ApprovalHistoryViewModel
-                            {
-                                ApprovalHistoryId = apprv.ApprovalHistoryId,
-                                RequestNo = hdr.RequestNo,                               
-                                Requestor = emp.Firstname + " " + emp.Lastname,                               
-                                Status = hdr.Status,
-                                StatusName = stat.StatusName,         
-                                StatusDate = apprv.DateCreated.ToString(),
-                                ModuleName = "Leave",
-                                DateCreated = hdr.DateFiled
-                            };
-
-                var queryDTR = from apprv in approvalLog
-                                 join dtr in dtrcontext on apprv.TransactionId equals dtr.DtrId
-                                 join emp in empList on dtr.CreatedBy equals emp.EmployeeId
-                                 join stat in statusList on dtr.Status equals stat.StatusId
-                                 where apprv.IsActive == true && apprv.ApproverId == model.CurrentUserId && apprv.ModulePageId == (int)EnumModulePage.DailyTimeRecord
-                               select new ApprovalHistoryViewModel
+                                 join hdr in leaveHdr on apprv.TransactionId equals hdr.LeaveRequestHeaderId
+                                 join emp in empList on hdr.EmployeeId equals emp.EmployeeId
+                                 join stat in statusList on hdr.Status equals stat.StatusId
+                                 where apprv.IsActive == true && apprv.ApproverId == model.CurrentUserId && apprv.ModulePageId == (int)EnumModulePage.Leave
+                                 select new ApprovalHistoryViewModel
                                  {
                                      ApprovalHistoryId = apprv.ApprovalHistoryId,
-                                     RequestNo = dtr.RequestNo,
+                                     RequestNo = hdr.RequestNo,
                                      Requestor = emp.Firstname + " " + emp.Lastname,
-                                     Status = dtr.Status,
+                                     Status = hdr.Status,
                                      StatusName = stat.StatusName,
                                      StatusDate = apprv.DateCreated.ToString(),
-                                     ModuleName = "DTR",
-                                     DateCreated = dtr.DateFiled
+                                     ModuleName = "Leave",
+                                     DateCreated = hdr.DateFiled
+                                 };
+
+                var queryDTR = from apprv in approvalLog
+                               join dtr in dtrcontext on apprv.TransactionId equals dtr.DtrId
+                               join emp in empList on dtr.CreatedBy equals emp.EmployeeId
+                               join stat in statusList on dtr.Status equals stat.StatusId
+                               where apprv.IsActive == true && apprv.ApproverId == model.CurrentUserId && apprv.ModulePageId == (int)EnumModulePage.DailyTimeRecord
+                               select new ApprovalHistoryViewModel
+                               {
+                                   ApprovalHistoryId = apprv.ApprovalHistoryId,
+                                   RequestNo = dtr.RequestNo,
+                                   Requestor = emp.Firstname + " " + emp.Lastname,
+                                   Status = dtr.Status,
+                                   StatusName = stat.StatusName,
+                                   StatusDate = apprv.DateCreated.ToString(),
+                                   ModuleName = "DTR",
+                                   DateCreated = dtr.DateFiled
                                };
 
                 return queryLeave.Concat(queryDTR).ToList();
 
 
-              //  return query.ToList();
+                //  return query.ToList();
             }
             catch (Exception ex)
             {
@@ -400,6 +518,26 @@ namespace DCI.Repositories
 
             return await query.ToListAsync();
         }
+
+        public async Task<IList<WFHHeaderViewModel>> GetAllWFH(WFHHeaderViewModel model)
+        {
+            var query = await (from hdr in _dbContext.WfhHeader.AsQueryable()
+                               join emp in _dbContext.Employee.AsNoTracking() on hdr.EmployeeId equals emp.EmployeeId
+                               join stat in _dbContext.Status on hdr.Status equals stat.StatusId
+                               select new WFHHeaderViewModel
+                               {
+                                   WfhHeaderId = hdr.WfhHeaderId,
+                                   RequestNo = hdr.RequestNo,
+                                   Fullname = emp.Lastname + " " + emp.Firstname,
+                                   StatusId = hdr.Status,
+                                   Remarks = hdr.Remarks,
+                                   DateCreated = hdr.DateCreated,
+                                   StatusName = stat.StatusName,
+
+                               }).ToListAsync();
+            return query;
+        }
+
 
     }
 }

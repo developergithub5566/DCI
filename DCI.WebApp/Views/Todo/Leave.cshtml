@@ -366,7 +366,7 @@
                              $('.spinner-overlay').show();
                         $.ajax({
                             type: 'POST',
-                            url: '@Url.Action("Approval", "Todo")',
+                            url: '@Url.Action("ApprovalLeave", "Todo")',
                             data: { TransactionId : leaveId , Status: status, Remarks: $('#Remarks').val() },
 
                             success: function (response) {
@@ -426,7 +426,7 @@
 
                         $.ajax({
                             type: 'POST',
-                            url: '@Url.Action("Approval", "Todo")',
+                            url: '@Url.Action("ApprovalLeave", "Todo")',
                             data: { TransactionId: _transId , Status: _action, Remarks: $('#Remarks_Approval').val() },
                             success: function (response) {
                                 if (response.success) {

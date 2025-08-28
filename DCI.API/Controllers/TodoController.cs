@@ -29,10 +29,10 @@ namespace DCI.API.Controllers
         //}
 
         [HttpPost]
-        [Route("Approval")]
-        public async Task<IActionResult> Approval([FromBody] ApprovalHistoryViewModel model)
+        [Route("ApprovalLeave")]
+        public async Task<IActionResult> ApprovalLeave([FromBody] ApprovalHistoryViewModel model)
         {
-             var result = await _todoRepository.Approval(model);
+             var result = await _todoRepository.ApprovalLeave(model);
             return StatusCode(result.statuscode, result.message);
         }
 
@@ -41,6 +41,14 @@ namespace DCI.API.Controllers
         public async Task<IActionResult> ApprovalDtr([FromBody] ApprovalHistoryViewModel model)
         {
             var result = await _todoRepository.ApprovalDtr(model);
+            return StatusCode(result.statuscode, result.message);
+        }
+
+        [HttpPost]
+        [Route("ApprovalWFH")]
+        public async Task<IActionResult> ApprovalWFH([FromBody] ApprovalHistoryViewModel model)
+        {
+            var result = await _todoRepository.ApprovalWFH(model);
             return StatusCode(result.statuscode, result.message);
         }
         //[HttpPost]
@@ -80,6 +88,15 @@ namespace DCI.API.Controllers
         public async Task<IActionResult> GetAllTodoOvertime([FromBody] OvertimeViewModel model)
         {
             var result = await _todoRepository.GetAllTodoOvertime(model);
+            return Ok(result);
+        }
+
+
+        [HttpPost]
+        [Route("GetAllWFH")]
+        public async Task<IActionResult> GetAllWFH([FromBody] WFHHeaderViewModel model)
+        {
+            var result = await _todoRepository.GetAllWFH(model);
             return Ok(result);
         }
 

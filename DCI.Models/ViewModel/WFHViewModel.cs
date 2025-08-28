@@ -12,6 +12,8 @@
         public string Password { get; set; } = string.Empty;
         public int CurrentUserId { get; set; } = 0;
         public int ScopeTypeEmp { get; set; } = 0;
+        public string TIME_IN { get; set; } = string.Empty;
+        public string DATE { get; set; } = string.Empty;
     }
 
     public class WfhLogModel

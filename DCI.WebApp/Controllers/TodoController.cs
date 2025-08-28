@@ -12,79 +12,79 @@ using System.Text;
 
 namespace DCI.WebApp.Controllers
 {
-	public class TodoController : Controller
-	{
-		private readonly IOptions<APIConfigModel> _apiconfig;
-		private readonly UserSessionHelper _userSessionHelper;
+    public class TodoController : Controller
+    {
+        private readonly IOptions<APIConfigModel> _apiconfig;
+        private readonly UserSessionHelper _userSessionHelper;
 
 
-		public TodoController(IOptions<APIConfigModel> apiconfig, UserSessionHelper userSessionHelper)
-		{
-			_apiconfig = apiconfig;
-			_userSessionHelper = userSessionHelper;
-		}
+        public TodoController(IOptions<APIConfigModel> apiconfig, UserSessionHelper userSessionHelper)
+        {
+            _apiconfig = apiconfig;
+            _userSessionHelper = userSessionHelper;
+        }
 
-		//public async Task<IActionResult> Todo(ApprovalHistoryViewModel model)
-		//{
-		//	try
-		//	{
-		//		using (var _httpclient = new HttpClient())
-		//		{
-		//			//var currentUser = _userSessionHelper.GetCurrentUser();
-		//			//model.ModifiedBy = currentUser.UserId;
+        //public async Task<IActionResult> Todo(ApprovalHistoryViewModel model)
+        //{
+        //	try
+        //	{
+        //		using (var _httpclient = new HttpClient())
+        //		{
+        //			//var currentUser = _userSessionHelper.GetCurrentUser();
+        //			//model.ModifiedBy = currentUser.UserId;
 
-		//			var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-		//			var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Todo/GetTodoByApproverId");
+        //			var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+        //			var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Todo/GetTodoByApproverId");
 
-		//			request.Content = stringContent;
-		//			var response = await _httpclient.SendAsync(request);
-		//			var responseBody = await response.Content.ReadAsStringAsync();
-		//			if (response.IsSuccessStatusCode)
-		//			{
-		//				return Json(new { success = true, message = responseBody });
-		//			}
-		//			return Json(new { success = false, message = responseBody });
-		//		}
-		//	}
-		//	catch (Exception ex)
-		//	{
-		//		Log.Error(ex.ToString());
-		//		return Json(new { success = false, message = ex.Message });
-		//	}
-		//	finally
-		//	{
-		//		Log.CloseAndFlush();
-		//	}
-		//}
+        //			request.Content = stringContent;
+        //			var response = await _httpclient.SendAsync(request);
+        //			var responseBody = await response.Content.ReadAsStringAsync();
+        //			if (response.IsSuccessStatusCode)
+        //			{
+        //				return Json(new { success = true, message = responseBody });
+        //			}
+        //			return Json(new { success = false, message = responseBody });
+        //		}
+        //	}
+        //	catch (Exception ex)
+        //	{
+        //		Log.Error(ex.ToString());
+        //		return Json(new { success = false, message = ex.Message });
+        //	}
+        //	finally
+        //	{
+        //		Log.CloseAndFlush();
+        //	}
+        //}
 
 
 
-		public async Task<IActionResult> Leave()
-		{
-			List<LeaveRequestHeaderViewModel> model = new List<LeaveRequestHeaderViewModel>();
+        public async Task<IActionResult> Leave()
+        {
+            List<LeaveRequestHeaderViewModel> model = new List<LeaveRequestHeaderViewModel>();
 
-			using (var _httpclient = new HttpClient())
-			{
-				LeaveViewModel _filterRoleModel = new LeaveViewModel();
+            using (var _httpclient = new HttpClient())
+            {
+                LeaveViewModel _filterRoleModel = new LeaveViewModel();
 
-				var currentUser = _userSessionHelper.GetCurrentUser();
-				//_filterRoleModel = currentUser.RoleId;
-				//_filterRoleModel.CurrentUserId = currentUser.UserId;
+                var currentUser = _userSessionHelper.GetCurrentUser();
+                //_filterRoleModel = currentUser.RoleId;
+                //_filterRoleModel.CurrentUserId = currentUser.UserId;
 
-				var stringContent = new StringContent(JsonConvert.SerializeObject(_filterRoleModel), Encoding.UTF8, "application/json");
-				var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Todo/GetAllTodoLeave");
+                var stringContent = new StringContent(JsonConvert.SerializeObject(_filterRoleModel), Encoding.UTF8, "application/json");
+                var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Todo/GetAllTodoLeave");
 
-				request.Content = stringContent;
-				var response = await _httpclient.SendAsync(request);
-				var responseBody = await response.Content.ReadAsStringAsync();
-				if (response.IsSuccessStatusCode)
-				{
-					model = JsonConvert.DeserializeObject<List<LeaveRequestHeaderViewModel>>(responseBody)!;
-				}
+                request.Content = stringContent;
+                var response = await _httpclient.SendAsync(request);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    model = JsonConvert.DeserializeObject<List<LeaveRequestHeaderViewModel>>(responseBody)!;
+                }
 
-			}
-			return View(model);
-		}
+            }
+            return View(model);
+        }
 
         public async Task<IActionResult> DTR()
         {
@@ -111,39 +111,39 @@ namespace DCI.WebApp.Controllers
             }
             return View(model);
         }
-        public async Task<IActionResult> Approval(ApprovalHistoryViewModel model)
-		{
-			try
-			{
-				using (var _httpclient = new HttpClient())
-				{
-					var currentUser = _userSessionHelper.GetCurrentUser();
-					model.CreatedBy = currentUser.UserId;
-					model.ApproverId = currentUser.UserId;
-			
-					var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-					var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Todo/Approval");
+        public async Task<IActionResult> ApprovalLeave(ApprovalHistoryViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    model.CreatedBy = currentUser.UserId;
+                    model.ApproverId = currentUser.UserId;
 
-					request.Content = stringContent;
-					var response = await _httpclient.SendAsync(request);
-					var responseBody = await response.Content.ReadAsStringAsync();
-					if (response.IsSuccessStatusCode)
-					{
-						return Json(new { success = true, message = responseBody });
-					}
-					return Json(new { success = false, message = responseBody });
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex.ToString());
-				return Json(new { success = false, message = ex.Message });
-			}
-			finally
-			{
-				Log.CloseAndFlush();
-			}
-		}
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Todo/ApprovalLeave");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = responseBody });
+                    }
+                    return Json(new { success = false, message = responseBody });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
 
         public async Task<IActionResult> ApprovalDtr(ApprovalHistoryViewModel model)
         {
@@ -206,6 +206,41 @@ namespace DCI.WebApp.Controllers
             return View(model);
         }
 
+        public async Task<IActionResult> ApprovalWFH(ApprovalHistoryViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    model.CreatedBy = currentUser.UserId;
+                    model.ApproverId = currentUser.UserId;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Todo/ApprovalWFH");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = responseBody });
+                    }
+                    return Json(new { success = false, message = responseBody });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+
         public async Task<IActionResult> Overtime()
         {
             List<OvertimeViewModel> model = new List<OvertimeViewModel>();
@@ -227,6 +262,33 @@ namespace DCI.WebApp.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     model = JsonConvert.DeserializeObject<List<OvertimeViewModel>>(responseBody)!;
+                }
+
+            }
+            return View(model);
+        }
+
+        public async Task<IActionResult> WFH()
+        {
+            List<WFHHeaderViewModel> model = new List<WFHHeaderViewModel>();
+
+            using (var _httpclient = new HttpClient())
+            {
+                WFHHeaderViewModel _filterRoleModel = new WFHHeaderViewModel();
+
+                var currentUser = _userSessionHelper.GetCurrentUser();
+                _filterRoleModel.EmployeeId = currentUser.EmployeeId;
+                _filterRoleModel.CurrentUserId = currentUser.UserId;
+
+                var stringContent = new StringContent(JsonConvert.SerializeObject(_filterRoleModel), Encoding.UTF8, "application/json");
+                var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Todo/GetAllWFH");
+
+                request.Content = stringContent;
+                var response = await _httpclient.SendAsync(request);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    model = JsonConvert.DeserializeObject<List<WFHHeaderViewModel>>(responseBody)!;
                 }
 
             }

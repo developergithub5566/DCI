@@ -126,15 +126,15 @@ namespace DCI.Repositories
         public async Task<IList<WFHViewModel>> GetWFHLogsByEmployeeId(WFHViewModel model)
         {
             var _emp = await _dbContext.Employee.AsQueryable().Where(x => x.EmployeeId == model.EMPLOYEE_ID).FirstOrDefaultAsync();
-            var empNO = _emp.EmployeeNo;
+            var empNO = _emp.EmployeeNo ?? string.Empty;
 
             var query = await (from logs in _dbContext.tbl_wfh_logs.AsQueryable()                         
                                where logs.EMPLOYEE_ID == empNO && logs.DATE_TIME.Date == model.DATE_TIME.Date
                                select new WFHViewModel
                                {
-                                   DATE_TIME = logs.DATE_TIME,
-                                   EMPLOYEE_NO = logs.EMPLOYEE_ID                                
-
+                                   DATE = logs.DATE_TIME.ToString("MM/dd/yyyy"),
+                                   EMPLOYEE_NO = logs.EMPLOYEE_ID ,
+                                   TIME_IN = logs.DATE_TIME.ToString("HH:mm:ss")
                                }).ToListAsync();
             return query;
         }

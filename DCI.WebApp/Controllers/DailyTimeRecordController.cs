@@ -505,7 +505,7 @@ namespace DCI.WebApp.Controllers
                     }
 
                 }
-                return View(model);
+                return Json(new { success = true, data = model });
             }
             catch (Exception ex)
             {

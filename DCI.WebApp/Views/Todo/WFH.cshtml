@@ -51,14 +51,14 @@
 }
 
 <div class="container-fluid">
- @*    <div class="spinner-overlay">
+@*    <div class="spinner-overlay">
         <div class="spinner-border text-light" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
     </div> *@
     <div class="d-sm-flex align-items-center justify-content-between mb-3">
         <h6 class="m-0 font-weight-bold text-gray-800">@ViewBag.BreadCrumbLabel</h6>
-  @*       <div class="upperRightDivBtn">
+        @*       <div class="upperRightDivBtn">
             <a href="#" title="Add Overtime" class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")" data-toggle="modal" data-target="#" onclick="filewfhmodal()" id="AddWFH">
                 <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
                 <span class="text text-white"><small>File WFH</small></span>
@@ -93,14 +93,14 @@
                             <th>
                                 <label>Name</label>
                             </th>
-                       
+
                             <th>
                                 <label>Status</label>
                             </th>
                             <th>
                                 <label>Date Created</label>
                             </th>
-                          
+
                             <th>
                                 Action
                             </th>
@@ -112,22 +112,23 @@
                             <tr>
 
                                 <td>
-                                   @item.RequestNo
+                                    @item.RequestNo
                                 </td>
                                 <td>
                                     @item.Fullname
-                                </td>                               
+                                </td>
                                 <td>
                                     @item.StatusName
                                 </td>
                                 <td>
                                     @item.DateCreated
                                 </td>
-                            
+
                                 <td class="text-center">
                                     <a href="#" onclick='viewWFHdDetails(@item.WfhHeaderId);' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
-
-@*                                     <a href="#" title="logs" class="btn btn-secondary"><i class="fas fa-history"></i></a> *@
+                                                        
+                                    <a href="#" id="approved" onclick="approvalForm(@item.WfhHeaderId,@((int)EnumStatus.Approved))" title="Approve" class="btn btn-info"> <i class="fa fa-check"></i></a>
+                                    <a href="#" id="disapproved" onclick="remarksForm(@item.WfhHeaderId,@((int)EnumStatus.Rejected))" class="btn btn-danger"> <i class="fa fa-remove"></i></a>
                                 </td>
                             </tr>
                         }
@@ -148,10 +149,11 @@
                         </div>
                         <form id="wfhInfo">
                             <div class="modal-body">
-                                <table class="table table-bordered text-dark text-xs" >
+                                <input type="hidden" id="WfhHeaderId" name="WfhHeaderId">
+                                <table class="table table-bordered text-dark text-xs">
                                     <thead>
-                                        <tr>                                         
-                                         
+                                        <tr>
+
                                             <th>
                                                 <label>Date</label>
                                             </th>
@@ -163,23 +165,27 @@
                                             </th>
                                             <th>
                                                 <label>Total Working Hours</label>
-                                            </th>                                      
+                                            </th>
 
                                         </tr>
                                     </thead>
                                     <tbody id="tblFileforWFH">
-                                     
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="modal-footer">                               
+                            <div class="modal-footer">
+                                <a href="#" id="approved" onclick="approvalForm($('#WfhHeaderId').val(),@((int)EnumStatus.Approved))" title="Approve" class="btn btn-info"> Approve</a>
+                                <a href="#" id="disapproved" onclick="remarksForm($('#WfhHeaderId').val(),@((int)EnumStatus.Rejected))" class="btn btn-danger"> Disapprove</a>
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal"><small>Close</small></button>
                             </div>
                         </form>
+
+                        <input type="hidden" id="HiddenHeaderId" name="HiddenHeaderId" value="">
+                        <input type="hidden" id="HiddenAction" name="HiddenAction" value="">
                     </div>
                 </div>
             </div>
-
+       
         </div>
 
 
@@ -203,16 +209,13 @@
                             // js('#tblDTR').DataTable({
                             //      order: [[2, 'desc']]
                             // });
-                            // realTime();
-
-
-                            //      $('#selectAll').on('click', function () {
-                            //           $('.row-checkbox').prop('checked', this.checked);
-                            //      });
-                        });                                                         
+                          
+                        });
 
                 function viewWFHdDetails(headerId){
-          
+                       $('#HiddenHeaderId').val(headerId);
+                          $('#WfhHeaderId').val(headerId);
+                       
                                           $.ajax({
                                               type: 'POST',
                                               url: '@Url.Action("WFHApplicationDetails", "DailyTimeRecord")',
@@ -261,7 +264,106 @@
                 }
 
 
-                   
+                  function approvalForm(headerId,status) {
+
+                    
+
+
+                             $('.spinner-overlay').show();
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("ApprovalWFH", "Todo")',
+                            data: { TransactionId : headerId , Status: status, Remarks: $('#Remarks').val() },
+
+                            success: function (response) {
+                                if (response.success) {
+                                                        Swal.fire({
+                                                            text: response.message,
+                                                            icon: "success",
+                                                            confirmButtonText: "Ok"
+                                                        }).then((result) => {
+                                                            location.reload();
+                                                        });
+
+                                        } else {
+                                    Swal.fire({
+                                        text: response.message,
+                                        icon: "error"
+                                    });
+                                }
+                                 $('.spinner-overlay').hide();
+                            },
+                            error: function () {
+                                 $('.spinner-overlay').hide();
+                                Swal.fire({
+                                    text: "An error occurred. Please try again.",
+                                    icon: "error"
+                                });
+                            }
+                        });
+
+
+                }
+
+                 function remarksForm(headerId,status) {
+                      $('#Remarks_Approval').val("");
+                      $('#HiddenHeaderId').val(headerId);
+                      $('#HiddenAction').val(status);
+                       js('#remarksmodal').modal('show');
+                 }
+
+                 function approvalRemarksForm() {
+
+                  if($('#Remarks_Approval').val() == "")
+                  {
+                         Swal.fire({
+                                        text: "Please input remarks",
+                                        icon: "error"
+                                    });
+                  }
+                  else
+                  {
+
+
+                     const _transId =  $('#HiddenHeaderId').val();
+                      const _action =  $('#HiddenAction').val();
+
+                                          $('.spinner-overlay').show();
+
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("ApprovalWFH", "Todo")',
+                            data: { TransactionId: _transId , Status: _action, Remarks: $('#Remarks_Approval').val() },
+                            success: function (response) {
+                                if (response.success) {
+                                                        Swal.fire({
+                                                            text: response.message,
+                                                            icon: "success",
+                                                            confirmButtonText: "Ok"
+                                                        }).then((result) => {
+                                                            location.reload();
+                                                        });
+
+                                        } else {
+                                    Swal.fire({
+                                        text: response.message,
+                                        icon: "error"
+                                    });
+                                }
+                                      $('.spinner-overlay').hide();
+                            },
+                            error: function () {
+                                      $('.spinner-overlay').hide();
+                                Swal.fire({
+                                    text: "An error occurred. Please try again.",
+                                    icon: "error"
+                                });
+                            }
+                        });
+
+                   }
+                   }
+
 
             </script>
 }

@@ -420,7 +420,7 @@
                             <div class="modal-body">           
 
 
-                                <table class="table table-bordered text-dark text-xs" id="tblWfhLogs">
+                                <table class="table table-bordered text-dark text-xs" >
                                     <thead>
                                         <tr>
                                          
@@ -434,35 +434,16 @@
                                           
                                           
 
-                                            <th>
+                                         @*    <th>
                                                 <label>Source</label>
                                             </th>
                                             <th>
                                                 <label>Status</label>
-                                            </th>
+                                            </th> *@
 
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        @foreach (var item in Model)
-                                        {
-                                            <tr>                                                
-                                           
-                                                <td>
-                                                    @item.DATE.ToShortDateString()
-                                                </td>
-                                                <td>
-                                                    @item.FIRST_IN
-                                                </td>    
-                                                <td>
-                                                    <span class="btnSuccess applicationStatus">REMOTE</span>
-                                                </td>
-                                                <td>
-                                                    @item.STATUSNAME
-                                                </td>
-
-                                            </tr>
-                                        }
+                                    <tbody id="tblWfhLogs">                        
                                     </tbody>
                                 </table>
                             </div>
@@ -687,15 +668,16 @@
                                                           success: function (response) {
                                                               if (response.success) {
 
+                                                                  console.log(response.data)
                                                                          var tbodytable = $("#tblWfhLogs");
                                                                         tbodytable.empty();
 
                                                                         if (response.data.length > 0) {
                                                                             $.each(response.data, function(index, item) {
                                                                                 var row = `<tr>
-
                                                                                                      <td>${item.date}</td>
-                                                                                                        <td>${item.timeIn}</td>                                                                                                     
+                                                                                                     <td>${item.timE_IN}</td>
+                                                                                                     
                                                                                             </tr>`;
                                                                                 tbodytable.append(row);
                                                                             });
