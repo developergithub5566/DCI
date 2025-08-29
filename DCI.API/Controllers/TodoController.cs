@@ -51,6 +51,14 @@ namespace DCI.API.Controllers
             var result = await _todoRepository.ApprovalWFH(model);
             return StatusCode(result.statuscode, result.message);
         }
+
+        [HttpPost]
+        [Route("ApprovalOvertime")]
+        public async Task<IActionResult> ApprovalOvertime([FromBody] ApprovalHistoryViewModel model)
+        {
+            var result = await _todoRepository.ApprovalOvertime(model);
+            return StatusCode(result.statuscode, result.message);
+        }
         //[HttpPost]
         //[Route("GetAllTodo")]
         //public async Task<IActionResult> GetAllTodo([FromBody] DocumentViewModel model)

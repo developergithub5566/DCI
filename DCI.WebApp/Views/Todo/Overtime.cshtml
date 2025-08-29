@@ -1,29 +1,12 @@
-﻿@model IEnumerable<DCI.Models.ViewModel.LeaveRequestHeaderViewModel>
+﻿@model IEnumerable<DCI.Models.ViewModel.OvertimeViewModel>
 @using Newtonsoft.Json;
 @using DCI.Core.Common;
 @using DCI.Models.ViewModel;
 
-<link href="~/css/DCIcustom.css" rel="stylesheet" />
-<style>
-
-    .custom-file-label {
-        padding: 8px 16px;
-        background-color: #007bff;
-        color: white;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
-    .file-name {
-        margin-left: 10px;
-        font-style: italic;
-    }
-
-</style>
+<link href="~/css/dcicustom.css" rel="stylesheet" />
 
 @{
     var modulePageAccess = Context.Session.GetString("ModulePageAccess");
-
     var canView = false;
     var canAdd = false;
     var canEdit = false;
@@ -57,12 +40,13 @@
     else
     {
         var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
-                        .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Document);
+                    .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Department);
         canView = module?.View ?? false;
         canAdd = module?.Add ?? false;
         canEdit = module?.Update ?? false;
         canDelete = module?.Delete ?? false;
     }
+
 }
 
 <div class="container-fluid">
@@ -71,53 +55,58 @@
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
-
-
-
     <div class="d-sm-flex align-items-center justify-content-between mb-3">
-        <h6 class="m-0 font-weight-bold text-gray-800">To Do</h6>
+        <h6 class="m-0 font-weight-bold text-gray-800">@ViewBag.BreadCrumbLabel</h6>
+        <div class="upperRightDivBtn">
+            @*         <a href="#" title="Add Department" class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")" data-toggle="modal" data-target="#" onclick="newForm()">
+                <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
+                <span class="text text-white"><small>Add Overtime</small></span>
+            </a> *@
 
+  @*           <a asp-controller="DailyTimeRecord" asp-action="AddOvertime" asp-route-OTHeaderId="0" class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")">
+                <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
+                <span class="text text-white"><small>File Overtime</small></span>
+            </a> *@
+        </div>
 
     </div>
     <div class="col-12 p0">
         <ul class="breadcrumb">
             <li><a href="~/Home/Index">Dashboard</a></li>
-            <li>To Do</li>
+            <li><a href="#">To Do</a></li>
+            <li><a href="#">Overtime</a></li>
+
         </ul>
     </div>
 
     <div class="card shadow mb-4">
         <div class="card-header">
-            <label class="mb0">Leave</label>
+            <label class="mb0">Data</label>
         </div>
         <div class="card-body">
             <div class="table-responsive mt20">
-
-
-                <table class="table table-bordered nowrap" id="tblDocument" width="100%" cellspacing="0">
+                <table class="table table-bordered" id="tblDTR">
                     <thead>
                         <tr>
-                            @* 	<th>
-							<label>Id</label>
-							</th> *@
                             <th>
-                                <label>Request No</label>
+                                <label>RequestNo</label>
                             </th>
+                            <th>
+                                <label>Name</label>
+                            </th>
+                            <th>
+                                <label>Total</label>
+                            </th>
+                            <th>
+                                <label>Status</label>
+                            </th>
+                            @*          <th>
+                                <label>CreatedBy</label>
+                            </th> *@
                             <th>
                                 <label>Date Filed</label>
                             </th>
-                            <th>
-                                <label>Requestor</label>
-                            </th>
-                            <th>
-                                <label>Date Covered</label>
-                            </th>
-                            <th>
-                                <label>No. of Days</label>
-                            </th>
-                            @*  <th>
-                                <label>Status</label>
-                            </th>     *@                     
+
                             <th>
                                 Action
                             </th>
@@ -132,100 +121,107 @@
                                     @item.RequestNo
                                 </td>
                                 <td>
-                                    @item.DateFiled.ToString("MM/dd/yyyy hh:mm tt")
+                                    @item.Fullname
                                 </td>
                                 <td>
-                                    @item.EmployeeName
+                                    @item.TotalString
                                 </td>
                                 <td>
-                                    <strong>
-                                        @foreach (var dtl in item.LeaveRequestDetailList)
-                                        {
-                                            <span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>@dtl.LeaveDate.ToShortDateString()</span>
-                                        }
-                                    </strong>
-                                </td>
-                                <td>
-                                    @item.NoofDays
-                                </td>
-                                @*    <td>
                                     @item.StatusName
-                                </td>   *@                            
-
+                                </td>
+                                @*      <td>
+                                    @item.CreatedBy
+                                </td>   *@                             
                                     <td>
-                                    <a href="#" onclick="editForm(@item.LeaveRequestHeaderId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
-                                    @*      <a href="#" onclick='editForm({
-                                                                requestNo:"@item.RequestNo",
-                                                                dateFiled:"@item.DateFiled",
-                                                                empName :"@item.EmployeeName" ,
-                                                                dateCovered : "" ,
-                                                                noDays : "@item.NoofDays",
-                                                                status : "@item.StatusName",
-                                                                reason : "@item.Reason"
-                                                                })' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a> *@
-                                    <a href="#" id="approved" onclick="approvalForm(@item.LeaveRequestHeaderId,@((int)EnumStatus.Approved))" title="Approve" class="btn btn-info"> <i class="fa fa-check"></i></a>
-                                    <a href="#" id="disapproved" onclick="remarksForm(@item.LeaveRequestHeaderId,@((int)EnumStatus.Rejected))" class="btn btn-danger"> <i class="fa fa-remove"></i></a>
+                                    @item.DateCreated
+                                </td>
+
+                                <td>
+                               @*      <a asp-controller="DailyTimeRecord" asp-action="AddOvertime" asp-route-OTHeaderId="@item.OTHeaderId" class="btn btn-primary">
+                                        <i class="fas fa-search"></i>
+                                    </a> *@
+
+                                    <a href="#" onclick='newForm()' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
                                 </td>
                             </tr>
                         }
                     </tbody>
                 </table>
-
-
-
-
             </div>
-            </<div>
-            </div>
+</<div>
+</div>
 
-            <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
+      
+
+            <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+                <div class="modal-dialog modal-lg" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel"><label id="lblReq"></label></h5>
+                            <h5 class="modal-title" id="exampleModalLabel">Overtime Approval</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <form id="createForm">
+                        <form id="wfhInfo">
                             <div class="modal-body">
+
                                 <table class="viewDetailsTbl table table-striped">
                                     <tbody>
-                                        @* <tr>
-                                            <th>Request No.:</th>
-                                            <th class="tblEmNo">  <label id="lblReq"></label></th>
-                                        </tr> *@
                                         <tr>
-                                            <th>Date Filed:</th>
-                                            <th class="tblDate">  <label id="lblDateFiled"></label>  </th>
-                                        </tr>
-
-                                        <tr>
-                                            <th>Employee Name:</th>
-                                            <th class="tblName"> <label id="lblName"></label> </th>
+                                            <input type="hidden" id="WfhHeaderId" name="WfhHeaderId" value="0" />
+                                            <th>Request No:</th>
+                                            <th class="tblDate">  <label id="lblReqNo"></label>  </th>
                                         </tr>
                                         <tr>
-                                            <th>DTR Covered:</th>
-                                            <td><div id="dateContainer"></div></td>
+                                            <th>Recommended By:</th>
+                                            <th class="tblEmNo">  <label id="lblRecommend"></label></th>
                                         </tr>
                                         <tr>
-                                            <th>No. of Days:</th>
-                                            <th class="tblTimeIn"><label id="lblNoDays"></label></th>
-                                        </tr>
+                                            <th>Approver :</th>
+                                            <th class="tblEmNo">  <label id="lblApprver"></label></th>
+                                        </tr>                                      
                                         <tr>
                                             <th>Status:</th>
                                             <td class="tblStatus"><span class="btnSuccess applicationStatus"><label id="lblStatus"></label></span></td>
-                                            <th class="tblStatus"><label id="lblStatus"></label></th>
                                         </tr>
                                         <tr>
-                                            <th>Reason:</th>
-                                            <th class="tblTimeOut"><label id="lblReason"></label></th>
+                                            <th>Remarks:</th>
+                                          @*   <th class="tblName"> <textarea id="Remarks" name="Remarks" rows="3"></textarea></th> *@
+                                             <th class="tblEmNo">  <label id="lblremarks"></label></th>
                                         </tr>
                                     </tbody>
+                                </table>
 
+
+
+                                <table class="table table-bordered text-dark text-xs" >
+                                    <thead>
+                                        <tr>                                         
+                                            <th>
+                                                <label>Overtime Type</label>
+                                            </th>
+                                            <th>
+                                                <label>Date</label>
+                                            </th>
+                                            <th>
+                                                <label>Time From</label>
+                                            </th>
+                                            <th>
+                                                <label>Time To</label>
+                                            </th>
+                                            <th>
+                                                <label>Total Hours</label>
+                                            </th>  
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblOvertime">
+                                    
+                                    </tbody>
                                 </table>
                             </div>
-                            <div class="modal-footer">
+                               <div class="modal-footer">
+                                <a href="#" id="approved" onclick="approvalForm($('#OTHeaderId').val(),@((int)EnumStatus.Approved))" title="Approve" class="btn btn-info"> Approve</a>
+                                <a href="#" id="disapproved" onclick="remarksForm($('#OTHeaderId').val(),@((int)EnumStatus.Rejected))" class="btn btn-danger"> Disapprove</a>
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal"><small>Close</small></button>
                             </div>
                         </form>
@@ -233,7 +229,7 @@
                 </div>
             </div>
 
-            <!-- Remarks modal -->
+                  <!-- Remarks modal -->
             <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="remarksmodal" aria-hidden="true" id="remarksmodal">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -255,209 +251,213 @@
                             <button type="button" class="btn btn-info" onclick="approvalRemarksForm()" id="btnApprove">Submit</button>
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         </div>
+
                     </div>
                 </div>
             </div>
 
-            <input type="hidden" id="HiddenHeaderId" name="HiddenDocId" value="">
-            <input type="hidden" id="HiddenAction" name="HiddenAction" value="">
-        </div>
-
 @section scripts {
-    @* <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script> *@
-            <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
 
-            <script>
-                window.addEventListener('DOMContentLoaded', () => {
-                    const urlParams = new URLSearchParams(window.location.search);
-                 console.log("bypass-" + urlParams);
-                    const id = urlParams.get('leaveId');
-                    if (id) {
-                        editForm(id);
-                    }
-                });
-            </script>
-
-
-            <script type="text/javascript">
-                var js = jQuery.noConflict(true);
-
-                $('.spinner-overlay').show();
-
-                setTimeout(() => {
-                    $('.spinner-overlay').hide();
-                }, 200);
-
-                $(document).ready(function () {
+                <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
+                <script src="~/js/dci-validation.js"></script>
+                <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 
 
+                <script type="text/javascript">
+                            var js = jQuery.noConflict(true);
+                                               let fromTime = null;
+                        let toTime = null;
+
+                                    $('.spinner-overlay').show();
+
+                        setTimeout(() => {
+                            $('.spinner-overlay').hide();
+                        }, 200);
 
 
-                });
+                            $(document).ready(function () {
+                                js('#tblDTR').DataTable({
+                                     order: [[2, 'desc']]
+                                });     
+                            });
 
 
-                                           // document.getElementById('lblReq').textContent = dtr.requestNo;
-                           //      document.getElementById('lblDateFiled').textContent = dtr.dateFiled;
-                           //       document.getElementById('lblName').textContent = dtr.empName;
-                           //       document.getElementById('lblSource').textContent = dtr.dateCovered;
-                           //       document.getElementById('lblNoDays').textContent = dtr.noDays;
-                           //        document.getElementById('lblStatus').textContent = dtr.status
-                           //           document.getElementById('lblReason').textContent = dtr.reason
 
-                        function editForm(leaveHdrId) {
-                             const formData = new FormData();
-                                formData.append('LeaveRequestHeaderId', leaveHdrId);
+                
 
-                                  $.ajax({
-                                      type: 'POST',
-                                      url: '@Url.Action("RequestLeave", "DailyTimeRecord")',
-                                      data: formData,
-                                      processData: false,
-                                      contentType: false,
-                                      success: function (response) {
-                                          if (response.success) {
-                                                 console.log(response);
+                            // function newForm(dtr) {
+                            //    // console.log(dtr)
 
-                                         document.getElementById('lblReq').textContent = response.data.leaveRequestHeader.requestNo;
-                                       document.getElementById('lblDateFiled').textContent = response.data.leaveRequestHeader.dateFiledString;
-                                        document.getElementById('lblName').textContent = response.data.leaveRequestHeader.employeeName;
-                                        document.getElementById('lblNoDays').textContent = response.data.leaveRequestHeader.noofDays;
-                                         document.getElementById('lblStatus').textContent = response.data.leaveRequestHeader.statusName;
-                                            document.getElementById('lblReason').textContent = response.data.leaveRequestHeader.reason;
-
-                                              var container = $('#dateContainer');
-                                              container.empty();
+                            //       const timefrom = document.querySelector("#OTTimeFrom")._flatpickr;
+                            //                          timefrom.clear();
+                            //       const timeto = document.querySelector("#OTTimeTo")._flatpickr;
+                            //                                          timeto.clear();
 
 
-                                                  response.data.leaveDateList.forEach(function (date) {
-                                                         var span = `<span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>${date}</span>`;
-                                                         container.append(span);
-                                                     });
 
-                                              js('#createmodal').modal('show');
-                                          } else {
-                                              Swal.fire({
-                                                  text: response.message,
-                                                  icon: "error"
-                                              });
-                                          }
-                                          $('.spinner-overlay').hide();
-                                      },
-                                      error: function () {
-                                          $('.spinner-overlay').hide();
-                                          Swal.fire({
-                                              text: "An error occurred. Please try again.",
-                                              icon: "error"
+
+                            //         js('#createmodal').modal('show');
+                            // }
+
+                               function newForm(dtr) {
+                                          
+                                          $.ajax({
+                                              type: 'POST',
+                                             url: '@Url.Action("AddOvertimeJson", "DailyTimeRecord")',
+                                            data: { OTHeaderId: 1 },
+                                              success: function (response) {
+                                                  if (response.success) {
+                                                      console.log(response.data);
+
+                                       document.getElementById('lblReqNo').textContent =response.data.requestNo;
+                               document.getElementById('lblRecommend').textContent =response.data.recommendedBy;
+                               document.getElementById('lblApprver').textContent =response.data.approvedBy;
+                           document.getElementById('lblStatus').textContent =response.data.statusName;
+                    document.getElementById('lblremarks').textContent =response.data.remarks;
+
+
+                                                   var tbodytable = $("#tblOvertime");                
+                                                    tbodytable.empty();
+                                                  
+
+                                                    if (response.data.otDetails.length > 0) {
+                                                        $.each(response.data.otDetails, function(index, item) {
+                                                            var row = `<tr>
+                                                                             <td>${item.otTypeName}</td>
+                                                                                <td>${item.otDateString}</td>
+                                                                                <td>${item.otTimeFrom}</td>
+                                                                                   <td>${item.otTimeTo}</td>
+                                                                            <td>${item.totalHours}</td>
+                                                                        </tr>`;
+                                                            tbodytable.append(row);
+                                                        });
+                                                    } else {
+                                                        tbodytable.html(`<tr><td colspan="5" class="text-center">No record found.</td></tr>`);
+                                                    }
+
+                                                      js('#filewfhmodal').modal('show');
+
+                                                  } else {
+                                                      Swal.fire({
+                                                          text: response.message,
+                                                          icon: "error"
+                                                      });
+                                                  }
+                                                  $('.spinner-overlay').hide();
+                                              },
+                                              error: function () {
+                                                  $('.spinner-overlay').hide();
+                                                  Swal.fire({
+                                                      text: "An error occurred. Please try again.",
+                                                      icon: "error"
+                                                  });
+                                              }
                                           });
-                                      }
-                                  });
-                               js('#createmodal').modal('show');
-                }
 
 
+                                js('#createmodal').modal('show');
+                        }
 
+                                function approvalForm(headerId,status) {
 
+                                 $('.spinner-overlay').show();
+                            $.ajax({
+                                type: 'POST',
+                                url: '@Url.Action("ApprovalWFH", "Todo")',
+                                data: { TransactionId : headerId , Status: status, Remarks: $('#Remarks').val() },
 
+                                success: function (response) {
+                                    if (response.success) {
+                                                            Swal.fire({
+                                                                text: response.message,
+                                                                icon: "success",
+                                                                confirmButtonText: "Ok"
+                                                            }).then((result) => {
+                                                                location.reload();
+                                                            });
 
-
-                function approvalForm(leaveId,status) {
-
-                             $('.spinner-overlay').show();
-                        $.ajax({
-                            type: 'POST',
-                            url: '@Url.Action("Approval", "Todo")',
-                            data: { TransactionId : leaveId , Status: status, Remarks: $('#Remarks').val() },
-
-                            success: function (response) {
-                                if (response.success) {
-                                                        Swal.fire({
-                                                            text: response.message,
-                                                            icon: "success",
-                                                            confirmButtonText: "Ok"
-                                                        }).then((result) => {
-                                                            location.reload();
-                                                        });
-
-                                        } else {
+                                            } else {
+                                        Swal.fire({
+                                            text: response.message,
+                                            icon: "error"
+                                        });
+                                    }
+                                     $('.spinner-overlay').hide();
+                                },
+                                error: function () {
+                                     $('.spinner-overlay').hide();
                                     Swal.fire({
-                                        text: response.message,
+                                        text: "An error occurred. Please try again.",
                                         icon: "error"
                                     });
                                 }
-                                 $('.spinner-overlay').hide();
-                            },
-                            error: function () {
-                                 $('.spinner-overlay').hide();
-                                Swal.fire({
-                                    text: "An error occurred. Please try again.",
-                                    icon: "error"
-                                });
-                            }
-                        });
+                            });
+                    }
 
 
-                }
+                     function remarksForm(headerId,status) {
 
-                 function remarksForm(leaveId,status) {
-                      $('#Remarks_Approval').val("");
-                      $('#HiddenHeaderId').val(leaveId);
-                      $('#HiddenAction').val(status);
-                       js('#remarksmodal').modal('show');
-                 }
-
-                 function approvalRemarksForm() {
-
-                  if($('#Remarks_Approval').val() == "")
-                  {
-                         Swal.fire({
-                                        text: "Please input remarks",
-                                        icon: "error"
-                                    });
-                  }
-                  else
-                  {
+                          $('#Remarks_Approval').val("");
+                          $('#HiddenHeaderId').val(headerId);
+                                 $('#WfhHeaderId').val(headerId);
+                          $('#HiddenAction').val(status);
+                           js('#remarksmodal').modal('show');
+                     }
 
 
-                     const _transId =  $('#HiddenHeaderId').val();
-                      const _action =  $('#HiddenAction').val();
 
-                                          $('.spinner-overlay').show();
+                    function approvalRemarksForm() {
 
-                        $.ajax({
-                            type: 'POST',
-                            url: '@Url.Action("Approval", "Todo")',
-                            data: { TransactionId: _transId , Status: _action, Remarks: $('#Remarks_Approval').val() },
-                            success: function (response) {
-                                if (response.success) {
-                                                        Swal.fire({
-                                                            text: response.message,
-                                                            icon: "success",
-                                                            confirmButtonText: "Ok"
-                                                        }).then((result) => {
-                                                            location.reload();
-                                                        });
-
-                                        } else {
-                                    Swal.fire({
-                                        text: response.message,
-                                        icon: "error"
-                                    });
-                                }
-                                      $('.spinner-overlay').hide();
-                            },
-                            error: function () {
-                                      $('.spinner-overlay').hide();
-                                Swal.fire({
-                                    text: "An error occurred. Please try again.",
-                                    icon: "error"
-                                });
-                            }
-                        });
-
-                   }
-                   }
+                                 if($('#Remarks_Approval').val() == "")
+                                 {
+                                        Swal.fire({
+                                                       text: "Please input remarks",
+                                                       icon: "error"
+                                                   });
+                                 }
+                                 else
+                                 {
 
 
-            </script>
+                                    const _transId =  $('#HiddenHeaderId').val();
+                                     const _action =  $('#HiddenAction').val();
+
+                                    $('.spinner-overlay').show();
+
+                                       $.ajax({
+                                           type: 'POST',
+                                           url: '@Url.Action("ApprovalWFH", "Todo")',
+                                           data: { TransactionId: _transId , Status: _action, Remarks: $('#Remarks_Approval').val() },
+                                           success: function (response) {
+                                               if (response.success) {
+                                                                       Swal.fire({
+                                                                           text: response.message,
+                                                                           icon: "success",
+                                                                           confirmButtonText: "Ok"
+                                                                       }).then((result) => {
+                                                                           location.reload();
+                                                                       });
+
+                                                       } else {
+                                                   Swal.fire({
+                                                       text: response.message,
+                                                       icon: "error"
+                                                   });
+                                               }
+                                                     $('.spinner-overlay').hide();
+                                           },
+                                           error: function () {
+                                                     $('.spinner-overlay').hide();
+                                               Swal.fire({
+                                                   text: "An error occurred. Please try again.",
+                                                   icon: "error"
+                                               });
+                                           }
+                                       });
+                                  }
+                      }
+
+                </script>
 }

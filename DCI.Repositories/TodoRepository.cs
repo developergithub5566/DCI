@@ -444,6 +444,7 @@ namespace DCI.Repositories
                 var statusList = _dbContext.Status.AsQueryable().ToList();
                 var approvalLog = _dbContext.ApprovalHistory.AsQueryable().ToList();
                 var dtrcontext = _dbContext.DTRCorrection.AsQueryable().ToList();
+                var wfhcontext  = _dbContext.WfhHeader.AsQueryable().ToList();
 
                 var queryLeave = from apprv in approvalLog
                                  join hdr in leaveHdr on apprv.TransactionId equals hdr.LeaveRequestHeaderId
@@ -479,7 +480,24 @@ namespace DCI.Repositories
                                    DateCreated = dtr.DateFiled
                                };
 
-                return queryLeave.Concat(queryDTR).ToList();
+                var queryWFH = from apprv in approvalLog
+                               join wfh in wfhcontext on apprv.TransactionId equals wfh.WfhHeaderId
+                               join emp in empList on wfh.EmployeeId equals emp.EmployeeId
+                               join stat in statusList on wfh.Status equals stat.StatusId
+                               where apprv.IsActive == true && apprv.ModulePageId == (int)EnumModulePage.WFH //apprv.ApproverId == model.CurrentUserId && 
+                               select new ApprovalHistoryViewModel
+                               {
+                                   ApprovalHistoryId = apprv.ApprovalHistoryId,
+                                   RequestNo = wfh.RequestNo,
+                                   Requestor = emp.Firstname + " " + emp.Lastname,
+                                   Status = wfh.Status,
+                                   StatusName = stat.StatusName,
+                                   StatusDate = apprv.DateCreated.ToString(),
+                                   ModuleName = "WFH",
+                                   DateCreated = wfh.DateCreated
+                               };
+
+                return queryLeave.Concat(queryDTR).Concat(queryWFH).ToList();
 
 
                 //  return query.ToList();
@@ -538,6 +556,56 @@ namespace DCI.Repositories
             return query;
         }
 
+        public async Task<(int statuscode, string message)> ApprovalOvertime(ApprovalHistoryViewModel param)
+        {
+            try
+            {
+                ApprovalHistory entity = new ApprovalHistory();
+                entity.ModulePageId = (int)EnumModulePage.WFH;
+                entity.TransactionId = param.TransactionId;
+                entity.ApproverId = param.ApproverId;
+                entity.Status = param.Status;
+                entity.Remarks = param.Remarks;
+                entity.CreatedBy = param.CreatedBy;
+                entity.DateCreated = DateTime.Now;
+                entity.IsActive = true;
+                await _dbContext.ApprovalHistory.AddAsync(entity);
+                await _dbContext.SaveChangesAsync();
 
+
+                //OPTIMIZED CODE CHATGPT END
+
+
+                // var entitiesToViewModel = await _dtrRepository.DTRCorrectionByDtrId(contextHdr.DtrId);
+
+                // Send Email Notif
+                //   await _emailRepository.SendToRequestorDTR(entitiesToViewModel);
+
+                string status = param.Status == (int)EnumStatus.Approved ? "approved" : "disapproved";
+
+                //NotificationViewModel notifvm = new NotificationViewModel();
+                //notifvm.Title = "WFH";
+                //notifvm.Description = String.Format("WFH Request No {0} has been {1}", contextHdr.RequestNo, status);
+                //notifvm.ModuleId = (int)EnumModulePage.WFH;
+                //notifvm.TransactionId = param.TransactionId;
+                //notifvm.AssignId = contextHdr.CreatedBy;
+                //notifvm.URL = "/DailyTimeRecord/WFH/?wfhHeader=" + contextHdr.WfhHeaderId;
+                //notifvm.MarkRead = false;
+                //notifvm.CreatedBy = param.CreatedBy;
+                //notifvm.IsActive = true;
+                //await _homeRepository.SaveNotification(notifvm);
+
+                return (StatusCodes.Status200OK, String.Format("WFH Request No {0} has been {1}.","RequestNo", status));
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return (StatusCodes.Status406NotAcceptable, ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
     }
 }

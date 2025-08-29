@@ -126,7 +126,7 @@
 
                                 <td class="text-center">
                                     <a href="#" onclick='viewWFHdDetails(@item.WfhHeaderId);' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
-                                                        
+
                                     <a href="#" id="approved" onclick="approvalForm(@item.WfhHeaderId,@((int)EnumStatus.Approved))" title="Approve" class="btn btn-info"> <i class="fa fa-check"></i></a>
                                     <a href="#" id="disapproved" onclick="remarksForm(@item.WfhHeaderId,@((int)EnumStatus.Rejected))" class="btn btn-danger"> <i class="fa fa-remove"></i></a>
                                 </td>
@@ -185,185 +185,214 @@
                     </div>
                 </div>
             </div>
-       
-        </div>
+
+            <!-- Remarks modal -->
+            <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="remarksmodal" aria-hidden="true" id="remarksmodal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Required</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col">
+                                    <label for="Remarks" class="col-form-label required">Remarks:</label>
+                                    <textarea rows="2" class="form-control" id="Remarks_Approval" name="Remarks_Approval"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-info" onclick="approvalRemarksForm()" id="btnApprove">Submit</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <input type="hidden" id="HiddenDocId" name="HiddenDocId" value="">
+            <input type="hidden" id="HiddenAction" name="HiddenAction" value="">
+        </div>     <!-- Remarks modal END -->
+
+    </div>
 
 
 
 @section scripts {
 
-            <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
-            <script src="~/js/dci-validation.js"></script>
+        <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
+        <script src="~/js/dci-validation.js"></script>
 
-            <script type="text/javascript">
-                        var js = jQuery.noConflict(true);
+        <script type="text/javascript">
+                    var js = jQuery.noConflict(true);
 
-                                $('.spinner-overlay').show();
+                            $('.spinner-overlay').show();
 
-                    setTimeout(() => {
-                        $('.spinner-overlay').hide();
-                    }, 200);
+                setTimeout(() => {
+                    $('.spinner-overlay').hide();
+                }, 200);
 
 
-                        $(document).ready(function () {
-                            // js('#tblDTR').DataTable({
-                            //      order: [[2, 'desc']]
-                            // });
-                          
-                        });
+                    $(document).ready(function () {
+                        // js('#tblDTR').DataTable({
+                        //      order: [[2, 'desc']]
+                        // });
 
-                function viewWFHdDetails(headerId){
-                       $('#HiddenHeaderId').val(headerId);
-                          $('#WfhHeaderId').val(headerId);
-                       
-                                          $.ajax({
-                                              type: 'POST',
-                                              url: '@Url.Action("WFHApplicationDetails", "DailyTimeRecord")',
-                                                data: { WFHHeaderId: headerId },
-                                              success: function (response) {
-                                                  if (response.success) {
+                    });
 
-                                                      console.log(response.data);
+            function viewWFHdDetails(headerId){
+                   $('#HiddenHeaderId').val(headerId);
+                      $('#WfhHeaderId').val(headerId);
 
-                                                           var tbodytable = $("#tblFileforWFH");
-                                                    tbodytable.empty();
+                                      $.ajax({
+                                          type: 'POST',
+                                          url: '@Url.Action("WFHApplicationDetails", "DailyTimeRecord")',
+                                            data: { WFHHeaderId: headerId },
+                                          success: function (response) {
+                                              if (response.success) {
 
-                                                    if (response.data.length > 0) {
-                                                        $.each(response.data, function(index, item) {
-                                                            var row = `<tr>
+                                                  console.log(response.data);
 
-                                                                                 <td>${item.date}</td>
-                                                                                    <td>${item.timeIn}</td>
-                                                                                    <td>${item.timeOut}</td>
-                                                                                       <td>${item.totalWorkingHours}</td>
-                                                                        </tr>`;
-                                                            tbodytable.append(row);
-                                                        });
-                                                    } else {
-                                                        tbodytable.html(`<tr><td colspan="4" class="text-center">No record found.</td></tr>`);
-                                                    }
+                                                       var tbodytable = $("#tblFileforWFH");
+                                                tbodytable.empty();
 
-                                                      js('#filewfhmodal').modal('show');
+                                                if (response.data.length > 0) {
+                                                    $.each(response.data, function(index, item) {
+                                                        var row = `<tr>
 
-                                                  } else {
-                                                      Swal.fire({
-                                                          text: response.message,
-                                                          icon: "error"
-                                                      });
-                                                  }
-                                                  $('.spinner-overlay').hide();
-                                              },
-                                              error: function () {
-                                                  $('.spinner-overlay').hide();
+                                                                             <td>${item.date}</td>
+                                                                                <td>${item.timeIn}</td>
+                                                                                <td>${item.timeOut}</td>
+                                                                                   <td>${item.totalWorkingHours}</td>
+                                                                    </tr>`;
+                                                        tbodytable.append(row);
+                                                    });
+                                                } else {
+                                                    tbodytable.html(`<tr><td colspan="4" class="text-center">No record found.</td></tr>`);
+                                                }
+
+                                                  js('#filewfhmodal').modal('show');
+
+                                              } else {
                                                   Swal.fire({
-                                                      text: "An error occurred. Please try again.",
+                                                      text: response.message,
                                                       icon: "error"
                                                   });
                                               }
-                                          });
-                }
+                                              $('.spinner-overlay').hide();
+                                          },
+                                          error: function () {
+                                              $('.spinner-overlay').hide();
+                                              Swal.fire({
+                                                  text: "An error occurred. Please try again.",
+                                                  icon: "error"
+                                              });
+                                          }
+                                      });
+            }
 
 
-                  function approvalForm(headerId,status) {
+              function approvalForm(headerId,status) {
 
-                    
+                         $('.spinner-overlay').show();
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("ApprovalWFH", "Todo")',
+                        data: { TransactionId : headerId , Status: status, Remarks: $('#Remarks').val() },
 
+                        success: function (response) {
+                            if (response.success) {
+                                                    Swal.fire({
+                                                        text: response.message,
+                                                        icon: "success",
+                                                        confirmButtonText: "Ok"
+                                                    }).then((result) => {
+                                                        location.reload();
+                                                    });
 
-                             $('.spinner-overlay').show();
-                        $.ajax({
-                            type: 'POST',
-                            url: '@Url.Action("ApprovalWFH", "Todo")',
-                            data: { TransactionId : headerId , Status: status, Remarks: $('#Remarks').val() },
-
-                            success: function (response) {
-                                if (response.success) {
-                                                        Swal.fire({
-                                                            text: response.message,
-                                                            icon: "success",
-                                                            confirmButtonText: "Ok"
-                                                        }).then((result) => {
-                                                            location.reload();
-                                                        });
-
-                                        } else {
-                                    Swal.fire({
-                                        text: response.message,
-                                        icon: "error"
-                                    });
-                                }
-                                 $('.spinner-overlay').hide();
-                            },
-                            error: function () {
-                                 $('.spinner-overlay').hide();
+                                    } else {
                                 Swal.fire({
-                                    text: "An error occurred. Please try again.",
+                                    text: response.message,
                                     icon: "error"
                                 });
                             }
-                        });
+                             $('.spinner-overlay').hide();
+                        },
+                        error: function () {
+                             $('.spinner-overlay').hide();
+                            Swal.fire({
+                                text: "An error occurred. Please try again.",
+                                icon: "error"
+                            });
+                        }
+                    });
 
 
-                }
+            }
 
-                 function remarksForm(headerId,status) {
-                      $('#Remarks_Approval').val("");
-                      $('#HiddenHeaderId').val(headerId);
-                      $('#HiddenAction').val(status);
-                       js('#remarksmodal').modal('show');
-                 }
+             function remarksForm(headerId,status) {
+              
+                  $('#Remarks_Approval').val("");
+                  $('#HiddenHeaderId').val(headerId);
+                         $('#WfhHeaderId').val(headerId);
+                  $('#HiddenAction').val(status);
+                   js('#remarksmodal').modal('show');
+             }
 
-                 function approvalRemarksForm() {
+             function approvalRemarksForm() {
 
-                  if($('#Remarks_Approval').val() == "")
-                  {
-                         Swal.fire({
-                                        text: "Please input remarks",
-                                        icon: "error"
-                                    });
-                  }
-                  else
-                  {
+                          if($('#Remarks_Approval').val() == "")
+                          {
+                                 Swal.fire({
+                                                text: "Please input remarks",
+                                                icon: "error"
+                                            });
+                          }
+                          else
+                          {
 
 
-                     const _transId =  $('#HiddenHeaderId').val();
-                      const _action =  $('#HiddenAction').val();
+                             const _transId =  $('#HiddenHeaderId').val();
+                              const _action =  $('#HiddenAction').val();
 
-                                          $('.spinner-overlay').show();
+                                                  $('.spinner-overlay').show();
 
-                        $.ajax({
-                            type: 'POST',
-                            url: '@Url.Action("ApprovalWFH", "Todo")',
-                            data: { TransactionId: _transId , Status: _action, Remarks: $('#Remarks_Approval').val() },
-                            success: function (response) {
-                                if (response.success) {
-                                                        Swal.fire({
-                                                            text: response.message,
-                                                            icon: "success",
-                                                            confirmButtonText: "Ok"
-                                                        }).then((result) => {
-                                                            location.reload();
-                                                        });
+                                $.ajax({
+                                    type: 'POST',
+                                    url: '@Url.Action("ApprovalWFH", "Todo")',
+                                    data: { TransactionId: _transId , Status: _action, Remarks: $('#Remarks_Approval').val() },
+                                    success: function (response) {
+                                        if (response.success) {
+                                                                Swal.fire({
+                                                                    text: response.message,
+                                                                    icon: "success",
+                                                                    confirmButtonText: "Ok"
+                                                                }).then((result) => {
+                                                                    location.reload();
+                                                                });
 
-                                        } else {
-                                    Swal.fire({
-                                        text: response.message,
-                                        icon: "error"
-                                    });
-                                }
-                                      $('.spinner-overlay').hide();
-                            },
-                            error: function () {
-                                      $('.spinner-overlay').hide();
-                                Swal.fire({
-                                    text: "An error occurred. Please try again.",
-                                    icon: "error"
+                                                } else {
+                                            Swal.fire({
+                                                text: response.message,
+                                                icon: "error"
+                                            });
+                                        }
+                                              $('.spinner-overlay').hide();
+                                    },
+                                    error: function () {
+                                              $('.spinner-overlay').hide();
+                                        Swal.fire({
+                                            text: "An error occurred. Please try again.",
+                                            icon: "error"
+                                        });
+                                    }
                                 });
-                            }
-                        });
-
-                   }
-                   }
+                           }
+               }
 
 
-            </script>
+        </script>
 }
