@@ -91,12 +91,12 @@
                                     <label class="bottomLabelText">Last Name</label>
                                 </div>
                             </div>
-                            <div class="col-lg-4">
+                   @*          <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
                                     <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.Prefix) ? "-" : Model.Prefix)</label>
                                     <label class="bottomLabelText">Prefix</label>
                                 </div>
-                            </div>
+                            </div> *@
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
                                     <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.Suffix) ? "-" : Model.Suffix)</label>
@@ -143,27 +143,34 @@
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.Pagibig) ? "00-00000000-0" : Model.Pagibig)</label>
+                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.Pagibig) ? "0000-0000-0000" : Model.Pagibig)</label>
                                     <label class="bottomLabelText">Pagibig(HDMF)</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group mb10 text-center">
+                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.Philhealth) ? "00-000000000-0" : Model.Philhealth)</label>
+                                    <label class="bottomLabelText">Philhealth</label>
                                 </div>
                             </div>
                          
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                    <label class="topLabelText">-</label>
+                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.NationalId) ? "0000-0000-0000-0000" : Model.NationalId)</label>
                                     <label class="bottomLabelText">National ID</label>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.ContactPerson) ? "-" : Model.ContactPerson)</label>
-                                    <label class="bottomLabelText">Contact Person</label>
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="ContactPerson" name="ContactPerson" value="@(string.IsNullOrWhiteSpace(Model.ContactPerson) ? "-" : Model.ContactPerson)">
+                                    <label class="bottomLabelText">Contact Person</label>                                
+                         
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.ContactPersonNo) ? "-" : Model.ContactPersonNo)</label>
-                                    <label class="bottomLabelText">Contact Person No</label>
+                                    <input type="number" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="ContactPersonNo" name="ContactPersonNo" value="@(string.IsNullOrWhiteSpace(Model.ContactPersonNo) ? "-" : Model.ContactPersonNo)">
+                                    <label class="bottomLabelText">Contact Person Number</label>
                                 </div>
                             </div>
 
@@ -360,6 +367,8 @@
                     formData.append('Nickname',  $('#Nickname').val());
                      formData.append('MobileNoPersonal', $('#MobileNoPersonal').val());
                      formData.append('EmailPersonal', $('#EmailPersonal').val());
+                        formData.append('ContactPerson', $('#ContactPerson').val());
+                           formData.append('ContactPersonNo', $('#ContactPersonNo').val());
                 console.log(formData);
                 Swal.fire({
                     text: "Are you sure you want to save this record?",

@@ -44,7 +44,8 @@
                             <div class="h3 mb-0 font-weight-bold text-dark">@Model.VLBalance</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fa-solid fa-tree-city fa-2x text-gray-300"></i>
+                   
+                            <i class="fa-solid fa-plane fa-2x text-gray-300"></i>
                         </div>
                     </div>
                 </div>
@@ -80,7 +81,7 @@
                             <div class="h3 mb-0 font-weight-bold text-dark">0</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fa-solid fa-plane fa-2x text-gray-300"></i>
+                            <i class="fa-solid fa-tree-city fa-2x text-gray-300"></i>
                         </div>
                     </div>
                 </div>
@@ -351,7 +352,7 @@
                             <div class="form-group">
                                 <label class="frmText"><span class="required">*</span> No. of Days</label>
                                 @*  <input type="number" min="0" step="any" name="NO_DAYS" class="form-control frmField" autocomplete="off"> *@
-                                <input type="text" min="0" step="any" id="NoOfDays" name="NoOfDays" class="form-control frmField" readonly="true">
+                                <input type="text" step="any" id="NoOfDays" name="NoOfDays" class="form-control frmField" autocomplete="off" onkeypress="return isNumber(event);">
                             </div>
                         </div>
 
@@ -425,7 +426,7 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
-
+    <script src="~/js/dci-validation.js"></script>
 
     <script>
         window.addEventListener('DOMContentLoaded', () => {

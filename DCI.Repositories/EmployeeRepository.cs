@@ -285,6 +285,8 @@ namespace DCI.Repositories
                     emp.Nickname = model.Nickname;    
                     emp.MobileNoPersonal = model.MobileNoPersonal;
                     emp.EmailPersonal = model.EmailPersonal;
+                    emp.ContactPerson = model.ContactPerson;
+                emp.ContactPersonNo = model.ContactPersonNo;
                     emp.DateModified = DateTime.Now;
                     emp.ModifiedBy = model.ModifiedBy;
                     _dbContext.Employee.Entry(emp).State = EntityState.Modified;

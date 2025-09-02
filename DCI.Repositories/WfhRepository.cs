@@ -73,6 +73,7 @@ namespace DCI.Repositories
             entity.DATE_TIME = DateTime.Now;
             entity.CREATED_DATE = DateTime.Now;
             entity.CREATED_BY = model.CREATED_BY;
+            entity.STATUS = (int)EnumStatus.Draft;
             await _dbContext.tbl_wfh_logs.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
 

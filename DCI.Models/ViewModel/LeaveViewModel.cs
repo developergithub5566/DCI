@@ -9,6 +9,7 @@ namespace DCI.Models.ViewModel
         public string EmpNo { get; set; } = string.Empty;
         public decimal VLBalance { get; set; } = 0;
         public decimal SLBalance { get; set; } = 0;
+        public decimal SPLBalance { get; set; } = 0;
         public int LeaveTypeId { get; set; } = 0;
 
         public List<LeaveSummaryViewModel>? vlSummaries { get; set; } = new();
