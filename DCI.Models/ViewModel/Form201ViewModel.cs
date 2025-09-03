@@ -48,6 +48,7 @@ namespace DCI.Models.ViewModel
         public string? DepartmentName { get; set; }
         public string? JobFunction { get; set; }
         public DateTime? DateHired { get; set; }
+        public DateTime? DateRegularized { get; set; }
         public int? PositionId { get; set; }
         public string? PositionName { get; set; } = string.Empty;
         public bool IsResigned { get; set; } = false;

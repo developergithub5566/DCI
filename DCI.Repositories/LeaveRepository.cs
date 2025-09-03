@@ -85,7 +85,7 @@ namespace DCI.Repositories
          await GetYearList(model, param.EmployeeId);
 
           var vlSummary = _dbContext.LeaveSummary
-                    .FromSqlInterpolated($"EXEC sp_GetVacationLeaveBalance @EmployeeId = {param.EmployeeId},@Year = {_currentYear.ToString()}, @LeaveType =  'VL'  ")
+                    .FromSqlInterpolated($"EXEC get_LeaveBalanceRegular @EmployeeId = {param.EmployeeId},@Year = {_currentYear.ToString()}, @LeaveType =  'VL'  ")
                     .ToList();
 
             model.vlSummaries = vlSummary
@@ -102,7 +102,7 @@ namespace DCI.Repositories
 
 
             var slSummary = _dbContext.LeaveSummary
-                      .FromSqlInterpolated($"EXEC sp_GetVacationLeaveBalance @EmployeeId = {param.EmployeeId},@Year = {_currentYear.ToString()}, @LeaveType =  'SL'  ")
+                      .FromSqlInterpolated($"EXEC get_LeaveBalanceRegular @EmployeeId = {param.EmployeeId},@Year = {_currentYear.ToString()}, @LeaveType =  'SL'  ")
                       .ToList();
 
             model.slSummaries = slSummary

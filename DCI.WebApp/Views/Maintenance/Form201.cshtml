@@ -111,7 +111,7 @@
                                 <div class="form-group mb10 text-center">
 
                                     @*  <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Suffix" name="Suffix" value="@(string.IsNullOrWhiteSpace(Model.Suffix) ? "-" : Model.Suffix)"> *@
-                                    <select id="SexSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" asp-for="Suffix"  required>
+                                    <select id="SexSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" asp-for="Suffix" >
                                         <option value="">SELECT SUFFIX</option>
                                         <option value="1.">Jr.</option>
                                         <option value="2">II</option>
@@ -245,14 +245,14 @@
                             <div class="col-lg-6">
                                 <div class="form-group mb10 text-center">
 
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Email" name="Email" value="@(string.IsNullOrWhiteSpace(Model.Email) ? "-" : Model.Email)">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Email" name="Email" placeholder="email@dci.ph" value="@(string.IsNullOrWhiteSpace(Model.Email) ? "" : Model.Email)">
                                     <label class="bottomLabelText">Company Email</label>
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group mb10 text-center">
 
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="MobileNoOffice" name="MobileNoOffice"  value="@(string.IsNullOrWhiteSpace(Model.MobileNoOffice) ? "-" : Model.MobileNoOffice)">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="MobileNoOffice" name="MobileNoOffice" value="@(string.IsNullOrWhiteSpace(Model.MobileNoOffice) ? "-" : Model.MobileNoOffice)">
                                     <label class="bottomLabelText">Company Mobile No.</label>
                                 </div>
                             </div>
@@ -320,7 +320,7 @@
                                     <label class="bottomLabelText">Department</label>
                                 </div>
                             </div>
-                            <div class="col-lg-5">
+                            <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
                                     @*        <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.EmployeeStatusName) ? "-" : Model.EmployeeStatusName)</label> *@
                                     @*   <select id="empStatusSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" required>                                  
@@ -336,7 +336,13 @@
                                     <label class="bottomLabelText">Date Hired</label>
                                 </div>
                             </div>
-
+                            <div class="col-lg-3">
+                                <div class="form-group mb10 text-center">
+                                    @*  <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.DateHired.ToString()) ? "-" : Model.DateHired?.ToString("MMMM dd, yyyy"))</label> *@
+                                    <input type="text" name="DateRegularized" id="DateRegularized" class="bg-gray-100 font-weight-bold form-control frmField text-center" autocomplete="off" value="@Model.DateRegularized?.ToString("yyyy-MM-dd")">
+                                    <label class="bottomLabelText">Date Regularized</label>
+                                </div>
+                            </div>
 
                             <div class="col-lg-2">
                                 <div class="form-group mb10 text-center">
@@ -345,7 +351,7 @@
                                     <label class="bottomLabelText">Salary</label>
                                 </div>
                             </div>
-                            <div class="col-lg-2">
+                        @*     <div class="col-lg-2">
                                 <div class="form-group mb10 text-center">
                                     <select id="bandlevelSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" asp-for="BandLevel" required>
                                         <option value="">SELECT BAND LVL</option>
@@ -360,7 +366,7 @@
                                     </select>
                                     <label class="bottomLabelText">Band Level</label>
                                 </div>
-                            </div>
+                            </div> *@
                         </div>
 
                         @*            <div class="col-12 mt20">
@@ -436,6 +442,9 @@
 
                                         flatpickr("#DateHired", {
                                        dateFormat: "Y-m-d",                                    
+                                    });
+                                       flatpickr("#DateRegularized", {
+                                       dateFormat: "Y-m-d",
                                     });
 
                                     // if(fp != null){

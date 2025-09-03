@@ -124,6 +124,7 @@ namespace DCI.Repositories
                                                 DepartmentName = dpt.Description,
                                                 JobFunction = dtl.JobFunction,
                                                 DateHired = dtl.DateHired,
+                                                DateRegularized = dtl.DateRegularized,
                                                 PositionId = post.PositionId,
                                                 PositionName = post.Description,
                                                 ResignedDate = dtl.ResignedDate,
@@ -200,6 +201,7 @@ namespace DCI.Repositories
                     dtl.DepartmentId = model.DepartmentId;
                     dtl.JobFunction = model.JobFunction;
                     dtl.DateHired = model.DateHired;
+                    dtl.DateRegularized = model.DateRegularized;
                     dtl.Position = model.PositionId;
                     dtl.ResignedDate = model.ResignedDate;
                     dtl.BandLevel = model.BandLevel;
@@ -253,6 +255,7 @@ namespace DCI.Repositories
                     dtl.DepartmentId = model.DepartmentId;
                     dtl.JobFunction = model.JobFunction;
                     dtl.DateHired = model.DateHired;
+                    dtl.DateRegularized = model.DateRegularized;
                     dtl.Position = model.PositionId;
                     dtl.ResignedDate = model.ResignedDate;
                     dtl.BandLevel = model.BandLevel;
@@ -286,7 +289,7 @@ namespace DCI.Repositories
                     emp.MobileNoPersonal = model.MobileNoPersonal;
                     emp.EmailPersonal = model.EmailPersonal;
                     emp.ContactPerson = model.ContactPerson;
-                emp.ContactPersonNo = model.ContactPersonNo;
+                    emp.ContactPersonNo = model.ContactPersonNo;
                     emp.DateModified = DateTime.Now;
                     emp.ModifiedBy = model.ModifiedBy;
                     _dbContext.Employee.Entry(emp).State = EntityState.Modified;

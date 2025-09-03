@@ -262,7 +262,7 @@
                                     <label class="bottomLabelText">Department</label>
                                 </div>
                             </div>
-                            <div class="col-lg-5">
+                            <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
                                 <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.EmployeeStatusName) ? "-" : Model.EmployeeStatusName)</label>
                                     <label class="bottomLabelText">Employment Status</label>
@@ -274,7 +274,12 @@
                                 <label class="bottomLabelText">Date Hired</label>
                                 </div>
                             </div>
-                         
+                        <div class="col-lg-3">
+                            <div class="form-group mb10 text-center">
+                                <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.DateRegularized.ToString()) ? "-" : Model.DateRegularized?.ToString("MMMM dd, yyyy"))</label>
+                                <label class="bottomLabelText">Date of Regularization</label>
+                            </div>
+                        </div>
                      
                             <div class="col-lg-2">
                                 <div class="form-group mb10 text-center">
@@ -283,12 +288,12 @@
                                     <label class="bottomLabelText">Salary</label>
                                 </div>
                             </div>
-                            <div class="col-lg-2">
+                         @*    <div class="col-lg-2">
                                 <div class="form-group mb10 text-center">
-                                    <label class="topLabelText">5</label>
+                                    <label class="topLabelText">@Model.BandLevel</label>
                                     <label class="bottomLabelText">Band Level</label>
                                 </div>
-                            </div>
+                            </div> *@
                         </div>
 
              @*            <div class="col-12 mt20">

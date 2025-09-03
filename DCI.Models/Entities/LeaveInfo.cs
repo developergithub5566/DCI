@@ -13,10 +13,13 @@ namespace DCI.Models.Entities
         public decimal VLBalance { get; set; }
 
         public decimal SLBalance { get; set; }
+        public decimal SPLBalance { get; set; }
+        
+        public decimal Credit { get; set; }
 
-        public DateTime? DateModified { get; set; }
+        public DateTime DateCreated { get; set; }
 
-        public int? ModifiedBy { get; set; }
+        public int CreatedBy { get; set; }
 
         public bool IsActive { get; set; }
 

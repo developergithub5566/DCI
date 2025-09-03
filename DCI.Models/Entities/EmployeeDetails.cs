@@ -16,6 +16,7 @@ namespace DCI.Models.Entities
         public int? DepartmentId { get; set; }
         public string? JobFunction { get; set; }
         public DateTime? DateHired { get; set; }
+        public DateTime? DateRegularized { get; set; }
         public int? Position { get; set; }
         public DateTime? ResignedDate { get; set; }
         public int? BandLevel { get; set; }
