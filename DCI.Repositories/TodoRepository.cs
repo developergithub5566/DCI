@@ -144,25 +144,28 @@ namespace DCI.Repositories
                 await _dbContext.ApprovalHistory.AddAsync(entity);
                 await _dbContext.SaveChangesAsync();
 
+                int _currentYear = DateTime.Now.Year;
 
                 var contextHdr = _dbContext.LeaveRequestHeader.Where(x => x.LeaveRequestHeaderId == param.TransactionId).FirstOrDefault();
 
                 if (contextHdr != null)
                 {
-                    var contextLeaveInfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == contextHdr.EmployeeId).FirstOrDefault();
+                    var contextLeaveInfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == contextHdr.EmployeeId && x.DateCreated.Date.Year == _currentYear).OrderByDescending(x => x.DateCreated).FirstOrDefault();
 
                     if (contextHdr.LeaveTypeId == (int)EnumLeaveType.VL)
                     {
-                        contextLeaveInfo.VLBalance = contextLeaveInfo.VLBalance - contextHdr.NoOfDays;
-                        _dbContext.LeaveInfo.Entry(contextLeaveInfo).State = EntityState.Modified;
-                        _dbContext.SaveChanges();
+                        contextLeaveInfo.VLBalance = contextLeaveInfo.VLBalance - contextHdr.NoOfDays;                 
                     }
                     else if (contextHdr.LeaveTypeId == (int)EnumLeaveType.SL)
                     {
-                        contextLeaveInfo.SLBalance = contextLeaveInfo.SLBalance - contextHdr.NoOfDays;
-                        _dbContext.LeaveInfo.Entry(contextLeaveInfo).State = EntityState.Modified;
-                        _dbContext.SaveChanges();
+                        contextLeaveInfo.SLBalance = contextLeaveInfo.SLBalance - contextHdr.NoOfDays;                       
                     }
+                    else if (contextHdr.LeaveTypeId == (int)EnumLeaveType.SPL)
+                    {
+                        contextLeaveInfo.SPLBalance = contextLeaveInfo.SPLBalance - contextHdr.NoOfDays;                       
+                    }
+                    _dbContext.LeaveInfo.Entry(contextLeaveInfo).State = EntityState.Modified;
+                    _dbContext.SaveChanges();
                 }
 
                 contextHdr.Status = param.Status;

@@ -39,9 +39,10 @@ namespace DCI.Repositories
 
             int _currentYear = DateTime.Now.Year;
 
-            var leaveinfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == param.EmployeeId).FirstOrDefault();
+            var leaveinfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == param.EmployeeId && x.DateCreated.Date.Year == _currentYear).OrderByDescending(x => x.DateCreated).FirstOrDefault();
             model.VLBalance = leaveinfo?.VLBalance ?? 0;
             model.SLBalance = leaveinfo?.SLBalance ?? 0 ;
+            model.SPLBalance = leaveinfo?.SPLBalance ?? 0;
 
             var leaveReqHeaderDbContext = _dbContext.LeaveRequestHeader.AsQueryable();
 
@@ -84,8 +85,12 @@ namespace DCI.Repositories
 
          await GetYearList(model, param.EmployeeId);
 
+
+        int selectedYear = param.FilterYear > 0 ? param.FilterYear : _currentYear;
+
+
           var vlSummary = _dbContext.LeaveSummary
-                    .FromSqlInterpolated($"EXEC get_LeaveBalanceRegular @EmployeeId = {param.EmployeeId},@Year = {_currentYear.ToString()}, @LeaveType =  'VL'  ")
+                    .FromSqlInterpolated($"EXEC get_LeaveBalance @EmployeeId = {param.EmployeeId},@Year = {selectedYear.ToString()}, @LeaveType =  'VL'  ")
                     .ToList();
 
             model.vlSummaries = vlSummary
@@ -102,7 +107,7 @@ namespace DCI.Repositories
 
 
             var slSummary = _dbContext.LeaveSummary
-                      .FromSqlInterpolated($"EXEC get_LeaveBalanceRegular @EmployeeId = {param.EmployeeId},@Year = {_currentYear.ToString()}, @LeaveType =  'SL'  ")
+                      .FromSqlInterpolated($"EXEC get_LeaveBalance @EmployeeId = {param.EmployeeId},@Year = {selectedYear.ToString()}, @LeaveType =  'SL'  ")
                       .ToList();
 
             model.slSummaries = slSummary
@@ -275,7 +280,7 @@ namespace DCI.Repositories
                     notifvm.ModuleId = (int)EnumModulePage.Leave;
                     notifvm.TransactionId = entity.LeaveRequestHeaderId;
                     notifvm.AssignId = dept.ApproverId ?? 0;
-                    notifvm.URL = "/Todo/Index/?leaveId=" + model.LeaveRequestHeaderId;
+                    notifvm.URL = "/Todo/Index/?leaveId=" + entity.LeaveRequestHeaderId;
                     notifvm.MarkRead = false;        
                     notifvm.CreatedBy = param.EmployeeId;
                     notifvm.IsActive = true;

@@ -237,8 +237,9 @@ namespace DCI.Repositories
 
 		async Task<LeaveViewModel> RequestorNotificationBodyMessage(LeaveViewModel model)
 		{
-			var userEntity = await _userRepository.GetUserById(model.LeaveRequestHeader.EmployeeId); 
-			model.RequestorEmail = userEntity.Email;
+            //var userEntity = await _userRepository.GetUserById(model.LeaveRequestHeader.EmployeeId); 
+            var userEntity = await _userRepository.GetUserByEmployeeId(model.LeaveRequestHeader.EmployeeId);          
+            model.RequestorEmail = userEntity?.Email ?? string.Empty;
 
 			model.EmailBody = $@"
             <html>

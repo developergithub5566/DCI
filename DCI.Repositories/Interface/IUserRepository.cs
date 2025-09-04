@@ -31,5 +31,6 @@ namespace DCI.Repositories.Interface
         Task<(int statuscode, string message)> UpdateUserAccount(UserViewModel model);
         //Task<(int statuscode, string message, string email)> CreateUserAccount(UserViewModel model);
         Task<UserViewModel> CreateUserAccount(UserViewModel model);
+        Task<User> GetUserByEmployeeId(int empId);
     }
 }

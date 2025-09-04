@@ -36,6 +36,8 @@ namespace DCI.Models.ViewModel
         public string ApproverEmail { get; set; } = string.Empty;
         public int? ApproverId { get; set; } = 0;
         public string StatusName { get; set; } = string.Empty;
+
+        public int FilterYear { get; set; } = 0;
     }
 
     public class LeaveRequestHeaderViewModel

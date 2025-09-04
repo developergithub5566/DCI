@@ -78,7 +78,7 @@
                                 <span class="text-uppercase"> SPECIAL LEAVE</span> <br>
                                 <small class="text-secondary">(Remaining Balance)</small>
                             </div>
-                            <div class="h3 mb-0 font-weight-bold text-dark">0</div>
+                            <div class="h3 mb-0 font-weight-bold text-dark">@Model.SPLBalance</div>
                         </div>
                         <div class="col-auto">
                             <i class="fa-solid fa-tree-city fa-2x text-gray-300"></i>
@@ -99,7 +99,7 @@
 
                 <!-- Card Body -->
                 <div class="card-body">
-                    <div id="accordion">
+            @*         <div id="accordion">
                         <button type="button" class="btn btnSecondary btn-icon-split pr10" data-toggle="collapse" href="#collapseFilter">
                             <span class="icon text-white">
                                 <i class="fa-solid fa-filter text-xs"></i>
@@ -144,7 +144,7 @@
                                 </div>
                             </form>
                         </div>
-                    </div>
+                    </div> *@
                     <div class="table-responsive mt20">
                         <table class="table table-bordered dataTable" width="100%" cellspacing="0" id="tblDocument">
                             <thead>
@@ -224,11 +224,11 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label class="frmText"><span class="required">*</span> Year</label>
-                                <select id="yearSelect" class="form-select" required asp-items="@(new SelectList(Model.YearList))">
+
+                                <select id="yearSelect" class="form-select" asp-items="@(new SelectList(Model.YearList))" onchange="getLeaveByYear()">
                                     <option value="">select year</option>
                                     Model.vlSummaries
                                 </select>
-
                             </div>
                         </div>
 
@@ -261,7 +261,7 @@
                                     <th><span>End Bal</span></th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="tblVL">
                                 @foreach (var vl in Model.vlSummaries)
                                 {
                                     <tr class=''>
@@ -301,7 +301,7 @@
                                     <th><span>End Bal</span></th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="tblSL">
                                 @foreach (var sl in Model.slSummaries)
                                 {
                                     <tr class=''>
@@ -337,6 +337,7 @@
 
                         <input type="hidden" id="SelectedLeaveTypeAmount" name="SelectedLeaveTypeAmount" value="0" />
                         <input type="hidden" id="preloadedDates" />
+                        <input type="hidden" id="isMultiple" name="isMultiple" value="1">
 
                         <div class="col-lg-6">
                             <div class="form-group">
@@ -352,7 +353,8 @@
                             <div class="form-group">
                                 <label class="frmText"><span class="required">*</span> No. of Days</label>
                                 @*  <input type="number" min="0" step="any" name="NO_DAYS" class="form-control frmField" autocomplete="off"> *@
-                                <input type="text" step="any" id="NoOfDays" name="NoOfDays" class="form-control frmField" autocomplete="off" onkeypress="return isNumber(event);">
+                               @*  <input type="text" step="any" id="NoOfDays" name="NoOfDays" class="form-control frmField" autocomplete="off" onkeypress="return isNumericDecimalKey(event,this);"> *@
+                                <input type="text" id="NoOfDays" name="NoOfDays" class="form-control frmField" autocomplete="off" onkeypress="return isNumericDecimalKey(event, this)" oninput="validateNumber(this)" />
                             </div>
                         </div>
 
@@ -449,39 +451,48 @@
                              $('.spinner-overlay').hide();
                          }, 200);
 
+                         let fp;
 
                         $(document).ready(function () {
                               js('#tblDocument').DataTable({
-                                 //order: [[1, 'desc']]
+                                 order: [[1, 'desc']]
                               });
 
 
 
                              let nodays = 0.0000;
 
-
-                                                                flatpickr("#dateCovered", {
-                                                                           mode: "multiple",
+                                  
+                                                            fp =    flatpickr("#dateCovered", {
+                                                                           mode: "multiple",                                                                         
                                                                            enableTime: false,
                                                                            dateFormat: "Y-m-d",
                                                                            onChange: function(selectedDates, dateStr, instance) {
                                                                              // Update number of selected days
                                                                              let nodays = selectedDates.length;
                                                                                     let amount =     $('#SelectedLeaveTypeAmount').val();
-                                                                                console.log("select-amount-",amount);
+                                                                                    //   let iMultiple =     $('#isMultiple').val();
+
+                                                                              // console.log("xx",iMultiple)
+
                                                                           let total = amount * nodays;
-                                                                        let formattedDays = total.toFixed(4);
+                                                                         let formattedDays = total.toFixed(4);
                                                                              $('#NoOfDays').val(formattedDays);
 
+
+                                                                             if($('#isMultiple').val() == 1){
+                                                                                     fp.set("mode", "multiple");
+                                                                             }else{
+                                                                                 console.log("false daw")
+                                                                                     fp.set("mode", "single");
+                                                                             }
+                                                                                     
 
                                                                              let selectedDateStrings = selectedDates.map(date =>
                                                                                instance.formatDate(date, "Y-m-d")
                                                                              );
 
-                                                                                     // let selectedDatesXXX = flatpickr.selectedDates.map(date =>
-                                                                                     //   flatpickr.formatDate(date, "yyyy-MM-dd")
-                                                                                     // );
-                                                                                     // $('#dateSelected').val(selectedDatesXXX);
+                                                                                  
 
                                                                              $('#SelectedDatesJson').val(JSON.stringify(selectedDateStrings));
                                                                            }
@@ -490,7 +501,7 @@
 
                   $('#createForm').submit(function (event) {
                       event.preventDefault();
-                      alert("ok")
+                     // alert("ok")
 
               }); //submit
                            }); //end doc
@@ -758,23 +769,193 @@
                      let leave =  $('#leaveTypeSelect').val();
                       console.log(leave);
                      let  _amount = 0.0000;
+                    
+
                     if(leave ==1){
                        _amount = 0.5000;
                        $('#SelectedLeaveTypeAmount').val(_amount);
+                           $('#isMultiple').val(0);
+                       
                     }else{
                         _amount = 1.0000;
                        $('#SelectedLeaveTypeAmount').val(_amount);
+                       $('#isMultiple').val(1);
                     }
 
-                   //const clearDate = flatpickr("#dateCovered", {});
-                     // const clearDate = $("#dateCovered").flatpickr();
-                     //       clearDate.clear();
+                     console.log("x", $('#isMultiple').val())
 
-                       const my_fp = document.querySelector("#dateCovered")._flatpickr;
+                        const my_fp = document.querySelector("#dateCovered")._flatpickr;
                         my_fp.clear();
-               }
+
+                       // initFlatpickr(isMultiple)
+                 }
+
+               //         var fp;
+               //          function initFlatpickr(condition) {
+               //              if (fp) {
+               //                  fp.destroy(); // clean up existing instance
+               //              }
+
+               //              fp = flatpickr("#dateCovered", {
+               //                  mode: condition ? "multiple" : "single",
+               //                  dateFormat: "Y-m-d"
+               //              });
+               //          }
+
+                       
+
+                    // function GetLeaveTypeAmount() {
+                    //     let leave = $('#leaveTypeSelect').val();
+                    //     let _amount = 0.0000;
+                    //     let isMultiple = true;
+
+                    //     if (leave == 1) {
+                    //         isMultiple = false;
+                    //         _amount = 0.5000;                               
+                    //     } else {
+                    //         _amount = 1.0000;
+                    //     }
+
+                       
+
+                    //     // Destroy old flatpickr if it exists
+                    //     if (fp) {
+                    //         fp.destroy();
+                    //     }
+
+                    //     // Re-initialize with correct mode
+                    //     fp = flatpickr("#dateCovered", {
+                    //         mode: isMultiple ? "multiple" : "single",
+                    //         dateFormat: "Y-m-d"
+                    //     });
+
+
+                    
+                    //      $('#SelectedLeaveTypeAmount').val(_amount);
+                    //          fp.clear();
+                    //        }
+                        
+
+                       function isNumericDecimalKey(evt, el) {
+                            const k = evt.key; // more reliable than keyCode for modern browsers
+
+                            // Allow navigation/edit keys
+                            if (k === 'Backspace' || k === 'Tab' || k === 'ArrowLeft' || k === 'ArrowRight' || k === 'Home' || k === 'End') {
+                                return true;
+                            }
+
+                            // Allow only digits
+                            if (k >= '0' && k <= '9') return true;
+
+                            // Allow a single decimal point (not as the first char)
+                            if (k === '.') {
+                                if (el.value.length === 0) { evt.preventDefault(); return false; }
+                                if (el.value.indexOf('.') === -1) return true;
+                                evt.preventDefault();
+                                return false;
+                            }
+
+                            // Block everything else (e, E, -, +, spaces, etc.)
+                            evt.preventDefault();
+                            return false;
+                        }
+
+      
+
+        function validateNumber(el) {
+            let v = el.value;
+
+            // Remove all characters except digits and dot
+            v = v.replace(/[^\d.]/g, '');
+
+            // Remove leading dot
+            v = v.replace(/^\./, '');
+
+            // Only one dot allowed
+            let parts = v.split('.');
+            if (parts.length > 2) {
+                v = parts[0] + '.' + parts[1]; // ignore extra dots
+                parts = v.split('.');
+            }
+
+            // Limit before decimal to 3 digits
+            if (parts[0].length > 3) {
+                parts[0] = parts[0].substring(0, 3);
+            }
+
+            // Limit after decimal to 4 digits
+            if (parts[1] && parts[1].length > 4) {
+                parts[1] = parts[1].substring(0, 4);
+            }
+
+            // Recombine
+            el.value = parts.join('.');
+        }
+
+         function getLeaveByYear() {
+
+           
+                  var _year = document.getElementById("yearSelect").value;
+                 
+                    $.ajax({
+                              type: 'POST',
+                              url: '@Url.Action("LeaveDropdown", "DailyTimeRecord")',
+                              data: { filteryear : _year},
+                                 
+                              success: function (response) {
+                                  if (response.success) {
+                                                                       
+                                       var tbodytableVL = $("#tblVL");
+                                                tbodytableVL.empty();
+
+                                                if (response.data.vlSummaries.length > 0) {
+                                                    $.each(response.data.vlSummaries, function(index, item) {
+                                                               var row = `<tr>
+                                                                            <td><strong>${item.asOf}</strong></td>
+                                                                            <td><strong>${parseFloat(item.begBal).toFixed(4)}</strong></td>
+                                                                            <td>${parseFloat(item.credit).toFixed(4)}</td>
+                                                                            <td><strong>${parseFloat(item.availed).toFixed(4)}</strong></td>
+                                                                            <td><strong>${parseFloat(item.monetized).toFixed(4)}</strong></td>
+                                                                            <td>${parseFloat(item.endBal).toFixed(4)}</td>
+                                                                        </tr>`;
+                                                        tbodytableVL.append(row);
+                                                    });
+                                                }
+
+                                                  var tbodytableSL = $("#tblSL");
+                                                tbodytableSL.empty();
+                                                if (response.data.slSummaries.length > 0) {
+                                                    $.each(response.data.slSummaries, function(index, item) {
+                                                       var row = `<tr>
+                                                                            <td><strong>${item.asOf}</strong></td>
+                                                                            <td><strong>${parseFloat(item.begBal).toFixed(4)}</strong></td>
+                                                                            <td>${parseFloat(item.credit).toFixed(4)}</td>
+                                                                            <td><strong>${parseFloat(item.availed).toFixed(4)}</strong></td>
+                                                                            <td><strong>${parseFloat(item.monetized).toFixed(4)}</strong></td>
+                                                                            <td>${parseFloat(item.endBal).toFixed(4)}</td>
+                                                                        </tr>`;
+                                                        tbodytableSL.append(row);
+                                                    });
+                                                }
 
 
 
+                                  } else {
+                                      Swal.fire({
+                                          text: response.message,
+                                          icon: "error"
+                                      });
+                                  }
+                                  $('.spinner-overlay').hide();
+                              },
+                              error: function () {
+                                  $('.spinner-overlay').hide();
+                                  Swal.fire({
+                                      text: "An error occurred. Please try again.",
+                                      icon: "error"
+                                  });
+                              }
+                          });
+        }
     </script>
 }

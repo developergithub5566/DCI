@@ -236,6 +236,44 @@ namespace DCI.WebApp.Controllers
             //  return View(model);
         }
 
+        public async Task<IActionResult> LeaveDropdown(int filteryear)
+        {
+            LeaveViewModel model = new LeaveViewModel();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    model.CurrentUserId = currentUser.UserId;
+                    model.EmployeeId = currentUser.EmployeeId;
+                    model.FilterYear = filteryear;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllLeave");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<LeaveViewModel>(responseBody)!;
+                        return Json(new { success = true, data = model });
+                    }
+                }
+                return Json(new { success = false, data = model });
+   
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return View(model);
+        }
+
         public async Task<IActionResult> DTRCorrection(int id)
         {
             List<DTRCorrectionViewModel> list = new List<DTRCorrectionViewModel>();

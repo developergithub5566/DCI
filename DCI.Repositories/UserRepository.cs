@@ -457,5 +457,9 @@ namespace DCI.Repositories
         }
 
 
+        public async Task<User> GetUserByEmployeeId(int empId)
+        {
+            return await _dbContext.User.Where(x => x.EmployeeId == empId).FirstOrDefaultAsync();
+        }
     }
 }
