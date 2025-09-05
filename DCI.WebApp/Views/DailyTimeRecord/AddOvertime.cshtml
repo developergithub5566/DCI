@@ -184,7 +184,15 @@
                                         <button type="button" class="btn btn-sm btn-danger remove-row">Remove</button>
                                     </td>
                                 </tr>
-                            }
+                            }                            
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">
+                                    No overtime requests found.
+                                </td>
+                            </tr>
                         }
                     </tbody>
                 </table>
@@ -307,6 +315,7 @@
                                                     enableTime: false,
                                                    dateFormat: "Y-m-d",
                                                         time_24hr: true,
+                                                        maxDate: new Date().fp_incr(-1),
                                                  onChange: function(selectedDates, dateStr, instance) {
                                                       }
                                                 });
@@ -342,7 +351,11 @@
                                const entries = collectOvertimeEntries();
 
                                if(entries.length ==0){
-                                   alert("Please add Overtime");
+                       
+                                     Swal.fire({
+                                                                text: "Please file overtime before submitting.",
+                                                                icon: "error"
+                                                            });
                                    return;
                                }
 
@@ -550,7 +563,11 @@
                                if (hasError) return;
 
                                if (dateAlreadyExists(date)) {
-                                 alert('An entry for that date already exists. You cannot add a duplicate date.');
+                               //  alert('An entry for that date already exists. You cannot add a duplicate date.');
+                                   Swal.fire({
+                                                                text: "An entry for that date already exists. You cannot add a duplicate date.",
+                                                                icon: "error"
+                                                            });
                                  return;
                                }
 
@@ -629,9 +646,9 @@
                                                                                         tbodytable.append(row);
                                                                                     });
 
-                                                                } else {
-                                                                    tbodytable.html(`<tr><td colspan="7" class="text-center">No record found.</td></tr>`);
-                                                                }
+                                                                                    } else {
+                                                                                        tbodytable.html(`<tr><td colspan="7" class="text-center">No record found.</td></tr>`);
+                                                                                    }
 
 
 
