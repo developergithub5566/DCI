@@ -5,119 +5,192 @@
 
 <div class="container-fluid">
 
-    <div class="list-group">
-        <button type="button" class="list-group-item list-group-item-action">
-            <a href="/Report/ReportStatus/"><i class='fa-solid fa-file'></i> Document Status Report List </a>
-        </button>
-        <button type="button" class="list-group-item list-group-item-action">
-            <a href="/Report/ReportDocType/"><i class='fa-solid fa-file'></i> Document Type Report List </a>
-        </button>
-    </div>
-    <hr />
-      
-@*    1 row in 2 columns
-    <div style="display: flex; justify-content: space-between; width: 100%; margin: auto;">
-        <!-- First Bar Chart -->
-        <div style="flex: 1; padding: 10px;">
-            <canvas id="documentChart"></canvas>
+    <div class="row">
+        <div class="col-md-7 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">      
+                    <canvas id="graphDocType"></canvas>
+                </div>
+            </div>
         </div>
-
-        <!-- Second Bar Chart -->
-        <div style="flex: 1; padding: 10px;">
-            <canvas id="documenttype"></canvas>
-        </div>
-    </div> *@
-
-
-    <div style="display: flex; flex-direction: column; align-items: center; width: 100%; margin: auto;">
-        <!-- First Bar Chart (First Row) -->
-        <div style="width: 60%; padding: 10px;">
-            <canvas id="graphStatus"></canvas>
-        </div>
-
-        <!-- Second Bar Chart (Second Row) -->
-        <div style="width: 60%; padding: 10px; margin-top: 20px;">
-            <canvas id="graphDocType"></canvas>
+        <div class="col-md-5 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                 
+                    <canvas id="graphStatus"></canvas>
+                </div>
+            </div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="list-group">
+            <button type="button" class="list-group-item list-group-item-action">
+                <a href="/Report/ReportStatus/"><i class='fa-solid fa-file'></i> Employee List</a>
+            </button>
+            <button type="button" class="list-group-item list-group-item-action">
+                <a href="/Report/ReportUser/"><i class='fa-solid fa-file'></i> 201 File</a>
+            </button>
+
+
+            <button type="button" class="list-group-item list-group-item-action">
+                <a href="/Report/ReportDocType/"><i class='fa-solid fa-file'></i> Daily Time Record(DTR) Report</a>
+            </button>
+        
+            <button type="button" class="list-group-item list-group-item-action">
+                <a href="/Report/ReportDepartment/"><i class='fa-solid fa-file'></i> Leave Balance Report</a>
+            </button>
+
+            <button type="button" class="list-group-item list-group-item-action">
+                <a href="/Report/ReportWorkflow/"><i class='fa-solid fa-file'></i> Undertime Summary Report</a>
+            </button>
+            <button type="button" class="list-group-item list-group-item-action">
+                <a href="/Report/ReportAssignTask/"><i class='fa-solid fa-file'></i> Overtime Hours Summary</a>
+            </button>
+        </div>
+        <hr />
+
+
+        <div style="display: flex; flex-direction: column; align-items: center; width: 100%; margin: auto;">   
+           
+            <div style="width: 60%; padding: 10px; margin-top: 20px;">              
+            </div>
+        </div>
+    </div>
+
 </div>
 
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
 <script>
-       document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function () {
         var ctx = document.getElementById('graphStatus').getContext('2d');
-    var statusData = @Html.Raw(JsonSerializer.Serialize(Model.StatusData));
+        var statusData = @Html.Raw(JsonSerializer.Serialize(Model.StatusData));
 
-          var colorPalette = [
-            'red', 'green', 'blue', 'purple', 'orange', 'pink', 'yellow', 'cyan', 'magenta', 'lime',
-            'brown', 'indigo', 'teal', 'violet', 'gold', 'silver', 'peach', 'coral', 'skyblue', 'chocolate'
-        ];             
-    
-        var colors = statusData.map(function(count, index) {
-            return colorPalette[index % colorPalette.length]; 
-        });
+        // Creating gradient colors for a smooth 2D look
+        var graphGradient1 = ctx.createLinearGradient(0, 0, 0, 181);
+        graphGradient1.addColorStop(0, 'rgba(54, 215, 232, 1)');
+        graphGradient1.addColorStop(1, 'rgba(177, 148, 250, 1)');
 
-        var chart = new Chart(ctx, {
-            type: 'bar',
+        var graphGradient2 = ctx.createLinearGradient(0, 0, 0, 50);
+        graphGradient2.addColorStop(0, 'rgba(255, 191, 150, 1)');
+        graphGradient2.addColorStop(1, 'rgba(254, 112, 150, 1)');
+
+        var graphGradient3 = ctx.createLinearGradient(0, 0, 0, 300);
+        graphGradient3.addColorStop(0, 'rgba(6, 185, 157, 1)');
+        graphGradient3.addColorStop(1, 'rgba(132, 217, 210, 1)');
+
+        // Assigning gradient colors dynamically
+        var colors = [graphGradient1, graphGradient2, graphGradient3];
+        var backgroundColors = statusData.map((item, index) => colors[index % colors.length]);
+
+        // Chart.js Doughnut Chart
+        new Chart(ctx, {
+            type: 'doughnut',
             data: {
-                  labels: statusData.map(item => item.Status),
+                labels: statusData.map(item => item.Status),
                 datasets: [{
                     label: 'Document Status',
-                    data:  statusData.map(item => item.Count),
-                    backgroundColor: colors,
-                    borderColor: ['black'],
-                    borderWidth: 1
+                    data: statusData.map(item => item.Count),
+                    backgroundColor: backgroundColors,
+                    hoverBackgroundColor: backgroundColors,
+                    borderColor: 'white',
+                    borderWidth: 2
                 }]
             },
             options: {
+                cutout: '50%', // Adjusts the inner radius for the doughnut shape
                 responsive: true,
                 maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 15
+                        }
                     }
+                },
+                animation: {
+                    animateRotate: true,
+                    animateScale: false
                 }
             }
         });
     });
 
-     document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () {
         var ctx = document.getElementById('graphDocType').getContext('2d');
-           
-        var typeData =  @Html.Raw(JsonSerializer.Serialize(Model.TypeData));
-      
-        var colorPalette = [
-            'brown', 'indigo', 'teal', 'violet', 'gold', 'silver', 'peach', 'coral', 'skyblue', 'chocolate',
-            'red', 'green', 'blue', 'purple', 'orange', 'pink', 'yellow', 'cyan', 'magenta', 'lime'            
-        ];
+        var typeData = @Html.Raw(JsonSerializer.Serialize(Model.TypeData));
 
-      
-       
-        var colors = typeData.map(function(count, index) {
-            return colorPalette[index % colorPalette.length]; 
-        });
+        // Create gradient colors for a 2D effect
+        var graphGradient1 = ctx.createLinearGradient(0, 0, 0, 400);
+        graphGradient1.addColorStop(0, 'rgba(54, 162, 235, 1)');
+        graphGradient1.addColorStop(1, 'rgba(54, 162, 235, 0.5)');
+
+        var graphGradient2 = ctx.createLinearGradient(0, 0, 0, 400);
+        graphGradient2.addColorStop(0, 'rgba(255, 99, 132, 1)');
+        graphGradient2.addColorStop(1, 'rgba(255, 99, 132, 0.5)');
+
+        var graphGradient3 = ctx.createLinearGradient(0, 0, 0, 400);
+        graphGradient3.addColorStop(0, 'rgba(255, 206, 86, 1)');
+        graphGradient3.addColorStop(1, 'rgba(255, 206, 86, 0.5)');
+
+        var graphGradient4 = ctx.createLinearGradient(0, 0, 0, 400);
+        graphGradient4.addColorStop(0, 'rgba(75, 192, 192, 1)');
+        graphGradient4.addColorStop(1, 'rgba(75, 192, 192, 0.5)');
+
+        var graphGradient5 = ctx.createLinearGradient(0, 0, 0, 400);
+        graphGradient5.addColorStop(0, 'rgba(153, 102, 255, 1)');
+        graphGradient5.addColorStop(1, 'rgba(153, 102, 255, 0.5)');
+
+        // Assigning gradients dynamically
+        var gradients = [graphGradient1, graphGradient2, graphGradient3, graphGradient4, graphGradient5];
+        var colors = typeData.map((_, index) => gradients[index % gradients.length]);
 
         var chart = new Chart(ctx, {
             type: 'bar',
             data: {
-                 labels: typeData.map(item => item.Status),
+                labels: typeData.map(item => item.Status),
                 datasets: [{
                     label: 'Document Type',
                     data: typeData.map(item => item.Count),
                     backgroundColor: colors,
-                    borderColor: ['black'],
-                    borderWidth: 1
+                    borderColor: 'rgba(0, 0, 0, 0.1)', // Slight border for a 2D look
+                    borderWidth: 1,
+                    borderRadius: 8, // Slight rounding for a modern look
+                    barThickness: 40, // Adjust bar thickness
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false // Hide legend for a clean look
+                    }
+                },
                 scales: {
+                    x: {
+                        grid: {
+                            display: false // Hide x-axis grid lines for a clean look
+                        }
+                    },
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        grid: {
+                            borderDash: [5, 5] // Dotted grid lines for a modern feel
+                        }
                     }
                 }
             }
         });
     });
+
+
+
+
+
 </script>

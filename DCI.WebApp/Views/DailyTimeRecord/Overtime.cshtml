@@ -57,7 +57,7 @@
     </div>
     <div class="d-sm-flex align-items-center justify-content-between mb-3">
         <h6 class="m-0 font-weight-bold text-gray-800">@ViewBag.BreadCrumbLabel</h6>
-               <div class="upperRightDivBtn">
+            <div class="upperRightDivBtn">
     @*         <a href="#" title="Add Department" class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")" data-toggle="modal" data-target="#" onclick="newForm()">
                 <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
                 <span class="text text-white"><small>Add Overtime</small></span>
@@ -66,16 +66,16 @@
             <a asp-controller="DailyTimeRecord" asp-action="AddOvertime" asp-route-OTHeaderId="0" class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")">
                 <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
                 <span class="text text-white"><small>File Overtime</small></span>
-            </a>
+            </a>   
         </div>
-
+  
     </div>
+
     <div class="col-12 p0">
         <ul class="breadcrumb">
             <li><a href="~/Home/Index">Dashboard</a></li>
             <li><a href="#">Daily Time Record</a></li>
-            <li><a href="#">Overtime</a></li>
-        
+            <li><a href="#">Overtime</a></li>        
         </ul>
     </div>
 
@@ -227,8 +227,17 @@
                 <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
                 <script src="~/js/dci-validation.js"></script>
                 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
-                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">    
 
+
+                      <script src="https://cdn.datatables.net/buttons/3.2.1/js/dataTables.buttons.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+            <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.html5.min.js"></script>
+            <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.print.min.js"></script>
+            <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
+            <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.1/css/buttons.dataTables.css">
 
 
                 <script type="text/javascript">
@@ -245,6 +254,28 @@
 
                         $(document).ready(function () {
                             js('#tblDTR').DataTable({
+                                      dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
+                         buttons: [
+                             {
+                                 extend: 'excel',
+                                 text: 'Excel',
+                                 title: 'Document Report',
+                                 exportOptions: {
+                                     columns: ':not(:last-child)' // Excludes the last column
+                                 }
+                             },
+                             {
+                                 extend: 'pdf',
+                                 text: 'PDF',
+                                 title: 'Document Report',
+                                 exportOptions: {
+                                     columns: ':not(:last-child)' // Excludes the last column
+                                 }
+                             }
+                         ],
+                         lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
+                         pageLength: 10 ,// Default entries per page
+
                                  order: [[2, 'desc']]
                             });
 
