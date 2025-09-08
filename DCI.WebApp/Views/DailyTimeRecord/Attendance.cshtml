@@ -139,7 +139,14 @@
                                     @item.UNDER_TIME
                                 </td>
                                 <td>
-                                    <span class="btnSuccess applicationStatus">BIOMETRICS</span>
+                                    @if(item.SOURCE == "BIOMETRICS")
+                                    {
+                                        <span class="btnSuccess applicationStatus">@item.SOURCE</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="btnPrimary applicationStatus">@item.SOURCE</span>
+                                    }                                   
                                 </td>
                                 @*       <td class="text-center">
                                     <a href="#" onclick="newForm({
@@ -155,7 +162,7 @@
                                                         date:"@item.DATE.ToString("MM/dd/yyyy")",
                                                         emp:"@item.EMPLOYEE_NO",
                                                         name :"@item.NAME" ,
-                                                        source : "BIOMETRICS",
+                                                        source : "@item.SOURCE",
                                                         timein : "@item.FIRST_IN",
                                                         timeout : "@item.LAST_OUT",
                                                         clockout : "@item.CLOCK_OUT",
@@ -277,7 +284,27 @@
 
                         $(document).ready(function () {
                             js('#tblDTR').DataTable({
-
+                                            dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
+                         buttons: [
+                             {
+                                 extend: 'excel',
+                                 text: 'Excel',
+                                 title: 'Document Report',
+                                 exportOptions: {
+                                     columns: ':not(:last-child)' // Excludes the last column
+                                 }
+                             },
+                             {
+                                 extend: 'pdf',
+                                 text: 'PDF',
+                                 title: 'Document Report',
+                                 exportOptions: {
+                                     columns: ':not(:last-child)' // Excludes the last column
+                                 }
+                             }
+                         ],
+                         lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
+                         pageLength: 10 ,// Default entries per page
                                  order: [[2, 'desc']]
                             });
 

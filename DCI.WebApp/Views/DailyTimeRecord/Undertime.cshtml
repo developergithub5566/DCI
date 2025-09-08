@@ -192,8 +192,7 @@
                             </th>
                             <th>
                                 <label>Total Undertime</label>
-                            </th>
-                     
+                            </th>               
                             <th>
                                 Action
                             </th>
@@ -223,11 +222,10 @@
                                 </td>
                                 <td>
                                     @item.TOTAL_UNDERTIME
-                                </td>
-                             
+                                </td>                                    
                              
                                 <td class="text-center">
-                                    <a href="#" onclick='editForm("@item.EMPLOYEE_NO")' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+                                    <a href="#" onclick='editForm("@item.EMPLOYEE_NO","@item.DateFrom","@item.DateTo")' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
                                 </td>
                             </tr>
                         }
@@ -268,6 +266,12 @@
                                             </th>
                                             <th>
                                                 <label>Undertime</label>
+                                            </th>
+                                            <th>
+                                                <label>Transaction No</label>
+                                            </th>
+                                            <th>
+                                                <label>Status</label>
                                             </th>
                                         </tr>
                                     </thead>
@@ -452,14 +456,16 @@
 
 
 
-                        function editForm(empNo) {
+                        function editForm(empNo,datefrom,dateto) {
                                 //   event.preventDefault();
                                      console.log(empNo);
+                                                     console.log(datefrom);
+                                                                     console.log(dateto);
 
                                       $.ajax({
                                           type: 'POST',
                                           url: '@Url.Action("UndertimeById", "DailyTimeRecord")',
-                                           data: { EMPLOYEE_NO: empNo },
+                                           data: { EMPLOYEE_NO: empNo,DateFrom : datefrom , DateTo : dateto },
                                           success: function (response) {
                                               if (response.success) {
                                                      console.log(response);
@@ -478,6 +484,8 @@
                                                                                     <td>${item.firsT_IN}</td>
                                                                                     <td>${item.lasT_OUT}</td>
                                                                                        <td>${item.undeR_TIME}</td>
+                                                                                                <td>${item.requestNo}</td>
+                                                                                                         <td>${item.statusname}</td>
                                                                         </tr>`;
                                                             tbodytable.append(row);
                                                         });

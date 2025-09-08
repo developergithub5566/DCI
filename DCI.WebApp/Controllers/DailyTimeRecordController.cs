@@ -7,6 +7,7 @@ using DCI.Models.Entities;
 using DCI.Models.ViewModel;
 using DCI.WebApp.Configuration;
 using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Office2016.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
@@ -14,6 +15,7 @@ using Newtonsoft.Json;
 using Serilog;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 //using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
@@ -261,7 +263,7 @@ namespace DCI.WebApp.Controllers
                     }
                 }
                 return Json(new { success = false, data = model });
-   
+
             }
             catch (Exception ex)
             {
@@ -462,8 +464,8 @@ namespace DCI.WebApp.Controllers
                     if (response.IsSuccessStatusCode == true)
                     {
                         model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
-                        emp_name = model.FirstOrDefault().NAME ?? string.Empty;
-                        emp_no = model.FirstOrDefault().EMPLOYEE_NO ?? string.Empty;
+                        emp_name = model.Count > 0 ?  model.FirstOrDefault().NAME : string.Empty;
+                        emp_no = model.Count > 0 ?  model.FirstOrDefault().EMPLOYEE_NO : string.Empty;
 
                     }
                     return Json(new { success = true, data = model, emp = String.Format("{0} - {1}", emp_no, emp_name) });
@@ -530,9 +532,9 @@ namespace DCI.WebApp.Controllers
                     var currentUser = _userSessionHelper.GetCurrentUser();
 
                     // param.ScopeTypeEmp = (int)EnumEmployeeScope.PerEmployee;
-                     param.EMPLOYEE_ID = currentUser.EmployeeId;
-                  
-                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    param.EMPLOYEE_ID = currentUser.EmployeeId;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetWFHLogsByEmployeeId");
                     request.Content = stringContent;
                     var response = await _httpclient.SendAsync(request);
@@ -557,30 +559,47 @@ namespace DCI.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
-        public async Task<IActionResult> WFHTimeIn(WFHViewModel param)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> WFHTimeIn(WFHViewModel param, CancellationToken cancellationToken)
         {
             //  List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();
             try
             {
 
+                var currentUser = _userSessionHelper.GetCurrentUser();
+
+                param.EMPLOYEE_ID = currentUser.EmployeeId;
+
+
+                using (var client = new HttpClient())
+                {
+
+
+                    LoginViewModel loginvm = new LoginViewModel();
+                    loginvm.Email = currentUser.Email;
+                    loginvm.Password = param.Password;
+                    var stringContentPassword = new StringContent(JsonConvert.SerializeObject(loginvm), Encoding.UTF8, "application/json");
+                    var requestPassword = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Account/Login");
+                    requestPassword.Content = stringContentPassword;
+                    var responsePassword = client.Send(requestPassword); //await Task.FromResult(_httpclient.Send(requestPassword));
+                    //  string responseBodyPassword = await responsePassword.Content.ReadAsStringAsync();
+                    if (!responsePassword.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = false, message = "Invalid password!" });
+                    }
+                }
 
                 using (var _httpclient = new HttpClient())
                 {
-
-                    var currentUser = _userSessionHelper.GetCurrentUser();
-
-                    param.EMPLOYEE_ID = currentUser.EmployeeId;
-
-
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/SaveWFHTimeIn");
                     request.Content = stringContent;
                     var response = await _httpclient.SendAsync(request);
                     var responseBody = await response.Content.ReadAsStringAsync();
 
-                    string emp_name = string.Empty;
-                    string emp_no = string.Empty;
-                    string emp_info = string.Empty;
+                    //string emp_name = string.Empty;
+                    //string emp_no = string.Empty;
+                    //string emp_info = string.Empty;
                     if (response.IsSuccessStatusCode)
                     {
                         return Json(new { success = true, message = responseBody });
@@ -913,9 +932,11 @@ namespace DCI.WebApp.Controllers
                             clockout = TimeSpan.Parse("16:30");
                         }
 
+
+
                         /* FILTER */
                         bool isHoliday = dtrmodel.IsHoliday;
-                        bool isRestDay = param.OTDate.DayOfWeek == DayOfWeek.Saturday || param.OTDate.DayOfWeek == DayOfWeek.Sunday;                      
+                        bool isRestDay = param.OTDate.DayOfWeek == DayOfWeek.Saturday || param.OTDate.DayOfWeek == DayOfWeek.Sunday;
 
 
                         TimeSpan after8hrs = new TimeSpan(21, 59, 0);
@@ -927,6 +948,11 @@ namespace DCI.WebApp.Controllers
                         List<OvertimeDetailViewModel> otList = new List<OvertimeDetailViewModel>();
 
                         TimeSpan totalWorkingHours = lastout - firstin;
+
+                        if (!param.IsOfficialBuss && totalWorkingHours.TotalMinutes == 0)
+                        {
+                            return Json(new { success = false, message = "No biometric records found." });
+                        }
 
 
                         if (isHoliday == true && isRestDay == false)
@@ -959,7 +985,7 @@ namespace DCI.WebApp.Controllers
                                     otAfter8hrs.OTTimeTo = lastout.ToString();
                                     otAfter8hrs.TotalMinutes = (int)spcHolidayAfter8hrs.TotalMinutes;
                                     otAfter8hrs.TotalHours = TimeHelper.ConvertMinutesToHHMM((int)spcHolidayAfter8hrs.TotalMinutes);
-                                    otAfter8hrs.OTType = (int)EnumOvertime.After8hrs; 
+                                    otAfter8hrs.OTType = (int)EnumOvertime.After8hrs;
                                     otAfter8hrs.OTTypeName = "169% AFTER 8 HRS OF 130%";
                                     param.otDetails.Add(otAfter8hrs);
                                 }
@@ -1024,6 +1050,8 @@ namespace DCI.WebApp.Controllers
 
 
                             TimeSpan spcHolidayAfter8hrs = lastout - clockout;
+
+
                             OvertimeDetailViewModel otAfter8hrs = new OvertimeDetailViewModel();
                             otAfter8hrs.OTDate = param.OTDate.ToString();
                             otAfter8hrs.OTDateString = param.OTDate.ToString("yyyy-MM-dd");
@@ -1054,7 +1082,7 @@ namespace DCI.WebApp.Controllers
                         }
                         else if (param.IsOfficialBuss == true && isHoliday == false && isRestDay == false)
                         {
-                          
+
                             var regOt = lastout - clockout;
                             if (regOt > morethan1hr)
                             {

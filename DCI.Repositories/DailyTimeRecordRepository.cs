@@ -25,12 +25,12 @@ namespace DCI.Repositories
 
         public async Task<IList<DailyTimeRecordViewModel>> GetAllDTR(DailyTimeRecordViewModel model)
         {
-            var context = _dbContext.vw_AttendanceSummary.AsQueryable();
+           // var biometriclogs = _dbContext.vw_AttendanceSummary.AsQueryable();
+           // var wfhlogs = _dbContext.vw_AttendanceSummary.AsQueryable();
 
 
-            var query = await (from dtr in context
-
-                         orderby dtr.DATE descending, dtr.NAME descending
+            var biometriclogs = await (from dtr in _dbContext.vw_AttendanceSummary.AsQueryable()
+                               orderby dtr.DATE descending, dtr.NAME descending
                          select new DailyTimeRecordViewModel
                          {
                              ID = dtr.ID,
@@ -44,21 +44,42 @@ namespace DCI.Repositories
                              UNDER_TIME = dtr.UNDER_TIME,
                              OVERTIME = dtr.OVERTIME,
                              TOTAL_HOURS = dtr.TOTAL_HOURS,
-                             TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS
+                             TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS,
+                             SOURCE = "BIOMETRICS"
                          }).ToListAsync();
 
-            if((int)EnumEmployeeScope.PerEmployee == model.ScopeTypeEmp)
-            {
-                //var emp = _dbContext.Employee.Where(x => x.EmployeeId == model.CurrentUserId).FirstOrDefault();
-                //if(emp != null) 
-                //query = query.Where(x => x.EMPLOYEE_NO == emp.EmployeeNo).ToList();
+
+            var wfhlogs = await (from dtr in _dbContext.vw_AttendanceSummary_WFH.AsQueryable()
+                                 where dtr.STATUS == (int)EnumStatus.Approved
+                                 orderby dtr.DATE descending, dtr.NAME descending
+                                 select new DailyTimeRecordViewModel
+                                 {
+                                     ID = dtr.ID,
+                                     EMPLOYEE_NO = dtr.EMPLOYEE_NO,
+                                     NAME = dtr.NAME,
+                                     DATE = dtr.DATE,
+                                     FIRST_IN = dtr.FIRST_IN,
+                                     LAST_OUT = dtr.LAST_OUT,
+                                     LATE = dtr.LATE,
+                                     CLOCK_OUT = dtr.CLOCK_OUT,
+                                     UNDER_TIME = dtr.UNDER_TIME,
+                                     OVERTIME = dtr.OVERTIME,
+                                     TOTAL_HOURS = dtr.TOTAL_HOURS,
+                                     TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS,
+                                     SOURCE = "REMOTE"
+                                 }).ToListAsync();
+
+            var attendance = biometriclogs.Concat(wfhlogs).ToList();
+
+            if ((int)EnumEmployeeScope.PerEmployee == model.ScopeTypeEmp)
+            {         
                 var usr = _dbContext.User.Where(x => x.UserId == model.CurrentUserId).FirstOrDefault();
                 var emp = _dbContext.Employee.Where(x => x.EmployeeId == usr.EmployeeId).FirstOrDefault();
-                if(emp != null) 
-                query = query.Where(x => x.EMPLOYEE_NO == emp.EmployeeNo).ToList();
+                if(emp != null)
+                    attendance = attendance.Where(x => x.EMPLOYEE_NO == emp.EmployeeNo).ToList();
             }
 
-            return query;
+            return attendance;
         }
 
         public async Task<IList<DailyTimeRecordViewModel>> GetAllDTRByEmpNo(string empNo)
@@ -329,15 +350,19 @@ namespace DCI.Repositories
         {
             var context = _dbContext.vw_AttendanceSummary.AsQueryable();
 
+            var empdbcontext = _dbContext.Employee.Where(x => x.EmployeeNo == model.EMPLOYEE_NO).FirstOrDefault();
+            var _empId = empdbcontext?.EmployeeId ?? 0;
 
-            DateTime dateFrom = new DateTime(2024, 6, 1);
-           
+
+
+            //DateTime dateFrom = new DateTime(2024, 6, 1);
+
 
             var dateTo = model.DateTo.Date.AddDays(1).AddTicks(-1);
-
+   
             var query = (from dtr in context
-                         //join emp in _dbContext.Employee on dtr.EMPLOYEE_NO equals emp.EmployeeNo
-                         where dtr.DATE >= dateFrom && dtr.DATE <= dateTo && dtr.EMPLOYEE_NO == model.EMPLOYEE_NO // && emp.EmployeeId == model.ID
+                         
+                         where dtr.DATE >= model.DateFrom && dtr.DATE <= dateTo && dtr.EMPLOYEE_NO == model.EMPLOYEE_NO // && emp.EmployeeId == model.ID
                          select new DailyTimeRecordViewModel
                          {
                              ID = dtr.ID,
@@ -352,8 +377,37 @@ namespace DCI.Repositories
                              OVERTIME = dtr.OVERTIME,
                              TOTAL_HOURS = dtr.TOTAL_HOURS,
                              TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS,
-                             DATESTRING = dtr.DATE.ToString("MM/dd/yyyy")
+                             DATESTRING = dtr.DATE.ToString("MM/dd/yyyy"),
+                             ModulePageId = (int)EnumModulePage.DailyTimeRecord
                          }).ToList();
+
+
+            var leave = (from lv in _dbContext.LeaveRequestDetails.AsQueryable()
+                        join hdr in _dbContext.LeaveRequestHeader on lv.LeaveRequestHeaderId equals hdr.LeaveRequestHeaderId
+                         join stat in _dbContext.Status on hdr.Status equals stat.StatusId
+                         where lv.LeaveDate >= model.DateFrom && lv.LeaveDate <= dateTo && hdr.EmployeeId == _empId &&
+                         (hdr.LeaveTypeId == (int)EnumLeaveType.HD || hdr.LeaveTypeId == (int)EnumLeaveType.OB || hdr.LeaveTypeId == (int)EnumLeaveType.SL)
+                         select new DailyTimeRecordViewModel
+                         {
+                             ID = lv.LeaveRequestDetailId,
+                             EMPLOYEE_NO = model.EMPLOYEE_NO,
+                             NAME = string.Empty,
+                             DATE = lv.LeaveDate,
+                             FIRST_IN = string.Empty,
+                             LAST_OUT = string.Empty,
+                             LATE = string.Empty,
+                             CLOCK_OUT = string.Empty,
+                             UNDER_TIME = string.Empty,
+                             OVERTIME = string.Empty,
+                             TOTAL_HOURS = string.Empty,
+                             TOTAL_WORKING_HOURS = string.Empty,
+                             DATESTRING = lv.LeaveDate.ToString("MM/dd/yyyy"),
+                             ModulePageId = (int)EnumModulePage.Leave,
+                             STATUS = hdr.Status,
+                             STATUSNAME = stat.StatusName
+                         }).ToList();
+
+            query =  query.Concat(leave).ToList();
 
 
             return query;

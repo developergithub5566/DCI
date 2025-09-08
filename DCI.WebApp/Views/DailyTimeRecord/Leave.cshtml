@@ -466,6 +466,27 @@
 
                         $(document).ready(function () {
                               js('#tblDocument').DataTable({
+                                        dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
+                         buttons: [
+                             {
+                                 extend: 'excel',
+                                 text: 'Excel',
+                                 title: 'Document Report',
+                                 exportOptions: {
+                                     columns: ':not(:last-child)' // Excludes the last column
+                                 }
+                             },
+                             {
+                                 extend: 'pdf',
+                                 text: 'PDF',
+                                 title: 'Document Report',
+                                 exportOptions: {
+                                     columns: ':not(:last-child)' // Excludes the last column
+                                 }
+                             }
+                         ],
+                         lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
+                         pageLength: 10 ,// Default entries per page
                                  order: [[1, 'desc']]
                               });
 
@@ -481,22 +502,24 @@
                                                                            onChange: function(selectedDates, dateStr, instance) {
                                                                              // Update number of selected days
                                                                              let nodays = selectedDates.length;
+                                                                            // alert("nodays" + nodays); 
                                                                                     let amount =     $('#SelectedLeaveTypeAmount').val();
                                                                                     //   let iMultiple =     $('#isMultiple').val();
-
-                                                                              // console.log("xx",iMultiple)
+                                                                                            //   alert("amount" + amount);
+                                                                            //   console.log(nodays);
 
                                                                           let total = amount * nodays;
+                                                                     
                                                                          let formattedDays = total.toFixed(4);
                                                                              $('#NoOfDays').val(formattedDays);
 
 
-                                                                             if($('#isMultiple').val() == 1){
-                                                                                     fp.set("mode", "multiple");
-                                                                             }else{
-                                                                                 console.log("false daw")
-                                                                                     fp.set("mode", "single");
-                                                                             }
+                                                                             // if($('#isMultiple').val() == 1){
+                                                                             //         fp.set("mode", "multiple");
+                                                                             // }else{
+                                                                             //     console.log("false daw")
+                                                                             //         fp.set("mode", "single");
+                                                                             // }
                                                                                      
 
                                                                              let selectedDateStrings = selectedDates.map(date =>
@@ -778,11 +801,12 @@
 
                function GetLeaveTypeAmount(){
                      let leave =  $('#leaveTypeSelect').val();
-                      console.log(leave);
+                      console.log("getleave" + leave);
                      let  _amount = 0.0000;
                     
 
                     if(leave ==1){
+
                        _amount = 0.5000;
                        $('#SelectedLeaveTypeAmount').val(_amount);
                            $('#isMultiple').val(0);
@@ -793,7 +817,7 @@
                        $('#isMultiple').val(1);
                     }
 
-                     console.log("x", $('#isMultiple').val())
+                     //console.log("x", $('#isMultiple').val())
 
                         const my_fp = document.querySelector("#dateCovered")._flatpickr;
                         my_fp.clear();

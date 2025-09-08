@@ -25,12 +25,17 @@ namespace DCI.Models.ViewModel
         public string DATESTRING { get; set; } = string.Empty;
         public string DATE_COVERED { get; set; } = string.Empty;
         public string TOTAL_UNDERTIME { get; set; } = string.Empty;
+
+        public string SOURCE { get; set; } = string.Empty;
         public DateTime DateFrom { get; set; } = DateTime.Now;
         public DateTime DateTo { get; set; } = DateTime.Now;
 
         public bool IsHoliday { get; set; } = false;
 
         public int EMPLOYEE_ID { get; set; } = 0;
+
+        public int ModulePageId { get; set; } = 0;
+        public string RequestNo { get; set; } = string.Empty;
     }
     public class DTRCorrectionViewModel
     {
