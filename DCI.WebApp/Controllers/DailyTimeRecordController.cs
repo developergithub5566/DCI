@@ -369,7 +369,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
-                    model.CreatedBy = 2;
+                    model.CreatedBy = currentUser.UserId;
+                    model.EmployeeId = currentUser.EmployeeId;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/SaveDTRCorrection");

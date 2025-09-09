@@ -4,9 +4,14 @@ using DCI.Models.Entities;
 using DCI.Models.ViewModel;
 using DCI.Repositories.Interface;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Serilog;
+using System.ComponentModel;
 using System.Reflection.PortableExecutable;
+using System.Text.RegularExpressions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DCI.Repositories
@@ -25,28 +30,28 @@ namespace DCI.Repositories
 
         public async Task<IList<DailyTimeRecordViewModel>> GetAllDTR(DailyTimeRecordViewModel model)
         {
-           // var biometriclogs = _dbContext.vw_AttendanceSummary.AsQueryable();
-           // var wfhlogs = _dbContext.vw_AttendanceSummary.AsQueryable();
+            // var biometriclogs = _dbContext.vw_AttendanceSummary.AsQueryable();
+            // var wfhlogs = _dbContext.vw_AttendanceSummary.AsQueryable();
 
 
             var biometriclogs = await (from dtr in _dbContext.vw_AttendanceSummary.AsQueryable()
-                               orderby dtr.DATE descending, dtr.NAME descending
-                         select new DailyTimeRecordViewModel
-                         {
-                             ID = dtr.ID,
-                             EMPLOYEE_NO = dtr.EMPLOYEE_NO,
-                             NAME = dtr.NAME,
-                             DATE = dtr.DATE,
-                             FIRST_IN = dtr.FIRST_IN,
-                             LAST_OUT = dtr.LAST_OUT,
-                             LATE = dtr.LATE,
-                             CLOCK_OUT = dtr.CLOCK_OUT,
-                             UNDER_TIME = dtr.UNDER_TIME,
-                             OVERTIME = dtr.OVERTIME,
-                             TOTAL_HOURS = dtr.TOTAL_HOURS,
-                             TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS,
-                             SOURCE = "BIOMETRICS"
-                         }).ToListAsync();
+                                       orderby dtr.DATE descending, dtr.NAME descending
+                                       select new DailyTimeRecordViewModel
+                                       {
+                                           ID = dtr.ID,
+                                           EMPLOYEE_NO = dtr.EMPLOYEE_NO,
+                                           NAME = dtr.NAME,
+                                           DATE = dtr.DATE,
+                                           FIRST_IN = dtr.FIRST_IN,
+                                           LAST_OUT = dtr.LAST_OUT,
+                                           LATE = dtr.LATE,
+                                           CLOCK_OUT = dtr.CLOCK_OUT,
+                                           UNDER_TIME = dtr.UNDER_TIME,
+                                           OVERTIME = dtr.OVERTIME,
+                                           TOTAL_HOURS = dtr.TOTAL_HOURS,
+                                           TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS,
+                                           SOURCE = "BIOMETRICS"
+                                       }).ToListAsync();
 
 
             var wfhlogs = await (from dtr in _dbContext.vw_AttendanceSummary_WFH.AsQueryable()
@@ -72,10 +77,10 @@ namespace DCI.Repositories
             var attendance = biometriclogs.Concat(wfhlogs).ToList();
 
             if ((int)EnumEmployeeScope.PerEmployee == model.ScopeTypeEmp)
-            {         
+            {
                 var usr = _dbContext.User.Where(x => x.UserId == model.CurrentUserId).FirstOrDefault();
                 var emp = _dbContext.Employee.Where(x => x.EmployeeId == usr.EmployeeId).FirstOrDefault();
-                if(emp != null)
+                if (emp != null)
                     attendance = attendance.Where(x => x.EMPLOYEE_NO == emp.EmployeeNo).ToList();
             }
 
@@ -109,7 +114,7 @@ namespace DCI.Repositories
             return query;
         }
         public async Task<IList<DTRCorrectionViewModel>> GetAllDTRCorrection(DTRCorrectionViewModel model)
-        {    
+        {
             var query = (from dtr in _dbContext.DTRCorrection.AsQueryable()
                          join stat in _dbContext.Status on dtr.Status equals stat.StatusId
                          where dtr.CreatedBy == model.CreatedBy
@@ -119,7 +124,7 @@ namespace DCI.Repositories
                              RequestNo = dtr.RequestNo,
                              DateFiled = dtr.DateFiled,
                              DtrType = dtr.DtrType,
-                             DtrDateTime = dtr.DtrDateTime,                            
+                             DtrDateTime = dtr.DtrDateTime,
                              Status = dtr.Status,
                              StatusName = stat.StatusName,
                              Reason = dtr.Reason,
@@ -131,8 +136,8 @@ namespace DCI.Repositories
 
 
             if ((int)EnumEmployeeScope.PerEmployee == model.ScopeTypeEmp)
-            {           
-                    query = query.Where(x => x.CreatedBy == model.CreatedBy).ToList();
+            {
+                query = query.Where(x => x.CreatedBy == model.CreatedBy).ToList();
             }
             return query;
         }
@@ -177,8 +182,9 @@ namespace DCI.Repositories
                 {
                     DTRCorrection entity = new DTRCorrection();
                     entity.DateFiled = DateTime.Now;
+                    entity.EmployeeId = param.EmployeeId;
                     entity.RequestNo = await GenereteRequestNo();
-                    entity.DtrType = param.DtrType; 
+                    entity.DtrType = param.DtrType;
                     entity.DateFiled = DateTime.Now;
                     entity.DtrDateTime = param.DtrDateTime;
                     entity.Status = (int)EnumStatus.ForApproval;
@@ -189,7 +195,7 @@ namespace DCI.Repositories
                     entity.IsActive = true;
                     await _dbContext.DTRCorrection.AddAsync(entity);
                     await _dbContext.SaveChangesAsync();
-               
+
                     //var workdtls = _dbContext.EmployeeWorkDetails.Where(x => x.EmployeeId == param.EmployeeId).FirstOrDefault();
                     //var dept = _dbContext.Department.Where(x => x.DepartmentId == workdtls.DepartmentId).FirstOrDefault();
                     //model.ApproverId = dept.ApproverId;
@@ -238,8 +244,8 @@ namespace DCI.Repositories
                                                 .ToListAsync();
 
 
-                int totalrecords = _dtr.Count() + 1;              
-                string finalSetRecords = GetFormattedRecord(totalrecords);                
+                int totalrecords = _dtr.Count() + 1;
+                string finalSetRecords = GetFormattedRecord(totalrecords);
                 string yearMonth = DateTime.Now.ToString("yyyyMM");
                 string req = "DTR";
 
@@ -273,56 +279,48 @@ namespace DCI.Repositories
 
             var dateTo = model.DateTo.Date.AddDays(1).AddTicks(-1);
 
+            //var leaveInfo = (from li in _dbContext.LeaveInfo
+            //                 join emp in _dbContext.Employee on li.EmployeeId equals emp.EmployeeId
+            //                 where li.IsActive && li.DateCreated.Year == 2025
+            //                 group li by li.EmployeeId into g
+            //                 select g.OrderByDescending(x => x.DateCreated).FirstOrDefault()
+            //               ).ToList();
 
-            //var query = (from dtr in context
-            //             where dtr.DATE >= dateFrom && dtr.DATE <= dateTo
-            //             group dtr by new { dtr.EMPLOYEE_NO, dtr.NAME } into g
-            //             select new DailyTimeRecordViewModel
-            //             {
-            //                 EMPLOYEE_NO = g.Key.EMPLOYEE_NO,
-            //                 NAME = g.Key.NAME,
-            //                 TOTAL_UNDERTIME = g.Sum(x =>
-            //                     TimeSpan.TryParse(x.UNDER_TIME, out var t) ? (decimal?)t.TotalMinutes : 0m)
-            //             }).ToList();
+            var leaveInfo = (from li in _dbContext.LeaveInfo
+                             join emp in _dbContext.Employee on li.EmployeeId equals emp.EmployeeId
+                             where li.IsActive && li.DateCreated.Year == 2025
+                             group new { li, emp } by li.EmployeeId into g
+                             select new
+                             {
+                                 Leave = g.OrderByDescending(x => x.li.DateCreated).FirstOrDefault().li,
+                                 EmpNo = g.OrderByDescending(x => x.li.DateCreated).FirstOrDefault().emp.EmployeeNo
+                             }).ToList();
 
-            //var rawData = context
-            //                .Where(dtr => dtr.DATE >= dateFrom && dtr.DATE <= dateTo)
-            //                .Select(dtr => new 
-            //                {
-            //                    dtr.EMPLOYEE_NO,
-            //                    dtr.NAME,
-            //                    dtr.UNDER_TIME
-            //                })
-            //                .ToList(); // ← materialize data to memory
 
-            //var query = rawData
-            //    .GroupBy(x => new { x.EMPLOYEE_NO, x.NAME })
-            //    .Select(g =>  
-            //    {
-            //        var totalMinutes = g.Sum(x =>
-            //            TimeSpan.TryParse(x.UNDER_TIME, out var t) ? t.TotalMinutes : 0);
-
-            //        return new DailyTimeRecordViewModel
-            //        {
-            //            EMPLOYEE_NO = g.Key.EMPLOYEE_NO,
-            //            NAME = g.Key.NAME,
-            //            TOTAL_UNDERTIME = (decimal)totalMinutes
-            //        };
-            //    })
-            //    .ToList();
-
-            var rawData = context
+            var rawData = context                     
                         .Where(dtr => dtr.DATE >= model.DateFrom.Date && dtr.DATE <= dateTo)
                         .Select(dtr => new
                         {
-                            dtr.EMPLOYEE_NO,                        
+                            dtr.EMPLOYEE_NO,
                             dtr.NAME,
                             dtr.UNDER_TIME
                         })
-                        .ToList(); 
+                        .ToList();
 
-            var query = rawData
-                .GroupBy(x => new { x.EMPLOYEE_NO, x.NAME })
+            var joined = (from dtr in rawData
+                          join li in leaveInfo
+                              on dtr.EMPLOYEE_NO equals li.EmpNo into gj
+                          from li in gj.DefaultIfEmpty()   // LEFT JOIN
+                          select new
+                          {
+                              dtr.EMPLOYEE_NO,
+                              dtr.NAME,
+                              dtr.UNDER_TIME,
+                              LeaveBalance = li?.Leave.VLBalance ?? 0,                           
+                          }).ToList();
+
+            var query = joined
+                .GroupBy(x => new { x.EMPLOYEE_NO, x.NAME , x.LeaveBalance})
                 .Select(g =>
                 {
                     var totalUnderTime = g
@@ -335,10 +333,11 @@ namespace DCI.Repositories
                     return new DailyTimeRecordViewModel
                     {
                         EMPLOYEE_NO = g.Key.EMPLOYEE_NO,
-                        NAME = g.Key.NAME,          
+                        NAME = g.Key.NAME,
                         DateFrom = model.DateFrom,
                         DateTo = model.DateTo,
-                        TOTAL_UNDERTIME =  string.Format("{0:0.0000}",totalMinutes) + " or " + totalUnderTime.ToString(@"hh\:mm\:ss") 
+                        TOTAL_UNDERTIME = string.Format("{0:0.0000}", totalMinutes) + " or " + totalUnderTime.ToString(@"hh\:mm\:ss"),
+                        VLBalance = g.Key.LeaveBalance
                     };
                 })
                 .ToList();
@@ -348,69 +347,233 @@ namespace DCI.Repositories
 
         public async Task<IList<DailyTimeRecordViewModel>> GetUndertimeById(DailyTimeRecordViewModel model)
         {
-            var context = _dbContext.vw_AttendanceSummary.AsQueryable();
+            try
+            {
+                var context = _dbContext.vw_AttendanceSummary.AsQueryable();
 
-            var empdbcontext = _dbContext.Employee.Where(x => x.EmployeeNo == model.EMPLOYEE_NO).FirstOrDefault();
-            var _empId = empdbcontext?.EmployeeId ?? 0;
+                var empdbcontext = _dbContext.Employee.Where(x => x.EmployeeNo == model.EMPLOYEE_NO).FirstOrDefault();
+                var _empId = empdbcontext?.EmployeeId ?? 0;
 
-
-
-            //DateTime dateFrom = new DateTime(2024, 6, 1);
-
-
-            var dateTo = model.DateTo.Date.AddDays(1).AddTicks(-1);
-   
-            var query = (from dtr in context
-                         
-                         where dtr.DATE >= model.DateFrom && dtr.DATE <= dateTo && dtr.EMPLOYEE_NO == model.EMPLOYEE_NO // && emp.EmployeeId == model.ID
-                         select new DailyTimeRecordViewModel
-                         {
-                             ID = dtr.ID,
-                             EMPLOYEE_NO = dtr.EMPLOYEE_NO,
-                             NAME = dtr.NAME,
-                             DATE = dtr.DATE,
-                             FIRST_IN = dtr.FIRST_IN,
-                             LAST_OUT = dtr.LAST_OUT,
-                             LATE = dtr.LATE,
-                             CLOCK_OUT = dtr.CLOCK_OUT,
-                             UNDER_TIME = dtr.UNDER_TIME,
-                             OVERTIME = dtr.OVERTIME,
-                             TOTAL_HOURS = dtr.TOTAL_HOURS,
-                             TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS,
-                             DATESTRING = dtr.DATE.ToString("MM/dd/yyyy"),
-                             ModulePageId = (int)EnumModulePage.DailyTimeRecord
-                         }).ToList();
+                var dateTo = model.DateTo.Date.AddDays(1).AddTicks(-1);
 
 
-            var leave = (from lv in _dbContext.LeaveRequestDetails.AsQueryable()
-                        join hdr in _dbContext.LeaveRequestHeader on lv.LeaveRequestHeaderId equals hdr.LeaveRequestHeaderId
-                         join stat in _dbContext.Status on hdr.Status equals stat.StatusId
-                         where lv.LeaveDate >= model.DateFrom && lv.LeaveDate <= dateTo && hdr.EmployeeId == _empId &&
-                         (hdr.LeaveTypeId == (int)EnumLeaveType.HD || hdr.LeaveTypeId == (int)EnumLeaveType.OB || hdr.LeaveTypeId == (int)EnumLeaveType.SL)
-                         select new DailyTimeRecordViewModel
-                         {
-                             ID = lv.LeaveRequestDetailId,
-                             EMPLOYEE_NO = model.EMPLOYEE_NO,
-                             NAME = string.Empty,
-                             DATE = lv.LeaveDate,
-                             FIRST_IN = string.Empty,
-                             LAST_OUT = string.Empty,
-                             LATE = string.Empty,
-                             CLOCK_OUT = string.Empty,
-                             UNDER_TIME = string.Empty,
-                             OVERTIME = string.Empty,
-                             TOTAL_HOURS = string.Empty,
-                             TOTAL_WORKING_HOURS = string.Empty,
-                             DATESTRING = lv.LeaveDate.ToString("MM/dd/yyyy"),
-                             ModulePageId = (int)EnumModulePage.Leave,
-                             STATUS = hdr.Status,
-                             STATUSNAME = stat.StatusName
-                         }).ToList();
-
-            query =  query.Concat(leave).ToList();
+                //var leaveQuery =
+                //              from lv in _dbContext.LeaveRequestDetails
+                //              join hdr in _dbContext.LeaveRequestHeader on lv.LeaveRequestHeaderId equals hdr.LeaveRequestHeaderId
+                //              join stat in _dbContext.Status on hdr.Status equals stat.StatusId
+                //              where lv.LeaveDate >= model.DateFrom && lv.LeaveDate <= dateTo
+                //                    && hdr.EmployeeId == _empId
+                //                    && (hdr.LeaveTypeId == (int)EnumLeaveType.HD
+                //                        || hdr.LeaveTypeId == (int)EnumLeaveType.OB
+                //                        || hdr.LeaveTypeId == (int)EnumLeaveType.SL)
+                //              select new
+                //              {
+                //                  LeaveDate = lv.LeaveDate,
+                //                  RequestNo = hdr.RequestNo,
+                //                  StatusName = stat.StatusName
+                //              };
 
 
-            return query;
+                //var query = (from dtr in context
+                //             where dtr.DATE >= model.DateFrom && dtr.DATE <= dateTo && dtr.EMPLOYEE_NO == model.EMPLOYEE_NO
+                //             join lv in leaveQuery on dtr.DATE.Date equals lv.LeaveDate.Date into gj
+                //             from lv in gj.DefaultIfEmpty()
+                //             select new DailyTimeRecordViewModel
+                //             {
+                //                 ID = dtr.ID,
+                //                 EMPLOYEE_NO = dtr.EMPLOYEE_NO,
+                //                 NAME = dtr.NAME,
+                //                 DATE = dtr.DATE,
+                //                 FIRST_IN = dtr.FIRST_IN,
+                //                 LAST_OUT = dtr.LAST_OUT,
+                //                 LATE = dtr.LATE,
+                //                 CLOCK_OUT = dtr.CLOCK_OUT,
+                //                 UNDER_TIME = dtr.UNDER_TIME,
+                //                 OVERTIME = dtr.OVERTIME,
+                //                 TOTAL_HOURS = dtr.TOTAL_HOURS,
+                //                 TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS,
+                //                 DATESTRING = dtr.DATE.ToString("MM/dd/yyyy"),
+                //                 ModulePageId = (int)EnumModulePage.DailyTimeRecord,
+                //                 RequestNo = (lv == null ? "" : lv.RequestNo),
+                //                 STATUSNAME = (lv == null ? "" : lv.StatusName)
+                //             }).ToList();
+
+
+                // inputs
+                //var empNo = "080343";
+                //var dateFrom = new DateTime(2025, 9, 1);
+                //var dateToEx = new DateTime(2025, 9, 9).AddDays(1); // half-open, inclusive end
+
+                var dtrCorrectRaw = await (
+                       from b in _dbContext.DTRCorrection
+                       join s in _dbContext.Status on b.Status equals s.StatusId into sj
+                       from s in sj.DefaultIfEmpty()
+                       where b.IsActive
+                       select new
+                       {
+                           b.EmployeeId,               
+                           Date = b.DtrDateTime.Date,
+                           b.RequestNo,
+                           StatusName = s.StatusName
+                       }
+                   ).ToListAsync();
+
+                var dtrCorrectMap = dtrCorrectRaw
+                    .GroupBy(x => new { x.EmployeeId, x.Date })
+                    .ToDictionary(
+                        g => g.Key,
+                        g => new
+                        {
+                            RequestNos = string.Join(", ", g.Select(v => v.RequestNo).Where(s => s != null).Distinct()),
+                            StatusNames = string.Join(", ", g.Select(v => v.StatusName).Where(s => s != null).Distinct())
+                        }
+                    );
+
+              
+
+
+                var leavesRaw = await (
+                    from b in _dbContext.LeaveRequestHeader
+                    join c in _dbContext.LeaveRequestDetails
+                         on b.LeaveRequestHeaderId equals c.LeaveRequestHeaderId
+                    join s in _dbContext.Status on b.Status equals s.StatusId into sj
+                    from s in sj.DefaultIfEmpty()
+                    where b.IsActive && c.LeaveDate >= model.DateFrom.Date && c.LeaveDate.Date < dateTo && b.EmployeeId == _empId
+                                        && (b.LeaveTypeId == (int)EnumLeaveType.HD
+                                        || b.LeaveTypeId == (int)EnumLeaveType.OB
+                                        || b.LeaveTypeId == (int)EnumLeaveType.SL)
+                    select new
+                    {
+                        b.EmployeeId,
+                        Date = c.LeaveDate.Date,  
+                        b.RequestNo,
+                        StatusName = s.StatusName
+                    }
+                ).ToListAsync();
+
+                var leaveMap = leavesRaw
+                    .GroupBy(x => new { x.EmployeeId, x.Date })
+                    .ToDictionary(
+                        g => g.Key,
+                        g => new
+                        {
+                            RequestNos = string.Join(", ", g.Select(v => v.RequestNo).Where(s => s != null).Distinct()),
+                            StatusNames = string.Join(", ", g.Select(v => v.StatusName).Where(s => s != null).Distinct())
+                        }
+                    );
+
+              
+                var att = await (
+                    from a in _dbContext.vw_AttendanceSummary
+                    join e in _dbContext.Employee on a.EMPLOYEE_NO equals e.EmployeeNo
+                    where a.EMPLOYEE_NO == model.EMPLOYEE_NO
+                       && a.DATE >= model.DateFrom && a.DATE < dateTo
+                    orderby a.DATE
+                    select new
+                    {
+                        Row = a,
+                        EmployeeId = e.EmployeeId
+                    }
+                ).ToListAsync();
+
+
+                //var result = att.Select(x =>
+                //{
+                //    var d = x.Row.DATE.Date; 
+                //    var key = new { x.EmployeeId, Date = d };
+
+                //    var agg = leaveMap.TryGetValue(key, out var found) ? found : null;
+
+                //    return new DailyTimeRecordViewModel
+                //    {
+                //        ID = x.Row.ID,
+                //        EMPLOYEE_NO = x.Row.EMPLOYEE_NO,
+                //        NAME = x.Row.NAME,
+                //        DATE = x.Row.DATE,
+                //        FIRST_IN = x.Row.FIRST_IN,
+                //        LAST_OUT = x.Row.LAST_OUT,
+                //        LATE = x.Row.LATE,
+                //        CLOCK_OUT = x.Row.CLOCK_OUT,
+                //        UNDER_TIME = x.Row.UNDER_TIME,
+                //        OVERTIME = x.Row.OVERTIME,
+                //        TOTAL_HOURS = x.Row.TOTAL_HOURS,
+                //        TOTAL_WORKING_HOURS = x.Row.TOTAL_WORKING_HOURS,
+                //        DATESTRING = x.Row.DATE.ToString("MM/dd/yyyy"),
+                //        ModulePageId = (int)EnumModulePage.DailyTimeRecord,
+
+                //        RequestNo = agg?.RequestNos ?? string.Empty,
+                //        STATUSNAME = agg?.StatusNames ?? string.Empty
+                //    };
+                //}).ToList();
+
+                var result = att.Select(x =>
+                {
+                    var d = x.Row.DATE.Date;
+                    var key = new { x.EmployeeId, Date = d };
+
+                    // lookup leave
+                    var leaveAgg = leaveMap.TryGetValue(key, out var lf) ? lf : null;
+
+                    // lookup dtr correction
+                    var corrAgg = dtrCorrectMap.TryGetValue(key, out var cf) ? cf : null;
+
+                    // merge: if both exist, concatenate
+                    var reqNos = new List<string>();
+                    var statNms = new List<string>();
+
+                    if (leaveAgg != null)
+                    {
+                        if (!string.IsNullOrEmpty(leaveAgg.RequestNos))
+                            reqNos.Add(leaveAgg.RequestNos);
+                        if (!string.IsNullOrEmpty(leaveAgg.StatusNames))
+                            statNms.Add(leaveAgg.StatusNames);
+                    }
+
+                    if (corrAgg != null)
+                    {
+                        if (!string.IsNullOrEmpty(corrAgg.RequestNos))
+                            reqNos.Add(corrAgg.RequestNos);
+                        if (!string.IsNullOrEmpty(corrAgg.StatusNames))
+                            statNms.Add(corrAgg.StatusNames);
+                    }
+
+                    return new DailyTimeRecordViewModel
+                    {
+                        ID = x.Row.ID,
+                        EMPLOYEE_NO = x.Row.EMPLOYEE_NO,
+                        NAME = x.Row.NAME,
+                        DATE = x.Row.DATE,
+                        FIRST_IN = x.Row.FIRST_IN,
+                        LAST_OUT = x.Row.LAST_OUT,
+                        LATE = x.Row.LATE,
+                        CLOCK_OUT = x.Row.CLOCK_OUT,
+                        UNDER_TIME = x.Row.UNDER_TIME,
+                        OVERTIME = x.Row.OVERTIME,
+                        TOTAL_HOURS = x.Row.TOTAL_HOURS,
+                        TOTAL_WORKING_HOURS = x.Row.TOTAL_WORKING_HOURS,
+                        DATESTRING = x.Row.DATE.ToString("MM/dd/yyyy"),
+                        ModulePageId = (int)EnumModulePage.DailyTimeRecord,
+
+                        RequestNo = string.Join(" | ", reqNos.Distinct()),
+                        STATUSNAME = string.Join(" | ", statNms.Distinct())
+                    };
+                }).ToList();
+
+
+
+                var query = result;
+
+               return query;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return null;
         }
 
         //public async Task<IList<WFHViewModel>> GetAllWFH(WFHViewModel model)
@@ -433,7 +596,7 @@ namespace DCI.Repositories
         //    }
         //    return query;
         //}
-          
+
 
     }
 }

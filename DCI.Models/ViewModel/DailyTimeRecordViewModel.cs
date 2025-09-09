@@ -36,10 +36,13 @@ namespace DCI.Models.ViewModel
 
         public int ModulePageId { get; set; } = 0;
         public string RequestNo { get; set; } = string.Empty;
+        public decimal VLBalance { get; set; } = 0;
+
     }
     public class DTRCorrectionViewModel
     {
         public int DtrId { get; set; } = 0;
+        public int EmployeeId { get; set; } = 0;
         public string RequestNo { get; set; } = string.Empty;
         public DateTime DateFiled { get; set; }
         public int DtrType { get; set; } = 0;

@@ -7,6 +7,7 @@ namespace DCI.Models.Entities
     {
         [Key]
         public int DtrId { get; set; }
+        public int EmployeeId { get; set; }
         public string RequestNo { get; set; }
 
         public DateTime DateFiled { get; set; }

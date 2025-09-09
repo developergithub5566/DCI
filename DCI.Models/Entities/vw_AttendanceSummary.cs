@@ -16,5 +16,6 @@ namespace DCI.Models.Entities
         public string OVERTIME { get; set; } = string.Empty;
         public string TOTAL_HOURS { get; set; } = string.Empty;
         public string TOTAL_WORKING_HOURS { get; set; } = string.Empty;
+        public int STATUS { get; set; } = 0;
     }
 }

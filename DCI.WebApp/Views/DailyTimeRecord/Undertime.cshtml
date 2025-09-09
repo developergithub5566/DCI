@@ -192,7 +192,10 @@
                             </th>
                             <th>
                                 <label>Total Undertime</label>
-                            </th>               
+                            </th>
+                            <th>
+                                <label>Remaining VL</label>
+                            </th>
                             <th>
                                 Action
                             </th>
@@ -222,10 +225,13 @@
                                 </td>
                                 <td>
                                     @item.TOTAL_UNDERTIME
-                                </td>                                    
-                             
+                                </td>
+                                <td>
+                                    @item.VLBalance
+                                </td>
+
                                 <td class="text-center">
-                                    <a href="#" onclick='editForm("@item.EMPLOYEE_NO","@item.DateFrom","@item.DateTo")' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+                                    <a href="javascript:void(0)" onclick='editForm("@item.EMPLOYEE_NO","@item.DateFrom","@item.DateTo")' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
                                 </td>
                             </tr>
                         }
@@ -493,7 +499,7 @@
                                                         tbodytable.html(`<tr><td colspan="4" class="text-center">No record found.</td></tr>`);
                                                     }
 
-
+                                                    // e.preventDefault();
                                                   js('#createmodal').modal('show');
                                               } else {
                                                   Swal.fire({
