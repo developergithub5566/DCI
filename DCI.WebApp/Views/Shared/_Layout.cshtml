@@ -281,7 +281,7 @@
 						<a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 						<i class="fas fa-bell fa-fw"></i>
 						<!-- Counter - Alerts -->
-						<span class="badge badge-danger badge-counter">0</span>
+						<span class="badge badge-danger badge-counter"><div id="notification-count"></div></span>
 						</a>
 						    <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
 						        <h6 class="dropdown-header">
@@ -305,6 +305,8 @@
 
                                     connection.on("ReceiveNotifications", function (notifications) {                                     
                                          const container = document.getElementById("notification-container");
+                                             const countLabel = document.getElementById("notification-count");   
+                                             countLabel.innerHTML = notifications.filter(n => !n.markRead).length;
                                         container.innerHTML = ""; // Clear existing
 
                                                     // <a href="#" onclick="NotifMarkRead(${n.notificationId},'${n.url}')" class="dropdown-item preview-item ${n.markRead ?  ''  : 'bg-body-secondary' }">

@@ -485,6 +485,41 @@ namespace DCI.WebApp.Controllers
             }
         }
 
+        public async Task<IActionResult> SaveUndertime([FromBody] List<UndertimeDeductionViewModel> model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    //model.CreatedBy = currentUser.UserId;
+                   // model.EmployeeId = currentUser.EmployeeId;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/SaveUndertime");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = responseBody });
+                    }
+                    return Json(new { success = false, message = responseBody });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
         public async Task<IActionResult> WFH(DailyTimeRecordViewModel param)
         {
             List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();

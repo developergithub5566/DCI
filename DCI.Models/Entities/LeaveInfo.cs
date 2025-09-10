@@ -15,7 +15,8 @@ namespace DCI.Models.Entities
         public decimal SLBalance { get; set; }
         public decimal SPLBalance { get; set; }
         
-        public decimal Credit { get; set; }
+        public decimal VLCredit { get; set; }
+        public decimal SLCredit { get; set; }
 
         public DateTime DateCreated { get; set; }
 

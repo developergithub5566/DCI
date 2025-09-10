@@ -190,7 +190,7 @@
 
 
                                         <td class="text-center">
-                                            <a href="#" onclick="editForm(@hdr.LeaveRequestHeaderId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+                                            <a href="javascript:void(0)" onclick="editForm(@hdr.LeaveRequestHeaderId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
 
                                             @*      <div class="dropdown">
                                                 <a href="#" class="dropdown-toggl text-lg" data-toggle="dropdown">
@@ -237,7 +237,9 @@
             </div>
 
         </div>
-
+        @{
+            var currentMonth = DateTime.Now.ToString("MMM-yyyy"); // e.g. "Sep-2025"
+        }
         <div class="col-xl-6">
 
             <div class="card shadow mb-4">
@@ -264,7 +266,9 @@
                             <tbody id="tblVL">
                                 @foreach (var vl in Model.vlSummaries)
                                 {
-                                    <tr class=''>
+                                    string rowClass = vl.AsOf == currentMonth ? "table-success" : "";
+
+                                    <tr class='@rowClass'>
                                         <td><strong> @vl.AsOf  </strong></td>
                                         <td><strong>  @vl.BegBal</strong></td>
                                         <td>@vl.Credit</td>
@@ -302,9 +306,12 @@
                                 </tr>
                             </thead>
                             <tbody id="tblSL">
+                               
                                 @foreach (var sl in Model.slSummaries)
-                                {
-                                    <tr class=''>
+                                {                                 
+                                    string rowClass = sl.AsOf == currentMonth ? "table-success" : "";
+
+                                    <tr class='@rowClass'>
                                         <td><strong> @sl.AsOf  </strong></td>
                                         <td><strong>  @sl.BegBal</strong></td>
                                         <td>@sl.Credit</td>
@@ -939,13 +946,22 @@
                                  
                               success: function (response) {
                                   if (response.success) {
+
+                                            var now = new Date();
+                                            var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                                                              "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                                            var currentMonth = monthNames[now.getMonth()] + "-" + now.getFullYear();
+                                         
                                                                        
                                        var tbodytableVL = $("#tblVL");
                                                 tbodytableVL.empty();
 
                                                 if (response.data.vlSummaries.length > 0) {
+
                                                     $.each(response.data.vlSummaries, function(index, item) {
-                                                               var row = `<tr>
+                                                           var highlightClass = (item.asOf === currentMonth) ? "table-success" : "";
+
+                                                                    var row = `<tr class="${highlightClass}">
                                                                             <td><strong>${item.asOf}</strong></td>
                                                                             <td><strong>${parseFloat(item.begBal).toFixed(4)}</strong></td>
                                                                             <td>${parseFloat(item.credit).toFixed(4)}</td>
@@ -961,7 +977,9 @@
                                                 tbodytableSL.empty();
                                                 if (response.data.slSummaries.length > 0) {
                                                     $.each(response.data.slSummaries, function(index, item) {
-                                                       var row = `<tr>
+                                                         var highlightClass = (item.asOf === currentMonth) ? "table-success" : "";
+
+                                                             var row = `<tr class="${highlightClass}">
                                                                             <td><strong>${item.asOf}</strong></td>
                                                                             <td><strong>${parseFloat(item.begBal).toFixed(4)}</strong></td>
                                                                             <td>${parseFloat(item.credit).toFixed(4)}</td>

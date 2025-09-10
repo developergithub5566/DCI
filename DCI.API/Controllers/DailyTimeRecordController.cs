@@ -102,6 +102,13 @@ namespace DCI.API.Controllers
         }
 
         [HttpPost]
+        [Route("SaveUndertime")]
+        public async Task<IActionResult> SaveUndertime([FromBody] List<UndertimeDeductionViewModel> model)
+        {
+            return Ok(await _dtrRepository.SaveUndertime(model));
+        }
+
+        [HttpPost]
         [Route("GetAllWFH")]
         public async Task<IActionResult> GetAllWFH([FromBody] DailyTimeRecordViewModel model)
         {

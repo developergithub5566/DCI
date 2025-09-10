@@ -39,7 +39,7 @@ namespace DCI.Repositories
 
             int _currentYear = DateTime.Now.Year;
 
-            var leaveinfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == param.EmployeeId && x.DateCreated.Date.Year == _currentYear).OrderByDescending(x => x.DateCreated).FirstOrDefault();
+            var leaveinfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == param.EmployeeId && x.DateCreated.Date.Year == _currentYear && x.IsActive).OrderByDescending(x => x.DateCreated).FirstOrDefault();
             model.VLBalance = leaveinfo?.VLBalance ?? 0;
             model.SLBalance = leaveinfo?.SLBalance ?? 0 ;
             model.SPLBalance = leaveinfo?.SPLBalance ?? 0;
@@ -51,7 +51,7 @@ namespace DCI.Repositories
                                                  on lheader.LeaveTypeId equals lvtype.LeaveTypeId
                                                  join stat in _dbContext.Status
                                                  on lheader.Status equals stat.StatusId
-                                                 where lheader.EmployeeId ==  param.EmployeeId
+                                                 where lheader.EmployeeId ==  param.EmployeeId && lheader.IsActive
                                                  select new LeaveRequestHeaderViewModel
                                                  {
                                                      LeaveRequestHeaderId = lheader.LeaveRequestHeaderId,

@@ -25,6 +25,7 @@ namespace DCI.Models.ViewModel
         public string DATESTRING { get; set; } = string.Empty;
         public string DATE_COVERED { get; set; } = string.Empty;
         public string TOTAL_UNDERTIME { get; set; } = string.Empty;
+        public string TOTAL_UNDERTIMEHOURS { get; set; } = string.Empty;
 
         public string SOURCE { get; set; } = string.Empty;
         public DateTime DateFrom { get; set; } = DateTime.Now;
@@ -72,7 +73,15 @@ namespace DCI.Models.ViewModel
         public string EMPLOYEE_NO { get; set; }
         public string NAME { get; set; }
         public decimal? TotalUnderTime { get; set; }
-    }        
+    }
+
+    public class UndertimeDeductionViewModel
+    {
+        public string EmpNo { get; set; } = string.Empty;
+        public DateTime DateFrom { get; set; } 
+        public DateTime DateTo { get; set; }
+        public decimal? TotalUndertime { get; set; } = 0;
+    }
 }
 
 

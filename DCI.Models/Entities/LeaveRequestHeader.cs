@@ -1,5 +1,6 @@
 ﻿using DCI.Models.Configuration;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DCI.Models.Entities
 {
@@ -17,7 +18,8 @@ namespace DCI.Models.Entities
         public int? ModifiedBy { get; set; }
         public bool IsActive { get; set; }
         public Employee? Employee { get; set; }
-         public decimal NoOfDays { get; set; }
+        [Column(TypeName = "decimal(7,4)")]
+        public decimal NoOfDays { get; set; }
         public virtual ICollection<LeaveRequestDetails> LeaveRequestDetailsList { get; set; }
     }
 }

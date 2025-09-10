@@ -44,7 +44,8 @@ namespace DCI.Core.Common
         Leave = 18,
         Overtime = 19,
         Holiday = 20,
-        WFH = 21
+        WFH = 21,
+        Undertime = 22
     }
 
     public enum EnumRole
@@ -145,7 +146,8 @@ namespace DCI.Core.Common
         MS = 7,
         OB = 8,
         VLMon = 9,
-        SLMon = 10
+        SLMon = 10,
+        UT =11
     }
 
     public enum EnumEmployeeScope

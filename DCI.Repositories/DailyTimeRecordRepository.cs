@@ -1,4 +1,5 @@
 ﻿using DCI.Core.Common;
+using DCI.Core.Helpers;
 using DCI.Data;
 using DCI.Models.Entities;
 using DCI.Models.ViewModel;
@@ -19,9 +20,11 @@ namespace DCI.Repositories
     public class DailyTimeRecordRepository : IDailyTimeRecordRepository, IDisposable
     {
         private DCIdbContext _dbContext;
-        public DailyTimeRecordRepository(DCIdbContext dbContext)
+        private readonly IHomeRepository _homeRepository;
+        public DailyTimeRecordRepository(DCIdbContext dbContext, IHomeRepository homeRepository)
         {
             _dbContext = dbContext;
+            _homeRepository = homeRepository;
         }
         public void Dispose()
         {
@@ -275,7 +278,7 @@ namespace DCI.Repositories
         public async Task<IList<DailyTimeRecordViewModel>> GetAllUndertime(DailyTimeRecordViewModel model)
         {
             var context = _dbContext.vw_AttendanceSummary.AsQueryable();
-
+            int _currentYear = DateTime.Now.Year;
 
             var dateTo = model.DateTo.Date.AddDays(1).AddTicks(-1);
 
@@ -288,7 +291,7 @@ namespace DCI.Repositories
 
             var leaveInfo = (from li in _dbContext.LeaveInfo
                              join emp in _dbContext.Employee on li.EmployeeId equals emp.EmployeeId
-                             where li.IsActive && li.DateCreated.Year == 2025
+                             where li.IsActive && li.DateCreated.Year == _currentYear
                              group new { li, emp } by li.EmployeeId into g
                              select new
                              {
@@ -336,7 +339,10 @@ namespace DCI.Repositories
                         NAME = g.Key.NAME,
                         DateFrom = model.DateFrom,
                         DateTo = model.DateTo,
-                        TOTAL_UNDERTIME = string.Format("{0:0.0000}", totalMinutes) + " or " + totalUnderTime.ToString(@"hh\:mm\:ss"),
+                        //TOTAL_UNDERTIME = string.Format("{0:0.0000}", totalMinutes)  ,
+                        TOTAL_UNDERTIME = TimeHelper.ConvertMinutesToValue(totalMinutes).ToString(),
+                        //TOTAL_UNDERTIMEHOURS = "Hour:" + totalUnderTime.ToString(@"hh") + " Minute:" + totalUnderTime.ToString(@"mm"), // + " Second:" + totalUnderTime.ToString(@"ss")
+                        TOTAL_UNDERTIMEHOURS = totalUnderTime.ToString(@"hh") + " Hour/s" + " and " + totalUnderTime.ToString(@"mm") + " Minute/s",
                         VLBalance = g.Key.LeaveBalance
                     };
                 })
@@ -575,6 +581,191 @@ namespace DCI.Repositories
             }
             return null;
         }
+
+
+        public async Task<(int statuscode, string message)> SaveUndertime(List<UndertimeDeductionViewModel> model)
+        {
+         //   DTRCorrectionViewModel model = new DTRCorrectionViewModel();
+
+            try
+            {
+                //var leaveInfo = (from li in _dbContext.LeaveInfo
+                //                 join emp in _dbContext.Employee on li.EmployeeId equals emp.EmployeeId
+                //                 where li.IsActive && li.DateCreated.Year == _currentYear
+                //                 group new { li, emp } by li.EmployeeId into g
+                //                 select new
+                //                 {
+                //                     Leave = g.OrderByDescending(x => x.li.DateCreated).FirstOrDefault().li,
+                //                     EmpNo = g.OrderByDescending(x => x.li.DateCreated).FirstOrDefault().emp.EmployeeNo
+                //                 }).ToList();
+
+
+           
+
+
+                foreach (var ut in model)
+                {
+                    if(ut.EmpNo != null && ut.TotalUndertime > 0)
+                    {
+                        var emp = _dbContext.Employee.Where(x => x.EmployeeNo == ut.EmpNo).FirstOrDefault();
+                        //var leafinfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == emp.EmployeeId).FirstOrDefault();
+                        var leafinfo = _dbContext.LeaveInfo.Where(li => li.IsActive&& li.EmployeeId == emp.EmployeeId && li.DateCreated.Year == DateTime.Now.Year).OrderByDescending(li => li.DateCreated).FirstOrDefault();
+
+
+                        leafinfo.VLBalance = leafinfo.VLBalance - ut.TotalUndertime ?? 0;
+                       // leafinfo.DateModified = DateTime.Now;
+                       // leafinfo.ModifiedBy = model.ModifiedBy;
+                        leafinfo.IsActive = true;
+                        _dbContext.LeaveInfo.Entry(leafinfo).State = EntityState.Modified;
+                       // await _dbContext.SaveChangesAsync();
+
+
+                        LeaveFormViewModel lvFormmodel = new LeaveFormViewModel();
+                        lvFormmodel.EmployeeId = emp.EmployeeId;
+                        lvFormmodel.NoOfDays = ut.TotalUndertime ?? 0;                        
+                        await SaveLeaveForUndertime(lvFormmodel);
+
+
+                        //notif for employee
+                        //    //NotificationViewModel notifvm = new NotificationViewModel();
+                        //    //notifvm.Title = "Leave";
+                        //    //notifvm.Description = String.Format("You have been assigned leave request {0} for review", entity.RequestNo);
+                        //    //notifvm.ModuleId = (int)EnumModulePage.Leave;
+                        //    //notifvm.TransactionId = entity.LeaveRequestHeaderId;
+                        //    //notifvm.AssignId = dept.ApproverId ?? 0;
+                        //    //notifvm.URL = "/Todo/Index/?leaveId=" + model.LeaveRequestHeaderId;
+                        //    //notifvm.MarkRead = false;
+                        //    //notifvm.CreatedBy = param.EmployeeId;
+                        //    //notifvm.IsActive = true;
+                        //    //await _homeRepository.SaveNotification(notifvm);
+
+
+                        //Update DTR attendance summary status to DEDUCTED
+
+
+                        //create audit logs for undertime execution 
+
+                    }
+                }     
+             
+                return (StatusCodes.Status200OK, "Successfully updated");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return (StatusCodes.Status406NotAcceptable, ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        public async Task SaveLeaveForUndertime(LeaveFormViewModel param)
+        {
+            LeaveViewModel model = new LeaveViewModel();
+
+            try
+            {
+              
+                    LeaveRequestHeader entity = new LeaveRequestHeader();
+                    entity.EmployeeId = param.EmployeeId;
+                    entity.RequestNo = await GenereteRequestNoForUndertime();
+                    entity.DateFiled = DateTime.Now;
+                    entity.LeaveTypeId = (int)EnumLeaveType.UT;
+                    entity.Status = (int)EnumStatus.Approved;
+                    entity.Reason = "System-Generated Undertime Deduction.";
+                    entity.NoOfDays = param.NoOfDays;
+                    entity.ModifiedBy = null;
+                    entity.DateModified = null;
+                    entity.IsActive = true;
+                    await _dbContext.LeaveRequestHeader.AddAsync(entity);
+                    await _dbContext.SaveChangesAsync();
+
+                   
+                        LeaveRequestDetails entityDtl = new LeaveRequestDetails();
+                        entityDtl.LeaveRequestHeaderId = entity.LeaveRequestHeaderId;
+                        entityDtl.LeaveDate = DateTime.Now;
+                        entityDtl.Amount = param.NoOfDays;
+                        entityDtl.IsActive = true;
+                        await _dbContext.LeaveRequestDetails.AddAsync(entityDtl);
+                        await _dbContext.SaveChangesAsync();
+                
+
+                    //var workdtls = _dbContext.EmployeeWorkDetails.Where(x => x.EmployeeId == param.EmployeeId).FirstOrDefault();
+                    //var dept = _dbContext.Department.Where(x => x.DepartmentId == workdtls.DepartmentId).FirstOrDefault();
+                    //model.ApproverId = dept.ApproverId;
+                    //model.LeaveRequestHeader.Status = entity.Status;
+                    //model.LeaveRequestHeader.RequestNo = entity.RequestNo;
+                    //await _emailRepository.SendToApproval(model);
+
+
+
+                    NotificationViewModel notifvm = new NotificationViewModel();
+                    notifvm.Title = "Undertime";
+                    notifvm.Description = System.String.Format("System-Generated Undertime Deduction.", entity.RequestNo);
+                    notifvm.ModuleId = (int)EnumModulePage.Undertime;
+                    notifvm.TransactionId = entity.LeaveRequestHeaderId;
+                    notifvm.AssignId = param.EmployeeId;
+                    notifvm.URL = "/Todo/Index/?leaveId=" + entity.LeaveRequestHeaderId;
+                    notifvm.MarkRead = false;
+                    notifvm.CreatedBy = param.EmployeeId;
+                    notifvm.IsActive = true;
+                    await _homeRepository.SaveNotification(notifvm);
+
+
+               
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());              
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        private async Task<string> GenereteRequestNoForUndertime()
+        {
+
+            try
+            {
+                int _currentYear = DateTime.Now.Year;
+                int _currentMonth = DateTime.Now.Month;
+                var _leaveContext = await _dbContext.LeaveRequestHeader
+                                                .Where(x => x.IsActive == true && x.DateFiled.Date.Year == _currentYear && x.DateFiled.Date.Month == _currentMonth)
+                                                .AsQueryable()
+                                                .ToListAsync();
+
+
+                int totalrecords = _leaveContext.Count() + 1;
+                string finalSetRecords = GetFormattedRecordForUndertime(totalrecords);
+                string yearMonth = DateTime.Now.ToString("yyyyMM");
+                string req = "UT";
+
+                return $"{req}-{yearMonth}-{finalSetRecords}";
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return string.Empty;
+        }
+
+        private string GetFormattedRecordForUndertime(int totalRecords)
+        {
+            int setA = totalRecords % 1000;
+            int setB = totalRecords / 1000;
+            string formattedA = setA.ToString("D4");
+            string formattedB = setB.ToString("D4");
+            return $"{formattedA}";
+        }
+
 
         //public async Task<IList<WFHViewModel>> GetAllWFH(WFHViewModel model)
         //{

@@ -76,7 +76,7 @@
             <li><a href="~/DailyTimeRecord/Undertime">Undertime</a></li>
             @*         <li><a asp-controller="DailyTimeRecord" asp-action="Attendance" asp-route-id="1">Attendance</a></li> *@
 
-           
+
         </ul>
     </div>
 
@@ -138,28 +138,24 @@
                     <div class="form-group col-3">
                         <label class="frmText">Date Covered From: </label>
                         <div class="input-group">
-                       @*      <input type="text" name="dateFrom" id="dateFrom" class="form-control frmField" value="@dateFrom?.ToString("yyyy-MM-dd")" autocomplete="off">
+
+                            <input type="text" name="dateFrom" id="dateFrom" class="form-control frmField" value="@dateFrom?.ToString("yyyy-MM-dd")" autocomplete="off">
                             <div class="input-group-prepend prependBtn">
                                 <i class="fa fa-calendar"></i>
-                            </div> *@
-
-                                <input type="text" name="dateFrom" id="dateFrom" class="form-control frmField" value="@dateFrom?.ToString("yyyy-MM-dd")" autocomplete="off">
-                                <div class="input-group-prepend prependBtn">
-                                    <i class="fa fa-calendar"></i>
-                                </div>
-                                <label for="dateFrom" generated="true" class="error"></label>
+                            </div>
+                            <label for="dateFrom" generated="true" class="error"></label>
                         </div>
                     </div>
                     <div class="form-group col-3">
                         <label class="frmText">Date Covered To: </label>
                         <div class="input-group">
-                   
 
-                                <input type="text" name="dateTo" id="dateTo" class="form-control frmField" value="@dateTo?.ToString("yyyy-MM-dd")" autocomplete="off">
-                                <div class="input-group-prepend prependBtn">
-                                    <i class="fa fa-calendar"></i>
-                                </div>
-                                <label for="dateTo" generated="true" class="error"></label>
+
+                            <input type="text" name="dateTo" id="dateTo" class="form-control frmField" value="@dateTo?.ToString("yyyy-MM-dd")" autocomplete="off">
+                            <div class="input-group-prepend prependBtn">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            <label for="dateTo" generated="true" class="error"></label>
                         </div>
                     </div>
                     <div class="form-group col-sm-6 col-md-4 col-lg-3 col-xl-2 mb0">
@@ -168,14 +164,22 @@
                             <span class="text"><small>Apply </small></span>
                             <span class="icon text-white-50"><i class="fa-solid fa-caret-right text-xs"></i></span>
                         </button>
-                
+
+                    </div>
+                    <div class="form-group col-sm-4 col-md-4 col-lg-3 col-xl-2 mb0 ml-auto text-right align-self-center">
+                        <a href="#" title="Submit"
+                           class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")"
+                           data-toggle="modal" data-target="#" onclick="SubmitUndertimeDeduction()" id="Submit">
+                            <span class="icon text-white"><i class="fa fa-paper-plane" aria-hidden="true"></i></span>
+                            <span class="text text-white"><small>Submit</small></span>
+                        </a>
                     </div>
                 </form>
             </div>
 
 
             <div class="table-responsive mt20">
-                <table class="table table-bordered" id="tblDTR">
+                <table class="table table-bordered" id="tblUndertime">
                     <thead>
                         <tr>
                             <th>
@@ -209,21 +213,21 @@
                                     <input type="checkbox" class="row-checkbox" />
 
                                 </td>
-                              
+
                                 <td>
                                     @item.EMPLOYEE_NO
                                 </td>
                                 <td>
                                     @item.NAME
                                 </td>
-                            
+
                                 <td class="text-center">
-                             @*    <td class="text-center"><strong><span class='btn-danger applicationStatus'>@hdr.StatusName</span></strong></td> *@
+                                    @*    <td class="text-center"><strong><span class='btn-danger applicationStatus'>@hdr.StatusName</span></strong></td> *@
                                     <strong><span class='btn-primary applicationStatus'>@item.DateFrom.ToString("MM/dd/yyyy")</span></strong>
                                     <strong><span class='btn-secondary applicationStatus'>to</span></strong>
                                     <strong><span class='btn-primary applicationStatus'>@item.DateTo.ToString("MM/dd/yyyy")</span></strong>
                                 </td>
-                                <td>
+                                <td title="@item.TOTAL_UNDERTIMEHOURS">
                                     @item.TOTAL_UNDERTIME
                                 </td>
                                 <td>
@@ -253,14 +257,14 @@
                         </div>
                         <form id="createForm">
                             <div class="modal-body">
-                               <row>
-                                  <strong><label id="labelEmpName"></label></strong> 
-                               </row>
+                                <row>
+                                    <strong><label id="labelEmpName"></label></strong>
+                                </row>
                                 <table class="table table-bordered text-dark text-xs">
                                     <thead>
                                         <tr>
 
-                                          
+
                                             <th>
                                                 <label>Date</label>
                                             </th>
@@ -274,7 +278,7 @@
                                                 <label>Undertime</label>
                                             </th>
                                             <th>
-                                                <label>Transaction No</label>
+                                                <label>Reference No</label>
                                             </th>
                                             <th>
                                                 <label>Status</label>
@@ -297,7 +301,7 @@
 
 
     @*       <script src="https://code.jquery.com/jquery-3.7.1.js"></script> *@
-@*              <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
+    @*              <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
                  <script src="https://cdn.datatables.net/select/3.0.1/js/dataTables.select.js"></script>
                 <script src="https://cdn.datatables.net/select/3.0.1/js/select.dataTables.js"></script>                
  
@@ -305,19 +309,19 @@
                 <link href="https://cdn.datatables.net/select/3.0.1/css/select.dataTables.css" rel="stylesheet" />   *@
 
 
-                    <!-- jQuery -->
-              @*   <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+                <!-- jQuery -->
+    @*   <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
                 <!-- DataTables CSS + JS -->
                 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
                 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script> *@
-@* 
+    @* 
     okay na to
                 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
                 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
  *@
 
-        @*         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.2/moment.min.js"></script>
+    @*         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.2/moment.min.js"></script>
                 <script src=" https://cdn.datatables.net/datetime/1.5.5/js/dataTables.dateTime.min.js"></script> *@
 
 
@@ -375,52 +379,11 @@
 
 
                         $(document).ready(function () {
-                
+
                                                          js('#tblDTR').DataTable({
                                                               pageLength: 50
 
                                                          });
-                   
-                  
-
-
-
-                                    //    var minDate, maxDate;
-
-                    // Custom filtering function which will search data in column four between two values
-                    // DataTable.ext.search.push(function (settings, data, dataIndex) {
-                    //     var min = minDate.val();
-                    //     var max = maxDate.val();
-                    //     var date = new Date(data[4]);
-
-                    //     if (
-                    //         (min === null && max === null) ||
-                    //         (min === null && date <= max) ||
-                    //         (min <= date && max === null) ||
-                    //         (min <= date && date <= max)
-                    //     ) {
-                    //         return true;
-                    //     }
-                    //     return false;
-                    // });
-
-                    // // Create date inputs
-                    // minDate = new DateTime('#dateFrom', {
-                    //     format: 'MM/DD/YYYY'
-                    // });
-                    // maxDate = new DateTime('#dateTo', {
-                    //     format: 'MM/DD/YYYY'
-                    // });
-
-                    // // DataTables initialisation
-                    // var table = $('#tblDTR').DataTable();
-
-                    // // Refilter the table
-                    // $('#dateFrom, #dateTo').on('change', function () {
-                    //     table.draw();
-                    // });
-
-
 
                           }); // end document
 
@@ -439,7 +402,7 @@
                                           success: function (response) {
                                               if (response.success) {
                                                      console.log(response);
-                                                 
+
 
                                                   js('#createmodal').modal('show');
                                               } else {
@@ -485,7 +448,7 @@
                                                     if (response.data.length > 0) {
                                                         $.each(response.data, function(index, item) {
                                                             var row = `<tr>
-                                                                            
+
                                                                                  <td>${item.datestring}</td>
                                                                                     <td>${item.firsT_IN}</td>
                                                                                     <td>${item.lasT_OUT}</td>
@@ -496,7 +459,7 @@
                                                             tbodytable.append(row);
                                                         });
                                                     } else {
-                                                        tbodytable.html(`<tr><td colspan="4" class="text-center">No record found.</td></tr>`);
+                                                        tbodytable.html(`<tr><td colspan="6" class="text-center">No record found.</td></tr>`);
                                                     }
 
                                                     // e.preventDefault();
@@ -516,11 +479,77 @@
                                                   icon: "error"
                                               });
                                           }
-                                      });                           
+                                      });
                         }
 
-                    
 
+                                        function SubmitUndertimeDeduction() {
+                                           var  dateFrom = $('#dateFrom').val();
+                                           var dateTo = $('#dateTo').val();
+
+                                                     console.log(dateFrom);
+
+                                                let details = [];
+
+                                                // get all checked rows
+                                                let checkedRows = document.querySelectorAll('#tblUndertime .row-checkbox:checked');
+
+                                                checkedRows.forEach((checkbox) => {
+                                                    let row = checkbox.closest('tr');
+                                                    let cells = row.querySelectorAll('td');
+
+                                                    details.push({
+                                                        empNo: cells[1].innerText.trim(),
+                                                        dateFrom: dateFrom,
+                                                        dateTo: dateTo,
+                                                        totalUndertime: cells[4].innerText.trim()
+                                                    });
+                                                });
+
+
+                                                console.log(details);
+                                                // combine header + details
+                                                // let datax = {
+                                                //     header: header,
+                                                //     details: details
+                                                // };
+
+                                               // console.log(datax); // send this object via AJAX
+
+
+                                                          $.ajax({
+                                                              type: 'POST',
+                                                              url: '@Url.Action("SaveUndertime", "DailyTimeRecord")',
+                                                                data: JSON.stringify(details),
+                                                                        contentType: 'application/json; charset=utf-8',
+                                                              success: function (response) {
+                                                                  if (response.success) {                                                                
+
+                                                                   Swal.fire({
+                                                                       text: response.message,
+                                                                       icon: "success",
+                                                                       confirmButtonText: "Ok"
+                                                                   }).then((result) => {
+                                                                       location.reload();
+                                                                   });
+                                                                  } else {
+                                                                      Swal.fire({
+                                                                          text: response.message,
+                                                                          icon: "error"
+                                                                      });
+                                                                  }
+                                                                  $('.spinner-overlay').hide();
+                                                              },
+                                                              error: function () {
+                                                                  $('.spinner-overlay').hide();
+                                                                  Swal.fire({
+                                                                      text: "An error occurred. Please try again.",
+                                                                      icon: "error"
+                                                                  });
+                                                              }
+                                                          });
+
+                                            }
 
 
 
