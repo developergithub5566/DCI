@@ -160,9 +160,9 @@
                     </div>
                     <div class="form-group col-sm-6 col-md-4 col-lg-3 col-xl-2 mb0">
                         <label>&nbsp;</label>
-                        <button class="btn btn-dark btn-icon-split d-block pl20" id="viewAttendanceBtn">
+                        <button class="btn btn-secondary btn-icon-split d-block pl20" id="viewAttendanceBtn">
                             <span class="text"><small>Apply </small></span>
-                            <span class="icon text-white-50"><i class="fa-solid fa-caret-right text-xs"></i></span>
+                            <span class="icon text-white-50"><i class="fa fa-filter" aria-hidden="true"></i></span>
                         </button>
 
                     </div>
@@ -278,7 +278,7 @@
                                                 <label>Undertime</label>
                                             </th>
                                             <th>
-                                                <label>Reference No</label>
+                                                <label>Request No</label>
                                             </th>
                                             <th>
                                                 <label>Status</label>
@@ -324,13 +324,23 @@
     @*         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.2/moment.min.js"></script>
                 <script src=" https://cdn.datatables.net/datetime/1.5.5/js/dataTables.dateTime.min.js"></script> *@
 
+                <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
+
+
+    @*  Export Button*@
+                <script src="https://cdn.datatables.net/buttons/3.2.1/js/dataTables.buttons.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+                <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.html5.min.js"></script>
+                <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.print.min.js"></script>
+                <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
+                <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.1/css/buttons.dataTables.css">
+
+
 
                 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
-
                 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
-
-
 
                 <script src="~/js/dci-validation.js"></script>
 
@@ -346,7 +356,6 @@
 
                                   flatpickr("#dateTo", {
                                    dateFormat: "Y-m-d",
-
                                    onChange: function(selectedDates, dateStr, instance) {
                                   }
                                 });
@@ -380,10 +389,34 @@
 
                         $(document).ready(function () {
 
-                                                         js('#tblDTR').DataTable({
-                                                              pageLength: 50
+                                                         js('#tblUndertime').DataTable({
+                                                                         dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
+                                                                 buttons: [
+                                                                     {
+                                                                         extend: 'excel',
+                                                                         text: 'Excel',
+                                                                         title: 'Document Report',
+                                                                         exportOptions: {
+                                                                             columns: ':not(:last-child)' // Excludes the last column
+                                                                         }
+                                                                     },
+                                                                     {
+                                                                         extend: 'pdf',
+                                                                         text: 'PDF',
+                                                                         title: 'Document Report',
+                                                                         exportOptions: {
+                                                                             columns: ':not(:last-child)' // Excludes the last column
+                                                                         }
+                                                                     }
+                                                                 ],
+                                                                 lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
+                                                                 pageLength: 50 ,// Default entries per page
+                              
+                                                                    });                                                             
 
-                                                         });
+
+                                                                 
+                                                            
 
                           }); // end document
 
@@ -506,8 +539,18 @@
                                                     });
                                                 });
 
+                                                       console.log(details.length );
 
-                                                console.log(details);
+                                                if(details.length == 0){
+                                                      Swal.fire({
+                                                                          text: "Please select employee before submitting.",
+                                                                          icon: "error"
+                                                                      });
+
+                                                                      return;
+                                                }
+
+                                         
                                                 // combine header + details
                                                 // let datax = {
                                                 //     header: header,

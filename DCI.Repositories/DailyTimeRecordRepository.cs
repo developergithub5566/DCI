@@ -277,7 +277,7 @@ namespace DCI.Repositories
 
         public async Task<IList<DailyTimeRecordViewModel>> GetAllUndertime(DailyTimeRecordViewModel model)
         {
-            var context = _dbContext.vw_AttendanceSummary.AsQueryable();
+            var context = _dbContext.vw_AttendanceSummary.AsQueryable().Where(x => x.STATUS != (int)EnumStatus.Deducted);
             int _currentYear = DateTime.Now.Year;
 
             var dateTo = model.DateTo.Date.AddDays(1).AddTicks(-1);
@@ -444,7 +444,7 @@ namespace DCI.Repositories
                          on b.LeaveRequestHeaderId equals c.LeaveRequestHeaderId
                     join s in _dbContext.Status on b.Status equals s.StatusId into sj
                     from s in sj.DefaultIfEmpty()
-                    where b.IsActive && c.LeaveDate >= model.DateFrom.Date && c.LeaveDate.Date < dateTo && b.EmployeeId == _empId
+                    where b.IsActive && c.LeaveDate.Date >= model.DateFrom.Date && c.LeaveDate.Date < dateTo && b.EmployeeId == _empId
                                         && (b.LeaveTypeId == (int)EnumLeaveType.HD
                                         || b.LeaveTypeId == (int)EnumLeaveType.OB
                                         || b.LeaveTypeId == (int)EnumLeaveType.SL)
@@ -473,7 +473,7 @@ namespace DCI.Repositories
                     from a in _dbContext.vw_AttendanceSummary
                     join e in _dbContext.Employee on a.EMPLOYEE_NO equals e.EmployeeNo
                     where a.EMPLOYEE_NO == model.EMPLOYEE_NO
-                       && a.DATE >= model.DateFrom && a.DATE < dateTo
+                       && a.DATE.Date >= model.DateFrom.Date && a.DATE.Date < dateTo
                     orderby a.DATE
                     select new
                     {
@@ -599,56 +599,78 @@ namespace DCI.Repositories
                 //                     EmpNo = g.OrderByDescending(x => x.li.DateCreated).FirstOrDefault().emp.EmployeeNo
                 //                 }).ToList();
 
-
-           
-
-
                 foreach (var ut in model)
                 {
                     if(ut.EmpNo != null && ut.TotalUndertime > 0)
                     {
+
+
+                        var dateTo = ut.DateTo.Date.AddDays(1).AddTicks(-1);
                         var emp = _dbContext.Employee.Where(x => x.EmployeeNo == ut.EmpNo).FirstOrDefault();
                         //var leafinfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == emp.EmployeeId).FirstOrDefault();
                         var leafinfo = _dbContext.LeaveInfo.Where(li => li.IsActive&& li.EmployeeId == emp.EmployeeId && li.DateCreated.Year == DateTime.Now.Year).OrderByDescending(li => li.DateCreated).FirstOrDefault();
 
+                  
 
-                        leafinfo.VLBalance = leafinfo.VLBalance - ut.TotalUndertime ?? 0;
-                       // leafinfo.DateModified = DateTime.Now;
-                       // leafinfo.ModifiedBy = model.ModifiedBy;
-                        leafinfo.IsActive = true;
-                        _dbContext.LeaveInfo.Entry(leafinfo).State = EntityState.Modified;
-                       // await _dbContext.SaveChangesAsync();
+                        //create audit logs for undertime execution 
+                        UndertimeHeader oth = new UndertimeHeader();
+                        oth.RequestNo = await GenereteRequestNoForUndertimeDeduction();
+                        oth.DateFrom = ut.DateFrom;
+                        oth.DateTo = ut.DateTo;
+                        oth.DateCreated = DateTime.Now;
+                        oth.CreatedBy = 1;
+                        oth.IsActive = true;
+                        await _dbContext.UndertimeHeader.AddAsync(oth);
+                        await _dbContext.SaveChangesAsync();
 
+                        UndertimeDetail otd = new UndertimeDetail();
 
+                        //Insert Leave application : leavetype Undertime , Status automatic approved and Insert Notification 
                         LeaveFormViewModel lvFormmodel = new LeaveFormViewModel();
                         lvFormmodel.EmployeeId = emp.EmployeeId;
-                        lvFormmodel.NoOfDays = ut.TotalUndertime ?? 0;                        
+                        lvFormmodel.NoOfDays = ut.TotalUndertime ?? 0;
                         await SaveLeaveForUndertime(lvFormmodel);
 
 
-                        //notif for employee
-                        //    //NotificationViewModel notifvm = new NotificationViewModel();
-                        //    //notifvm.Title = "Leave";
-                        //    //notifvm.Description = String.Format("You have been assigned leave request {0} for review", entity.RequestNo);
-                        //    //notifvm.ModuleId = (int)EnumModulePage.Leave;
-                        //    //notifvm.TransactionId = entity.LeaveRequestHeaderId;
-                        //    //notifvm.AssignId = dept.ApproverId ?? 0;
-                        //    //notifvm.URL = "/Todo/Index/?leaveId=" + model.LeaveRequestHeaderId;
-                        //    //notifvm.MarkRead = false;
-                        //    //notifvm.CreatedBy = param.EmployeeId;
-                        //    //notifvm.IsActive = true;
-                        //    //await _homeRepository.SaveNotification(notifvm);
+                        var attendanceList = await _dbContext.vw_AttendanceSummary.Where(x => x.)
+
+                        if (leafinfo?.VLBalance >= ut.TotalUndertime)
+                        {
+                            leafinfo.VLBalance = leafinfo.VLBalance - ut.TotalUndertime ?? 0;
+                            // leafinfo.DateModified = DateTime.Now;
+                            // leafinfo.ModifiedBy = model.ModifiedBy;
+                            leafinfo.IsActive = true;
+                            _dbContext.LeaveInfo.Entry(leafinfo).State = EntityState.Modified;
+                             await _dbContext.SaveChangesAsync();                      
 
 
-                        //Update DTR attendance summary status to DEDUCTED
+                            //Update DTR attendance summary status to DEDUCTED                    
+                            await _dbContext.tbl_raw_logs.Where(x => x.EMPLOYEE_ID == ut.EmpNo && x.DATE_TIME >= ut.DateFrom && x.DATE_TIME <= dateTo)
+                                                         .ExecuteUpdateAsync(s => s
+                                                         .SetProperty(r => r.STATUS, r => (int)EnumStatus.Deducted));
 
 
-                        //create audit logs for undertime execution 
 
+                            otd.UndertimeHeaderId = oth.UndertimeHeaderId;
+                            otd.AttendanceId = 1;
+                            otd.DeductionType = (int)EnumDeductionType.VacationLeave;
+                            otd.IsActive = true;
+                        }
+
+                        else
+                        {
+                            otd.UndertimeHeaderId = oth.UndertimeHeaderId;
+                            otd.AttendanceId = 1;
+                            otd.DeductionType = (int)EnumDeductionType.Payroll;
+                            otd.IsActive = true;
+                        }
+
+                        await _dbContext.UndertimeDetail.AddAsync(otd);
+                        await _dbContext.SaveChangesAsync();
                     }
                 }     
              
-                return (StatusCodes.Status200OK, "Successfully updated");
+                return (StatusCodes.Status200OK, "Deductions successfully applied to all selected employees.");
             }
             catch (Exception ex)
             {
@@ -765,6 +787,39 @@ namespace DCI.Repositories
             string formattedB = setB.ToString("D4");
             return $"{formattedA}";
         }
+
+        private async Task<string> GenereteRequestNoForUndertimeDeduction()
+        {
+
+            try
+            {
+                int _currentYear = DateTime.Now.Year;
+                int _currentMonth = DateTime.Now.Month;
+                var _leaveContext = await _dbContext.UndertimeHeader
+                                                .Where(x => x.IsActive == true)
+                                                .AsQueryable()
+                                                .ToListAsync();
+
+
+                int totalrecords = _leaveContext.Count() + 1;
+                string finalSetRecords = GetFormattedRecordForUndertime(totalrecords);
+                string yearMonth = DateTime.Now.ToString("yyyyMM");
+                string req = "UTD";
+
+                return $"{req}-{yearMonth}-{finalSetRecords}";
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return string.Empty;
+        }
+
+ 
 
 
         //public async Task<IList<WFHViewModel>> GetAllWFH(WFHViewModel model)

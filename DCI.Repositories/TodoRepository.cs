@@ -10,6 +10,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection.PortableExecutable;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DCI.Repositories
 {
@@ -148,7 +149,7 @@ namespace DCI.Repositories
 
                 var contextHdr = _dbContext.LeaveRequestHeader.Where(x => x.LeaveRequestHeaderId == param.TransactionId).FirstOrDefault();
 
-                if (contextHdr != null)
+                if (contextHdr != null && param.Status == (int)EnumStatus.Approved)
                 {
                     var contextLeaveInfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == contextHdr.EmployeeId && x.DateCreated.Date.Year == _currentYear).OrderByDescending(x => x.DateCreated).FirstOrDefault();
 
@@ -166,6 +167,20 @@ namespace DCI.Repositories
                     }
                     _dbContext.LeaveInfo.Entry(contextLeaveInfo).State = EntityState.Modified;
                     _dbContext.SaveChanges();
+
+
+                    var contextDtl = _dbContext.LeaveRequestDetails.Where(x => x.IsActive && x.LeaveRequestHeaderId == contextHdr?.LeaveRequestHeaderId).ToList();
+                    var emp = _dbContext.Employee.Where(x => x.EmployeeId == contextHdr.EmployeeId).FirstOrDefault();
+
+
+                    foreach (var raw in contextDtl)
+                    {
+                        //Update DTR attendance summary status to DEDUCTED                    
+                        await _dbContext.tbl_raw_logs.Where(x => x.EMPLOYEE_ID == emp.EmployeeNo && x.DATE_TIME.Date == raw.LeaveDate.Date)
+                                                     .ExecuteUpdateAsync(s => s
+                                                     .SetProperty(r => r.STATUS, r => (int)EnumStatus.NotDeducted));
+                    }
+
                 }
 
                 contextHdr.Status = param.Status;
@@ -254,6 +269,7 @@ namespace DCI.Repositories
                 notifvm.CreatedBy = param.CreatedBy;
                 notifvm.IsActive = true;
                 await _homeRepository.SaveNotification(notifvm);
+
 
                 return (StatusCodes.Status200OK, String.Format("DTR Request No {0} has been {1}.", contextHdr.RequestNo, status));
             }

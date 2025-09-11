@@ -105,7 +105,9 @@ namespace DCI.API.Controllers
         [Route("SaveUndertime")]
         public async Task<IActionResult> SaveUndertime([FromBody] List<UndertimeDeductionViewModel> model)
         {
-            return Ok(await _dtrRepository.SaveUndertime(model));
+           // return Ok(await _dtrRepository.SaveUndertime(model));
+            var result = await _dtrRepository.SaveUndertime(model);
+            return StatusCode(result.statuscode, result.message);
         }
 
         [HttpPost]

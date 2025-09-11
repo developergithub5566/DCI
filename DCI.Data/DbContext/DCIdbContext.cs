@@ -39,12 +39,16 @@ namespace DCI.Data
         public DbSet<Notification> Notification { get; set; }
         public DbSet<DTRCorrection> DTRCorrection { get; set; }
         public DbSet<Position> Position { get; set; }
+        public DbSet<tbl_raw_logs> tbl_raw_logs { get; set; }
         public DbSet<tbl_wfh_logs> tbl_wfh_logs { get; set; }
         public DbSet<OvertimeHeader> OvertimeHeader { get; set; }
         public DbSet<OvertimeDetail> OvertimeDetail { get; set; }
         public DbSet<Holiday> Holiday { get; set; }
         public DbSet<WfhHeader> WfhHeader { get; set; }
         public DbSet<WfhDetail> WfhDetail { get; set; }
+        public DbSet<UndertimeHeader> UndertimeHeader { get; set; }
+        public DbSet<UndertimeDetail> UndertimeDetail { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

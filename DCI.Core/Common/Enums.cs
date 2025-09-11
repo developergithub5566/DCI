@@ -132,7 +132,8 @@ namespace DCI.Core.Common
         Cancelled = 6,
         Deleted = 7,
         Active = 8,
-        InActive = 9
+        Deducted = 9,
+        NotDeducted = 10
     }
 
     public enum EnumLeaveType
@@ -163,5 +164,11 @@ namespace DCI.Core.Common
         SpecialHoliday = 3,
         After8hrs = 4,
         HolidayOnRestDay = 5
+    }
+
+    public enum EnumDeductionType
+    {
+        VacationLeave = 1,
+        Payroll = 2,
     }
 }
