@@ -10,7 +10,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection.PortableExecutable;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+
 
 namespace DCI.Repositories
 {
@@ -169,7 +169,7 @@ namespace DCI.Repositories
                     _dbContext.SaveChanges();
 
 
-                    var contextDtl = _dbContext.LeaveRequestDetails.Where(x => x.IsActive && x.LeaveRequestHeaderId == contextHdr?.LeaveRequestHeaderId).ToList();
+                    var contextDtl = _dbContext.LeaveRequestDetails.Where(x => x.IsActive && x.LeaveRequestHeaderId == contextHdr.LeaveRequestHeaderId).ToList();
                     var emp = _dbContext.Employee.Where(x => x.EmployeeId == contextHdr.EmployeeId).FirstOrDefault();
 
 

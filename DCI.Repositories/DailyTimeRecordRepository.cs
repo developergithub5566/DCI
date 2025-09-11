@@ -603,8 +603,6 @@ namespace DCI.Repositories
                 {
                     if(ut.EmpNo != null && ut.TotalUndertime > 0)
                     {
-
-
                         var dateTo = ut.DateTo.Date.AddDays(1).AddTicks(-1);
                         var emp = _dbContext.Employee.Where(x => x.EmployeeNo == ut.EmpNo).FirstOrDefault();
                         //var leafinfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == emp.EmployeeId).FirstOrDefault();
@@ -632,7 +630,7 @@ namespace DCI.Repositories
                         await SaveLeaveForUndertime(lvFormmodel);
 
 
-                        var attendanceList = await _dbContext.vw_AttendanceSummary.Where(x => x.)
+                         var attendanceList = await _dbContext.vw_AttendanceSummary.Where(x => x.EMPLOYEE_NO == ut.EmpNo && x.DATE >= ut.DateFrom.Date && x.DATE <= dateTo.Date && (x.STATUS != (int)EnumStatus.NotDeducted || x.STATUS != (int)EnumStatus.Deducted)).ToListAsync();
 
                         if (leafinfo?.VLBalance >= ut.TotalUndertime)
                         {
@@ -649,24 +647,31 @@ namespace DCI.Repositories
                                                          .ExecuteUpdateAsync(s => s
                                                          .SetProperty(r => r.STATUS, r => (int)EnumStatus.Deducted));
 
-
-
-                            otd.UndertimeHeaderId = oth.UndertimeHeaderId;
-                            otd.AttendanceId = 1;
-                            otd.DeductionType = (int)EnumDeductionType.VacationLeave;
-                            otd.IsActive = true;
+                          
+                            foreach(var attdnc in attendanceList)
+                            {
+                                otd.UndertimeHeaderId = oth.UndertimeHeaderId;
+                                otd.AttendanceId = (int)attdnc.ID;
+                                otd.DeductionType = (int)EnumDeductionType.VacationLeave;
+                                otd.IsActive = true;
+                                await _dbContext.UndertimeDetail.AddAsync(otd);
+                                await _dbContext.SaveChangesAsync();
+                            }                        
                         }
-
                         else
                         {
-                            otd.UndertimeHeaderId = oth.UndertimeHeaderId;
-                            otd.AttendanceId = 1;
-                            otd.DeductionType = (int)EnumDeductionType.Payroll;
-                            otd.IsActive = true;
+                            foreach (var attdnc in attendanceList)
+                            {
+                                otd.UndertimeHeaderId = oth.UndertimeHeaderId;
+                                otd.AttendanceId = (int)attdnc.ID;
+                                otd.DeductionType = (int)EnumDeductionType.Payroll;
+                                otd.IsActive = true;
+                                await _dbContext.UndertimeDetail.AddAsync(otd);
+                                await _dbContext.SaveChangesAsync();
+                            }
                         }
 
-                        await _dbContext.UndertimeDetail.AddAsync(otd);
-                        await _dbContext.SaveChangesAsync();
+                       
                     }
                 }     
              
