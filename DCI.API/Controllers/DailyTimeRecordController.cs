@@ -16,14 +16,16 @@ namespace DCI.API.Controllers
         ILeaveRepository _leaveRepository;
         IOvertimeRepository _overtimeRepository;
         IWfhRepository _wfhRepository;
+        IUndertimeRepository _undertimeRepository;
 
         public DailyTimeRecordController(IDailyTimeRecordRepository dtrRepository, ILeaveRepository leaveRepository,
-            IOvertimeRepository overtimeRepository, IWfhRepository wfhRepository)
+            IOvertimeRepository overtimeRepository, IWfhRepository wfhRepository, IUndertimeRepository undertimeRepository)
         {
             _dtrRepository = dtrRepository;
             _leaveRepository = leaveRepository;
             _overtimeRepository = overtimeRepository;
             _wfhRepository = wfhRepository;
+            _undertimeRepository = undertimeRepository;
         }
 
         [HttpPost]
@@ -90,7 +92,7 @@ namespace DCI.API.Controllers
         [Route("GetAllUndertime")]
         public async Task<IActionResult> GetAllUndertime(DailyTimeRecordViewModel model)
         {
-            var result = await _dtrRepository.GetAllUndertime(model);
+            var result = await _undertimeRepository.GetAllUndertime(model);
             return Ok(result);
         }
 
@@ -98,7 +100,7 @@ namespace DCI.API.Controllers
         [Route("GetUndertimeById")]
         public async Task<IActionResult> GetUndertimeById([FromBody] DailyTimeRecordViewModel model)
         {
-            return Ok(await _dtrRepository.GetUndertimeById(model));
+            return Ok(await _undertimeRepository.GetUndertimeById(model));
         }
 
         [HttpPost]
@@ -106,8 +108,22 @@ namespace DCI.API.Controllers
         public async Task<IActionResult> SaveUndertime([FromBody] List<UndertimeDeductionViewModel> model)
         {
            // return Ok(await _dtrRepository.SaveUndertime(model));
-            var result = await _dtrRepository.SaveUndertime(model);
+            var result = await _undertimeRepository.SaveUndertime(model);
             return StatusCode(result.statuscode, result.message);
+        }
+
+        [HttpPost]
+        [Route("GetUndertimeDeduction")]
+        public async Task<IActionResult> GetUndertimeDeduction([FromBody] DailyTimeRecordViewModel model)
+        {
+            return Ok(await _undertimeRepository.GetUndertimeDeduction(model));
+        }
+
+        [HttpPost]
+        [Route("GetUndertimeDeductionByHeaderId")]
+        public async Task<IActionResult> GetUndertimeDeductionByHeaderId([FromBody] DailyTimeRecordViewModel model)
+        {
+            return Ok(await _undertimeRepository.GetUndertimeDeductionByHeaderId(model));
         }
 
         [HttpPost]

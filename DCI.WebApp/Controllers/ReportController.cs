@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Serilog;
 using System.Text;
 
 namespace DCI.WebApp.Controllers
@@ -266,6 +267,87 @@ namespace DCI.WebApp.Controllers
 
             return Json(new { success = true, message = "", data = model });
 
+        }
+
+
+ 
+
+        public async Task<IActionResult> Undertime(DailyTimeRecordViewModel param)
+        {
+            List<UndertimeHeaderViewModel> model = new List<UndertimeHeaderViewModel>();
+
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    param.CurrentUserId = 1;//currentUser.UserId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetUndertimeDeduction");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<List<UndertimeHeaderViewModel>>(responseBody)!;
+                    }                   
+                }
+
+                return View(model);
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return View(model);
+        }
+
+        public async Task<IActionResult> UndertimeByEmpNo(UndertimeHeaderViewModel param) //UndertimeDeductionByHeaderId
+        {
+            List<UndertimeDetailViewModel> model = new List<UndertimeDetailViewModel>();
+
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                   // param.CurrentUserId = 1;//currentUser.UserId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetUndertimeDeductionByHeaderId");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<List<UndertimeDetailViewModel>>(responseBody)!;
+                    }
+                    // return Json(new { success = true, message = "", data = model });
+                    ViewBag.RequestNo = param.RequestNo ?? string.Empty;
+                    
+                    return View(model);
+                }
+
+                return Json(new { success = false, message = "", data = model });
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return View(model);
         }
     }
 }

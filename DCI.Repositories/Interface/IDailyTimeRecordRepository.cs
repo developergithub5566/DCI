@@ -9,9 +9,7 @@ namespace DCI.Repositories.Interface
         Task<IList<DTRCorrectionViewModel>> GetAllDTRCorrection(DTRCorrectionViewModel model);
         Task<DTRCorrectionViewModel> DTRCorrectionByDtrId(int dtrId);
         Task<(int statuscode, string message)> SaveDTRCorrection(DTRCorrectionViewModel param);
-        Task<IList<DailyTimeRecordViewModel>> GetAllUndertime(DailyTimeRecordViewModel model);
-        Task<IList<DailyTimeRecordViewModel>> GetUndertimeById(DailyTimeRecordViewModel model);
-        Task<(int statuscode, string message)> SaveUndertime(List<UndertimeDeductionViewModel> model);
+   
         //Task<IList<WFHViewModel>> GetAllWFHById(WFHViewModel model);
         //Task<IList<DailyTimeRecordViewModel>> GetAllWFH(DailyTimeRecordViewModel model);
         // Task<(int statuscode, string message)> SaveWFHTimeIn(WFHViewModel model);
