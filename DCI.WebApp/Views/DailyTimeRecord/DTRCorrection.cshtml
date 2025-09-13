@@ -4,7 +4,7 @@
 @using DCI.Models.ViewModel;
 
 <link href="~/css/dcicustom.css" rel="stylesheet" />
-<link href="~/css/ess/sb-admin-2.min.css?v0.0.3" rel="stylesheet" />
+
 
 
 @{
@@ -18,31 +18,31 @@
     {
         <script>
             $.ajax({
-                type: 'POST',
-                url: '@Url.Action("Logout", "Account")',
-                success: function (response) {
+            type: 'POST',
+            url: '@Url.Action("Logout", "Account")',
+            success: function (response) {
 
-                    Swal.fire({
-                        text: "Your session has timed out. Please log in again.",
-                        icon: "info",
-                        confirmButtonText: "Ok"
-                    }).then((result) => {
-                        window.location.href = '/Account/Logout';
-                    });
-                },
-                error: function () {
-                    Swal.fire({
-                        text: "An error occurred. Please try again.",
-                        icon: "error"
-                    });
-                }
+            Swal.fire({
+            text: "Your session has timed out. Please log in again.",
+            icon: "info",
+            confirmButtonText: "Ok"
+            }).then((result) => {
+            window.location.href = '/Account/Logout';
+            });
+            },
+            error: function () {
+            Swal.fire({
+            text: "An error occurred. Please try again.",
+            icon: "error"
+            });
+            }
             })
         </script>
     }
     else
     {
         var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
-                    .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Department);
+                    .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.DTRCorrection);
         canView = module?.View ?? false;
         canAdd = module?.Add ?? false;
         canEdit = module?.Update ?? false;
@@ -62,7 +62,7 @@
         <div class="upperRightDivBtn">
             <a href="#" title="Add DTR Correction" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#" onclick="newForm()">
                 <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
-                <span class="text text-white"><small>File DTR Correction</small></span>
+                <span class="text text-white"><small>File DTR Adjustment</small></span>
             </a>
         </div>
 
@@ -84,11 +84,18 @@
                 <table class="table table-bordered" id="tblDTR">
                     <thead>
                         <tr>
-                      
+
 
                             <th>
                                 <label>Request No</label>
                             </th>
+                            @if (@ViewBag.BreadCrumbLabel == "DTR Adjustment Summary")
+                            {
+                                <th>
+                                    <label>Employee</label>
+                                </th>
+                            }
+                           
                             <th>
                                 <label>DTR Date & Time</label>
                             </th>
@@ -114,8 +121,15 @@
                                   @item.RequestNo
                                   
                                 </td>
+                                @if (@ViewBag.BreadCrumbLabel == "DTR Adjustment Summary")
+                                {
+                                    <td>
+                                        @item.EmployeeName
+                                    </td>
+                                }
+                              
                                 <td>
-                                    @item.DtrDateTime.ToString("MM/dd/yyyy hh:mm tt")
+                                    @item.DtrDateTime.ToString("MM/dd/yyyy HH:mm")
                                 </td>
                                 <td>
                                     @if (item.DtrType == 1)
@@ -131,11 +145,11 @@
                                     @item.StatusName
                                 </td>
                                 <td>
-                                    @item.DateFiled.ToString("MM/dd/yyyy")
+                                    @item.DateFiled.ToString("MM/dd/yyyy HH:mm")
                                 </td>
                               
                                 <td class="text-center">
-                                    <a href="#" onclick="editForm(@item.DtrId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>                   
+                                    <a href="#" onclick="view(@item.DtrId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>                   
                                 </td>
                             </tr>
                         }
@@ -146,7 +160,7 @@
 </div>
 
 
-            <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -181,7 +195,7 @@
                                         <div class="form-group">
                                             <label class="frmText"><span class="required">*</span>DTR Date & Time</label>
                                             <div class="input-group">
-                                                <input type="text" name="dateCovered" id="dateCovered" class="form-control frmField" autocomplete="off">
+                                                <input type="text" name="dateCovered" id="dateCovered" class="form-control frmField" autocomplete="off" required>
                                                 <div class="input-group-prepend prependBtn">
                                                     <i class="fa fa-calendar"></i>
                                                 </div>
@@ -192,7 +206,7 @@
                                     <div class="col-lg-6">
                                         <div class="form-group">
                                             <label class="frmText"><span class="required">*</span> Type</label>
-                                            <select class="form-control frmField" name="DtrType" id="DtrType">
+                                            <select class="form-control frmField" name="DtrType" id="DtrType" required>
                                                 <option value="0">Select</option>
                                                 <option value="1" class="TIME_IN">Time In</option>
                                                 <option value="2" class="TIME_OUT">Time Out</option>
@@ -209,15 +223,15 @@
                                     <div class="col-12">
                                         <div class="form-group">
                                             <label class="frmText"><span class="required">*</span> Reason:</label>
-                                            <textarea class="form-control frmField" name="Reason" id="Reason"></textarea>
+                                            <textarea class="form-control frmField" name="Reason" id="Reason" required></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-12">
+                             @*        <div class="col-12">
                                         <div class="form-group mb10">
                                             <label class="frmText">Attachment:</label>
                                             <input type="file" class="frmFile " name="AttachmentId" id="AttachmentId">
                                         </div>
-                                    </div>
+                                    </div> *@
                                     <div class="col-12">
                                         <hr>
                                         <div class="form-group">
@@ -231,18 +245,18 @@
 
                             <!-- Modal footer -->
                             <div class="modal-footer pt0">
-                                <button class="btn btnPrimary btn-icon-split d-block" onclick="save()">
-                                    <span class="icon text-white-50">
+                                <button class="btn btnPrimary btn-icon-split d-block" onclick="save()" type="button" id="btnSave">
+                                    <span class="icon text-white">
                                         <i class="fa-regular fa-file-lines text-xs"></i>
                                     </span>
-                                    <span class="text"><small>Submit </small></span>
+                                    <span class="text text-white"><small>Submit </small></span>
                                 </button>
 
                                 <button class="btn btnSecondary btn-icon-split d-block" data-dismiss="modal">
-                                    <span class="icon text-white-50">
+                                    <span class="icon text-white">
                                         <i class="fa-solid fa-xmark text-xs"></i>
                                     </span>
-                                    <span class="text"><small>Close </small></span>
+                                    <span class="text text-white"><small>Close </small></span>
                                 </button>
                             </div>
                    
@@ -257,6 +271,18 @@
                 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
                 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
+                    @*  Export Button*@
+            <script src="https://cdn.datatables.net/buttons/3.2.1/js/dataTables.buttons.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+            <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.html5.min.js"></script>
+            <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.print.min.js"></script>
+            <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
+            <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.1/css/buttons.dataTables.css">
+
+
+          
                 <script type="text/javascript">
                         var js = jQuery.noConflict(true);
 
@@ -268,17 +294,42 @@
 
 
                         $(document).ready(function () {
-                            js('#tblDocument').DataTable({
+                               js('#tblDTR').DataTable({
+                                      dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
+                         buttons: [
+                             {
+                                 extend: 'excel',
+                                 text: 'Excel',
+                                 title: 'Document Report',
+                                 exportOptions: {
+                                     columns: ':not(:last-child)' // Excludes the last column
+                                 }
+                             },
+                             {
+                                 extend: 'pdf',
+                                 text: 'PDF',
+                                 title: 'Document Report',
+                                 exportOptions: {
+                                     columns: ':not(:last-child)' // Excludes the last column
+                                 }
+                             }
+                         ],
+                         lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
+                         pageLength: 10 ,// Default entries per page
+                                 order: [[2, 'desc']]
                             });
+
+
                                      flatpickr("#dateCovered", {
                                         enableTime: true,
                                        dateFormat: "Y-m-d H:i",                                     
                                             time_24hr: true,
+                                             maxDate: new Date(),
                                        onChange: function(selectedDates, dateStr, instance) {
                                       }
                                     });
 
-
+                  
                         });
 
 
@@ -286,15 +337,18 @@
                                              const my_fp = document.querySelector("#dateCovered")._flatpickr;
                                                  my_fp.clear();
                                                    $('#Reason').val('');
-                                                    document.getElementById('deptHeadName').textContent = '';
+                                                    document.getElementById('deptHeadName').textContent = @Html.Raw(JsonConvert.SerializeObject(ViewBag.ApproverHead));
+
+                                                                       $('#btnSave').css("visibility", "visible");
+                                                         $('#createForm').find('input, select, textarea').prop('disabled', false);
                                 js('#createmodal').modal('show');
                         }
 
 
-                              function editForm(dtrId) {
+                              function view(dtrId) {
                                       event.preventDefault();
-                                 // const formData = new FormData();
-                                 //    formData.append('DtrId', dtrId);
+                                 
+                                       
 
                                       $.ajax({
                                           type: 'POST',
@@ -308,6 +362,10 @@
                                                           $('#Reason').val(response.data.reason);
                    
                                                               document.getElementById('deptHeadName').textContent = response.data.departmentHead;
+
+                                                              $('#btnSave').css("visibility", "hidden");
+                                                               
+                                                         $('#createForm').find('input, select, textarea').prop('disabled', true);
                                                   js('#createmodal').modal('show');
                                               } else {
                                                   Swal.fire({
@@ -330,9 +388,17 @@
 
 
                            function save() {
-                         
-                                  const formData = new FormData();
-                       
+
+                            //     var datecovered =  $('#dateCovered').val();
+                            //     var dtrtype =   $('#DtrType').val(response.data.dtrType);
+                            //     var reason = $('#Reason').val(response.data.reason);
+
+                            // console.log(datecovered)
+                            // console.log(dtrtype)
+                            // console.log(reason)
+
+
+                               const formData = new FormData();                       
                                   formData.append('DtrType', $('#DtrType').val());
                                    formData.append('DtrDateTime', $('#dateCovered').val());
                                     formData.append('Reason', $('#Reason').val());

@@ -349,5 +349,56 @@ namespace DCI.Repositories
 
 
         #endregion
+
+
+        #region DTRCorrection
+
+        public async Task SentToDTRCorrection(DTRCorrectionViewModel model)
+        {
+            model = await DTRCorrectionNotificationBodyMessage(model);
+
+
+            MailMessage mail = new MailMessage();
+            mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
+            mail.Subject = "Action Required: Please check the DTR Correction Request no. " + model.RequestNo;
+            mail.Body = model.EmailBody;
+            mail.IsBodyHtml = true;
+            mail.To.Add(model.ApproverEmail);
+            await SendMessage(mail);
+        }
+
+        async Task<DTRCorrectionViewModel> DTRCorrectionNotificationBodyMessage(DTRCorrectionViewModel model)
+        {
+            var userEntity = new User();
+            string statusName = string.Empty;
+
+
+          
+            if (model.Status == (int)EnumStatus.ForApproval)
+            {
+                userEntity = await _userRepository.GetUserById(model.ApproverId);
+                statusName = "for approval";
+            }
+
+            model.ApproverEmail = userEntity.Email;
+            model.EmailBody = $@"
+            <html>
+            <body>              
+                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
+                
+                <p>This is an automated message from DCI Application.</p>
+                 
+				<p>You have been assigned DTR Correction request {model.RequestNo} {statusName}. Kindly review and proceed accordingly. </p> 
+            
+                <p>If you encounter any issues, please contact our support team at [DCI Application Support].</p>            
+                <p>Thank you,<br />Your DCI</p>
+            </body>
+            </html>";
+
+            return model;
+        }
+
+
+        #endregion
     }
 }

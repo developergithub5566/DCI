@@ -1,4 +1,5 @@
-﻿using DCI.Models.Entities;
+﻿using DCI.Models.Configuration;
+using DCI.Models.Entities;
 using DCI.Models.ViewModel;
 
 
@@ -32,5 +33,7 @@ namespace DCI.Repositories.Interface
         //Task<(int statuscode, string message, string email)> CreateUserAccount(UserViewModel model);
         Task<UserViewModel> CreateUserAccount(UserViewModel model);
         Task<User> GetUserByEmployeeId(int empId);
+
+        Task<UserManager> GetUserManagerByEmail(string email);
     }
 }

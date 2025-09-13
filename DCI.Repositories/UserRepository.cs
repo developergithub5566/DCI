@@ -57,7 +57,7 @@ namespace DCI.Repositories
 
                 var result = (from usr in _dbContext.User
                               join role in _dbContext.Role on usr.RoleId equals role.RoleId
-                              where usr.IsActive == true
+                              where usr.IsActive == true && usr.UserId == userid
                               select new UserModel
                               {
                                   UserId = usr.UserId,
@@ -204,7 +204,45 @@ namespace DCI.Repositories
 			return await _dbContext.User.FirstOrDefaultAsync(x => x.Email == email);
 		}
 
-		public async Task<LoginViewModel> Login(string Email)
+        public async Task<UserManager> GetUserManagerByEmail(string email)
+        {
+
+            return await (
+						 from usr in _dbContext.User
+						 join emp in _dbContext.Employee on usr.EmployeeId equals emp.EmployeeId into empJoin
+						 from emp in empJoin.DefaultIfEmpty()
+						 join empdtls in _dbContext.EmployeeWorkDetails on emp.EmployeeId equals empdtls.EmployeeId into empdtlsJoin
+						 from empdtls in empdtlsJoin.DefaultIfEmpty()
+						 join dept in _dbContext.Department on empdtls.DepartmentId equals dept.DepartmentId into deptJoin
+						 from dept in deptJoin.DefaultIfEmpty()
+                         join post in _dbContext.Position on empdtls.Position equals post.PositionId into postJoin
+                         from post in postJoin.DefaultIfEmpty()
+                         join approver in _dbContext.User on dept.ApproverId equals approver.UserId into approverJoin
+                         from approver in approverJoin.DefaultIfEmpty()
+                         where usr.IsActive && usr.Email == email
+						 select new UserManager
+						 {
+							 UserId = usr.UserId,
+							 Email = usr.Email,
+							 EmpNo = emp.EmployeeNo,
+							 Lastname = emp.Lastname ?? string.Empty,
+							 Middlename = emp.Middlename ?? string.Empty,
+							 Firstname = emp.Firstname ?? string.Empty,
+							 RoleId = usr.RoleId,
+							 PositionName = post.PositionName,
+							 EmployeeId = usr.EmployeeId ?? 0,
+							 DepartmentId = (int?)empdtls.DepartmentId ?? 0,
+							 ApproverId = (int?)dept.ApproverId ?? 0,
+                             ApproverHead = approver.Firstname + " " + approver.Lastname,
+                             ModulePageList = null,
+							 ModulePageAccess = null,
+						 })
+						 .AsNoTracking()
+						 .FirstOrDefaultAsync();
+
+        }
+
+        public async Task<LoginViewModel> Login(string Email)
 		{
 			var context = _dbContext.User.AsQueryable();
 			var userAccessdbContext = _dbContext.UserAccess.AsQueryable();

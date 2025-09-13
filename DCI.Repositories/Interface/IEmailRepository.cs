@@ -13,5 +13,6 @@ namespace DCI.Repositories.Interface
         Task SendToRequestor(LeaveViewModel model);
 		Task SendToRequestorDTR(DTRCorrectionViewModel model);
         Task SentToOvertime(OvertimeViewModel model);
+        Task SentToDTRCorrection(DTRCorrectionViewModel model);
     }
 }

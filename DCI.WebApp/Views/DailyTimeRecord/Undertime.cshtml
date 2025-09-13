@@ -5,8 +5,8 @@
 
 <link href="~/css/dcicustom.css" rel="stylesheet" />
 @{
-    var dateFrom = Model.FirstOrDefault()?.DateFrom;
-    var dateTo = Model.FirstOrDefault()?.DateTo;
+    var dateFrom = Model.FirstOrDefault()?.DateFrom != null ? Model.FirstOrDefault()?.DateFrom : DateTime.Now;
+    var dateTo = Model.FirstOrDefault()?.DateTo != null ? Model.FirstOrDefault()?.DateTo : DateTime.Now;
 }
 
 @{
@@ -82,7 +82,7 @@
 
     <div class="card shadow mb-4">
         <div class="card-header">
-            <label class="mb0">Data</label>
+            <label class="mb0">Undertime</label>
         </div>
         <div class="card-body">
 @* 
@@ -361,7 +361,7 @@
                                 });
 
 
-                                            $('#viewAttendanceBtn').on('click', function (event) {
+                      $('#viewAttendanceBtn').on('click', function (event) {
                          event.preventDefault();
                         var dateFrom = $('#dateFrom').val();
                         var dateTo = $('#dateTo').val();

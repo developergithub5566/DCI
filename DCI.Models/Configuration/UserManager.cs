@@ -22,9 +22,13 @@ namespace DCI.Models.Configuration
         public string Provider { get; set; } = string.Empty;
 		public int RoleId { get; set; }
 		public string Rolename { get; set; }
+        public string PositionName { get; set; }
         public string Fullname => $"{Firstname} {Lastname}";
-
-		public string GetFullname()
+        public string EmpNo { get; set; } = string.Empty;
+        public int DepartmentId { get; set; }
+        public int ApproverId { get; set; }
+        public string ApproverHead { get; set; } = string.Empty;
+        public string GetFullname()
 		{
 			return $"{Firstname} {Lastname}";
 		}

@@ -485,7 +485,7 @@ namespace DCI.Repositories
                 notifvm.Description = System.String.Format("System-Generated Undertime Deduction.", entity.RequestNo);
                 notifvm.ModuleId = (int)EnumModulePage.Undertime;
                 notifvm.TransactionId = entity.LeaveRequestHeaderId;
-                notifvm.AssignId = param.EmployeeId;
+                notifvm.AssignId = param.ApproverId;
                 notifvm.URL = "/Todo/Index/?leaveId=" + entity.LeaveRequestHeaderId;
                 notifvm.MarkRead = false;
                 notifvm.CreatedBy = param.EmployeeId;

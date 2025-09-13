@@ -158,6 +158,7 @@ namespace DCI.WebApp.Controllers
                     var currentUser = _userSessionHelper.GetCurrentUser();
                     //  model.CurrentUserId = currentUser.UserId;
                     model.EmployeeId = currentUser.EmployeeId;
+                    model.ApproverId = currentUser.ApproverId;
 
                     model.SelectedDateList = JsonConvert.DeserializeObject<List<DateTime>>(model.SelectedDateJson);
 
@@ -276,7 +277,7 @@ namespace DCI.WebApp.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> DTRCorrection(int id)
+        public async Task<IActionResult> DTRCorrection(int DtrId)
         {
             List<DTRCorrectionViewModel> list = new List<DTRCorrectionViewModel>();
 
@@ -287,8 +288,8 @@ namespace DCI.WebApp.Controllers
                     DTRCorrectionViewModel model = new DTRCorrectionViewModel();
                     var currentUser = _userSessionHelper.GetCurrentUser();
 
-                    model.CreatedBy = 2;//currentUser.UserId;
-                    model.ScopeTypeEmp = id;
+                    model.CreatedBy = currentUser.UserId;
+                    model.ScopeTypeEmp = DtrId;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllDTRCorrection");
@@ -301,10 +302,11 @@ namespace DCI.WebApp.Controllers
                         list = JsonConvert.DeserializeObject<List<DTRCorrectionViewModel>>(responseBody)!;
 
                     }
-                    ViewBag.BreadCrumbLabel = "DTR Correction Summary";
+                    ViewBag.BreadCrumbLabel = "DTR Adjustment Summary";
+                    ViewBag.ApproverHead = currentUser?.ApproverHead;
                     if ((int)EnumEmployeeScope.PerEmployee == model.ScopeTypeEmp)
                     {
-                        ViewBag.BreadCrumbLabel = "DTR Correction";
+                        ViewBag.BreadCrumbLabel = "DTR Adjustment";
                     }
                 }
 
@@ -371,6 +373,7 @@ namespace DCI.WebApp.Controllers
                     var currentUser = _userSessionHelper.GetCurrentUser();
                     model.CreatedBy = currentUser.UserId;
                     model.EmployeeId = currentUser.EmployeeId;
+                    model.ApproverId = currentUser.ApproverId;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/SaveDTRCorrection");
@@ -408,7 +411,7 @@ namespace DCI.WebApp.Controllers
                     var currentUser = _userSessionHelper.GetCurrentUser();
 
 
-                    param.CurrentUserId = 2;//currentUser.UserId;
+                    param.CurrentUserId = currentUser.UserId;
 
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
@@ -419,12 +422,7 @@ namespace DCI.WebApp.Controllers
                     if (response.IsSuccessStatusCode == true)
                     {
                         model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
-                    }
-
-                    if ((int)EnumEmployeeScope.PerEmployee == param.ScopeTypeEmp)
-                    {
-
-                    }
+                    }                   
                 }
 
                 return View(model);
@@ -542,6 +540,8 @@ namespace DCI.WebApp.Controllers
                     {
                         model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
                     }
+         
+                    ViewBag.ApproverHead = currentUser?.ApproverHead;                  
 
                 }
                 return View(model);
@@ -595,8 +595,8 @@ namespace DCI.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> WFHTimeIn(WFHViewModel param, CancellationToken cancellationToken)
+       
+        public async Task<IActionResult> WFHTimeIn(WFHViewModel param)
         {
             //  List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();
             try
@@ -607,23 +607,23 @@ namespace DCI.WebApp.Controllers
                 param.EMPLOYEE_ID = currentUser.EmployeeId;
 
 
-                using (var client = new HttpClient())
-                {
+                //using (var client = new HttpClient())
+                //{
 
 
-                    LoginViewModel loginvm = new LoginViewModel();
-                    loginvm.Email = currentUser.Email;
-                    loginvm.Password = param.Password;
-                    var stringContentPassword = new StringContent(JsonConvert.SerializeObject(loginvm), Encoding.UTF8, "application/json");
-                    var requestPassword = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Account/Login");
-                    requestPassword.Content = stringContentPassword;
-                    var responsePassword = client.Send(requestPassword); //await Task.FromResult(_httpclient.Send(requestPassword));
-                    //  string responseBodyPassword = await responsePassword.Content.ReadAsStringAsync();
-                    if (!responsePassword.IsSuccessStatusCode)
-                    {
-                        return Json(new { success = false, message = "Invalid password!" });
-                    }
-                }
+                //    LoginViewModel loginvm = new LoginViewModel();
+                //    loginvm.Email = currentUser.Email;
+                //    loginvm.Password = param.Password;
+                //    var stringContentPassword = new StringContent(JsonConvert.SerializeObject(loginvm), Encoding.UTF8, "application/json");
+                //    var requestPassword = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Account/Login");
+                //    requestPassword.Content = stringContentPassword;
+                //    var responsePassword = client.Send(requestPassword); //await Task.FromResult(_httpclient.Send(requestPassword));
+                //    //  string responseBodyPassword = await responsePassword.Content.ReadAsStringAsync();
+                //    if (!responsePassword.IsSuccessStatusCode)
+                //    {
+                //        return Json(new { success = false, message = "Invalid password!" });
+                //    }
+                //}
 
                 using (var _httpclient = new HttpClient())
                 {

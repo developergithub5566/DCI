@@ -349,5 +349,48 @@ namespace DCI.WebApp.Controllers
             }
             return View(model);
         }
+        public async Task<IActionResult> WFH(DailyTimeRecordViewModel param)
+        {
+            List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+
+                    param.ScopeTypeEmp = (int)EnumEmployeeScope.ALL;
+                    param.EMPLOYEE_ID = currentUser.EmployeeId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllWFH");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
+                    }
+                    ViewBag.BreadCrumbLabel = "WFH Summary";
+                    ViewBag.ApproverHead = currentUser?.ApproverHead;
+                    if ((int)EnumEmployeeScope.PerEmployee == param.ScopeTypeEmp)
+                    {
+                        ViewBag.BreadCrumbLabel = "WFH";
+                    }
+
+                }
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
     }
 }

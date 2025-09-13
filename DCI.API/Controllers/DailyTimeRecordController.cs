@@ -64,7 +64,9 @@ namespace DCI.API.Controllers
         [Route("SaveLeave")]
         public async Task<IActionResult> SaveLeave([FromBody] LeaveFormViewModel model)
         {
-            return Ok(await _leaveRepository.SaveLeave(model));
+           // return Ok(await _leaveRepository.SaveLeave(model));
+            var result = await _leaveRepository.SaveLeave(model);
+            return StatusCode(result.statuscode, result.message);
         }
 
         [HttpPost]
@@ -85,7 +87,9 @@ namespace DCI.API.Controllers
         [Route("SaveDTRCorrection")]
         public async Task<IActionResult> SaveDTRCorrection([FromBody] DTRCorrectionViewModel model)
         {
-            return Ok(await _dtrRepository.SaveDTRCorrection(model));
+           // return Ok(await _dtrRepository.SaveDTRCorrection(model));
+            var result = await _dtrRepository.SaveDTRCorrection(model);
+            return StatusCode(result.statuscode, result.message);
         }
 
         [HttpPost]

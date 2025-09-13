@@ -20,11 +20,14 @@ namespace DCI.Repositories
     public class DailyTimeRecordRepository : IDailyTimeRecordRepository, IDisposable
     {
         private DCIdbContext _dbContext;
+        private readonly IHomeRepository _homeRepository;
+        private IEmailRepository _emailRepository;
 
-        public DailyTimeRecordRepository(DCIdbContext dbContext)
+        public DailyTimeRecordRepository(DCIdbContext dbContext, IHomeRepository homeRepository, IEmailRepository emailRepository)
         {
             _dbContext = dbContext;
-            
+            _homeRepository = homeRepository;
+            _emailRepository = emailRepository;
         }
         public void Dispose()
         {
@@ -119,12 +122,14 @@ namespace DCI.Repositories
         public async Task<IList<DTRCorrectionViewModel>> GetAllDTRCorrection(DTRCorrectionViewModel model)
         {
             var query = (from dtr in _dbContext.DTRCorrection.AsQueryable()
+                         join emp in _dbContext.Employee on dtr.EmployeeId equals emp.EmployeeId
                          join stat in _dbContext.Status on dtr.Status equals stat.StatusId
                          where dtr.CreatedBy == model.CreatedBy
                          select new DTRCorrectionViewModel
                          {
                              DtrId = dtr.DtrId,
                              RequestNo = dtr.RequestNo,
+                             EmployeeName = emp.Firstname + " " + emp.Lastname,
                              DateFiled = dtr.DateFiled,
                              DtrType = dtr.DtrType,
                              DtrDateTime = dtr.DtrDateTime,
@@ -149,9 +154,9 @@ namespace DCI.Repositories
         {
             var query = (from dtr in _dbContext.DTRCorrection.AsQueryable()
                          join stat in _dbContext.Status on dtr.Status equals stat.StatusId
-                         join emp in _dbContext.EmployeeWorkDetails on dtr.CreatedBy equals emp.EmployeeId
+                         join emp in _dbContext.EmployeeWorkDetails on dtr.EmployeeId equals emp.EmployeeId
                          join dept in _dbContext.Department on emp.DepartmentId equals dept.DepartmentId
-                         join depthead in _dbContext.Employee on dept.ApproverId equals depthead.EmployeeId
+                         join depthead in _dbContext.User on dept.ApproverId equals depthead.UserId
                          where dtr.DtrId == dtrId
                          select new DTRCorrectionViewModel
                          {
@@ -167,7 +172,7 @@ namespace DCI.Repositories
                              FileLocation = dtr.FileLocation,
                              CreatedBy = dtr.CreatedBy,
                              IsActive = dtr.IsActive,
-                             DepartmentHead = depthead.Firstname + " " + depthead.Lastname + " " + depthead.Suffix
+                             DepartmentHead = depthead.Firstname + " " + depthead.Lastname// + " " + depthead.Suffix
                          }).FirstOrDefault();
 
 
@@ -177,11 +182,11 @@ namespace DCI.Repositories
 
         public async Task<(int statuscode, string message)> SaveDTRCorrection(DTRCorrectionViewModel param)
         {
-            DTRCorrectionViewModel model = new DTRCorrectionViewModel();
+           
 
             try
             {
-                if (model.DtrId == 0)
+                if (param.DtrId == 0)
                 {
                     DTRCorrection entity = new DTRCorrection();
                     entity.DateFiled = DateTime.Now;
@@ -199,27 +204,41 @@ namespace DCI.Repositories
                     await _dbContext.DTRCorrection.AddAsync(entity);
                     await _dbContext.SaveChangesAsync();
 
-                    //var workdtls = _dbContext.EmployeeWorkDetails.Where(x => x.EmployeeId == param.EmployeeId).FirstOrDefault();
-                    //var dept = _dbContext.Department.Where(x => x.DepartmentId == workdtls.DepartmentId).FirstOrDefault();
-                    //model.ApproverId = dept.ApproverId;
-                    //model.LeaveRequestHeader.Status = entity.Status;
-                    //model.LeaveRequestHeader.RequestNo = entity.RequestNo;
-                    //await _emailRepository.SendToApproval(model);
+                    //Send Email Notification to Approver
+                    DTRCorrectionViewModel model = new DTRCorrectionViewModel();
+                    model.ApproverId = param.ApproverId;
+                    model.Status = entity.Status;
+                    model.RequestNo = entity.RequestNo;
+                    await _emailRepository.SentToDTRCorrection(model);
 
-                    //NotificationViewModel notifvm = new NotificationViewModel();
-                    //notifvm.Title = "Leave";
-                    //notifvm.Description = String.Format("You have been assigned leave request {0} for review", entity.RequestNo);
-                    //notifvm.ModuleId = (int)EnumModulePage.Leave;
-                    //notifvm.TransactionId = entity.LeaveRequestHeaderId;
-                    //notifvm.AssignId = dept.ApproverId ?? 0;
-                    //notifvm.URL = "/Todo/Index/?leaveId=" + model.LeaveRequestHeaderId;
-                    //notifvm.MarkRead = false;
-                    //notifvm.CreatedBy = param.EmployeeId;
-                    //notifvm.IsActive = true;
-                    //await _homeRepository.SaveNotification(notifvm);
+                    //Send Application Notification to Approver
+                    NotificationViewModel notifvmToApprover = new NotificationViewModel();
+                    notifvmToApprover.Title = "DTR Correction";
+                    notifvmToApprover.Description = System.String.Format("You have been assigned DTR Correction request {0} for approval", entity.RequestNo);
+                    notifvmToApprover.ModuleId = (int)EnumModulePage.DTRCorrection;
+                    notifvmToApprover.TransactionId = entity.DtrId;
+                    notifvmToApprover.AssignId = param.ApproverId;
+                    notifvmToApprover.URL = "/Todo/Index/?leaveId=" + model.DtrId;
+                    notifvmToApprover.MarkRead = false;
+                    notifvmToApprover.CreatedBy = param.EmployeeId;
+                    notifvmToApprover.IsActive = true;
+                    await _homeRepository.SaveNotification(notifvmToApprover);
+
+                    //Send Application Notification to Self
+                    NotificationViewModel notifvmToSelf = new NotificationViewModel();
+                    notifvmToSelf.Title = "DTR Correction";
+                    notifvmToSelf.Description = System.String.Format("You have been created DTR Correction request {0} for review", entity.RequestNo);
+                    notifvmToSelf.ModuleId = (int)EnumModulePage.DTRCorrection;
+                    notifvmToSelf.TransactionId = entity.DtrId;
+                    notifvmToSelf.AssignId = param.ApproverId;
+                    notifvmToSelf.URL = "/Todo/Index/?leaveId=" + model.DtrId;
+                    notifvmToSelf.MarkRead = false;
+                    notifvmToSelf.CreatedBy = param.EmployeeId;
+                    notifvmToSelf.IsActive = true;
+                    await _homeRepository.SaveNotification(notifvmToSelf);
 
 
-                    return (StatusCodes.Status200OK, "Successfully saved");
+                    return (StatusCodes.Status200OK, string.Format("DTR request {0} has been submitted for approval.", entity.RequestNo));
                 }
                 return (StatusCodes.Status200OK, "Successfully updated");
             }

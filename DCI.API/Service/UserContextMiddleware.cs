@@ -50,27 +50,33 @@ namespace DCI.API.Service
 		public async Task<UserManager> GetUserContext(string email)
 		{
 			var usermodel = new User();
-			var user = _httpContextAccessor.HttpContext.User;
+			var usermanager = new UserManager();
+
+            var user = _httpContextAccessor.HttpContext.User;
 			if (user == null || !user.Identity.IsAuthenticated)
 			{
-				usermodel = await _userRepository.GetUserByEmail(email);
-			}
+              //  usermodel = await _userRepository.GetUserByEmail(email);
+                usermanager = await _userRepository.GetUserManagerByEmail(email);
+
+            }
 
 		//	var moduleList = await _moduleInRoleRepository.GetModuleInRoleByRoleId(usermodel.RoleId); // need  to remove
-			var modulepageAccess = await _moduleInRoleRepository.GetModuleAccessByRoleId(usermodel.RoleId);
+			var modulepageAccess = await _moduleInRoleRepository.GetModuleAccessByRoleId(usermanager.RoleId);
+			usermanager.ModulePageAccess = modulepageAccess;
 
-			return new UserManager
-			{
-				UserId = usermodel.UserId,
-				Email = usermodel.Email,
-				Lastname = usermodel.Lastname,
-				Middlename = usermodel.Middlename,
-				Firstname = usermodel.Firstname,
-				RoleId = usermodel.RoleId,
-                EmployeeId = usermodel.EmployeeId ?? 0,
-                ModulePageList = null,  //remove ModulePageList
-				ModulePageAccess = modulepageAccess,
-			};	
-		}
+			return usermanager;
+            //return new UserManager
+            //{
+            //	UserId = usermodel.UserId,
+            //	Email = usermodel.Email,
+            //	Lastname = usermodel.Lastname,
+            //	Middlename = usermodel.Middlename,
+            //	Firstname = usermodel.Firstname,
+            //	RoleId = usermodel.RoleId,
+            //             EmployeeId = usermodel.EmployeeId ?? 0,
+            //             ModulePageList = null,  //remove ModulePageList
+            //	ModulePageAccess = modulepageAccess,
+            //};	
+        }
 	}
 }

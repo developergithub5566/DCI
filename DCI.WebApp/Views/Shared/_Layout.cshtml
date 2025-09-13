@@ -141,7 +141,7 @@
                             </div>
                         </a>
                     }
-                    @if (module.ModulePageId == (int)EnumModulePage.DailyTimeRecord)
+                @*     @if (module.ModulePageId == (int)EnumModulePage.DailyTimeRecord)
                     {                  
                         
                         <hr class='sidebar-divider'>
@@ -155,13 +155,41 @@
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">         
                                    <li><a asp-controller="DailyTimeRecord" asp-action="Attendance" asp-route-id="1">Attendance</a></li>   
-                                        <li><a asp-controller="DailyTimeRecord" asp-action="DTRCorrection" asp-route-id="1">DTR Correction</a></li>   
-                                @*     <li><a class="dropdown-item" href="/DailyTimeRecord/Attendance/">Attendance</a></li>    *@
-                             @*        <li><a class="dropdown-item" href="/DailyTimeRecord/DTRCorrection/">DTR Correction</a></li>    *@  
-                    
-                             
+                                        <li><a asp-controller="DailyTimeRecord" asp-action="DTRCorrection" asp-route-id="1">DTR Correction</a></li>                               
                             </ul>
                         </div>
+                    } *@
+
+                     @if (module.ModulePageId == (int)EnumModulePage.DailyTimeRecord)
+                    {
+                        <hr class='sidebar-divider'>
+                     @*    <a href="/DailyTimeRecord/Attendance" class='mainModule'>
+                            <div class='sidebar-heading mainModuleActive'>
+                                <i class='fa-solid fa-file'></i>
+                                <span>Attendance</span>
+                                <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
+                            </div>
+                        </a> *@
+                        <a asp-controller="DailyTimeRecord" asp-action="Attendance" asp-route-id="1">
+                            <div class='sidebar-heading mainModuleActive'>
+                                <i class='fa-solid fa-file'></i>
+                                <span>Attendance</span>
+                                <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
+                            </div>
+                        </a>
+                     
+                    }
+
+                    @if (module.ModulePageId == (int)EnumModulePage.DailyTimeRecord)
+                    {
+                        <hr class='sidebar-divider'>
+                        <a asp-controller="DailyTimeRecord" asp-action="DTRCorrection" asp-route-DtrId="1">
+                            <div class='sidebar-heading mainModuleActive'>
+                                <i class='fa-solid fa-file'></i>
+                                <span>DTR Adjustment</span>
+                                <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
+                            </div>
+                        </a>
                     }
 
                           @if (module.ModulePageId == (int)EnumModulePage.DTRManagement)
@@ -177,12 +205,13 @@
                                 </div>
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">         
-                                   <li><a asp-controller="DailyTimeRecord" asp-action="Attendance" asp-route-id="0">Attendance Summary</a></li>   
-                                        <li><a asp-controller="DailyTimeRecord" asp-action="DTRCorrection" asp-route-id="0">DTR Correction Summary</a></li>   
-                                @*     <li><a class="dropdown-item" href="/DailyTimeRecord/Attendance/">Attendance</a></li>    *@
+                                 @*   <li><a asp-controller="DailyTimeRecord" asp-action="Attendance" asp-route-id="0">Attendance Summary</a></li>   
+                                        <li><a asp-controller="DailyTimeRecord" asp-action="DTRCorrection" asp-route-id="0">DTR Correction Summary</a></li>    *@
+                                    <li><a class="dropdown-item" href="/DailyTimeRecord/Attendance/">Attendance</a></li>   
                              @*        <li><a class="dropdown-item" href="/DailyTimeRecord/DTRCorrection/">DTR Correction</a></li>    *@  
-                                    <li><a class="dropdown-item" href="/DailyTimeRecord/WFH/">WFH Summary</a></li>     
-                                                <li><a class="dropdown-item" href="/DailyTimeRecord/Undertime/">Undertime</a></li>  
+                                @*     <li><a class="dropdown-item" href="/DailyTimeRecord/WFH/">WFH Summary</a></li>     *@ 
+                                                <li><a class="dropdown-item" href="/DailyTimeRecord/Undertime/">Undertime</a></li>
+                                <li><a class="dropdown-item" href="#">Leave Management</a></li>
                                                         
                             </ul>
                         </div>
@@ -234,8 +263,9 @@
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">         
                               
-                                                    <li><a class="dropdown-item" href="/DailyTimeRecord/WFH/">WFH Records</a></li>     
-                                                <li><a class="dropdown-item" href="/DailyTimeRecord/WFHApplication/">WFH Application</a></li>     
+                                                  <li><a class="dropdown-item" href="/DailyTimeRecord/WFH/">WFH Records</a></li>      
+                               
+                                <li><a class="dropdown-item" href="/DailyTimeRecord/WFHApplication/">WFH Application</a></li>     
                             </ul>
                         </div>
                     }
@@ -499,7 +529,7 @@
         <footer class="sticky-footer">
             <div class="container my-auto">
                 <div class="copyright text-center my-auto">
-                    <span>&copy; 2025 DBP Data Center Inc.</span>
+                    <span>&copy; @DateTime.Now.Year DBP Data Center Inc.</span>
                 </div>
             </div>
         </footer>

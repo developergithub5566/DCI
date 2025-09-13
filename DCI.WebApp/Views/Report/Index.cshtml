@@ -34,7 +34,8 @@
 
 
             <button type="button" class="list-group-item list-group-item-action">
-                <a href="/Report/ReportDocType/"><i class='fa-solid fa-file'></i> Daily Time Record(DTR) Report</a>
+                @* <a href="/DailyTimeRecord/Attendance/"><i class='fa-solid fa-file'></i> Attedance Summary Report</a> *@
+                <a asp-controller="DailyTimeRecord" asp-action="Attendance" asp-route-id="0"><i class='fa-solid fa-file'></i> Attendance Summary</a>
             </button>
         
             <button type="button" class="list-group-item list-group-item-action">
@@ -42,10 +43,20 @@
             </button>
 
             <button type="button" class="list-group-item list-group-item-action">
+              @*   <a href="/Report/ReportDocType/"><i class='fa-solid fa-file'></i> DTR Correction Summary Report</a> *@
+                <a asp-controller="DailyTimeRecord" asp-action="DTRCorrection" asp-route-id="0"><i class='fa-solid fa-file'></i> DTR Correction Summary</a>
+            </button>
+
+            <button type="button" class="list-group-item list-group-item-action">
                 <a href="/Report/Undertime/"><i class='fa-solid fa-file'></i> Undertime Summary Report</a>
             </button>
             <button type="button" class="list-group-item list-group-item-action">
                 <a href="/Report/ReportAssignTask/"><i class='fa-solid fa-file'></i> Overtime Hours Summary</a>
+            </button>
+
+            <button type="button" class="list-group-item list-group-item-action">
+              @*   <a href="/Report/ReportAssignTask/"><i class='fa-solid fa-file'></i> WFH Summary</a> *@     
+                <a href="/Report/WFH/"><i class='fa-solid fa-file'></i>WFH Summary</a>
             </button>
         </div>
         <hr />

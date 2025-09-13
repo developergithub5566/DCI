@@ -45,7 +45,8 @@ namespace DCI.Core.Common
         Overtime = 19,
         Holiday = 20,
         WFH = 21,
-        Undertime = 22
+        Undertime = 22,
+        DTRCorrection = 23
     }
 
     public enum EnumRole
