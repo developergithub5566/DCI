@@ -18,10 +18,10 @@ namespace DCI.Models.ViewModel
         public int LeaveRequestHeaderId { get; set; } = 0;
 
         public LeaveRequestHeaderViewModel? LeaveRequestHeader { get; set; } = new();
-        public List<LeaveRequestHeaderViewModel>? LeaveRequestHeaderList { get; set; } = new(); 
+        public List<LeaveRequestHeaderViewModel>? LeaveRequestHeaderList { get; set; } = new();
         public List<LeaveTypeViewModel>? LeaveTypeList { get; set; } = new();
 
-       // public string SelectedDateJson { get; set; } = string.Empty;
+        // public string SelectedDateJson { get; set; } = string.Empty;
         public List<SelectListItem>? OptionsLeaveType { get; set; }
 
         public List<string> LeaveDateList { get; set; } = new();
@@ -36,6 +36,7 @@ namespace DCI.Models.ViewModel
         public string ApproverEmail { get; set; } = string.Empty;
         public int? ApproverId { get; set; } = 0;
         public string StatusName { get; set; } = string.Empty;
+        public string ApproverHead { get; set; } = string.Empty;
 
         public int FilterYear { get; set; } = 0;
     }
@@ -61,7 +62,8 @@ namespace DCI.Models.ViewModel
         public IList<LeaveType>? LeaveTypeList { get; set; }
         //public List<DateTime>? LeaveDateList { get; set; }
 
-        public DateTime DateApprovedDisapproved { get; set; }
+        public DateTime? DateApprovedDisapproved { get; set; }
+        public string ApprovalRemarks { get; set; } = string.Empty;
     }
 
     public class LeaveRequestDetailViewModel
@@ -99,6 +101,8 @@ namespace DCI.Models.ViewModel
 
     public class LeaveFormViewModel
     {
+
+        public int LeaveRequestHeader { get; set; } = 0;
         public int EmployeeId { get; set; } = 0;
         public int LeaveTypeId { get; set; } = 0;
         public decimal NoOfDays { get; set; } = 0;
@@ -108,6 +112,7 @@ namespace DCI.Models.ViewModel
         public string SelectedDateJson { get; set; } = string.Empty;
         public List<DateTime> SelectedDateList { get; set; } = new();
         public int ApproverId { get; set; } = 0;
+        public int CurrentUserId { get; set; } = 0;
     }
 
     public class LeaveTypeViewModel

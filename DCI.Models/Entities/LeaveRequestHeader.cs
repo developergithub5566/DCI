@@ -14,6 +14,7 @@ namespace DCI.Models.Entities
         public int LeaveTypeId { get; set; }
         public int Status { get; set; }
         public string Reason { get; set; } = string.Empty;
+        public int ApproverId { get; set; }
         public DateTime? DateModified { get; set; }
         public int? ModifiedBy { get; set; }
         public bool IsActive { get; set; }

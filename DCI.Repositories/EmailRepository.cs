@@ -18,78 +18,78 @@ using static System.Net.WebRequestMethods;
 
 namespace DCI.Repositories
 {
-	public class EmailRepository : IEmailRepository, IDisposable
-	{
-		private DCIdbContext _dbContext;
-		private readonly SMTPModel _smtpSettings;
-		private IUserRepository _userRepository;
-		private IUserAccessRepository _userAccessRepository;
-		private readonly IOptions<APIConfigModel> _apiconfig;
+    public class EmailRepository : IEmailRepository, IDisposable
+    {
+        private DCIdbContext _dbContext;
+        private readonly SMTPModel _smtpSettings;
+        private IUserRepository _userRepository;
+        private IUserAccessRepository _userAccessRepository;
+        private readonly IOptions<APIConfigModel> _apiconfig;
 
-		public EmailRepository(DCIdbContext context, IOptions<SMTPModel> smtpSettings, IUserRepository userRepository, IUserAccessRepository userAccessRepository, IOptions<APIConfigModel> apiconfig)
-		{
-			this._dbContext = context;
-			_smtpSettings = smtpSettings.Value;
-			_userRepository = userRepository;
-			_userAccessRepository = userAccessRepository;
-			this._apiconfig = apiconfig;
-		}
-		public async Task<bool> IsExistsEmail(string email)
-		{
-			return await _dbContext.User.AnyAsync(x => x.Email == email && x.IsActive == true);
-		}
-		public void Dispose()
-		{
-			_dbContext.Dispose();
-		}
-		public async Task SendMessage(MailMessage msg)
-		{
-			SmtpClient smtp = new SmtpClient();
-			try
-			{
-				smtp.Host = _smtpSettings.Host;
-				smtp.Port = _smtpSettings.Port;
-				smtp.EnableSsl = _smtpSettings.EnableSsl;
-				smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
-				smtp.UseDefaultCredentials = _smtpSettings.UseDefaultCredentials;
-				smtp.Credentials = new NetworkCredential(_smtpSettings.Username, _smtpSettings.Password);
-				smtp.Send(msg);
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex.ToString());
-			}
-			finally
-			{
-				Log.CloseAndFlush();
-				smtp.Dispose();
-			}
-		}
+        public EmailRepository(DCIdbContext context, IOptions<SMTPModel> smtpSettings, IUserRepository userRepository, IUserAccessRepository userAccessRepository, IOptions<APIConfigModel> apiconfig)
+        {
+            this._dbContext = context;
+            _smtpSettings = smtpSettings.Value;
+            _userRepository = userRepository;
+            _userAccessRepository = userAccessRepository;
+            this._apiconfig = apiconfig;
+        }
+        public async Task<bool> IsExistsEmail(string email)
+        {
+            return await _dbContext.User.AnyAsync(x => x.Email == email && x.IsActive == true);
+        }
+        public void Dispose()
+        {
+            _dbContext.Dispose();
+        }
+        public async Task SendMessage(MailMessage msg)
+        {
+            SmtpClient smtp = new SmtpClient();
+            try
+            {
+                smtp.Host = _smtpSettings.Host;
+                smtp.Port = _smtpSettings.Port;
+                smtp.EnableSsl = _smtpSettings.EnableSsl;
+                smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                smtp.UseDefaultCredentials = _smtpSettings.UseDefaultCredentials;
+                smtp.Credentials = new NetworkCredential(_smtpSettings.Username, _smtpSettings.Password);
+                smtp.Send(msg);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+                smtp.Dispose();
+            }
+        }
 
 
-		#region Reset Password
-		public async Task SendResetPassword(string email)
-		{
-			MailMessage mail = new MailMessage();
-			mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-			mail.Subject = Constants.Email_Subject_ResetPassword;
-			mail.Body = await ResetPasswordBodyMessage(email);
-			mail.IsBodyHtml = true;
-			mail.To.Add(email);
-			await SendMessage(mail);
-		}
+        #region Reset Password
+        public async Task SendResetPassword(string email)
+        {
+            MailMessage mail = new MailMessage();
+            mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
+            mail.Subject = Constants.Email_Subject_ResetPassword;
+            mail.Body = await ResetPasswordBodyMessage(email);
+            mail.IsBodyHtml = true;
+            mail.To.Add(email);
+            await SendMessage(mail);
+        }
 
-		async Task<string> ResetPasswordBodyMessage(string email)
-		{
-			var token = TokenGeneratorHelper.GetToken();
+        async Task<string> ResetPasswordBodyMessage(string email)
+        {
+            var token = TokenGeneratorHelper.GetToken();
 
-			var userEntity = await _userRepository.GetUserByEmail(email);
+            var userEntity = await _userRepository.GetUserByEmail(email);
 
-			var userAccessEntity = await _userAccessRepository.GetUserAccessByUserId(userEntity.UserId);
+            var userAccessEntity = await _userAccessRepository.GetUserAccessByUserId(userEntity.UserId);
 
-			//string link = "http://192.168.1.78:83/Account/ValidateToken?token=";
-			string link = _apiconfig.Value.WebAppConnection + "Account/ValidateToken?token=";
-			string emailBody = $@"
+            //string link = "http://192.168.1.78:83/Account/ValidateToken?token=";
+            string link = _apiconfig.Value.WebAppConnection + "Account/ValidateToken?token=";
+            string emailBody = $@"
             <html>
             <body>
                 <h2>Reset Password Request</h2>
@@ -102,39 +102,36 @@ namespace DCI.Repositories
             </body>
             </html>";
 
-			userAccessEntity.PasswordResetToken = token;
-			userAccessEntity.PasswordResetTokenExpiry = DateTime.UtcNow.AddDays(1);
-			await _userAccessRepository.UpdateUserAccess(userAccessEntity);
-			return emailBody;
-		}
+            userAccessEntity.PasswordResetToken = token;
+            userAccessEntity.PasswordResetTokenExpiry = DateTime.UtcNow.AddDays(1);
+            await _userAccessRepository.UpdateUserAccess(userAccessEntity);
+            return emailBody;
+        }
 
         #endregion
 
 
-
-
-
         #region Set Password
 
-        public async Task SendSetPassword(UserViewModel model)     
+        public async Task SendSetPassword(UserViewModel model)
         {
-			MailMessage mail = new MailMessage();
-			mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-			mail.Subject = Constants.Email_Subject_SetPassword;
-			mail.Body = await SetPasswordBodyMessage(model);
-			mail.IsBodyHtml = true;
-			mail.To.Add(model.Email);
-			await SendMessage(mail);
-		}
-		async Task<string> SetPasswordBodyMessage(UserViewModel model)
-		{
-			try
-			{
-            
+            MailMessage mail = new MailMessage();
+            mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
+            mail.Subject = Constants.Email_Subject_SetPassword;
+            mail.Body = await SetPasswordBodyMessage(model);
+            mail.IsBodyHtml = true;
+            mail.To.Add(model.Email);
+            await SendMessage(mail);
+        }
+        async Task<string> SetPasswordBodyMessage(UserViewModel model)
+        {
+            try
+            {
 
-               // var userEntity = await _userRepository.GetUserByEmail(email);
-			   
-               //  var userAccessEntity = await _userAccessRepository.GetUserAccessByUserId(model.UserId);
+
+                // var userEntity = await _userRepository.GetUserByEmail(email);
+
+                //  var userAccessEntity = await _userAccessRepository.GetUserAccessByUserId(model.UserId);
 
                 var token = TokenGeneratorHelper.GetToken();
                 //var userAccessEntity = usraccssentity.FirstOrDefault();
@@ -155,14 +152,14 @@ namespace DCI.Repositories
 					<p>Best regards,<br />DocTrack System Administrator</p>
 				</body>
 				</html>";
-				
+
                 await _userAccessRepository.UpdateUserEmployeeAccess(model, token);
                 return emailBody;
             }
             catch (Exception ex)
             {
                 Log.Error(ex.ToString());
-                return ( string.Empty);
+                return (string.Empty);
             }
             finally
             {
@@ -170,135 +167,100 @@ namespace DCI.Repositories
             }
 
         }
-		#endregion
-
-		#region Approval
-		public async Task SendToApproval(LeaveViewModel model)
-		{
-			model = await ApprovalNotificationBodyMessage(model);
+        #endregion
 
 
-			MailMessage mail = new MailMessage();
-			mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-			mail.Subject = "Action Required: Please check the Leave Request no. " + model.LeaveRequestHeader.RequestNo;
-			mail.Body = model.EmailBody;
-			mail.IsBodyHtml = true;
-			mail.To.Add(model.ApproverEmail);
-			await SendMessage(mail);
-		}
+        #region Leave
+        public async Task SendToApprovalLeave(LeaveViewModel model)
+        {
+            model = await ApprovalNotificationBodyMessage(model);
 
-		async Task<LeaveViewModel> ApprovalNotificationBodyMessage(LeaveViewModel model)
-		{
-			var userEntity = new User();
-			string statusName = string.Empty;
-	
 
-			if (model.LeaveRequestHeader.Status == (int)EnumStatus.ForApproval)
-			{
-				userEntity = await _userRepository.GetUserById(model.ApproverId ?? default(int));
-				statusName = "for approval";
-			}
+            MailMessage mail = new MailMessage();
+            mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
+            mail.Subject = "Action Required: Please check the Leave Request " + model.LeaveRequestHeader.RequestNo;
+            mail.Body = model.EmailBody;
+            mail.IsBodyHtml = true;
+            mail.To.Add(model.ApproverEmail);
+            await SendMessage(mail);
+        }
+
+        async Task<LeaveViewModel> ApprovalNotificationBodyMessage(LeaveViewModel model)
+        {
+            var userEntity = new User();
+            string statusName = string.Empty;
+
+
+            if (model.LeaveRequestHeader.Status == (int)EnumStatus.ForApproval)
+            {
+                userEntity = await _userRepository.GetUserById(model.ApproverId ?? default(int));
+                statusName = "for approval";
+            }
 
             //string link = _apiconfig.Value.WebAppConnection + "Document/Details?DocId=" + model.DocId;
 
             //<p>Please check the Leave Request {model.LeaveRequestHeader.RequestNo} {statusName}. </p> 
             model.ApproverEmail = userEntity.Email;
-			model.EmailBody = $@"
-            <html>
-            <body>              
-                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
-                
-                 <p>This is an automated message from DCI Application.</p>
-                 
-				<p>You have been assigned leave request {model.LeaveRequestHeader.RequestNo} {statusName}. Kindly review and proceed accordingly. </p> 
-            
-                <p>If you encounter any issues, please contact our support team at [DCI Application Support].</p>            
-                <p>Thank you,<br />Your DCI</p>
-            </body>
-            </html>";
-
-			return model;
-		}
-
-		public async Task SendToRequestor(LeaveViewModel model)
-		{
-            model.StatusName = model.LeaveRequestHeader.Status == (int)EnumStatus.Approved ? Constants.Approval_Approved : Constants.Approval_Disapproved;
-        
-            model = await RequestorNotificationBodyMessage(model);
-
-			MailMessage mail = new MailMessage();
-			mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-			mail.Subject = "DCI App - Your leave No. " + model.LeaveRequestHeader.RequestNo + " has been " + model.StatusName.ToLower();
-			mail.Body = model.EmailBody;
-			mail.IsBodyHtml = true;
-			mail.To.Add(model.RequestorEmail);
-			await SendMessage(mail);
-		}
-
-		async Task<LeaveViewModel> RequestorNotificationBodyMessage(LeaveViewModel model)
-		{
-            //var userEntity = await _userRepository.GetUserById(model.LeaveRequestHeader.EmployeeId); 
-            var userEntity = await _userRepository.GetUserByEmployeeId(model.LeaveRequestHeader.EmployeeId);          
-            model.RequestorEmail = userEntity?.Email ?? string.Empty;
-
-			model.EmailBody = $@"
-            <html>
-            <body>              
-                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
-                
-                 <p>This is an automated message from DCI Application.</p>
-                 <p>Your Leave request no {model.LeaveRequestHeader.RequestNo} has been {model.StatusName.ToLower()}.</p>   
-              
-                <p>If you encounter any issues, please contact our support team at [DCI Application Support].</p>            
-                <p>Thank you,<br />Your DCI</p>
-            </body>
-            </html>";
-
-			return model;
-		}
-
-
-        public async Task SendToRequestorDTR(DTRCorrectionViewModel model)
-        {
-            model.StatusName = model.Status == (int)EnumStatus.Approved ? Constants.Approval_Approved : Constants.Approval_Disapproved;
-
-            model = await RequestorNotificationBodyMessageDTR(model);
-
-            MailMessage mail = new MailMessage();
-            mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-            mail.Subject = "DCI App - Your DTR No. " + model.RequestNo + " has been " + model.StatusName.ToLower();
-            mail.Body = model.EmailBody;
-            mail.IsBodyHtml = true;
-            mail.To.Add(model.RequestorEmail);
-            await SendMessage(mail);
-        }
-
-        async Task<DTRCorrectionViewModel> RequestorNotificationBodyMessageDTR(DTRCorrectionViewModel model)
-        {
-            var userEntity = await _userRepository.GetUserById(model.CreatedBy);
-            model.RequestorEmail = userEntity.Email;
-
             model.EmailBody = $@"
             <html>
             <body>              
                 <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
                 
-                 <p>This is an automated message from DCI Application.</p>
-                 <p>Your DTR correction request no {model.RequestNo} has been {model.StatusName.ToLower()}.</p>   
-              
-                <p>If you encounter any issues, please contact our support team at [DCI Application Support].</p>            
-                <p>Thank you,<br />Your DCI</p>
+                       <p>This is an automated message from ESS System.</p>
+                 
+				<p>You have been assigned leave request {model.LeaveRequestHeader.RequestNo} {statusName}. Kindly review and proceed accordingly. </p> 
+            
+                        <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
+                <p>Best regards,<br />ESS System Administrator</p>
             </body>
             </html>";
 
             return model;
         }
 
+        public async Task SendToRequestorLeave(LeaveViewModel model)
+        {
+            model.StatusName = model.LeaveRequestHeader.Status == (int)EnumStatus.Approved ? Constants.Approval_Approved : Constants.Approval_Disapproved;
+
+            model = await RequestorNotificationBodyMessage(model);
+
+            MailMessage mail = new MailMessage();
+            mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
+            mail.Subject = "DCI App - Your leave request " + model.LeaveRequestHeader.RequestNo + " has been " + model.StatusName.ToLower();
+            mail.Body = model.EmailBody;
+            mail.IsBodyHtml = true;
+            mail.To.Add(model.RequestorEmail);
+            await SendMessage(mail);
+        }
+
+        async Task<LeaveViewModel> RequestorNotificationBodyMessage(LeaveViewModel model)
+        {
+            //var userEntity = await _userRepository.GetUserById(model.LeaveRequestHeader.EmployeeId); 
+            var userEntity = await _userRepository.GetUserByEmployeeId(model.LeaveRequestHeader.EmployeeId);
+            model.RequestorEmail = userEntity?.Email ?? string.Empty;
+
+            model.EmailBody = $@"
+            <html>
+            <body>              
+                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
+                
+              <p>This is an automated message from ESS System.</p>
+                 <p>Your Leave request {model.LeaveRequestHeader.RequestNo} has been {model.StatusName.ToLower()}.</p>   
+              
+                       <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
+                <p>Best regards,<br />ESS System Administrator</p>
+            </body>
+            </html>";
+
+            return model;
+        }
+
+
         #endregion
 
         #region Overtime
 
-        public async Task SentToOvertime(OvertimeViewModel model)
+        public async Task SentToApprovalOvertime(OvertimeViewModel model)
         {
             model = await OvertimeNotificationBodyMessage(model);
 
@@ -335,12 +297,12 @@ namespace DCI.Repositories
             <body>              
                 <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
                 
-                <p>This is an automated message from DCI Application.</p>
+                      <p>This is an automated message from ESS System.</p>
                  
 				<p>You have been assigned overtime request {model.RequestNo} {statusName}. Kindly review and proceed accordingly. </p> 
             
-                <p>If you encounter any issues, please contact our support team at [DCI Application Support].</p>            
-                <p>Thank you,<br />Your DCI</p>
+                <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
+                <p>Best regards,<br />ESS System Administrator</p>
             </body>
             </html>";
 
@@ -353,27 +315,25 @@ namespace DCI.Repositories
 
         #region DTRCorrection
 
-        public async Task SentToDTRCorrection(DTRCorrectionViewModel model)
+        public async Task SentToApprovalDTRAdjustment(DTRCorrectionViewModel model)
         {
-            model = await DTRCorrectionNotificationBodyMessage(model);
+            model = await DTRAdjustmentNotificationBodyMessage(model);
 
 
             MailMessage mail = new MailMessage();
             mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-            mail.Subject = "Action Required: Please check the DTR Correction Request no. " + model.RequestNo;
+            mail.Subject = "Action Required: Please check the DTR adjustment request " + model.RequestNo;
             mail.Body = model.EmailBody;
             mail.IsBodyHtml = true;
             mail.To.Add(model.ApproverEmail);
             await SendMessage(mail);
         }
 
-        async Task<DTRCorrectionViewModel> DTRCorrectionNotificationBodyMessage(DTRCorrectionViewModel model)
+        async Task<DTRCorrectionViewModel> DTRAdjustmentNotificationBodyMessage(DTRCorrectionViewModel model)
         {
             var userEntity = new User();
             string statusName = string.Empty;
 
-
-          
             if (model.Status == (int)EnumStatus.ForApproval)
             {
                 userEntity = await _userRepository.GetUserById(model.ApproverId);
@@ -386,18 +346,54 @@ namespace DCI.Repositories
             <body>              
                 <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
                 
-                <p>This is an automated message from DCI Application.</p>
+                <p>This is an automated message from ESS System.</p>
                  
 				<p>You have been assigned DTR Correction request {model.RequestNo} {statusName}. Kindly review and proceed accordingly. </p> 
             
-                <p>If you encounter any issues, please contact our support team at [DCI Application Support].</p>            
-                <p>Thank you,<br />Your DCI</p>
+                <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
+                <p>Best regards,<br />ESS System Administrator</p>
             </body>
             </html>";
 
             return model;
         }
 
+
+        public async Task SendToRequestorDTRAdjustment(DTRCorrectionViewModel model)
+        {
+            model.StatusName = model.Status == (int)EnumStatus.Approved ? Constants.Approval_Approved : Constants.Approval_Disapproved;
+
+            model = await RequestorNotificationBodyMessageDTRAdjustment(model);
+
+            MailMessage mail = new MailMessage();
+            mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
+            mail.Subject = "DCI ESS App - Your DTR adjustment " + model.RequestNo + " has been " + model.StatusName.ToLower();
+            mail.Body = model.EmailBody;
+            mail.IsBodyHtml = true;
+            mail.To.Add(model.RequestorEmail);
+            await SendMessage(mail);
+        }
+
+        async Task<DTRCorrectionViewModel> RequestorNotificationBodyMessageDTRAdjustment(DTRCorrectionViewModel model)
+        {
+            var userEntity = await _userRepository.GetUserById(model.CreatedBy);
+            model.RequestorEmail = userEntity.Email;
+
+            model.EmailBody = $@"
+            <html>
+            <body>              
+                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
+                
+                <p>This is an automated message from ESS System.</p>
+                 <p>Your DTR adjustment request {model.RequestNo} has been {model.StatusName.ToLower()}.</p>   
+              
+                  <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
+                  <p>Best regards,<br />ESS System Administrator</p>
+            </body>
+            </html>";
+
+            return model;
+        }
 
         #endregion
     }

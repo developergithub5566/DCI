@@ -92,30 +92,31 @@ namespace DCI.Repositories
         {
             try
             {
-                var context = _dbContext.DTRCorrection.AsQueryable().ToList();
-                var empList = _dbContext.Employee.AsQueryable().ToList();
-                var statusList = _dbContext.Status.AsQueryable().ToList();
+                var query = await (
+                              from dtr in _dbContext.DTRCorrection
+                              join usr in _dbContext.User on dtr.CreatedBy equals usr.UserId
+                              join emp in _dbContext.Employee on usr.EmployeeId equals emp.EmployeeId
+                              join stat in _dbContext.Status on dtr.Status equals stat.StatusId
+                              where dtr.IsActive
+                                    && dtr.Status == (int)EnumStatus.ForApproval
+                                    && dtr.ApproverId == model.CurrentUserId
+                              select new DTRCorrectionViewModel
+                              {
+                                  DtrId = dtr.DtrId,
+                                  RequestNo = dtr.RequestNo,
+                                  DateFiled = dtr.DateFiled,
+                                  DtrDateTime = dtr.DtrDateTime,
+                                  DtrType = dtr.DtrType,
+                                  EmployeeName = emp.Firstname + " " + emp.Lastname,
+                                  Status = dtr.Status,
+                                  StatusName = stat.StatusName,
+                                  Reason = dtr.Reason,
+                              })
+                              .AsNoTracking()
+                              .ToListAsync();
 
+                return query;
 
-                var query = (from dtr in context
-                             join emp in empList on dtr.CreatedBy equals emp.EmployeeId
-                             join stat in statusList on dtr.Status equals stat.StatusId
-                             where dtr.IsActive == true && dtr.Status == (int)EnumStatus.ForApproval
-                             select new DTRCorrectionViewModel
-                             {
-                                 DtrId = dtr.DtrId,
-                                 RequestNo = dtr.RequestNo,
-                                 DateFiled = dtr.DateFiled,
-                                 DtrDateTime = dtr.DtrDateTime,
-                                 DtrType = dtr.DtrType,
-                                 EmployeeName = emp.Firstname + " " + emp.Lastname,
-                                 Status = dtr.Status,
-                                 StatusName = stat.StatusName,
-                                 Reason = dtr.Reason,
-                             }).ToList();
-
-
-                return query.ToList();
             }
             catch (Exception ex)
             {
@@ -195,23 +196,24 @@ namespace DCI.Repositories
                 var entitiesToViewModel = await _leaveRepository.RequestLeave(lv);
 
                 // Send Email Notif
-                await _emailRepository.SendToRequestor(entitiesToViewModel);
+                await _emailRepository.SendToRequestorLeave(entitiesToViewModel);
 
                 string status = param.Status == (int)EnumStatus.Approved ? "approved" : "disapproved";
 
+
+                var user = _dbContext.User.Where(x => x.EmployeeId == contextHdr.EmployeeId).FirstOrDefault();
+
                 NotificationViewModel notifvm = new NotificationViewModel();
                 notifvm.Title = "Leave";
-                notifvm.Description = String.Format("Leave Request No {0} has been {1}", contextHdr.RequestNo, status);
+                notifvm.Description = String.Format("Leave request {0} has been {1}", contextHdr.RequestNo, status);
                 notifvm.ModuleId = (int)EnumModulePage.Leave;
                 notifvm.TransactionId = param.TransactionId;
-                notifvm.AssignId = contextHdr.EmployeeId;
-                notifvm.URL = "/DailyTimeRecord/Leave/?leaveId=" + contextHdr.LeaveRequestHeaderId;
+                notifvm.AssignId = user.UserId;
+                notifvm.URL = "/DailyTimeRecord/Leave";
                 notifvm.MarkRead = false;
                 notifvm.CreatedBy = param.CreatedBy;
                 notifvm.IsActive = true;
                 await _homeRepository.SaveNotification(notifvm);
-
-
 
                 return (StatusCodes.Status200OK, String.Format("Leave Request {0} has been {1}.", contextHdr.RequestNo, status));
             }
@@ -231,7 +233,7 @@ namespace DCI.Repositories
             try
             {
                 ApprovalHistory entity = new ApprovalHistory();
-                entity.ModulePageId = (int)EnumModulePage.DailyTimeRecord;
+                entity.ModulePageId = (int)EnumModulePage.DTRCorrection;
                 entity.TransactionId = param.TransactionId;
                 entity.ApproverId = param.ApproverId;
                 entity.Status = param.Status;
@@ -253,25 +255,26 @@ namespace DCI.Repositories
 
                 var entitiesToViewModel = await _dtrRepository.DTRCorrectionByDtrId(contextHdr.DtrId);
 
-                // Send Email Notif
-                await _emailRepository.SendToRequestorDTR(entitiesToViewModel);
-
+                //Send Email Notification to Requestor
+                await _emailRepository.SendToRequestorDTRAdjustment(entitiesToViewModel);
                 string status = param.Status == (int)EnumStatus.Approved ? "approved" : "disapproved";
 
+                //Send Application Notification to Requestor
                 NotificationViewModel notifvm = new NotificationViewModel();
-                notifvm.Title = "DTR";
-                notifvm.Description = String.Format("DTR Correction Request No {0} has been {1}", contextHdr.RequestNo, status);
-                notifvm.ModuleId = (int)EnumModulePage.DailyTimeRecord;
+                notifvm.Title = "DTR Adjustment";
+                notifvm.Description = String.Format("DTR adjustment request {0} has been {1}", contextHdr.RequestNo, status);
+                notifvm.ModuleId = (int)EnumModulePage.DTRCorrection;
                 notifvm.TransactionId = param.TransactionId;
                 notifvm.AssignId = contextHdr.CreatedBy;
-                notifvm.URL = "/DailyTimeRecord/DTRCorrectionById/?dtrId=" + contextHdr.DtrId;
+                // notifvm.URL = "/DailyTimeRecord/DTRCorrectionById/?dtrId=" + contextHdr.DtrId;
+                notifvm.URL = "/DailyTimeRecord/DTRCorrection";
                 notifvm.MarkRead = false;
                 notifvm.CreatedBy = param.CreatedBy;
                 notifvm.IsActive = true;
                 await _homeRepository.SaveNotification(notifvm);
 
-
-                return (StatusCodes.Status200OK, String.Format("DTR Request No {0} has been {1}.", contextHdr.RequestNo, status));
+         
+                return (StatusCodes.Status200OK, String.Format("DTR adjustment request {0} has been {1}.", contextHdr.RequestNo, status));
             }
             catch (Exception ex)
             {
@@ -484,9 +487,9 @@ namespace DCI.Repositories
 
                 var queryDTR = from apprv in approvalLog
                                join dtr in dtrcontext on apprv.TransactionId equals dtr.DtrId
-                               join emp in empList on dtr.CreatedBy equals emp.EmployeeId
+                               join emp in empList on dtr.EmployeeId equals emp.EmployeeId
                                join stat in statusList on dtr.Status equals stat.StatusId
-                               where apprv.IsActive == true && apprv.ApproverId == model.CurrentUserId && apprv.ModulePageId == (int)EnumModulePage.DailyTimeRecord
+                               where apprv.IsActive == true && apprv.ApproverId == model.CurrentUserId && apprv.ModulePageId == (int)EnumModulePage.DTRCorrection
                                select new ApprovalHistoryViewModel
                                {
                                    ApprovalHistoryId = apprv.ApprovalHistoryId,
@@ -495,7 +498,7 @@ namespace DCI.Repositories
                                    Status = dtr.Status,
                                    StatusName = stat.StatusName,
                                    StatusDate = apprv.DateCreated.ToString(),
-                                   ModuleName = "DTR",
+                                   ModuleName = "DTR Adjustment",
                                    DateCreated = dtr.DateFiled
                                };
 
@@ -503,7 +506,7 @@ namespace DCI.Repositories
                                join wfh in wfhcontext on apprv.TransactionId equals wfh.WfhHeaderId
                                join emp in empList on wfh.EmployeeId equals emp.EmployeeId
                                join stat in statusList on wfh.Status equals stat.StatusId
-                               where apprv.IsActive == true && apprv.ModulePageId == (int)EnumModulePage.WFH //apprv.ApproverId == model.CurrentUserId && 
+                               where apprv.IsActive == true && apprv.ApproverId == model.CurrentUserId && apprv.ModulePageId == (int)EnumModulePage.WFH 
                                select new ApprovalHistoryViewModel
                                {
                                    ApprovalHistoryId = apprv.ApprovalHistoryId,

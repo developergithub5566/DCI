@@ -159,6 +159,7 @@ namespace DCI.WebApp.Controllers
                     //  model.CurrentUserId = currentUser.UserId;
                     model.EmployeeId = currentUser.EmployeeId;
                     model.ApproverId = currentUser.ApproverId;
+                    model.CurrentUserId = currentUser.UserId;
 
                     model.SelectedDateList = JsonConvert.DeserializeObject<List<DateTime>>(model.SelectedDateJson);
 
@@ -195,7 +196,11 @@ namespace DCI.WebApp.Controllers
             {
                 using (var _httpclient = new HttpClient())
                 {
-                    model.EmployeeId = 2;
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                      model.CurrentUserId = currentUser.UserId;
+                    model.EmployeeId = currentUser.EmployeeId;
+                    model.ApproverId = currentUser.ApproverId;
+             
                     //  model.LeaveRequestHeaderId = 4;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -214,6 +219,7 @@ namespace DCI.WebApp.Controllers
                                         Value = x.LeaveTypeId.ToString(),
                                         Text = x.Description
                                     }).ToList();
+                        model.ApproverHead = currentUser?.ApproverHead;
 
                         //model.SelectedDateJson = JsonConvert.SerializeObject(model.LeaveDateList);
                         // var dateList = new List<string> { "2025-06-09","2025-06-10" };

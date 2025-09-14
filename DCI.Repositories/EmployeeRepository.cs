@@ -264,6 +264,16 @@ namespace DCI.Repositories
                     dtl.IsActive = true;
                     _dbContext.EmployeeWorkDetails.Entry(dtl).State = EntityState.Modified;
                     await _dbContext.SaveChangesAsync();
+
+                    var usr = await _dbContext.User.FirstOrDefaultAsync(x => x.EmployeeId == model.EmployeeId);
+                    usr.Firstname = model.Firstname;
+                    usr.Middlename = model.Middlename;
+                    usr.Lastname = model.Lastname;
+                    usr.ContactNo = model.MobileNoPersonal ?? model.MobileNoOffice;
+                    _dbContext.User.Entry(usr).State = EntityState.Modified;
+                    await _dbContext.SaveChangesAsync();
+
+
                     return (StatusCodes.Status200OK, "Registration updated");
                 }
             }

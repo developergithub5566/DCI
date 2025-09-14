@@ -400,6 +400,16 @@
                                 <textarea class="form-control frmField" name="Reason" id="Reason"></textarea>
                             </div>
                         </div>
+                        <div class="col-12">
+                            <hr>
+                            <div class="form-group">
+                                <label class="frmText" id="ApproverLabel"> </label><br>
+                                <label class="font-weight-bold mb0 text-danger" id="deptHeadName"></label>
+                                 <label class="d-block mt0 text-left text-xs" id="ApprovalDate"></label>
+                                <label class="d-block mt0 text-left text-xs" id="ApprovalRemarks"></label>
+                       @*          <label class="d-block mt0 text-left text-xs">(Department Head)</label> *@
+                            </div>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer pt0">
@@ -567,7 +577,8 @@
                               url: '@Url.Action("RequestLeave", "DailyTimeRecord")',
                               success: function (response) {
                                   if (response.success) {
-
+                                        document.getElementById('deptHeadName').textContent = response.data.approverHead;
+                                        document.getElementById('ApproverLabel').textContent = 'For Approval of:';
                                       $('#createForm').find('input, select, textarea').prop('disabled', false);
 
                                  var $select = $('#leaveTypeSelect');
@@ -639,6 +650,7 @@
                                   let nodays = 0.0000;
                                   $('#NoOfDays').val(nodays.toFixed(4));
                                   $('#Reason').val('');
+                              
                                     const formData = new FormData();
                                   formData.append('LeaveRequestHeaderId', leaveHdrId);
 
@@ -686,18 +698,45 @@
                                                  $('#Reason').val(response.data.leaveRequestHeader.reason);
 
                                             $('#btnCancel').hide();
-                                             $('#createForm').find('input, select, textarea').prop('disabled', true);
-                                   if(response.data.leaveRequestHeader.status == 2){  //pending
+
+                                                document.getElementById('ApproverLabel').textContent = '';
+                                                              document.getElementById('ApprovalDate').textContent = '';
+                                       document.getElementById('ApprovalRemarks').textContent = '';
+
+                                   if(response.data.leaveRequestHeader.status == 3){  //forapproval
                                                 $('#btnCancel').show();
                                                  $('#btnSubmit').hide();
+                                                     document.getElementById('deptHeadName').textContent = response.data.approverHead;
+                                                       document.getElementById('ApproverLabel').textContent = 'For Approval of:';
                                               }
                                 else if(response.data.leaveRequestHeader.status == 4){     //approved
                                                $('#btnSubmit').hide();
                                                    $('#btnCancel').hide();
+                                                         document.getElementById('deptHeadName').textContent = response.data.approverHead;
+                                                            document.getElementById('ApproverLabel').textContent = 'Approved By:';
+                                                             // document.getElementById('ApprovalDate').textContent = 'Approved Date and Time: ' + response.data.leaveRequestHeader.dateApprovedDisapproved;
+                                                                      let iso =  response.data.leaveRequestHeader.dateApprovedDisapproved;
+                                                       let formatted = iso.split(".")[0].replace("T", " ").slice(0, 16);
+                                                       document.getElementById('ApprovalDate').textContent = 'Approved Date and Time: ' +formatted;
                                     }
                                          else if(response.data.leaveRequestHeader.status == 5){     //Rejected
                                                 $('#btnSubmit').hide();
                                                     $('#btnCancel').hide();
+                                                          document.getElementById('deptHeadName').textContent = response.data.approverHead;
+                                                            document.getElementById('ApproverLabel').textContent = 'Rejected By:';
+                                                            //  document.getElementById('ApprovalDate').textContent = 'Rejected Date and Time: ' + response.data.leaveRequestHeader.dateApprovedDisapproved;
+                                            document.getElementById('ApprovalRemarks').textContent = 'Remarks: ' + response.data.leaveRequestHeader.approvalRemarks;
+                                                                 let iso =  response.data.leaveRequestHeader.dateApprovedDisapproved;
+                                                       let formatted = iso.split(".")[0].replace("T", " ").slice(0, 16);
+                                                       document.getElementById('ApprovalDate').textContent = 'Approved Date: ' +formatted;
+                                     }
+                                       else if(response.data.leaveRequestHeader.status == 9){     //Deducted
+                                                $('#btnSubmit').hide();
+                                                    $('#btnCancel').hide();
+                                                          document.getElementById('deptHeadName').textContent = 'HR Processed Undertime Deduction';
+                                                            document.getElementById('ApproverLabel').textContent = 'Deducted By:';
+
+                                                                   
                                      }
 
 
@@ -721,7 +760,7 @@
                                //    fp.setDate(["2025-06-10", "2025-06-15", "2025-06-20"]);
                                        console.log(preloaded);
                                        fp.setDate(preloaded);
-
+                                            $('#createForm').find('input, select, textarea').prop('disabled', true);
                                      js('#createmodal').modal('show');
                                  } else {
                                      Swal.fire({
@@ -730,6 +769,7 @@
                                      });
                                  }
                                  $('.spinner-overlay').hide();
+                                       
                              },
                              error: function () {
                                  $('.spinner-overlay').hide();
@@ -762,7 +802,7 @@
 
 
                   Swal.fire({
-                      text: "Are you sure you want to save this record?",
+                      text: "Are you sure you want to submit this record?",
                       icon: "question",
                       showCancelButton: true,
                       confirmButtonText: "Ok"

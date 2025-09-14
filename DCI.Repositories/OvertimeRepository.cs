@@ -241,7 +241,7 @@ namespace DCI.Repositories
                     param.ApproverId = hrHead.ApproverId ?? 0;
                     param.RequestNo = entity.RequestNo;
                     param.StatusId = entity.StatusId;
-                    await _emailRepository.SentToOvertime(param);
+                    await _emailRepository.SentToApprovalOvertime(param);
 
                     return (StatusCodes.Status200OK, "Successfully saved");
                 }

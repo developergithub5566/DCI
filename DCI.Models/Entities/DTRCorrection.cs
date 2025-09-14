@@ -19,6 +19,8 @@ namespace DCI.Models.Entities
 
         public string Reason { get; set; } = string.Empty;
 
+         public int ApproverId { get; set; }
+
         public string? Filename { get; set; }
 
         public string? FileLocation { get; set; }

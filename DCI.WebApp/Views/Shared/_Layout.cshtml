@@ -82,7 +82,7 @@
                         <hr class='sidebar-divider'>
                         <a class='mainModule' href='~/Employee/Form201'>
                             <div class='sidebar-heading mainModuleActive'>
-                                <i class='fa-solid fa-gauge-high'></i>
+                                <i class='fa-solid fa-user'></i>
                                 <span>201 File</span>
                                 <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
                             </div>
@@ -105,7 +105,7 @@
                         <div role="group">
                             <a href="#" id="btnGroupDrop1" class="mainModule" data-bs-toggle="dropdown" aria-expanded="false">
                                 <div class='sidebar-heading mainModuleActive'>
-                                    <i class='fa-solid fa fa-book'></i>
+                                    <i class='fa-solid fa-list-ul'></i>
                                     <span>To Do</span>
                                     <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
                                 </div>
@@ -135,7 +135,7 @@
                         <hr class='sidebar-divider'>
                         <a href="/Report/Index/" class='mainModule'>
                             <div class='sidebar-heading mainModuleActive'>
-                                <i class='fa-solid fa-file'></i>
+                                <i class='fa-solid fa-bar-chart'></i>
                                 <span>Reports</span>
                                 <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
                             </div>
@@ -170,9 +170,16 @@
                                 <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
                             </div>
                         </a> *@
-                        <a asp-controller="DailyTimeRecord" asp-action="Attendance" asp-route-id="1">
+                   @*      <a asp-controller="DailyTimeRecord" asp-action="Attendance" asp-route-id="1">
                             <div class='sidebar-heading mainModuleActive'>
                                 <i class='fa-solid fa-file'></i>
+                                <span>Attendance</span>
+                                <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
+                            </div>
+                        </a> *@
+                           <a href="/DailyTimeRecord/Attendance/1" class='mainModule'>
+                            <div class='sidebar-heading mainModuleActive'>
+                                <i class='fa-solid fa-users'></i>
                                 <span>Attendance</span>
                                 <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
                             </div>
@@ -183,9 +190,16 @@
                     @if (module.ModulePageId == (int)EnumModulePage.DailyTimeRecord)
                     {
                         <hr class='sidebar-divider'>
-                        <a asp-controller="DailyTimeRecord" asp-action="DTRCorrection" asp-route-DtrId="1">
+                     @*    <a asp-controller="DailyTimeRecord" asp-action="DTRCorrection" asp-route-DtrId="1">
                             <div class='sidebar-heading mainModuleActive'>
                                 <i class='fa-solid fa-file'></i>
+                                <span>DTR Adjustment</span>
+                                <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
+                            </div>
+                        </a> *@
+                        <a href="/DailyTimeRecord/DTRCorrection?DtrId=1" class='mainModule'>
+                            <div class='sidebar-heading mainModuleActive'>
+                                <i class='fa-solid fa-cog'></i>
                                 <span>DTR Adjustment</span>
                                 <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
                             </div>
@@ -232,7 +246,7 @@
                         <hr class='sidebar-divider'>
                         <a href="/DailyTimeRecord/Leave" class='mainModule'>
                             <div class='sidebar-heading mainModuleActive'>
-                                <i class='fa-solid fa-file'></i>
+                                <i class='fa-solid fa-suitcase'></i>
                                 <span>Leave</span>
                                 <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
                             </div>
@@ -243,7 +257,7 @@
                         <hr class='sidebar-divider'>
                         <a href="/DailyTimeRecord/Overtime" class='mainModule'>
                             <div class='sidebar-heading mainModuleActive'>
-                                <i class='fa-solid fa-file'></i>
+                                <i class='fa-solid fa-plus'></i>
                                 <span>Overtime</span>
                                 <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
                             </div>
@@ -256,7 +270,7 @@
                         <div role="group">
                             <a href="#" id="btnGroupDrop1" class="mainModule" data-bs-toggle="dropdown" aria-expanded="false">
                                 <div class='sidebar-heading mainModuleActive'>
-                                    <i class='fa-solid fa fa-book'></i>
+                                    <i class='fa-solid fa-desktop'></i>
                                     <span>WFH</span>
                                     <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
                                 </div>
@@ -274,7 +288,7 @@
                         <hr class='sidebar-divider'>
                         <a href="/DailyTimeRecord/Undertime" class='mainModule'>
                             <div class='sidebar-heading mainModuleActive'>
-                                <i class='fa-solid fa-file'></i>
+                                <i class='fa-solid fa-align-center'></i>
                                 <span>Undertime</span>
                                 <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
                             </div>

@@ -60,7 +60,7 @@
     <div class="d-sm-flex align-items-center justify-content-between mb-3">
         <h6 class="m-0 font-weight-bold text-gray-800">@ViewBag.BreadCrumbLabel</h6>
         <div class="upperRightDivBtn">
-            <a href="#" title="Add DTR Correction" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#" onclick="newForm()">
+            <a href="#" title="Add DTR Adjustment" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#" onclick="newForm()">
                 <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
                 <span class="text text-white"><small>File DTR Adjustment</small></span>
             </a>
@@ -141,15 +141,28 @@
                                         @("Time Out");                                        
                                     }
                                 </td>
-                                <td>
-                                    @item.StatusName
-                                </td>
+                                        @if (item.StatusName == "Approved")
+                                        {
+                                    <td class="text-center"><strong><span class='btnPrimary applicationStatus'>@item.StatusName</span></strong></td>
+                                        }
+                                        else if (item.StatusName == "Rejected")
+                                        {
+                                    <td class="text-center"><strong><span class='btn-danger applicationStatus'>@item.StatusName</span></strong></td>
+                                        }
+                                        else if (item.StatusName == "Deducted")
+                                        {
+                                            <td class="text-center"><strong><span class='btn-danger applicationStatus'>@item.StatusName</span></strong></td>
+                                        }
+                                        else
+                                        {
+                                    <td class="text-center"><strong><span class='btn-success applicationStatus'>@item.StatusName</span></strong></td>
+                                        }
                                 <td>
                                     @item.DateFiled.ToString("MM/dd/yyyy HH:mm")
                                 </td>
                               
                                 <td class="text-center">
-                                    <a href="#" onclick="view(@item.DtrId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>                   
+                                    <a href="javascript:void(0)" onclick="view(@item.DtrId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
                                 </td>
                             </tr>
                         }
@@ -164,7 +177,7 @@
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">DTR Correction</h5>
+                            <h5 class="modal-title" id="exampleModalLabel">DTR Adjustment</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -406,7 +419,7 @@
                                     console.log(formData)
 
                        Swal.fire({
-                           text: "Are you sure you want to save this record?",
+                           text: "Are you sure you want to submit this record?",
                            icon: "question",
                            showCancelButton: true,
                            confirmButtonText: "Ok"

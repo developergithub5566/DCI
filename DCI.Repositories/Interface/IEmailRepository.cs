@@ -7,12 +7,15 @@ namespace DCI.Repositories.Interface
 	{
 		Task<bool> IsExistsEmail(string email);
 		Task SendResetPassword(string email);
-        Task SendToApproval(LeaveViewModel model);
-        //Task SendSetPassword(string email);
         Task SendSetPassword(UserViewModel model);
-        Task SendToRequestor(LeaveViewModel model);
-		Task SendToRequestorDTR(DTRCorrectionViewModel model);
-        Task SentToOvertime(OvertimeViewModel model);
-        Task SentToDTRCorrection(DTRCorrectionViewModel model);
+
+        Task SendToApprovalLeave(LeaveViewModel model);
+        Task SendToRequestorLeave(LeaveViewModel model);
+
+        Task SentToApprovalOvertime(OvertimeViewModel model);
+
+        Task SentToApprovalDTRAdjustment(DTRCorrectionViewModel model);
+        Task SendToRequestorDTRAdjustment(DTRCorrectionViewModel model); 
+     
     }
 }

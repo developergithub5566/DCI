@@ -96,7 +96,7 @@ namespace DCI.WebApp.Controllers
                 DTRCorrectionViewModel _filterRoleModel = new DTRCorrectionViewModel();
 
                 var currentUser = _userSessionHelper.GetCurrentUser();
-
+                _filterRoleModel.CurrentUserId = currentUser.UserId;
 
                 var stringContent = new StringContent(JsonConvert.SerializeObject(_filterRoleModel), Encoding.UTF8, "application/json");
                 var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Todo/GetAllTodoDtr");

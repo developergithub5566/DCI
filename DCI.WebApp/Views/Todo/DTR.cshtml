@@ -83,6 +83,7 @@
         <ul class="breadcrumb">
             <li><a href="~/Home/Index">Dashboard</a></li>
             <li>To Do</li>
+            <li>DTR Adjustment</li>
         </ul>
     </div>
 
@@ -94,7 +95,7 @@
             <div class="table-responsive mt20">
 
 
-                <table class="table table-bordered nowrap" id="tblDocument" width="100%" cellspacing="0">
+                <table class="table table-bordered nowrap" id="tblDtr" width="100%" cellspacing="0">
                     <thead>
                         <tr>
                             @* 	<th>
@@ -153,10 +154,10 @@
                                
                            
                                     <td>
-                                    <a href="#" onclick="editForm(@item.DtrId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+                                    <a href="javascript:void(0)" onclick="editForm(@item.DtrId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
 
-                                    <a href="#" id="approved" onclick="approvalForm(@item.DtrId,@((int)EnumStatus.Approved))" title="Approve" class="btn btn-info"> <i class="fa fa-check"></i></a>
-                                    <a href="#" id="disapproved" onclick="remarksForm(@item.DtrId,@((int)EnumStatus.Rejected))" class="btn btn-danger"> <i class="fa fa-remove"></i></a>
+                                    <a href="javascript:void(0)" id="approved" onclick="approvalForm(@item.DtrId,@((int)EnumStatus.Approved))" title="Approve" class="btn btn-info"> <i class="fa fa-check"></i></a>
+                                    <a href="javascript:void(0)" id="disapproved" onclick="remarksForm(@item.DtrId,@((int)EnumStatus.Rejected))" class="btn btn-danger"> <i class="fa fa-remove"></i></a>
                                 </td>
                             </tr>
                         }
@@ -202,7 +203,7 @@
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">DTR Correction</h5>
+                            <h5 class="modal-title" id="exampleModalLabel">DTR Adjustment</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -242,7 +243,7 @@
                                             <textarea class="form-control frmField" name="Reason" id="Reason"></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-12">
+                                  @*   <div class="col-12">
                                         <div class="form-group mb10">
                                             <label class="frmText">Attachment:</label>
                                             <input type="file" class="frmFile " name="AttachmentId" id="AttachmentId">
@@ -255,7 +256,7 @@
                                             <label class="font-weight-bold mb0 text-danger" id="deptHeadName"></label>
                                             <label class="d-block mt0 text-left text-xs">(Department Head)</label>
                                         </div>
-                                    </div>
+                                    </div> *@
                                 </form>
                             </div>
 
@@ -269,10 +270,10 @@
                                 </button> *@
 
                                 <button class="btn btnSecondary btn-icon-split d-block" data-dismiss="modal">
-                                    <span class="icon text-white-50">
+                                    <span class="icon text-white">
                                         <i class="fa-solid fa-xmark text-xs"></i>
                                     </span>
-                                    <span class="text"><small>Close </small></span>
+                                    <span class="text text-white"><small>Close </small></span>
                                 </button>
                             </div>
 
@@ -285,7 +286,7 @@
         </div>
 
 @section scripts {
-    @* <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script> *@
+
             <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
 
             <script>
@@ -310,7 +311,9 @@
                 }, 200);
 
                 $(document).ready(function () {
-
+                             $('#tblDtr').DataTable({
+                               order: [[0, 'desc']]
+                            });
 
                 });
                       
@@ -328,8 +331,8 @@
                                                          $('#dateCovered').val(response.data.dtrDateTime);
                                                           $('#DtrType').val(response.data.dtrType);
                                                           $('#Reason').val(response.data.reason);
-
-                                                              document.getElementById('deptHeadName').textContent = response.data.departmentHead;
+                                                                     $('#createForm').find('input, select, textarea').prop('disabled', true);
+                                                             // document.getElementById('deptHeadName').textContent = response.data.departmentHead;
                                                   js('#createmodal').modal('show');
                                               } else {
                                                   Swal.fire({
@@ -348,6 +351,7 @@
                                           }
                                       });
 
+
                     }
 
 
@@ -357,6 +361,15 @@
 
 
                 function approvalForm(dtrId,status) {
+
+                       Swal.fire({
+                           text: "Are you sure you want to submit this DTR adjustment?",
+                           icon: "question",
+                           showCancelButton: true,
+                           confirmButtonText: "Ok"
+                       }).then((result) => {
+                           if (result.isConfirmed) {
+
 
                              $('.spinner-overlay').show();
                         $.ajax({
@@ -390,7 +403,11 @@
                                 });
                             }
                         });
+                  
+                         }
+                           });
 
+                      
 
                 }
 

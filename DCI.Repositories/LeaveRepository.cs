@@ -150,13 +150,19 @@ namespace DCI.Repositories
         public async Task<LeaveViewModel> RequestLeave(LeaveViewModel param)
         {
             LeaveViewModel model = new LeaveViewModel();
-          
-         
+            try
+            {
+
+                var approvalhistory = _dbContext.ApprovalHistory.Where(x => x.ModulePageId == (int)EnumModulePage.Leave);
+      
+
 
             var query = from lheader in _dbContext.LeaveRequestHeader
                         join lvtype in _dbContext.LeaveType on lheader.LeaveTypeId equals lvtype.LeaveTypeId
                         join stat in _dbContext.Status on lheader.Status equals stat.StatusId
                         join emp in _dbContext.Employee on lheader.EmployeeId equals emp.EmployeeId
+                        join apprvl in approvalhistory on lheader.LeaveRequestHeaderId equals apprvl.TransactionId into ah
+                        from apprvl in ah.DefaultIfEmpty()
                         where lheader.LeaveRequestHeaderId == param.LeaveRequestHeaderId
                         select new LeaveRequestHeaderViewModel
                         {
@@ -172,9 +178,11 @@ namespace DCI.Repositories
                             Status = lheader.Status,
                             StatusName = stat.StatusName,
                             EmployeeName = emp.Firstname + " " + emp.Lastname,
+                            DateApprovedDisapproved = apprvl != null ? apprvl.DateCreated : null,
+                            ApprovalRemarks = apprvl != null ? apprvl.Remarks : string.Empty,
                         };
 
-            model.LeaveRequestHeader = query.FirstOrDefault();
+            model.LeaveRequestHeader = await query.AsNoTracking().FirstOrDefaultAsync();
 
             if (param.LeaveRequestHeaderId == 0)
             {
@@ -200,10 +208,20 @@ namespace DCI.Repositories
                // model.LeaveRequestHeader.LeaveRequestDetailList = _dbContext.LeaveRequestDetails.Where(x => x.LeaveRequestHeaderId == param.LeaveRequestHeaderId).ToList();
             }
 
-            var leavetypeList = _dbContext.LeaveType.Where(x => x.IsActive == true).AsQueryable().ToList();
-            model.LeaveRequestHeader.LeaveTypeList = leavetypeList.Count() > 0 ? leavetypeList : null;
+                var leavetypeList = _dbContext.LeaveType.Where(x => x.IsActive == true).AsQueryable().ToList();
+                model.LeaveRequestHeader.LeaveTypeList = leavetypeList.Count() > 0 ? leavetypeList : null;
 
-            return model;
+                return model;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return null;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
         //public async Task<LeaveViewModel> RequestLeave(LeaveViewModel param)
@@ -232,11 +250,11 @@ namespace DCI.Repositories
 
         public async Task<(int statuscode, string message)> SaveLeave(LeaveFormViewModel param)
         {
-            LeaveViewModel model = new LeaveViewModel();
+          
 
             try
             {
-                if (model.LeaveTypeId == 0)
+                if (param.LeaveRequestHeader == 0)
                 {
                     LeaveRequestHeader entity = new LeaveRequestHeader();
                     entity.EmployeeId = param.EmployeeId;
@@ -244,6 +262,7 @@ namespace DCI.Repositories
                     entity.DateFiled = DateTime.Now;
                     entity.LeaveTypeId = param.LeaveTypeId;
                     entity.Status = (int)EnumStatus.ForApproval;
+                    entity.ApproverId = param.ApproverId;
                     entity.Reason = param.Reason;
                     entity.NoOfDays = param.NoOfDays;
                     entity.ModifiedBy = null;
@@ -265,31 +284,49 @@ namespace DCI.Repositories
                         await _dbContext.SaveChangesAsync();
                     }
 
-                    var workdtls = _dbContext.EmployeeWorkDetails.Where(x => x.EmployeeId == param.EmployeeId).FirstOrDefault();
-                    var dept = _dbContext.Department.Where(x => x.DepartmentId == workdtls.DepartmentId).FirstOrDefault();
-                    model.ApproverId = dept.ApproverId;
+                    LeaveViewModel model = new LeaveViewModel();
+                    //var workdtls = _dbContext.EmployeeWorkDetails.Where(x => x.EmployeeId == param.EmployeeId).FirstOrDefault();
+                    //var dept = _dbContext.Department.Where(x => x.DepartmentId == workdtls.DepartmentId).FirstOrDefault();
+                    model.ApproverId = param.ApproverId;//.ApproverId;
                     model.LeaveRequestHeader.Status = entity.Status;
                     model.LeaveRequestHeader.RequestNo = entity.RequestNo;
-                    await _emailRepository.SendToApproval(model);
+                    await _emailRepository.SendToApprovalLeave(model);
 
 
-
+                    //Send Application Notification to Approver
                     NotificationViewModel notifvm = new NotificationViewModel();                   
-                    notifvm.Title = "Leave";
-                    notifvm.Description = String.Format("You have been assigned leave request {0} for review",entity.RequestNo);     
+                    notifvm.Title = "Leave Request";
+                    notifvm.Description = String.Format("You have been assigned leave request {0} for approval",entity.RequestNo);     
                     notifvm.ModuleId = (int)EnumModulePage.Leave;
                     notifvm.TransactionId = entity.LeaveRequestHeaderId;
-                    notifvm.AssignId = dept.ApproverId ?? 0;
-                    notifvm.URL = "/Todo/Index/?leaveId=" + entity.LeaveRequestHeaderId;
+                    notifvm.AssignId = param.ApproverId;
+                    //notifvm.URL = "/Todo/Index/?leaveId=" + entity.LeaveRequestHeaderId;
+                    notifvm.URL = "/Todo/Leave";
                     notifvm.MarkRead = false;        
-                    notifvm.CreatedBy = param.EmployeeId;
+                    notifvm.CreatedBy = param.CurrentUserId;
                     notifvm.IsActive = true;
                     await _homeRepository.SaveNotification(notifvm);
-                    
 
-                    return (StatusCodes.Status200OK, "Successfully saved");
+
+                    //Send Application Notification to Requestor
+                    NotificationViewModel notifvmRequestor = new NotificationViewModel();
+                    notifvmRequestor.Title = "Leave Request";
+                    notifvmRequestor.Description = String.Format("Your Leave request {0} has been submitted for approval.", entity.RequestNo);
+                    notifvmRequestor.ModuleId = (int)EnumModulePage.Leave;
+                    notifvmRequestor.TransactionId = entity.LeaveRequestHeaderId;
+                    notifvmRequestor.AssignId = param.CurrentUserId;
+                    //notifvm.URL = "/Todo/Index/?leaveId=" + entity.LeaveRequestHeaderId;
+                    notifvmRequestor.URL = "/Home/Notification";
+                    notifvmRequestor.MarkRead = false;
+                    notifvmRequestor.CreatedBy = param.CurrentUserId;
+                    notifvmRequestor.IsActive = true;
+                    await _homeRepository.SaveNotification(notifvmRequestor);
+
+
+                    return (StatusCodes.Status200OK, string.Format("Leave request {0} has been submitted for approval.", entity.RequestNo));
+    
                 }              
-                return (StatusCodes.Status200OK, "Successfully updated");
+                return (StatusCodes.Status400BadRequest, "An error occurred. Please try again.");
             }
             catch (Exception ex)
             {

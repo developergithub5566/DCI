@@ -196,6 +196,7 @@ namespace DCI.Repositories
                     entity.DateFiled = DateTime.Now;
                     entity.DtrDateTime = param.DtrDateTime;
                     entity.Status = (int)EnumStatus.ForApproval;
+                    entity.ApproverId = param.ApproverId;
                     entity.Reason = param.Reason;
                     entity.Filename = param.Filename;
                     entity.FileLocation = param.FileLocation;
@@ -209,33 +210,35 @@ namespace DCI.Repositories
                     model.ApproverId = param.ApproverId;
                     model.Status = entity.Status;
                     model.RequestNo = entity.RequestNo;
-                    await _emailRepository.SentToDTRCorrection(model);
+                    await _emailRepository.SentToApprovalDTRAdjustment(model);
 
                     //Send Application Notification to Approver
                     NotificationViewModel notifvmToApprover = new NotificationViewModel();
-                    notifvmToApprover.Title = "DTR Correction";
-                    notifvmToApprover.Description = System.String.Format("You have been assigned DTR Correction request {0} for approval", entity.RequestNo);
+                    notifvmToApprover.Title = "DTR Adjustment";
+                    notifvmToApprover.Description = System.String.Format("You have been assigned DTR adjustment request {0} for approval.", entity.RequestNo);
                     notifvmToApprover.ModuleId = (int)EnumModulePage.DTRCorrection;
                     notifvmToApprover.TransactionId = entity.DtrId;
                     notifvmToApprover.AssignId = param.ApproverId;
-                    notifvmToApprover.URL = "/Todo/Index/?leaveId=" + model.DtrId;
-                    notifvmToApprover.MarkRead = false;
-                    notifvmToApprover.CreatedBy = param.EmployeeId;
+                    // notifvmToApprover.URL = "/Todo/Index/?leaveId=" + model.DtrId;
+                    notifvmToApprover.URL = "/Todo/DTR";
+                     notifvmToApprover.MarkRead = false;
+                    notifvmToApprover.CreatedBy = param.CreatedBy;
                     notifvmToApprover.IsActive = true;
                     await _homeRepository.SaveNotification(notifvmToApprover);
 
-                    //Send Application Notification to Self
-                    NotificationViewModel notifvmToSelf = new NotificationViewModel();
-                    notifvmToSelf.Title = "DTR Correction";
-                    notifvmToSelf.Description = System.String.Format("You have been created DTR Correction request {0} for review", entity.RequestNo);
-                    notifvmToSelf.ModuleId = (int)EnumModulePage.DTRCorrection;
-                    notifvmToSelf.TransactionId = entity.DtrId;
-                    notifvmToSelf.AssignId = param.ApproverId;
-                    notifvmToSelf.URL = "/Todo/Index/?leaveId=" + model.DtrId;
-                    notifvmToSelf.MarkRead = false;
-                    notifvmToSelf.CreatedBy = param.EmployeeId;
-                    notifvmToSelf.IsActive = true;
-                    await _homeRepository.SaveNotification(notifvmToSelf);
+                    //Send Application Notification to Requestor
+                    NotificationViewModel notifvmToRequestor = new NotificationViewModel();
+                    notifvmToRequestor.Title = "DTR Adjustment";
+                    notifvmToRequestor.Description = System.String.Format("Your DTR adjustment request {0} has been submitted for approval.", entity.RequestNo);
+                    notifvmToRequestor.ModuleId = (int)EnumModulePage.DTRCorrection;
+                    notifvmToRequestor.TransactionId = entity.DtrId;
+                    notifvmToRequestor.AssignId = param.CreatedBy;
+                    //  notifvmToSelf.URL = "/Todo/Index/?leaveId=" + model.DtrId;
+                    notifvmToRequestor.URL = "/Home/Notification";
+                    notifvmToRequestor.MarkRead = false;
+                    notifvmToRequestor.CreatedBy = param.CreatedBy;
+                    notifvmToRequestor.IsActive = true;
+                    await _homeRepository.SaveNotification(notifvmToRequestor);
 
 
                     return (StatusCodes.Status200OK, string.Format("DTR request {0} has been submitted for approval.", entity.RequestNo));

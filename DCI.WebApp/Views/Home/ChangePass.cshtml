@@ -100,7 +100,7 @@
 					if (result.isConfirmed) {
 						$.ajax({
 							type: 'POST',
-							url: '@Url.Action("ChangePassword", "Account")',
+							url: '@Url.Action("HomeChangePassword", "Account")',
 							data: formData,
 							success: function (response) {
 								if (response.success) {
