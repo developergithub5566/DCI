@@ -52,31 +52,31 @@ namespace DCI.Repositories
 
                 foreach (var entity in moduleInRoleEntity)
                 {
-					if (entity.ModulePageId == 2)
+					if (entity.ModulePageId == (int)EnumModulePage.Dashboard)
 					{
 						SysManageVM.Dashboard = true;
 					}
-					else if (entity.ModulePageId == 3)
+                    else if (entity.ModulePageId == (int)EnumModulePage.Form201)
                     {
-                        SysManageVM.Document = true;					
-						if (entity.View == true)
-							SysManageVM.DocumentView = true;
-						if (entity.Add == true)
-							SysManageVM.DocumentAdd = true;
-						if (entity.Update == true)
-							SysManageVM.DocumentUpdate = true;
-						if (entity.Delete == true)
-							SysManageVM.DocumentDelete = true;
-						if (entity.Import == true)
-							SysManageVM.DocumentImport = true;
-						if (entity.Export == true)
-							SysManageVM.DocumentExport = true;
-					}
-                    else if (entity.ModulePageId == 4)
+                        SysManageVM.Form201 = true;
+                        if (entity.View == true)
+                            SysManageVM.Form201View = true;
+                        if (entity.Add == true)
+                            SysManageVM.Form201Add = true;
+                        if (entity.Update == true)
+                            SysManageVM.Form201Update = true;
+                        if (entity.Delete == true)
+                            SysManageVM.Form201Delete = true;
+                        if (entity.Import == true)
+                            SysManageVM.Form201Import = true;
+                        if (entity.Export == true)
+                            SysManageVM.Form201Export = true;
+                    }
+                    else if (entity.ModulePageId == (int)EnumModulePage.Administration)
                     {
                         SysManageVM.Administration = true;
                     }
-                    else if (entity.ModulePageId == 5)
+                    else if (entity.ModulePageId == (int)EnumModulePage.UserManagement)
                     {
                         SysManageVM.UserManagement = true;
 						if (entity.View == true)
@@ -92,7 +92,7 @@ namespace DCI.Repositories
 						if (entity.Export == true)
 							SysManageVM.UserManagementExport = true;
 					}
-                    else if (entity.ModulePageId == 6)
+                    else if (entity.ModulePageId == (int)EnumModulePage.Department)
                     {
                         SysManageVM.Department = true;
                         if (entity.View == true)
@@ -108,39 +108,39 @@ namespace DCI.Repositories
                         if (entity.Export == true)
                             SysManageVM.DepartmentExport = true;
                     }
-					else if (entity.ModulePageId == 7)
+					else if (entity.ModulePageId == (int)EnumModulePage.EmployeeMaster)
                     {
-                        SysManageVM.Section = true;
+                        SysManageVM.EmployeeMaster = true;
 						if (entity.View == true)
-							SysManageVM.SectionView = true;
+							SysManageVM.EmployeeMasterView = true;
 						if (entity.Add == true)
-							SysManageVM.SectionAdd = true;
+							SysManageVM.EmployeeMasterAdd = true;
 						if (entity.Update == true)
-							SysManageVM.SectionUpdate = true;
+							SysManageVM.EmployeeMasterUpdate = true;
 						if (entity.Delete == true)
-							SysManageVM.SectionDelete = true;
+							SysManageVM.EmployeeMasterDelete = true;
 						if (entity.Import == true)
-							SysManageVM.SectionImport = true;
+							SysManageVM.EmployeeMasterImport = true;
 						if (entity.Export == true)
-							SysManageVM.SectionExport = true;
+							SysManageVM.EmployeeMasterExport = true;
 					}
-                    else if (entity.ModulePageId == 8)
+                    else if (entity.ModulePageId == (int)EnumModulePage.Holiday)
                     {
-                        SysManageVM.DocumentType = true;
+                        SysManageVM.Holiday = true;
 						if (entity.View == true)
-							SysManageVM.DocumentTypeView = true;
+							SysManageVM.HolidayView = true;
 						if (entity.Add == true)
-							SysManageVM.DocumentTypeAdd = true;
+							SysManageVM.HolidayAdd = true;
 						if (entity.Update == true)
-							SysManageVM.DocumentTypeUpdate = true;
+							SysManageVM.HolidayUpdate = true;
 						if (entity.Delete == true)
-							SysManageVM.DocumentTypeDelete = true;
+							SysManageVM.HolidayDelete = true;
 						if (entity.Import == true)
-							SysManageVM.DocumentTypeImport = true;
+							SysManageVM.HolidayImport = true;
 						if (entity.Export == true)
-							SysManageVM.DocumentTypeExport = true;
+							SysManageVM.HolidayExport = true;
 					}
-                    else if (entity.ModulePageId == 9)
+                    else if (entity.ModulePageId == (int)EnumModulePage.UserRole)
                     {
                         SysManageVM.UserRoleManagement = true;
 						if (entity.View == true)
@@ -156,11 +156,11 @@ namespace DCI.Repositories
 						if (entity.Export == true)
 							SysManageVM.UserRoleManagementExport = true;
 					}
-                    else if (entity.ModulePageId == 10)
+                    else if (entity.ModulePageId == (int)EnumModulePage.SystemManagement)
                     {
                         SysManageVM.SystemManagement = true;
                     }
-                    else if (entity.ModulePageId == 11)
+                    else if (entity.ModulePageId == (int)EnumModulePage.AuditTrail)
                     {
                         SysManageVM.AuditTrail = true;
 						if (entity.View == true)
@@ -176,15 +176,62 @@ namespace DCI.Repositories
 						if (entity.Export == true)
 							SysManageVM.AuditTrailExport = true;
 					}
-                    else if (entity.ModulePageId == 13)
+                    else if (entity.ModulePageId == (int)EnumModulePage.Todo)
                     {
                         SysManageVM.Todo = true;
                        
                     }
-                    else if (entity.ModulePageId == 14)
+                    else if (entity.ModulePageId == (int)EnumModulePage.Reports)
                     {
                         SysManageVM.Reports = true;
-
+                    }
+                    else if (entity.ModulePageId == (int)EnumModulePage.DTRManagement)
+                    {
+                        SysManageVM.DTRManagement = true;
+                    }
+                    else if (entity.ModulePageId == (int)EnumModulePage.Attendance)
+                    {
+                        SysManageVM.Attendance = true;
+                    }
+                    else if (entity.ModulePageId == (int)EnumModulePage.DailyTimeRecord)
+                    {
+                        SysManageVM.DailyTimeRecord = true;
+                    }
+                    else if (entity.ModulePageId == (int)EnumModulePage.Leave)
+                    {
+                        SysManageVM.Leave = true;
+                    }
+                    else if (entity.ModulePageId == (int)EnumModulePage.Overtime)
+                    {
+                        SysManageVM.Overtime = true;
+                    }
+                    else if (entity.ModulePageId == (int)EnumModulePage.Position)
+                    {                      
+                        SysManageVM.Position = true;
+                        if (entity.View == true)
+                            SysManageVM.PositionView = true;
+                        if (entity.Add == true)
+                            SysManageVM.PositionAdd = true;
+                        if (entity.Update == true)
+                            SysManageVM.PositionUpdate = true;
+                        if (entity.Delete == true)
+                            SysManageVM.PositionDelete = true;
+                        if (entity.Import == true)
+                            SysManageVM.PositionImport = true;
+                        if (entity.Export == true)
+                            SysManageVM.PositionExport = true;
+                    }
+                    else if (entity.ModulePageId == (int)EnumModulePage.WFH)
+                    {
+                        SysManageVM.WFH = true;
+                    }
+                    else if (entity.ModulePageId == (int)EnumModulePage.Undertime)
+                    {
+                        SysManageVM.Undertime = true;
+                    }
+                    else if (entity.ModulePageId == (int)EnumModulePage.DTRCorrection)
+                    {
+                        SysManageVM.DTRCorrection = true;
                     }
 
                 }

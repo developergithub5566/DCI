@@ -61,7 +61,7 @@ namespace DCI.Repositories
         public async Task<(int statuscode, string message)> SaveWFHTimeIn(WFHViewModel model)
         {
 
-            var empdtl = _dbContext.Employee.Where(x => x.EmployeeId == model.EMPLOYEE_ID).FirstOrDefault();
+            var empdtl = await _dbContext.Employee.Where(x => x.EmployeeId == model.EMPLOYEE_ID).FirstOrDefaultAsync();
 
             model.EMPLOYEE_NO = empdtl.EmployeeNo ?? string.Empty;
             model.FULL_NAME = empdtl.Firstname + " " + empdtl.Lastname;

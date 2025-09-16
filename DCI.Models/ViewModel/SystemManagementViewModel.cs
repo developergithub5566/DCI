@@ -6,14 +6,17 @@
 		public string RoleName { get; set; } = string.Empty;
 		public string Description { get; set; } = string.Empty;
 		public bool Dashboard { get; set; } = false;
-		public bool Document { get; set; } = false;
-		public bool DocumentView { get; set; } = false;
-		public bool DocumentAdd { get; set; } = false;
-		public bool DocumentUpdate { get; set; } = false;
-		public bool DocumentDelete { get; set; } = false;
-		public bool DocumentImport { get; set; } = false;
-		public bool DocumentExport { get; set; } = false;
+
+		public bool Form201 { get; set; } = false;
+		public bool Form201View { get; set; } = false;
+		public bool Form201Add { get; set; } = false;
+		public bool Form201Update { get; set; } = false;
+		public bool Form201Delete { get; set; } = false;
+		public bool Form201Import { get; set; } = false;
+		public bool Form201Export { get; set; } = false;
+
 		public bool Administration { get; set; } = false;
+
 		public bool UserManagement { get; set; } = false;
 		public bool UserManagementView { get; set; } = false;
 		public bool UserManagementAdd { get; set; } = false;
@@ -30,20 +33,21 @@
 		public bool DepartmentImport { get; set; } = false;
 		public bool DepartmentExport { get; set; } = false;
 
-		public bool Section { get; set; } = false;
-		public bool SectionView { get; set; } = false;
-		public bool SectionAdd { get; set; } = false;
-		public bool SectionUpdate { get; set; } = false;
-		public bool SectionDelete { get; set; } = false;
-		public bool SectionImport { get; set; } = false;
-		public bool SectionExport { get; set; } = false;
-		public bool DocumentType { get; set; } = false;
-		public bool DocumentTypeView { get; set; } = false;
-		public bool DocumentTypeAdd { get; set; } = false;
-		public bool DocumentTypeUpdate { get; set; } = false;
-		public bool DocumentTypeDelete { get; set; } = false;
-		public bool DocumentTypeImport { get; set; } = false;
-		public bool DocumentTypeExport { get; set; } = false;
+		public bool EmployeeMaster { get; set; } = false;
+		public bool EmployeeMasterView { get; set; } = false;
+		public bool EmployeeMasterAdd { get; set; } = false;
+		public bool EmployeeMasterUpdate { get; set; } = false;
+		public bool EmployeeMasterDelete { get; set; } = false;
+		public bool EmployeeMasterImport { get; set; } = false;
+		public bool EmployeeMasterExport { get; set; } = false;
+
+		public bool Holiday { get; set; } = false;
+		public bool HolidayView { get; set; } = false;
+		public bool HolidayAdd { get; set; } = false;
+		public bool HolidayUpdate { get; set; } = false;
+		public bool HolidayDelete { get; set; } = false;
+		public bool HolidayImport { get; set; } = false;
+		public bool HolidayExport { get; set; } = false;
 
 		public bool SystemManagement { get; set; } = false;
 		public bool SystemManagementView { get; set; } = false;
@@ -52,6 +56,7 @@
 		public bool SystemManagementDelete { get; set; } = false;
 		public bool SystemManagementImport { get; set; } = false;
 		public bool SystemManagementExport { get; set; } = false;
+
 		public bool AuditTrail { get; set; } = false;
 		public bool AuditTrailView { get; set; } = false;
 		public bool AuditTrailAdd { get; set; } = false;
@@ -78,7 +83,74 @@
 		public bool AnnouncementExport { get; set; } = false;
 
         public bool Todo { get; set; } = false;
+
         public bool Reports { get; set; } = false;
+
+        public bool DTRManagement { get; set; } = false;
+
+        public bool Attendance { get; set; } = false;
+        public bool AttendanceView { get; set; } = false;
+        public bool AttendanceAdd { get; set; } = false;
+        public bool AttendanceUpdate { get; set; } = false;
+        public bool AttendanceDelete { get; set; } = false;
+        public bool AttendanceImport { get; set; } = false;
+        public bool AttendanceExport { get; set; } = false;
+
+        public bool DailyTimeRecord { get; set; } = false;
+        public bool DailyTimeRecordView { get; set; } = false;
+        public bool DailyTimeRecordAdd { get; set; } = false;
+        public bool DailyTimeRecordUpdate { get; set; } = false;
+        public bool DailyTimeRecordDelete { get; set; } = false;
+        public bool DailyTimeRecordImport { get; set; } = false;
+        public bool DailyTimeRecordExport { get; set; } = false;
+
+        public bool Leave { get; set; } = false;
+        public bool LeaveView { get; set; } = false;
+        public bool LeaveAdd { get; set; } = false;
+        public bool LeaveUpdate { get; set; } = false;
+        public bool LeaveDelete { get; set; } = false;
+        public bool LeaveImport { get; set; } = false;
+        public bool LeaveExport { get; set; } = false;
+
+        public bool Overtime { get; set; } = false;
+        public bool OvertimeView { get; set; } = false;
+        public bool OvertimeAdd { get; set; } = false;
+        public bool OvertimeUpdate { get; set; } = false;
+        public bool OvertimeDelete { get; set; } = false;
+        public bool OvertimeImport { get; set; } = false;
+        public bool OvertimeExport { get; set; } = false;
+
+        public bool Position { get; set; } = false;
+        public bool PositionView { get; set; } = false;
+        public bool PositionAdd { get; set; } = false;
+        public bool PositionUpdate { get; set; } = false;
+        public bool PositionDelete { get; set; } = false;
+        public bool PositionImport { get; set; } = false;
+        public bool PositionExport { get; set; } = false;
+
+        public bool WFH { get; set; } = false;
+        public bool WFHView { get; set; } = false;
+        public bool WFHAdd { get; set; } = false;
+        public bool WFHUpdate { get; set; } = false;
+        public bool WFHDelete { get; set; } = false;
+        public bool WFHImport { get; set; } = false;
+        public bool WFHExport { get; set; } = false;
+
+        public bool Undertime { get; set; } = false;
+        public bool UndertimeView { get; set; } = false;
+        public bool UndertimeAdd { get; set; } = false;
+        public bool UndertimeUpdate { get; set; } = false;
+        public bool UndertimeDelete { get; set; } = false;
+        public bool UndertimeImport { get; set; } = false;
+        public bool UndertimeExport { get; set; } = false;
+
+        public bool DTRCorrection { get; set; } = false;
+        public bool DTRCorrectionView { get; set; } = false;
+        public bool DTRCorrectionAdd { get; set; } = false;
+        public bool DTRCorrectionUpdate { get; set; } = false;
+        public bool DTRCorrectionDelete { get; set; } = false;
+        public bool DTRCorrectionImport { get; set; } = false;
+        public bool DTRCorrectionExport { get; set; } = false;
 
         public int ViewEdit { get; set; } = 1;
 		public string DashboardLabel { get; set; } = string.Empty;

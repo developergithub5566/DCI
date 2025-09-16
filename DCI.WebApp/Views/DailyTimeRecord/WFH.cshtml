@@ -96,7 +96,7 @@
                                     <label>Name</label>
                                 </th>
                             }
-                        
+
                             <th>
                                 <label>Date</label>
                             </th>
@@ -110,11 +110,12 @@
                                 <label>Total Working Hours</label>
                             </th>
 
-                            <th>
-                                <label>Source</label>
-                            </th>
+
                             <th>
                                 <label>Status</label>
+                            </th>
+                            <th>
+                                <label>Source</label>
                             </th>
                             <th>
                                 Action
@@ -134,7 +135,7 @@
                                     <th>
                                         @item.NAME
                                     </th>
-                                }                             
+                                }
                                 <td>
                                     @item.DATE.ToShortDateString()
                                 </td>
@@ -148,27 +149,45 @@
                                     @item.TOTAL_WORKING_HOURS
                                 </td>
 
+
+
+
+                                @if (item.STATUSNAME == "Approved")
+                                {
+                                    <td class="text-center"><strong><span class='btnPrimary applicationStatus'>@item.STATUSNAME</span></strong></td>
+                                }
+                                else if (item.STATUSNAME == "Rejected")
+                                {
+                                    <td class="text-center"><strong><span class='btn-danger applicationStatus'>@item.STATUSNAME</span></strong></td>
+                                }
+                                else if (item.STATUSNAME == "Deducted")
+                                {
+                                    <td class="text-center"><strong><span class='btn-danger applicationStatus'>@item.STATUSNAME</span></strong></td>
+                                }
+                                else
+                                {
+                                    <td class="text-center"><strong><span class='btn-success applicationStatus'>@item.STATUSNAME</span></strong></td>
+                                }
                                 <td>
-                                    <span class="btnSuccess applicationStatus">REMOTE</span>
+                                    REMOTE
+                                    @*   <span class="btnSuccess applicationStatus">REMOTE</span> *@
                                 </td>
-                                <td>
-                                    @item.STATUSNAME
-                                </td>
+
                                 <td class="text-center">
                                     <a href="javascript:void(0)" onclick='newForm({
-                                                                date:"@item.DATE.ToString("MM/dd/yyyy")",
-                                                                emp:"@item.EMPLOYEE_NO",
-                                                                name :"@item.NAME" ,
-                                                                source : "REMOTE",
-                                                                timein : "@item.FIRST_IN",
-                                                                timeout : "@item.LAST_OUT",
-                                                                clockout : "@item.CLOCK_OUT",
-                                                                Late : "@item.LATE",
-                                                                UnderTime : "@item.UNDER_TIME",
-                                                                OT : "@item.OVERTIME",
-                                                                Hours : "@item.TOTAL_HOURS",
-                                                                WorkingHours : "@item.TOTAL_WORKING_HOURS"
-                                                                    })' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+                                                                    date:"@item.DATE.ToString("MM/dd/yyyy")",
+                                                                    emp:"@item.EMPLOYEE_NO",
+                                                                    name :"@item.NAME" ,
+                                                                    source : "REMOTE",
+                                                                    timein : "@item.FIRST_IN",
+                                                                    timeout : "@item.LAST_OUT",
+                                                                    clockout : "@item.CLOCK_OUT",
+                                                                    Late : "@item.LATE",
+                                                                    UnderTime : "@item.UNDER_TIME",
+                                                                    OT : "@item.OVERTIME",
+                                                                    Hours : "@item.TOTAL_HOURS",
+                                                                    WorkingHours : "@item.TOTAL_WORKING_HOURS"
+                                                                        })' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
 
                                     <a href="#" onclick="wfhlogsForm('@item.DATE.ToString("yyyy-MM-ddTHH:mm:ss")')" title="logs" class="btn btn-secondary"><i class="fas fa-history"></i></a>
                                 </td>
@@ -179,6 +198,17 @@
             </div>
             </<div>
             </div>
+
+            <style>
+                #clock {
+                    display: flex;
+                    align-items: center; /* vertical align (cross-axis) */
+                    justify-content: center; /* horizontal align (main axis) */
+                    gap: 5px; /* optional: spacing between numbers */
+                    height: 100px; /* or 100vh if you want full screen */
+                    text-align: center;
+                }
+            </style>
 
 
             <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
@@ -208,8 +238,8 @@
                             </div>
 
                             <form id="createForm">
-                               @*  @Html.AntiForgeryToken() *@
-                           @*      <div class="input-group mb-3">
+                                @*  @Html.AntiForgeryToken() *@
+                                @*      <div class="input-group mb-3">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
                                     </div>
@@ -308,37 +338,48 @@
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <form id="wfhInfo">
+                        <form id="savewfhapp">
                             <div class="modal-body">
 
-                                <table class="viewDetailsTbl table table-striped">
+                                <table class="viewDetailsTblWFH table table-striped">
                                     <tbody>
                                         <tr>
                                             <input type="hidden" id="WfhHeaderId" name="WfhHeaderId" value="0" />
-                                            <th>Request No:</th>
-                                            <th class="tblDate">  <label id="lblDate"></label>  </th>
+                                            <th>Date File:</th>
+                                            <td class="tblDate"><label id="lblDate">@DateTime.Now.ToString("MM/dd/yyyy")</label></td>
                                         </tr>
-                                        <tr>
-                                            <th>Approver :</th>
-                                            <th class="tblEmNo">  <label id="lblEmpNo"></label></th>
-                                        </tr>
-                                @*         <tr>
-                                            <th>Name:</th>
-                                            <th class="tblName"> <label id="lblName"></label> </th>
+                                        @*    <tr>
+                                            <th>Approver:</th>
+                                            <td class="tblEmNo"><label id="lblEmpNo"></label></td>
                                         </tr> *@
                                         <tr>
                                             <th>Status:</th>
-                                            <td class="tblSource"><span class="btnSuccess applicationStatus"><label id="lblSource">Draft</label></span></td>
+                                            <td class="tblSource">
+                                                <span class="btnSuccess applicationStatus">
+                                                    <label id="lblSource">Draft</label>
+                                                </span>
+                                            </td>
                                         </tr>
                                         <tr>
-                                            <th>Remarks:
-                                            <td class="tblRemarks"> <textarea id="Remarks" name="Remarks" rows="3"></textarea></td></th>
-                                            
+                                            <th>Remarks:</th>
+                                            <td class="tblRemarks">
+                                                <textarea id="Remarks" name="Remarks" rows="3" style="width:100%" required></textarea>
+                                            </td>
                                         </tr>
+
                                     </tbody>
                                 </table>
+                                <div class="col-12">
+
+                                    <div class="form-group">
+                                        <label class="frmText">For Approval of: </label><br>
+                                        <label class="font-weight-bold mb0 text-danger" id="deptHeadName"></label>
+                                        @* <label class="d-block mt0 text-left text-xs">(Department Head)</label> *@
+                                    </div>
+                                </div>
 
 
+                                <hr>
 
                                 <table class="table table-bordered text-dark text-xs" id="tblFileforWFH">
                                     <thead>
@@ -372,9 +413,9 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach (var item in Model.Where(x => x.STATUS == 1) )
+                                        @foreach (var item in Model.Where(x => x.STATUS == 1))
                                         {
-                                            <tr>                                                
+                                            <tr>
                                                 <td>
                                                     <input type="checkbox" class="row-checkbox" />
                                                 </td>
@@ -425,24 +466,24 @@
                             </button>
                         </div>
                         <form id="wfhInfo">
-                            <div class="modal-body">           
+                            <div class="modal-body">
 
 
-                                <table class="table table-bordered text-dark text-xs" >
+                                <table class="table table-bordered text-dark text-xs">
                                     <thead>
                                         <tr>
-                                         
-                                         
+
+
                                             <th>
                                                 <label>Date</label>
                                             </th>
                                             <th>
                                                 <label>Time In</label>
                                             </th>
-                                          
-                                          
 
-                                         @*    <th>
+
+
+                                            @*    <th>
                                                 <label>Source</label>
                                             </th>
                                             <th>
@@ -451,11 +492,11 @@
 
                                         </tr>
                                     </thead>
-                                    <tbody id="tblWfhLogs">                        
+                                    <tbody id="tblWfhLogs">
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="modal-footer">                               
+                            <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal"><small>Close</small></button>
                             </div>
                         </form>
@@ -475,7 +516,7 @@
     @*            <link href='https://192.168.1.100/DCI-ESS-STG/CSS/TEMPLATE/THEME/bootstrap-datepicker.standalone.min.css' rel='stylesheet'>
                 <script src='https://192.168.1.100/DCI-ESS-STG/JS/TEMPLATE/THEME/bootstrap-datepicker.min.js'></script> *@
 
-           @*  Export Button*@
+    @*  Export Button*@
             <script src="https://cdn.datatables.net/buttons/3.2.1/js/dataTables.buttons.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
@@ -497,6 +538,7 @@
 
 
                         $(document).ready(function () {
+                            
                             js('#tblDTR').DataTable({
                                       dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
                          buttons: [
@@ -527,7 +569,102 @@
                                  $('#selectAll').on('click', function () {
                                       $('.row-checkbox').prop('checked', this.checked);
                                  });
-                        });
+
+
+
+
+                                                               $('#savewfhapp').submit(function (e) {
+                                                                        e.preventDefault();
+
+                                                                       // $('.spinner-overlay').hide();
+                                                                       
+                                                                   
+                                                                                let header = {
+                                                                                    wfhHeaderId: document.getElementById("WfhHeaderId").value,
+                                                                                    remarks: document.getElementById("Remarks").value
+                                                                                    // ,requestNo: document.getElementById("RequestNo").value
+                                                                                };
+
+                                                                                 let details = [];
+                                                                                let checkedRows = document.querySelectorAll('#tblFileforWFH .row-checkbox:checked');
+
+                                                                                checkedRows.forEach((checkbox) => {
+                                                                                    let row = checkbox.closest('tr');
+                                                                                    let cells = row.querySelectorAll('td');
+
+                                                                                    details.push({
+                                                                                        id: cells[1].innerText.trim(),
+                                                                                        date: cells[2].innerText.trim(),
+                                                                                        timeIn: cells[3].innerText.trim(),
+                                                                                        timeOut: cells[4].innerText.trim()
+                                                                                    });
+                                                                                });
+
+                                                                                console.log(details);
+                                                                                 if (!details || details.length === 0) {
+                                                                                                Swal.fire({
+                                                                                                    text: "Please select at least one row before submitting.",
+                                                                                                    icon: "warning",
+                                                                                                    confirmButtonText: "Ok"
+                                                                                                });
+                                                                                                return; // stop here
+                                                                                            }
+
+                                                                                let datax = {
+                                                                                    header: header,
+                                                                                    details: details
+                                                                                };
+
+                                                                                console.log(datax);
+
+                                                                                     Swal.fire({
+                                                                                            text: "Are you sure you want to submit this record?",
+                                                                                            icon: "question",
+                                                                                            showCancelButton: true,
+                                                                                            confirmButtonText: "Ok"
+                                                                                        }).then((result) => {
+                                                                                            if (result.isConfirmed) {
+
+                                                                                $.ajax({
+                                                                                    type: 'POST',
+                                                                                    url: '@Url.Action("SaveWFHApplication", "DailyTimeRecord")',
+                                                                                    data: JSON.stringify(datax),
+                                                                                    contentType: 'application/json; charset=utf-8',
+                                                                                    success: function (response) {
+                                                                                        if (response.success) {
+                                                                                            Swal.fire({
+                                                                                                text: response.message,
+                                                                                                icon: "success",
+                                                                                                confirmButtonText: "Ok"
+                                                                                            }).then(() => {
+                                                                                                location.reload();
+                                                                                            });
+                                                                                        } else {
+                                                                                            Swal.fire({
+                                                                                                text: response.message,
+                                                                                                icon: "error"
+                                                                                            });
+                                                                                        }
+                                                                                        $('.spinner-overlay').hide();
+                                                                                    },
+                                                                                    error: function () {
+                                                                                        $('.spinner-overlay').hide();
+                                                                                        Swal.fire({
+                                                                                            text: "An error occurred. Please try again.",
+                                                                                            icon: "error"
+                                                                                        });
+                                                                                    }
+                                                                                }); // ajax
+                                                                            }
+
+                                                                            $('.spinner-overlay').hide();
+                                                                        }); // Swal.then
+                                                                    }); // submit
+
+
+
+                                                           
+                        });//end document
 
 
                         function newForm(dtr) {
@@ -544,6 +681,8 @@
                                 document.getElementById('lblOT').textContent = dtr.OT;
                                 document.getElementById('lblHours').textContent = dtr.Hours;
                                 document.getElementById('lblWorkingHours').textContent = dtr.WorkingHours;
+
+                               
                                 js('#detailsmodal').modal('show');
                         }
 
@@ -576,13 +715,13 @@
                 function submitTimeClock(){
                                 var formData = $(this).serialize();
                     var pass = $('#Password').val();//document.getElementById("Password");
-                    
+
                          // var clock = $('#clock').val();
                        // alert(clock)
-                             
+
                                           $.ajax({
                                               type: 'POST',
-                                              
+
                                               url: '@Url.Action("WFHTimeIn", "DailyTimeRecord")',
                                                 // data: { Password: pass,  __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
                                                               data: { Password: pass},
@@ -602,7 +741,7 @@
                                                                    });
                                                   } else {
 
-                                                     
+
                                                       Swal.fire({
                                                           text: response.message,
                                                           icon: "error"
@@ -618,86 +757,104 @@
                                                   });
                                               }
                                           });
-                                         
+
                 }
 
 
                    function filewfhmodal() {
 
+                          $("#Remarks").val("");
+                         $('.row-checkbox').prop('checked', false);
+
+                          document.getElementById('deptHeadName').textContent = @Html.Raw(JsonConvert.SerializeObject(ViewBag.ApproverHead));
                                 js('#filewfhmodal').modal('show');
                         }
 
 
 
-                                                        function SubmitWFHApplication() {
-                                                let header = {
-                                                    wfhHeaderId: document.getElementById("WfhHeaderId").value,
-                                                    remarks: document.getElementById("Remarks").value
-                                                   // ,requestNo: document.getElementById("RequestNo").value
-                                                };
-                                                debugger;
-                                                let details = [];
+                                            //  function SubmitWFHApplication() {
+                                            //        e.preventDefault();
 
-                                                // get all checked rows
-                                                let checkedRows = document.querySelectorAll('#tblFileforWFH .row-checkbox:checked');
+                                            //      if( $("#Remarks").val() == "")
+                                            //      {
 
-                                                checkedRows.forEach((checkbox) => {
-                                                    let row = checkbox.closest('tr');
-                                                    let cells = row.querySelectorAll('td');
+                                            //                              Swal.fire({
+                                            //                     text: "Remarks is required!",
+                                            //                     icon: "warning",   // maybe warning instead of success?
+                                            //                     confirmButtonText: "Ok"
+                                            //                 });
 
-                                                    details.push({
-                                                        id: cells[1].innerText.trim(),
-                                                        date: cells[2].innerText.trim(),
-                                                        timeIn: cells[3].innerText.trim(),
-                                                        timeOut: cells[4].innerText.trim()
-                                                    });
-                                                });
-
-                                                // combine header + details
-                                                let datax = {
-                                                    header: header,
-                                                    details: details
-                                                };
-
-                                                console.log(datax); // send this object via AJAX
+                                            //      }
 
 
-                                                          $.ajax({
-                                                              type: 'POST',
-                                                              url: '@Url.Action("SaveWFHApplication", "DailyTimeRecord")',
-                                                                data: JSON.stringify(datax), 
-                                                                        contentType: 'application/json; charset=utf-8',
-                                                              success: function (response) {
-                                                                  if (response.success) {
+                                            //     let header = {
+                                            //         wfhHeaderId: document.getElementById("WfhHeaderId").value,
+                                            //         remarks: document.getElementById("Remarks").value
+                                            //        // ,requestNo: document.getElementById("RequestNo").value
+                                            //     };
+                                            //     debugger;
+                                            //     let details = [];
 
-                                                                    //       $('#filewfhmodal')[0].reset();
-                                                                    // js('#filewfhmodal').modal('hide');
+                                            //     // get all checked rows
+                                            //     let checkedRows = document.querySelectorAll('#tblFileforWFH .row-checkbox:checked');
 
-                                                                   Swal.fire({
-                                                                       text: response.message,
-                                                                       icon: "success",
-                                                                       confirmButtonText: "Ok"
-                                                                   }).then((result) => {
-                                                                       location.reload();
-                                                                   });
-                                                                  } else {
-                                                                      Swal.fire({
-                                                                          text: response.message,
-                                                                          icon: "error"
-                                                                      });
-                                                                  }
-                                                                  $('.spinner-overlay').hide();
-                                                              },
-                                                              error: function () {
-                                                                  $('.spinner-overlay').hide();
-                                                                  Swal.fire({
-                                                                      text: "An error occurred. Please try again.",
-                                                                      icon: "error"
-                                                                  });
-                                                              }
-                                                          });
+                                            //     checkedRows.forEach((checkbox) => {
+                                            //         let row = checkbox.closest('tr');
+                                            //         let cells = row.querySelectorAll('td');
 
-                                            }
+                                            //         details.push({
+                                            //             id: cells[1].innerText.trim(),
+                                            //             date: cells[2].innerText.trim(),
+                                            //             timeIn: cells[3].innerText.trim(),
+                                            //             timeOut: cells[4].innerText.trim()
+                                            //         });
+                                            //     });
+
+                                            //     // combine header + details
+                                            //     let datax = {
+                                            //         header: header,
+                                            //         details: details
+                                            //     };
+
+                                            //     console.log(datax); // send this object via AJAX
+
+
+                                            //               $.ajax({
+                                            //                   type: 'POST',
+                                            //                   url: '@Url.Action("SaveWFHApplication", "DailyTimeRecord")',
+                                            //                     data: JSON.stringify(datax),
+                                            //                             contentType: 'application/json; charset=utf-8',
+                                            //                   success: function (response) {
+                                            //                       if (response.success) {
+
+                                            //                         //       $('#filewfhmodal')[0].reset();
+                                            //                         // js('#filewfhmodal').modal('hide');
+
+                                            //                        Swal.fire({
+                                            //                            text: response.message,
+                                            //                            icon: "success",
+                                            //                            confirmButtonText: "Ok"
+                                            //                        }).then((result) => {
+                                            //                            location.reload();
+                                            //                        });
+                                            //                       } else {
+                                            //                           Swal.fire({
+                                            //                               text: response.message,
+                                            //                               icon: "error"
+                                            //                           });
+                                            //                       }
+                                            //                       $('.spinner-overlay').hide();
+                                            //                   },
+                                            //                   error: function () {
+                                            //                       $('.spinner-overlay').hide();
+                                            //                       Swal.fire({
+                                            //                           text: "An error occurred. Please try again.",
+                                            //                           icon: "error"
+                                            //                       });
+                                            //                   }
+                                            //               });
+
+                                            // }
 
 
 
@@ -710,7 +867,7 @@
                                                           type: 'POST',
                                                           url: '@Url.Action("WFHLogs", "DailyTimeRecord")',
                                                                            data: JSON.stringify({
-                                                                        DATE_TIME: d.toISOString()  
+                                                                        DATE_TIME: d.toISOString()
                                                                     }),
                                                                contentType: 'application/json',
                                                           success: function (response) {
@@ -725,7 +882,7 @@
                                                                                 var row = `<tr>
                                                                                                      <td>${item.date}</td>
                                                                                                      <td>${item.timE_IN}</td>
-                                                                                                     
+
                                                                                             </tr>`;
                                                                                 tbodytable.append(row);
                                                                             });

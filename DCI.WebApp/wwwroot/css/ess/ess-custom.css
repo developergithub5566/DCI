@@ -1053,6 +1053,22 @@ button.btnRemoveMaterial {
 	color: black;
 }
 
+.viewDetailsTblWFH th {
+	font-size: 12px;
+	color: black;
+	width: 150px; /* fixed width for labels */
+	text-align: left;
+	vertical-align: top;
+	white-space: nowrap;
+}
+
+.viewDetailsTblWFH td {
+	font-size: 12px;
+	color: black;
+	vertical-align: top;
+}
+
+
 .deptDiv {
 	text-align: center;
 }

@@ -202,7 +202,7 @@
                                     </tbody>
                                 </table> *@
 
-                                <form class="row" id="frmDTRCorrection" method="POST">
+                               @*  <form class="row" id="createForm" method="POST"> *@
                                     <input type="hidden" name="DTR_DATE">
                                     <div class="col-lg-6">
                                         <div class="form-group">
@@ -220,7 +220,7 @@
                                         <div class="form-group">
                                             <label class="frmText"><span class="required">*</span> Type</label>
                                             <select class="form-control frmField" name="DtrType" id="DtrType" required>
-                                                <option value="0">Select</option>
+                                            <option value="" disabled selected>Select</option>
                                                 <option value="1" class="TIME_IN">Time In</option>
                                                 <option value="2" class="TIME_OUT">Time Out</option>
                                             </select>
@@ -235,7 +235,7 @@
 
                                     <div class="col-12">
                                         <div class="form-group">
-                                            <label class="frmText"><span class="required">*</span> Reason:</label>
+                                        <label class="frmText"><span class="required">*</span> Remarks:</label>
                                             <textarea class="form-control frmField" name="Reason" id="Reason" required></textarea>
                                         </div>
                                     </div>
@@ -250,15 +250,21 @@
                                         <div class="form-group">
                                             <label class="frmText">For Approval of: </label><br>
                                             <label class="font-weight-bold mb0 text-danger" id="deptHeadName"></label>
-                                            <label class="d-block mt0 text-left text-xs">(Department Head)</label>
+                                            @* <label class="d-block mt0 text-left text-xs">(Department Head)</label> *@
                                         </div>
                                     </div>
-                                </form>
+                                @* </form> *@
                             </div>
 
                             <!-- Modal footer -->
                             <div class="modal-footer pt0">
-                                <button class="btn btnPrimary btn-icon-split d-block" onclick="save()" type="button" id="btnSave">
+                           @*      <button class="btn btnPrimary btn-icon-split d-block" onclick="save()" type="button" id="btnSave">
+                                    <span class="icon text-white">
+                                        <i class="fa-regular fa-file-lines text-xs"></i>
+                                    </span>
+                                    <span class="text text-white"><small>Submit </small></span>
+                                </button> *@
+                                <button class="btn btnPrimary btn-icon-split d-block" type="submit" id="btnSave">
                                     <span class="icon text-white">
                                         <i class="fa-regular fa-file-lines text-xs"></i>
                                     </span>
@@ -339,9 +345,67 @@
                                             time_24hr: true,
                                              maxDate: new Date(),
                                        onChange: function(selectedDates, dateStr, instance) {
+                                             instance._input.setAttribute("required", "required");
                                       }
                                     });
 
+                                    $('#createForm').submit(function (event) {
+                                                    event.preventDefault();
+                                                                                                        
+                                                        const formData = new FormData();
+                                                      formData.append('DtrType', $('#DtrType').val());
+                                                       formData.append('DtrDateTime', $('#dateCovered').val());
+                                                        formData.append('Reason', $('#Reason').val());
+
+                                                        console.log(formData)
+
+                                                               Swal.fire({
+                                                                   text: "Are you sure you want to submit this record?",
+                                                                   icon: "question",
+                                                                   showCancelButton: true,
+                                                                   confirmButtonText: "Ok"
+                                                               }).then((result) => {
+                                                                   if (result.isConfirmed) {
+                                                                       $('.spinner-overlay').show();
+
+                                                                       $.ajax({
+                                                                           type: 'POST',
+                                                                           url: '@Url.Action("SaveDTRCorrection", "DailyTimeRecord")',
+                                                                           data: formData,
+                                                                               processData: false,
+                                                                                  contentType: false,
+                                                                           success: function (response) {
+                                                                               if (response.success) {
+                                                                                   $('#createForm')[0].reset();
+                                                                                   js('#createmodal').modal('hide');
+
+                                                                                   Swal.fire({
+                                                                                       text: response.message,
+                                                                                       icon: "success",
+                                                                                       confirmButtonText: "Ok"
+                                                                                   }).then((result) => {
+                                                                                       location.reload();
+                                                                                   });
+
+                                                                               } else {
+                                                                                   Swal.fire({
+                                                                                       text: response.message,
+                                                                                       icon: "error"
+                                                                                   });
+                                                                               }
+                                                                               $('.spinner-overlay').hide();
+                                                                           },
+                                                                           error: function () {
+                                                                               $('.spinner-overlay').hide();
+                                                                               Swal.fire({
+                                                                                   text: "An error occurred. Please try again.",
+                                                                                   icon: "error"
+                                                                               });
+                                                                           }
+                                                                       });
+                                                                   }
+                                                               });
+                                                      });// submit
                   
                         });
 
@@ -400,72 +464,72 @@
                     }
 
 
-                           function save() {
+                    //        function save() {
+                    //             event.preventDefault();
+                    //         //     var datecovered =  $('#dateCovered').val();
+                    //         //     var dtrtype =   $('#DtrType').val(response.data.dtrType);
+                    //         //     var reason = $('#Reason').val(response.data.reason);
 
-                            //     var datecovered =  $('#dateCovered').val();
-                            //     var dtrtype =   $('#DtrType').val(response.data.dtrType);
-                            //     var reason = $('#Reason').val(response.data.reason);
-
-                            // console.log(datecovered)
-                            // console.log(dtrtype)
-                            // console.log(reason)
+                    //         // console.log(datecovered)
+                    //         // console.log(dtrtype)
+                    //         // console.log(reason)
 
 
-                               const formData = new FormData();                       
-                                  formData.append('DtrType', $('#DtrType').val());
-                                   formData.append('DtrDateTime', $('#dateCovered').val());
-                                    formData.append('Reason', $('#Reason').val());
+                    //            const formData = new FormData();                       
+                    //               formData.append('DtrType', $('#DtrType').val());
+                    //                formData.append('DtrDateTime', $('#dateCovered').val());
+                    //                 formData.append('Reason', $('#Reason').val());
 
-                                    console.log(formData)
+                    //                 console.log(formData)
 
-                       Swal.fire({
-                           text: "Are you sure you want to submit this record?",
-                           icon: "question",
-                           showCancelButton: true,
-                           confirmButtonText: "Ok"
-                       }).then((result) => {
-                           if (result.isConfirmed) {
-                               $('.spinner-overlay').show();
+                    //    Swal.fire({
+                    //        text: "Are you sure you want to submit this record?",
+                    //        icon: "question",
+                    //        showCancelButton: true,
+                    //        confirmButtonText: "Ok"
+                    //    }).then((result) => {
+                    //        if (result.isConfirmed) {
+                    //            $('.spinner-overlay').show();
 
-                               $.ajax({
-                                   type: 'POST',
-                                   url: '@Url.Action("SaveDTRCorrection", "DailyTimeRecord")',
-                                   data: formData,
-                                       processData: false,
-                                          contentType: false,
-                                   success: function (response) {
-                                       if (response.success) {
-                                           $('#createForm')[0].reset();
-                                           js('#createmodal').modal('hide');
+                    //            $.ajax({
+                    //                type: 'POST',
+                    //                url: '@Url.Action("SaveDTRCorrection", "DailyTimeRecord")',
+                    //                data: formData,
+                    //                    processData: false,
+                    //                       contentType: false,
+                    //                success: function (response) {
+                    //                    if (response.success) {
+                    //                        $('#createForm')[0].reset();
+                    //                        js('#createmodal').modal('hide');
 
-                                           Swal.fire({
-                                               text: response.message,
-                                               icon: "success",
-                                               confirmButtonText: "Ok"
-                                           }).then((result) => {
-                                               location.reload();
-                                           });
+                    //                        Swal.fire({
+                    //                            text: response.message,
+                    //                            icon: "success",
+                    //                            confirmButtonText: "Ok"
+                    //                        }).then((result) => {
+                    //                            location.reload();
+                    //                        });
 
-                                       } else {
-                                           Swal.fire({
-                                               text: response.message,
-                                               icon: "error"
-                                           });
-                                       }
-                                       $('.spinner-overlay').hide();
-                                   },
-                                   error: function () {
-                                       $('.spinner-overlay').hide();
-                                       Swal.fire({
-                                           text: "An error occurred. Please try again.",
-                                           icon: "error"
-                                       });
-                                   }
-                               });
-                           }
-                       });
+                    //                    } else {
+                    //                        Swal.fire({
+                    //                            text: response.message,
+                    //                            icon: "error"
+                    //                        });
+                    //                    }
+                    //                    $('.spinner-overlay').hide();
+                    //                },
+                    //                error: function () {
+                    //                    $('.spinner-overlay').hide();
+                    //                    Swal.fire({
+                    //                        text: "An error occurred. Please try again.",
+                    //                        icon: "error"
+                    //                    });
+                    //                }
+                    //            });
+                    //        }
+                    //    });
 
-                    }
+                    // }
 
 
 

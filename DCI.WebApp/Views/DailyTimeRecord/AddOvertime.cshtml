@@ -72,8 +72,8 @@
     <div class="col-12 p0">
         <ul class="breadcrumb">
             <li><a href="~/Home/Index">Dashboard</a></li>
-            <li><a href="#">Daily Time Record</a></li>
-            <li><a href="#">Overtime</a></li>
+            <li><a href="~/DailyTimeRecord/Overtime">Daily Time Record</a></li>
+            <li><a href="~/DailyTimeRecord/Overtime">Overtime</a></li>
             <li><a href="#">File Overtime</a></li>
         </ul>
     </div>
@@ -84,27 +84,28 @@
         </div>
         <div class="card-body">
             <div class="table-responsive mt20">
-                <div id="otinfo" hidden>
+                <div id="otinfo">
+                    @* hidden *@
                     <div class="row">
                         <input type="hidden" id="OTHeaderId" name="OTHeaderId"  value="@Model.OTHeaderId"/>
                         <input type="hidden" id="EmployeeId" name="EmployeeId" value="@Model.EmployeeId" />
                         <div class="col-md-6">
                             <label class="frmText">Request No</label>
-                            <input type="text" min="0" step="any" id="RequestNo" name="RequestNo" class="form-control frmField" readonly="true" value="@Model.RequestNo">
+                            <input type="text" min="0" step="any" id="RequestNo" name="RequestNo" class="form-control frmField" readonly="true" value="@Model.RequestNo" placeholder="(System-Generated)">
                         </div>
                         <div class="col-md-6">
                             <label class="frmText">Status</label>
                             <input type="text" min="0" step="any" id="StatusId" name="StatusId" class="form-control frmField" readonly="true" value="@Model.StatusName">
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row">                  
                         <div class="col-md-6">
-                            <label class="frmText">Recommended By</label>
-                            <input type="text" min="0" step="any" id="RecommendedBy" name="RecommendedBy" class="form-control frmField" readonly="true" value="@Model.RecommendedBy">
+                            <label class="frmText" id="ApproverLabel">For Approval of: </label>
+                            <input type="text" min="0" step="any" id="ApprovedBy" name="ApprovedBy" class="form-control frmField" readonly="true" value="@Model.ApprovedBy">
                         </div>
                         <div class="col-md-6">
-                            <label class="frmText">Approved By</label>
-                            <input type="text" min="0" step="any" id="ApprovedBy" name="ApprovedBy" class="form-control frmField" readonly="true" value="@Model.ApprovedBy">
+                            <label class="frmText">Total</label>
+                            <input type="text" min="0" step="any" id="GrandTotal" name="GrandTotal" class="form-control frmField" readonly="true" value="0">
                         </div>
                     </div>
                 </div>
@@ -205,14 +206,12 @@
                         </div>
                         <form id="createForm">
                             <div class="modal-body">
-                                <div class="form-group">                           
-
-
-                                    <div class="input-group">
-                                        <label class="frmText">Official Business:<input type="checkbox" class="form-check" id="chkOB" name="chkOB" /> </label>
-
+                                <div class="form-group">
+                                    <div class="form-check form-check-inline">
+                                        <input type="checkbox" class="form-check-input" id="chkOB" name="chkOB">
+                                        <label class="form-check-label" for="chkOB">Official Business</label>
                                     </div>
-
+                                    </br>
                                     <label class="frmText"><span class="required">*</span> Date: </label>
                                     <div class="input-group">
                                         <input type="text" name="OTDate" id="OTDate" class="form-control frmField" autocomplete="off">
@@ -285,9 +284,10 @@
                                    var statusName = $('#StatusId').val();
                                  
                                   if(otHeaderId > 0){
-                                         $("#otinfo").prop("hidden", false);
+                                        // $("#otinfo").prop("hidden", false);
+                                       
                                   }else{
-                                         $("#otinfo").prop("hidden", true);
+                                        //$("#otinfo").prop("hidden", true);
                                   }
                                   if(statusName== "Pending"){
                                          $("#AddOvertime").prop("hidden", true);
@@ -499,25 +499,50 @@
                      function formatMinutes(totalMinutes) {
                        const h = Math.floor(totalMinutes / 60);
                        const m = totalMinutes % 60;
-                       return `${h}h ${m}m`;
+                       return `${h} hours(s) ${m} minute(s)`;
                      }
 
-                     function updateGrandTotal() {
-                       const rows = document.querySelectorAll('#otTable tbody tr');
-                       let sumMinutes = 0;
-                       rows.forEach(r => {
-                         const cell = r.children[4]; // Total Hours column
-                         if (!cell) return;
-                         const text = cell.textContent.trim(); // e.g., "2h 30m"
-                         const match = text.match(/(\d+)h\s*(\d+)m/);
-                         if (match) {
-                           const h = parseInt(match[1], 10);
-                           const m = parseInt(match[2], 10);
-                           sumMinutes += h * 60 + m;
-                         }
-                       });
-                       // document.getElementById('grandTotalText').innerHTML = `<strong>Grand Total:</strong> ${formatMinutes(sumMinutes)}`;
-                     }
+                     // function updateGrandTotal() {
+                     //   const rows = document.querySelectorAll('#otTable tbody tr');
+                     //   console.log(rows)
+                     //   let sumMinutes = 0;
+                     //   rows.forEach(r => {
+                     //     const cell = r.children[5]; // Total Hours column
+                     //      console.log(cell)
+                     //     if (!cell) return;
+                     //     const text = cell.textContent.trim(); // e.g., "2h 30m"
+
+                     //        console.log(text)
+                     //     const match = text.match(/(\d+)h\s*(\d+)m/);
+                     //                   console.log(match)
+                     //     if (match) {
+                     //       const h = parseInt(match[1], 10);
+                     //       const m = parseInt(match[2], 10);
+                     //       sumMinutes += h * 60 + m;
+                     //     }
+                     //   });
+
+                     //  // alert(sumMinutes);
+                     //  //  document.getElementById('Total').innerHTML = `<strong>Grand Total:</strong> ${formatMinutes(sumMinutes)}`;
+                     // }
+
+                                         function recomputeGrandTotal() {
+                        let total = 0;
+
+                        // loop over all hidden totalMinutes inputs
+                        $('#otTable tbody tr').each(function () {
+                            const minutes = parseInt($(this).find('input[name*=".TotalMinutes"]').val()) || 0;
+                            total += minutes;
+                        });
+                        console.log(total)
+
+                        // update a label or hidden field
+                       // $('#GrandTotal').text('Grand Total: ' + total + ' minutes');
+                       // $('#grandTotalMinutes').val(total); // hidden field for saving to DB
+                       $('#GrandTotal').val(formatMinutes(total))
+                    }
+
+
 
                     document.getElementById('addBtn').addEventListener('click', function () {
                                document.querySelectorAll('.error').forEach(e => e.textContent = '');
@@ -643,10 +668,10 @@
                                                                                         tbodytable.html(`<tr><td colspan="7" class="text-center">No record found.</td></tr>`);
                                                                                     }
 
-
+                                                                                    recomputeGrandTotal();
 
                                                                                               entryIndex++;
-                                                                                              updateGrandTotal();
+                                                                                            //  updateGrandTotal();
                                                                                       js('#createmodal').modal('hide');
 
 
@@ -670,7 +695,7 @@
 
 
 
-                              // updateGrandTotal();
+                               //updateGrandTotal();
                               // js('#createmodal').modal('hide');
                              });
 
@@ -680,7 +705,8 @@
                        if (e.target.matches('.remove-row')) {
                          const row = e.target.closest('tr');
                          row.remove();
-                         updateGrandTotal();
+                       //  updateGrandTotal();
+                               recomputeGrandTotal();
                        }
                      });
 
@@ -711,17 +737,7 @@
                         $('#otTable tbody tr').each(function () {
                             const row = $(this);
                             const entry = {
-                                //                          employeeNo: '',
-                                //                          otDetailId: 0 ,
-                                //                          otHeaderId: 0,
-                                //                          otType : 0,
-                                // otTypeName: row.find('input[name*=".OTTypeName"]').val(),
-                                // otDate: row.find('input[name*=".OTDate"]').val(),
-                                // otDateString: row.find('input[name*=".OTDateString"]').val(),
-                                // otTimeFrom: row.find('input[name*=".OTTimeFrom"]').val(),
-                                // otTimeTo: row.find('input[name*=".OTTimeTo"]').val(),
-                                // totalHours: row.find('input[name*=".TotalHours"]').val(),
-                                // totalMinutes: parseInt(row.find('input[name*=".TotalMinutes"]').val()) || 0
+                            
                                                                     employeeNo: '',
                                                          otDetailId:  row.find('input[name*=".OTDetailId"]').val() ,
                                                          otHeaderId: row.find('input[name*=".OTHeaderId"]').val() ,

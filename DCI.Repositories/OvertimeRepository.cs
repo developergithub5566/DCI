@@ -148,19 +148,20 @@ namespace DCI.Repositories
                     Remarks = ot.Remarks,
                     DateCreated = ot.DateCreated,
                     CreatedBy = ot.CreatedBy,
-                   
-                    RecommendedBy = usrApprover != null ? usrApprover.Firstname + " " + usrApprover.Lastname : string.Empty,
-                    ApprovedBy = "MARCO USTARIS",
+
+                    // RecommendedBy = usrApprover != null ? usrApprover.Firstname + " " + usrApprover.Lastname : string.Empty,
+                    // ApprovedBy = "MARCO USTARIS",
+                    ApprovedBy = usrApprover != null ? usrApprover.Firstname + " " + usrApprover.Lastname : string.Empty,
                     otDetails = _dbContext.OvertimeDetail
                         .Where(x => x.OTHeaderId == ot.OTHeaderId && x.IsActive)
                         .OrderBy(x => x.OTDate).ThenBy(x => x.OTTimeFrom)
                         .Select(x => new OvertimeDetailViewModel
                         {
-                            OTTypeName = x.OTType == 1 ? "125% REGULAR (AFTER OFFICE HRS. /MON - FRI / EXCEPT HOLIDAY"
-                                       : x.OTType == 2 ? "10% NIGHT DIFFERENTIAL (10PM - 6AM) MON - SUN / HOLIDAY"
-                                       : x.OTType == 3 ? "130% SPECIAL HOLIDAY MON - SUN / SAT-SUN (FIRST 8 HRS.)"
-                                       : x.OTType == 4 ? "169% AFTER 8 HRS OF 130%"
-                                       : x.OTType == 5 ? "150% HOLIDAY ON REST DAY (SAT - SUN)"
+                            OTTypeName = x.OTType == 1 ? Constants.OverTime_Regular
+                                       : x.OTType == 2 ? Constants.OverTime_NightDifferential 
+                                       : x.OTType == 3 ? Constants.OverTime_SpecialHoliday 
+                                       : x.OTType == 4 ? Constants.OverTime_After8hrs
+                                       : x.OTType == 5 ? Constants.OverTime_HolidayOnRestDay 
                                        : "",
                             OTHeaderId = x.OTHeaderId,
                             OTDetailId = x.OTDetailId,

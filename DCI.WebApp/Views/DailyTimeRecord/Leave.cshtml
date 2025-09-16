@@ -341,8 +341,9 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
+                <form id="createForm">
                 <div class="modal-body">
-                    <form id="createForm">
+             
                         <input type="hidden" id="SelectedDatesJson" name="SelectedDates" />
                         <input type="hidden" id="dateSelected" name="dateSelected" />
 
@@ -353,7 +354,7 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label class="frmText"><span class="required">*</span> Type</label>
-                                <select id="leaveTypeSelect" class="form-select" required onchange="GetLeaveTypeAmount()">
+                                <select id="leaveTypeSelect" class="form-select" required onchange="GetLeaveTypeAmount()" required>
                                     <option value="">select type</option>
                                 </select>
 
@@ -373,7 +374,7 @@
                             <div class="form-group" id="datepickerDate">
                                 <label class="frmText"><span class="required">*</span> Period Covered: </label>
                                 <div class="input-group">
-                                    <input type="text" name="COVERED_DATE" id="dateCovered" class="form-control frmField" autocomplete="off">
+                                    <input type="text" name="COVERED_DATE" id="dateCovered" class="form-control frmField" autocomplete="off" required>
                                     <div class="input-group-prepend prependBtn">
                                         <i class="fa fa-calendar"></i>
                                     </div>
@@ -396,8 +397,8 @@
 
                         <div class="col-12">
                             <div class="form-group">
-                                <label class="frmText"><span class="required">*</span> Reason:</label>
-                                <textarea class="form-control frmField" name="Reason" id="Reason"></textarea>
+                                <label class="frmText"><span class="required">*</span> Remarks:</label>
+                                <textarea class="form-control frmField" name="Reason" id="Reason" required></textarea>
                             </div>
                         </div>
                         <div class="col-12">
@@ -410,11 +411,11 @@
                        @*          <label class="d-block mt0 text-left text-xs">(Department Head)</label> *@
                             </div>
                         </div>
-                    </form>
+              
                 </div>
                 <div class="modal-footer pt0">
                     <div id="btnSubmit">
-                        <button class="btn btnPrimary btn-icon-split d-block" type="button" onclick="save()">
+                        <button class="btn btnPrimary btn-icon-split d-block" type="submit" onclick="save()">
                             <span class="icon text-white-50">
                                 <i class="fa-regular fa-file-lines text-xs"></i>
                             </span>
@@ -437,6 +438,7 @@
                     </button>
 
                 </div>
+                      </form>
             </div>
         </div>
     </div>
@@ -556,7 +558,69 @@
 
                   $('#createForm').submit(function (event) {
                       event.preventDefault();
-                     // alert("ok")
+                   const leaveTypeId = $('#leaveTypeSelect').val();
+                     const selectedDatesJson = $('#SelectedDatesJson').val();
+
+
+
+                         const noOfDays = $('#NoOfDays').val();
+                           const reason = $('#Reason').val();
+
+                             const formData = new FormData();
+                            formData.append('LeaveTypeId', leaveTypeId);
+                             formData.append('NoOfDays', noOfDays);
+                              formData.append('SelectedDateJson', selectedDatesJson);
+
+                               formData.append('Reason', reason);
+
+
+                  Swal.fire({
+                      text: "Are you sure you want to submit this record?",
+                      icon: "question",
+                      showCancelButton: true,
+                      confirmButtonText: "Ok"
+                  }).then((result) => {
+                      if (result.isConfirmed) {
+                          $('.spinner-overlay').show();
+
+                          $.ajax({
+                              type: 'POST',
+                              url: '@Url.Action("SaveLeave", "DailyTimeRecord")',
+                              data: formData,
+                                  processData: false,
+                                     contentType: false,
+                              success: function (response) {
+                                  if (response.success) {
+                                      $('#createForm')[0].reset();
+                                      js('#createmodal').modal('hide');
+
+                                      Swal.fire({
+                                          text: response.message,
+                                          icon: "success",
+                                          confirmButtonText: "Ok"
+                                      }).then((result) => {
+                                          location.reload();
+                                      });
+
+                                  } else {
+                                      Swal.fire({
+                                          text: response.message,
+                                          icon: "error"
+                                      });
+                                  }
+                                  $('.spinner-overlay').hide();
+                              },
+                              error: function () {
+                                  $('.spinner-overlay').hide();
+                                  Swal.fire({
+                                      text: "An error occurred. Please try again.",
+                                      icon: "error"
+                                  });
+                              }
+                          });
+                      }
+                  });
+
 
               }); //submit
                            }); //end doc
@@ -784,71 +848,71 @@
 
                    }
 
-                function save() {
-                        const leaveTypeId = $('#leaveTypeSelect').val();
-                     const selectedDatesJson = $('#SelectedDatesJson').val();
+               //  function save() {
+               //          const leaveTypeId = $('#leaveTypeSelect').val();
+               //       const selectedDatesJson = $('#SelectedDatesJson').val();
 
 
 
-                         const noOfDays = $('#NoOfDays').val();
-                           const reason = $('#Reason').val();
+               //           const noOfDays = $('#NoOfDays').val();
+               //             const reason = $('#Reason').val();
 
-                             const formData = new FormData();
-                            formData.append('LeaveTypeId', leaveTypeId);
-                             formData.append('NoOfDays', noOfDays);
-                              formData.append('SelectedDateJson', selectedDatesJson);
+               //               const formData = new FormData();
+               //              formData.append('LeaveTypeId', leaveTypeId);
+               //               formData.append('NoOfDays', noOfDays);
+               //                formData.append('SelectedDateJson', selectedDatesJson);
 
-                               formData.append('Reason', reason);
+               //                 formData.append('Reason', reason);
 
 
-                  Swal.fire({
-                      text: "Are you sure you want to submit this record?",
-                      icon: "question",
-                      showCancelButton: true,
-                      confirmButtonText: "Ok"
-                  }).then((result) => {
-                      if (result.isConfirmed) {
-                          $('.spinner-overlay').show();
+               //    Swal.fire({
+               //        text: "Are you sure you want to submit this record?",
+               //        icon: "question",
+               //        showCancelButton: true,
+               //        confirmButtonText: "Ok"
+               //    }).then((result) => {
+               //        if (result.isConfirmed) {
+               //            $('.spinner-overlay').show();
 
-                          $.ajax({
-                              type: 'POST',
-                              url: '@Url.Action("SaveLeave", "DailyTimeRecord")',
-                              data: formData,
-                                  processData: false,
-                                     contentType: false,
-                              success: function (response) {
-                                  if (response.success) {
-                                      $('#createForm')[0].reset();
-                                      js('#createmodal').modal('hide');
+               //            $.ajax({
+               //                type: 'POST',
+               //                url: '@Url.Action("SaveLeave", "DailyTimeRecord")',
+               //                data: formData,
+               //                    processData: false,
+               //                       contentType: false,
+               //                success: function (response) {
+               //                    if (response.success) {
+               //                        $('#createForm')[0].reset();
+               //                        js('#createmodal').modal('hide');
 
-                                      Swal.fire({
-                                          text: response.message,
-                                          icon: "success",
-                                          confirmButtonText: "Ok"
-                                      }).then((result) => {
-                                          location.reload();
-                                      });
+               //                        Swal.fire({
+               //                            text: response.message,
+               //                            icon: "success",
+               //                            confirmButtonText: "Ok"
+               //                        }).then((result) => {
+               //                            location.reload();
+               //                        });
 
-                                  } else {
-                                      Swal.fire({
-                                          text: response.message,
-                                          icon: "error"
-                                      });
-                                  }
-                                  $('.spinner-overlay').hide();
-                              },
-                              error: function () {
-                                  $('.spinner-overlay').hide();
-                                  Swal.fire({
-                                      text: "An error occurred. Please try again.",
-                                      icon: "error"
-                                  });
-                              }
-                          });
-                      }
-                  });
+               //                    } else {
+               //                        Swal.fire({
+               //                            text: response.message,
+               //                            icon: "error"
+               //                        });
+               //                    }
+               //                    $('.spinner-overlay').hide();
+               //                },
+               //                error: function () {
+               //                    $('.spinner-overlay').hide();
+               //                    Swal.fire({
+               //                        text: "An error occurred. Please try again.",
+               //                        icon: "error"
+               //                    });
+               //                }
+               //            });
+               //        }
+               //    });
 
-               }
+               // }
 
                function GetLeaveTypeAmount(){
                      let leave =  $('#leaveTypeSelect').val();
