@@ -36,6 +36,7 @@ namespace DCI.Repositories
                             HolidayDate = hol.HolidayDate,
                             HolidayName = hol.HolidayName,
                             Description = hol.Description,
+                            HolidayType = hol.HolidayType,
                             CreatedBy = hol.CreatedBy,
                             CreatedName = user.Firstname + " " + user.Lastname,
                             DateCreated = hol.DateCreated,
@@ -68,7 +69,9 @@ namespace DCI.Repositories
                                 HolidayId = hol.HolidayId,
                                 HolidayDate = hol.HolidayDate,
                                 HolidayName = hol.HolidayName,
+                                HolidayTypeName = hol.HolidayType == 1 ? "Regular" : "Special",
                                 Description = hol.Description,
+                                HolidayType = hol.HolidayType,
                                 CreatedBy = hol.CreatedBy,
                                 CreatedName = user.Firstname + " " + user.Lastname,
                                 DateCreated = hol.DateCreated,
@@ -106,7 +109,7 @@ namespace DCI.Repositories
                     entity.HolidayDate = model.HolidayDate;
                     entity.HolidayName = model.HolidayName;
                     entity.Description = model.Description;
-
+                    entity.HolidayType = model.HolidayType;
                     entity.CreatedBy = model.CreatedBy;
                     entity.DateCreated = DateTime.Now;
                     entity.ModifiedBy = null;
@@ -123,7 +126,7 @@ namespace DCI.Repositories
                     entity.HolidayDate = model.HolidayDate;
                     entity.HolidayName = model.HolidayName;
                     entity.Description = model.Description;
-             
+                    entity.HolidayType = model.HolidayType;
                     entity.DateCreated = entity.DateCreated;
                     entity.CreatedBy = entity.CreatedBy;
                     entity.DateModified = DateTime.Now;

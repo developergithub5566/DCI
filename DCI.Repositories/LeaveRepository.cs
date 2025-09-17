@@ -41,98 +41,105 @@ namespace DCI.Repositories
 
             var leaveinfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == param.EmployeeId && x.DateCreated.Date.Year == _currentYear && x.IsActive).OrderByDescending(x => x.DateCreated).FirstOrDefault();
             model.VLBalance = leaveinfo?.VLBalance ?? 0;
-            model.SLBalance = leaveinfo?.SLBalance ?? 0 ;
+            model.SLBalance = leaveinfo?.SLBalance ?? 0;
             model.SPLBalance = leaveinfo?.SPLBalance ?? 0;
 
             var leaveReqHeaderDbContext = _dbContext.LeaveRequestHeader.AsQueryable();
 
-            model.LeaveRequestHeaderList  = (from lheader in _dbContext.LeaveRequestHeader
-                                                 join lvtype in _dbContext.LeaveType
-                                                 on lheader.LeaveTypeId equals lvtype.LeaveTypeId
-                                                 join stat in _dbContext.Status
-                                                 on lheader.Status equals stat.StatusId
-                                                 where lheader.EmployeeId ==  param.EmployeeId && lheader.IsActive
-                                                 select new LeaveRequestHeaderViewModel
-                                                 {
-                                                     LeaveRequestHeaderId = lheader.LeaveRequestHeaderId,
-                                                     EmployeeId = lheader.EmployeeId,
-                                                     RequestNo = lheader.RequestNo,
-                                                     DateFiled = lheader.DateFiled,
-                                                     LeaveTypeId = lheader.LeaveTypeId,
-                                                     LeaveName = lvtype.Description,
-                                                     Status = lheader.Status,
-                                                     StatusName = stat.StatusName,
-                                                     Reason = lheader.Reason,
-                                                     DateModified = lheader.DateModified,
-                                                     ModifiedBy = lheader.ModifiedBy,
-                                                     IsActive = lheader.IsActive,
-                                                     NoofDays = _dbContext.LeaveRequestDetails
-                                                                                     .Where(ld => ld.LeaveRequestHeaderId == lheader.LeaveRequestHeaderId)
-                                                                                     .Sum(ld => (decimal?)ld.Amount) ?? 0,
+            model.LeaveRequestHeaderList = (from lheader in _dbContext.LeaveRequestHeader
+                                            join lvtype in _dbContext.LeaveType
+                                            on lheader.LeaveTypeId equals lvtype.LeaveTypeId
+                                            join stat in _dbContext.Status
+                                            on lheader.Status equals stat.StatusId
+                                            where lheader.EmployeeId == param.EmployeeId && lheader.IsActive
+                                            select new LeaveRequestHeaderViewModel
+                                            {
+                                                LeaveRequestHeaderId = lheader.LeaveRequestHeaderId,
+                                                EmployeeId = lheader.EmployeeId,
+                                                RequestNo = lheader.RequestNo,
+                                                DateFiled = lheader.DateFiled,
+                                                LeaveTypeId = lheader.LeaveTypeId,
+                                                LeaveName = lvtype.Description,
+                                                Status = lheader.Status,
+                                                StatusName = stat.StatusName,
+                                                Reason = lheader.Reason,
+                                                DateModified = lheader.DateModified,
+                                                ModifiedBy = lheader.ModifiedBy,
+                                                IsActive = lheader.IsActive,
+                                                NoofDays = _dbContext.LeaveRequestDetails
+                                                                                .Where(ld => ld.LeaveRequestHeaderId == lheader.LeaveRequestHeaderId)
+                                                                                .Sum(ld => (decimal?)ld.Amount) ?? 0,
 
-                                                     LeaveRequestDetailList = _dbContext.LeaveRequestDetails
-                                                         .Where(ld => ld.LeaveRequestHeaderId == lheader.LeaveRequestHeaderId)
-                                                         .Select(ld => new LeaveRequestDetailViewModel
-                                                         {
-                                                             LeaveRequestDetailId = ld.LeaveRequestDetailId,
-                                                             LeaveRequestHeaderId = ld.LeaveRequestHeaderId,
-                                                             LeaveDate = ld.LeaveDate,
-                                                             Amount = ld.Amount,
-                                                             IsActive = ld.IsActive
-                                                         }).ToList()
-                                                 }).OrderByDescending(x => x.LeaveRequestHeaderId).ToList();
-
-
-         await GetYearList(model, param.EmployeeId);
+                                                LeaveRequestDetailList = _dbContext.LeaveRequestDetails
+                                                    .Where(ld => ld.LeaveRequestHeaderId == lheader.LeaveRequestHeaderId)
+                                                    .Select(ld => new LeaveRequestDetailViewModel
+                                                    {
+                                                        LeaveRequestDetailId = ld.LeaveRequestDetailId,
+                                                        LeaveRequestHeaderId = ld.LeaveRequestHeaderId,
+                                                        LeaveDate = ld.LeaveDate,
+                                                        Amount = ld.Amount,
+                                                        IsActive = ld.IsActive
+                                                    }).ToList()
+                                            }).OrderByDescending(x => x.LeaveRequestHeaderId).ToList();
 
 
-        int selectedYear = param.FilterYear > 0 ? param.FilterYear : _currentYear;
+            await GetYearList(model, param.EmployeeId);
 
+            var workdtls = _dbContext.EmployeeWorkDetails.Where(x => x.EmployeeId == param.EmployeeId).FirstOrDefault();
 
-          var vlSummary = _dbContext.LeaveSummary
-                    .FromSqlInterpolated($"EXEC get_LeaveBalance @EmployeeId = {param.EmployeeId},@Year = {selectedYear.ToString()}, @LeaveType =  'VL'  ")
-                    .ToList();
+            int selectedYear = param.FilterYear > 0 ? param.FilterYear : _currentYear;
 
-            model.vlSummaries = vlSummary
-               .Select(dtr => new LeaveSummaryViewModel
-               {
-                   EmployeeId = dtr.EmployeeId,
-                   AsOf = dtr.AsOf,
-                   BegBal = dtr.BegBal,
-                   Credit = dtr.Credit,
-                   Availed = dtr.Availed,
-                   Monetized = dtr.Monetized,
-                   EndBal = dtr.EndBal
-               }).ToList();
+          
+            if (workdtls != null && (workdtls.EmployeeStatusId == (int)EnumEmploymentType.Regular || workdtls.EmployeeStatusId == (int)EnumEmploymentType.Probationary))
+            {
+                model.vlSummaries = GetLeaveSummary(param.EmployeeId, selectedYear, "VL", false);
+                model.slSummaries = GetLeaveSummary(param.EmployeeId, selectedYear, "SL", false);
 
-
-            var slSummary = _dbContext.LeaveSummary
-                      .FromSqlInterpolated($"EXEC get_LeaveBalance @EmployeeId = {param.EmployeeId},@Year = {selectedYear.ToString()}, @LeaveType =  'SL'  ")
-                      .ToList();
-
-            model.slSummaries = slSummary
-               .Select(dtr => new LeaveSummaryViewModel
-               {
-                   EmployeeId = dtr.EmployeeId,
-                   AsOf = dtr.AsOf,
-                   BegBal = dtr.BegBal,
-                   Credit = dtr.Credit,
-                   Availed = dtr.Availed,
-                   Monetized = dtr.Monetized,
-                   EndBal = dtr.EndBal
-               }).ToList();
-
-
+            }
+            else
+            {
+                model.vlSummaries = GetLeaveSummary(param.EmployeeId, selectedYear, "VL", true);
+                model.slSummaries = GetLeaveSummary(param.EmployeeId, selectedYear, "SL", true);
+            }
 
             return model;
         }
+
+        private List<LeaveSummaryViewModel> GetLeaveSummary(int employeeId, int year, string leaveType, bool isContractual)
+        {
+            IQueryable<LeaveSummary> query;
+
+            if (isContractual)
+            {
+                query = _dbContext.LeaveSummary
+                         .FromSqlInterpolated($"EXEC get_LeaveBalanceContractual @Year = {year}");
+            }
+            else
+            {
+                query = _dbContext.LeaveSummary
+                         .FromSqlInterpolated($"EXEC get_LeaveBalance @EmployeeId = {employeeId}, @Year = {year}, @LeaveType = {leaveType}");
+            }
+
+            return query.ToList()
+                        .Select(dtr => new LeaveSummaryViewModel
+                        {
+                            EmployeeId = dtr.EmployeeId,
+                            AsOf = dtr.AsOf,
+                            BegBal = dtr.BegBal,
+                            Credit = dtr.Credit,
+                            Availed = dtr.Availed,
+                            Monetized = dtr.Monetized,
+                            EndBal = dtr.EndBal
+                        }).ToList();
+        }
+
 
         private async Task<LeaveViewModel> GetYearList(LeaveViewModel model, int empId)
         {
             var workdtls = _dbContext.EmployeeWorkDetails.Where(x => x.EmployeeId == empId).FirstOrDefault();
 
             int startYear = workdtls?.DateHired?.Year ?? DateTime.Now.Year;
-            int currentYear = DateTime.Now.Year;         
+            int currentYear = DateTime.Now.Year;
 
             var _yearList = new LeaveViewModel
             {
@@ -154,59 +161,59 @@ namespace DCI.Repositories
             {
 
                 var approvalhistory = _dbContext.ApprovalHistory.Where(x => x.ModulePageId == (int)EnumModulePage.Leave);
-      
 
 
-            var query = from lheader in _dbContext.LeaveRequestHeader
-                        join lvtype in _dbContext.LeaveType on lheader.LeaveTypeId equals lvtype.LeaveTypeId
-                        join stat in _dbContext.Status on lheader.Status equals stat.StatusId
-                        join emp in _dbContext.Employee on lheader.EmployeeId equals emp.EmployeeId
-                        join apprvl in approvalhistory on lheader.LeaveRequestHeaderId equals apprvl.TransactionId into ah
-                        from apprvl in ah.DefaultIfEmpty()
-                        where lheader.LeaveRequestHeaderId == param.LeaveRequestHeaderId
-                        select new LeaveRequestHeaderViewModel
-                        {
-                            LeaveRequestHeaderId = lheader.LeaveRequestHeaderId,
-                            EmployeeId = lheader.EmployeeId,
-                            RequestNo = lheader.RequestNo,
-                            DateFiled = lheader.DateFiled,
-                            DateFiledString = lheader.DateFiled.ToString("MM/dd/yyyy hh:mm tt"),
-                            LeaveTypeId = lheader.LeaveTypeId,
-                            LeaveName = lvtype.Description,
-                            Reason = lheader.Reason,
-                            NoofDays = lheader.NoOfDays,
-                            Status = lheader.Status,
-                            StatusName = stat.StatusName,
-                            EmployeeName = emp.Firstname + " " + emp.Lastname,
-                            DateApprovedDisapproved = apprvl != null ? apprvl.DateCreated : null,
-                            ApprovalRemarks = apprvl != null ? apprvl.Remarks : string.Empty,
-                        };
 
-            model.LeaveRequestHeader = await query.AsNoTracking().FirstOrDefaultAsync();
+                var query = from lheader in _dbContext.LeaveRequestHeader
+                            join lvtype in _dbContext.LeaveType on lheader.LeaveTypeId equals lvtype.LeaveTypeId
+                            join stat in _dbContext.Status on lheader.Status equals stat.StatusId
+                            join emp in _dbContext.Employee on lheader.EmployeeId equals emp.EmployeeId
+                            join apprvl in approvalhistory on lheader.LeaveRequestHeaderId equals apprvl.TransactionId into ah
+                            from apprvl in ah.DefaultIfEmpty()
+                            where lheader.LeaveRequestHeaderId == param.LeaveRequestHeaderId
+                            select new LeaveRequestHeaderViewModel
+                            {
+                                LeaveRequestHeaderId = lheader.LeaveRequestHeaderId,
+                                EmployeeId = lheader.EmployeeId,
+                                RequestNo = lheader.RequestNo,
+                                DateFiled = lheader.DateFiled,
+                                DateFiledString = lheader.DateFiled.ToString("MM/dd/yyyy hh:mm tt"),
+                                LeaveTypeId = lheader.LeaveTypeId,
+                                LeaveName = lvtype.Description,
+                                Reason = lheader.Reason,
+                                NoofDays = lheader.NoOfDays,
+                                Status = lheader.Status,
+                                StatusName = stat.StatusName,
+                                EmployeeName = emp.Firstname + " " + emp.Lastname,
+                                DateApprovedDisapproved = apprvl != null ? apprvl.DateCreated : null,
+                                ApprovalRemarks = apprvl != null ? apprvl.Remarks : string.Empty,
+                            };
 
-            if (param.LeaveRequestHeaderId == 0)
-            {
-                model = new LeaveViewModel();
-            }
-            else
-            {
-                //var leaveDtl = (from dtl in _dbContext.LeaveRequestDetails
-                //            where dtl.LeaveRequestHeaderId == param.LeaveRequestHeaderId
-                //            select new LeaveRequestDetailViewModel
-                //            {
-                //                LeaveRequestHeaderId = dtl.LeaveRequestHeaderId,
-                //                LeaveDate = dtl.LeaveDate,
-                //                Amount = dtl.Amount                              
-                //            }).ToList();
+                model.LeaveRequestHeader = await query.AsNoTracking().FirstOrDefaultAsync();
 
-                model.LeaveDateList = _dbContext.LeaveRequestDetails
-                                 .Where(dtl => dtl.LeaveRequestHeaderId == param.LeaveRequestHeaderId)
-                                 .Select(dtl => dtl.LeaveDate.Date.ToShortDateString())
-                                 .ToList();
-               // model.LeaveDateList = leaveDates;
-               // model.LeaveRequestHeader.LeaveRequestDetailList = leaveDtl;
-               // model.LeaveRequestHeader.LeaveRequestDetailList = _dbContext.LeaveRequestDetails.Where(x => x.LeaveRequestHeaderId == param.LeaveRequestHeaderId).ToList();
-            }
+                if (param.LeaveRequestHeaderId == 0)
+                {
+                    model = new LeaveViewModel();
+                }
+                else
+                {
+                    //var leaveDtl = (from dtl in _dbContext.LeaveRequestDetails
+                    //            where dtl.LeaveRequestHeaderId == param.LeaveRequestHeaderId
+                    //            select new LeaveRequestDetailViewModel
+                    //            {
+                    //                LeaveRequestHeaderId = dtl.LeaveRequestHeaderId,
+                    //                LeaveDate = dtl.LeaveDate,
+                    //                Amount = dtl.Amount                              
+                    //            }).ToList();
+
+                    model.LeaveDateList = _dbContext.LeaveRequestDetails
+                                     .Where(dtl => dtl.LeaveRequestHeaderId == param.LeaveRequestHeaderId)
+                                     .Select(dtl => dtl.LeaveDate.Date.ToShortDateString())
+                                     .ToList();
+                    // model.LeaveDateList = leaveDates;
+                    // model.LeaveRequestHeader.LeaveRequestDetailList = leaveDtl;
+                    // model.LeaveRequestHeader.LeaveRequestDetailList = _dbContext.LeaveRequestDetails.Where(x => x.LeaveRequestHeaderId == param.LeaveRequestHeaderId).ToList();
+                }
 
                 var leavetypeList = _dbContext.LeaveType.Where(x => x.IsActive == true).AsQueryable().ToList();
                 model.LeaveRequestHeader.LeaveTypeList = leavetypeList.Count() > 0 ? leavetypeList : null;
@@ -250,7 +257,7 @@ namespace DCI.Repositories
 
         public async Task<(int statuscode, string message)> SaveLeave(LeaveFormViewModel param)
         {
-          
+
 
             try
             {
@@ -269,12 +276,12 @@ namespace DCI.Repositories
                     entity.DateModified = null;
                     entity.IsActive = true;
                     await _dbContext.LeaveRequestHeader.AddAsync(entity);
-                    await _dbContext.SaveChangesAsync();                
+                    await _dbContext.SaveChangesAsync();
 
                     int count = param.SelectedDateList.Count();
 
                     foreach (var date in param.SelectedDateList)
-                    {   
+                    {
                         LeaveRequestDetails entityDtl = new LeaveRequestDetails();
                         entityDtl.LeaveRequestHeaderId = entity.LeaveRequestHeaderId;
                         entityDtl.LeaveDate = date;
@@ -294,15 +301,15 @@ namespace DCI.Repositories
 
 
                     //Send Application Notification to Approver
-                    NotificationViewModel notifvm = new NotificationViewModel();                   
+                    NotificationViewModel notifvm = new NotificationViewModel();
                     notifvm.Title = "Leave Request";
-                    notifvm.Description = String.Format("You have been assigned leave request {0} for approval",entity.RequestNo);     
+                    notifvm.Description = String.Format("You have been assigned leave request {0} for approval", entity.RequestNo);
                     notifvm.ModuleId = (int)EnumModulePage.Leave;
                     notifvm.TransactionId = entity.LeaveRequestHeaderId;
                     notifvm.AssignId = param.ApproverId;
                     //notifvm.URL = "/Todo/Index/?leaveId=" + entity.LeaveRequestHeaderId;
                     notifvm.URL = "/Todo/Leave";
-                    notifvm.MarkRead = false;        
+                    notifvm.MarkRead = false;
                     notifvm.CreatedBy = param.CurrentUserId;
                     notifvm.IsActive = true;
                     await _homeRepository.SaveNotification(notifvm);
@@ -324,8 +331,8 @@ namespace DCI.Repositories
 
 
                     return (StatusCodes.Status200OK, string.Format("Leave request {0} has been submitted for approval.", entity.RequestNo));
-    
-                }              
+
+                }
                 return (StatusCodes.Status400BadRequest, "An error occurred. Please try again.");
             }
             catch (Exception ex)
@@ -336,27 +343,27 @@ namespace DCI.Repositories
             finally
             {
                 Log.CloseAndFlush();
-            }           
+            }
         }
 
         private async Task<string> GenereteRequestNo()
         {
 
             try
-            {     
+            {
                 int _currentYear = DateTime.Now.Year;
                 int _currentMonth = DateTime.Now.Month;
                 var _leaveContext = await _dbContext.LeaveRequestHeader
                                                 .Where(x => x.IsActive == true && x.DateFiled.Date.Year == _currentYear && x.DateFiled.Date.Month == _currentMonth)
                                                 .AsQueryable()
                                                 .ToListAsync();
-    
 
-                int totalrecords = _leaveContext.Count() + 1;           
-                string finalSetRecords = GetFormattedRecord(totalrecords);              
+
+                int totalrecords = _leaveContext.Count() + 1;
+                string finalSetRecords = GetFormattedRecord(totalrecords);
                 string yearMonth = DateTime.Now.ToString("yyyyMM");
                 string req = "RQT";
-         
+
                 return $"{req}-{yearMonth}-{finalSetRecords}";
             }
             catch (Exception ex)
@@ -371,7 +378,7 @@ namespace DCI.Repositories
         }
 
         private string GetFormattedRecord(int totalRecords)
-        {        
+        {
             int setA = totalRecords % 1000;
             int setB = totalRecords / 1000;
             string formattedA = setA.ToString("D4");

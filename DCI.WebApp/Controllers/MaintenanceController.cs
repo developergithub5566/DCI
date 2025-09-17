@@ -1430,6 +1430,14 @@ namespace DCI.WebApp.Controllers
                                    Value = x.DepartmentId.ToString(),
                                    Text = x.DepartmentName
                                }).ToList();
+
+                        vm.OptionsWorkLocation = vm.WorkLocationList.Select(x =>
+                           new SelectListItem
+                           {
+                               Value = x.WorkLocationId.ToString(),
+                               Text = x.Location
+                           }).ToList();
+
                     }
 
                     return View(vm);

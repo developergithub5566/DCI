@@ -14,6 +14,7 @@ namespace DCI.Models.Entities
         public string? MobileNoOffice { get; set; }
         public int? EmployeeStatusId { get; set; }
         public int? DepartmentId { get; set; }
+        public int? WorkLocation { get; set; }
         public string? JobFunction { get; set; }
         public DateTime? DateHired { get; set; }
         public DateTime? DateRegularized { get; set; }

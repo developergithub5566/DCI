@@ -366,7 +366,7 @@
                                 <label class="frmText"><span class="required">*</span> No. of Days</label>
                                 @*  <input type="number" min="0" step="any" name="NO_DAYS" class="form-control frmField" autocomplete="off"> *@
                                @*  <input type="text" step="any" id="NoOfDays" name="NoOfDays" class="form-control frmField" autocomplete="off" onkeypress="return isNumericDecimalKey(event,this);"> *@
-                                <input type="text" id="NoOfDays" name="NoOfDays" class="form-control frmField" autocomplete="off" onkeypress="return isNumericDecimalKey(event, this)" oninput="validateNumber(this)" />
+                                <input type="text" id="NoOfDays" name="NoOfDays" class="form-control frmField" autocomplete="off" onkeypress="return isNumericDecimalKey(event, this)" oninput="checkingNumber(this)" />
                             </div>
                         </div>
 
@@ -397,7 +397,7 @@
 
                         <div class="col-12">
                             <div class="form-group">
-                                <label class="frmText"><span class="required">*</span> Remarks:</label>
+                                <label class="frmText"><span class="required">*</span> Reason:</label>
                                 <textarea class="form-control frmField" name="Reason" id="Reason" required></textarea>
                             </div>
                         </div>
@@ -1012,35 +1012,6 @@
 
       
 
-        function validateNumber(el) {
-            let v = el.value;
-
-            // Remove all characters except digits and dot
-            v = v.replace(/[^\d.]/g, '');
-
-            // Remove leading dot
-            v = v.replace(/^\./, '');
-
-            // Only one dot allowed
-            let parts = v.split('.');
-            if (parts.length > 2) {
-                v = parts[0] + '.' + parts[1]; // ignore extra dots
-                parts = v.split('.');
-            }
-
-            // Limit before decimal to 3 digits
-            if (parts[0].length > 3) {
-                parts[0] = parts[0].substring(0, 3);
-            }
-
-            // Limit after decimal to 4 digits
-            if (parts[1] && parts[1].length > 4) {
-                parts[1] = parts[1].substring(0, 4);
-            }
-
-            // Recombine
-            el.value = parts.join('.');
-        }
 
          function getLeaveByYear() {
 

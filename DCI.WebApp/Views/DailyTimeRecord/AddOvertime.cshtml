@@ -112,8 +112,8 @@
 
                 <div class="row">
                     <div class="col-md-6">
-                        <label class="frmText">Remarks</label>
-                        <input type="text" id="Remarks" name="Remarks" class="form-control frmField" value="@Model.Remarks" required>
+                        <label class="frmText"><span class="required">*</span>Remarks</label>
+                        <input type="text" id="Remarks" name="Remarks" class="form-control frmField" value="@Model.Remarks" required autocomplete="off">
                     </div>
 
                 </div>         
@@ -342,21 +342,32 @@
 
                              function save() {
                                const entries = collectOvertimeEntries();
+                                           const _remarks = $('#Remarks').val();
 
-                               if(entries.length ==0){
+                                                 if(entries.length ==0){
                        
-                                     Swal.fire({
+                                                     Swal.fire({
                                                                 text: "Please file overtime before submitting.",
                                                                 icon: "error"
                                                             });
-                                   return;
-                               }
+                                                          return;
+                                               }
+                                                if(_remarks == "" ){
+
+                                             Swal.fire({
+                                                                        text: "Remarks is required.",
+                                                                        icon: "error"
+                                                                    });
+                                           return;
+                                       }
+
+                                                
 
                                const _otHeaderId =$('#OTHeaderId').val();
                                const _otdate =$('#OTDate').val();
                                const _timefrom =  $('#OTTimeFrom').val();
                                const _timeto = $('#OTTimeTo').val();
-                               const _remarks = $('#Remarks').val();
+                   
                                const ischkOB = document.getElementById("chkOB");
 
                                   const payload = {

@@ -2,13 +2,12 @@
 
 namespace DCI.Models.Entities
 {
-    public class Holiday : IAuditable
+    public class WorkLocation : IAuditable
     {
-        public int HolidayId { get; set; }
-        public DateTime HolidayDate { get; set; }
-        public string HolidayName { get; set; }
+        public int WorkLocationId { get; set; }
+        public string? Code { get; set; }
+        public string Location { get; set; } = string.Empty;
         public string? Description { get; set; }
-        public int HolidayType { get; set; }
         public DateTime DateCreated { get; set; }
         public int CreatedBy { get; set; }
         public DateTime? DateModified { get; set; }

@@ -354,6 +354,12 @@
                                     <label class="bottomLabelText">Salary</label>
                                 </div>
                             </div>
+                            <div class="col-lg-3">
+                                <div class="form-group mb10 text-center">
+                                    @Html.DropDownListFor(model => model.WorkLocation, Model.OptionsWorkLocation, "SELECT WORK LOCATION", new { @class = "bg-gray-100 font-weight-bold form-control frmField text-center" })
+                                    <label class="bottomLabelText">Work Location</label>
+                                </div>
+                            </div>
                         @*     <div class="col-lg-2">
                                 <div class="form-group mb10 text-center">
                                     <select id="bandlevelSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" asp-for="BandLevel" required>
@@ -411,11 +417,32 @@
                                 </div>
                             </div>
                         </div> *@
-
+                        <hr class="my-3"> 
+                        <div class="row">
+                   
+                            <div class="col-lg-2">
+                                <div class="form-group mb10 text-center">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="VLCredit" name="VLCredit" onkeypress="return isNumericDecimalKey(event, this)" oninput="checkingNumber(this)" title="VL Monthly Credit">
+                                    <label class="bottomLabelText">Vacation Leave Credit</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="form-group mb10 text-center">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="SLCredit" name="SLCredit" onkeypress="return isNumericDecimalKey(event, this)" oninput="checkingNumber(this)" title="SL Monthly Credit">
+                                    <label class="bottomLabelText">Sick Leave Credit</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="form-group mb10 text-center">                          
+                                    <label class="topLabelText" title="SPL Yearly Credit">3.0000</label>
+                                    <label class="bottomLabelText">Special Leave Credit</label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </form>
-
+      
         </div>
 
     </div>
@@ -427,6 +454,8 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="@Url.Content("~/js/dci-validation.js")"></script>
+
 
     <script type="text/javascript">
         var js = jQuery.noConflict(true);
@@ -609,5 +638,8 @@
                 }
             });
         }
+
+    
+
     </script>
 }

@@ -89,7 +89,10 @@ namespace DCI.Repositories
                                      join post in _dbContext.Position on dtl.Position equals post.PositionId into postGroup
                                      from post in postGroup.DefaultIfEmpty()
 
-                                     join empstat in _dbContext.EmployeeStatus on dtl.EmployeeStatusId equals empstat.EmployeeStatusId into empstatGroup
+                                    join loc in _dbContext.WorkLocation on dtl.WorkLocation equals loc.WorkLocationId into locGroup
+                                    from loc in locGroup.DefaultIfEmpty()
+
+                                    join empstat in _dbContext.EmployeeStatus on dtl.EmployeeStatusId equals empstat.EmployeeStatusId into empstatGroup
                                      from empstat in empstatGroup.DefaultIfEmpty()
 
                                      where emp.EmployeeId == empId
@@ -129,6 +132,8 @@ namespace DCI.Repositories
                                                 PositionName = post.Description,
                                                 ResignedDate = dtl.ResignedDate,
                                                 BandLevel = dtl.BandLevel,
+                                                WorkLocation = loc.WorkLocationId,
+                                                WorkLocationName = loc.Location,
                                                 EmployeeStatusId = empstat.EmployeeStatusId,
                                                 EmployeeStatusName = empstat.Description,
                                                 DateCreated = emp.DateCreated,
@@ -142,7 +147,7 @@ namespace DCI.Repositories
                 result.EmployeeStatusList = _dbContext.EmployeeStatus.Where(x => x.IsActive).ToList();
                 result.DepartmentList = _dbContext.Department.Where(x => x.IsActive).ToList();
                 result.PositionList = _dbContext.Position.Where(x => x.IsActive).ToList();
-
+                result.WorkLocationList = _dbContext.WorkLocation.Where(x => x.IsActive).ToList();
                 return result;
             }
             catch (Exception ex)
@@ -205,11 +210,15 @@ namespace DCI.Repositories
                     dtl.Position = model.PositionId;
                     dtl.ResignedDate = model.ResignedDate;
                     dtl.BandLevel = model.BandLevel;
+                    dtl.WorkLocation = model.WorkLocation;
                     dtl.DateModified = null;
                     dtl.DateModified = null;
                     dtl.IsActive = true;
                     await _dbContext.EmployeeWorkDetails.AddAsync(dtl);
                     await _dbContext.SaveChangesAsync();
+
+                   await UpdateLeaveInfo(model, true);
+
                     return (StatusCodes.Status200OK, "Registration successful");
                 }
                 else
@@ -259,6 +268,7 @@ namespace DCI.Repositories
                     dtl.Position = model.PositionId;
                     dtl.ResignedDate = model.ResignedDate;
                     dtl.BandLevel = model.BandLevel;
+                    dtl.WorkLocation = model.WorkLocation;
                     dtl.DateModified = DateTime.Now;
                     dtl.ModifiedBy = model.ModifiedBy;
                     dtl.IsActive = true;
@@ -273,6 +283,7 @@ namespace DCI.Repositories
                     _dbContext.User.Entry(usr).State = EntityState.Modified;
                     await _dbContext.SaveChangesAsync();
 
+                    await UpdateLeaveInfo(model, false);
 
                     return (StatusCodes.Status200OK, "Registration updated");
                 }
@@ -288,6 +299,49 @@ namespace DCI.Repositories
             }
         }
 
+        private async Task UpdateLeaveInfo(Form201ViewModel model, bool IsNewEmployee)
+        {
+            int _year = DateTime.Now.Year;
+
+            var leaveinfo = await _dbContext.LeaveInfo.OrderByDescending(x => x.EmployeeId == model.EmployeeId).FirstOrDefaultAsync();
+
+            if(leaveinfo == null && IsNewEmployee)
+            {
+                LeaveInfo lv = new LeaveInfo();
+                lv.EmployeeId = model.EmployeeId;
+                lv.VLYear = 0;
+                lv.SLYear = 0;
+                lv.VLBalance = 0;
+                lv.SLBalance = 0;
+                lv.VLCredit = model.VLCredit;
+                lv.SLCredit = model.SLCredit;
+                lv.DateCreated = DateTime.Now;
+                lv.CreatedBy = model.CurrentUserId;
+                lv.IsActive = true;
+                await _dbContext.LeaveInfo.AddAsync(lv);
+                await _dbContext.SaveChangesAsync();
+              
+            }
+            // kung hindi same lang nung last record, issave nya. 
+            else if (IsNewEmployee == false && leaveinfo?.VLCredit != model.VLCredit && leaveinfo?.SLCredit != model.SLCredit)
+            {
+                //add new row 
+                LeaveInfo lv = new LeaveInfo();
+                lv.EmployeeId = model.EmployeeId;
+                lv.VLYear = leaveinfo.VLYear;
+                lv.SLYear = leaveinfo.SLYear;
+                lv.VLBalance = leaveinfo.VLBalance;
+                lv.SLBalance = leaveinfo.SLBalance;
+                lv.VLCredit = model.VLCredit;
+                lv.SLCredit = model.SLCredit;
+                lv.DateCreated = DateTime.Now;
+                lv.CreatedBy = model.CurrentUserId;
+                lv.IsActive = true;
+                await _dbContext.LeaveInfo.AddAsync(lv);
+                await _dbContext.SaveChangesAsync();
+            }
+           
+        }
 
         public async Task<(int statuscode, string message)> Update201Form(Form201ViewModel model)
         {

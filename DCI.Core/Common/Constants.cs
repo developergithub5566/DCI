@@ -8,9 +8,10 @@
 		public const string AppCode = "DMS";
 		public const string DocControlNo = "CN";
 
-		public const string Msg_ErrorMessage = "An error occurred. Please try again.";	
+		public const string Msg_ErrorMessage = "An error occurred. Please try again.";
+        public const string Msg_NoBiometricsFound = "No biometric records found.";
 
-		public const string Email_Subject_SetPassword = "DCI App - Set Password";
+        public const string Email_Subject_SetPassword = "DCI App - Set Password";
 		public const string Email_Subject_ResetPassword = "DCI App - Reset Password";
 		public const string Email_Subject_UploadFile = "DCI App - Please Upload Your Document No";
 

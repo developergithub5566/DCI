@@ -93,6 +93,9 @@
                                 <label>Holiday Name</label>
                             </th>
                             <th>
+                                <label>Type</label>
+                            </th>
+                            <th>
                                 <label>Description</label>
                             </th>
                             <th>
@@ -118,6 +121,9 @@
                                 </td>
                                 <td>
                                     @item.HolidayName
+                                </td>
+                                <td>
+                                    @item.HolidayTypeName
                                 </td>
                                 <td>
                                     @item.Description
@@ -169,6 +175,13 @@
                                     <label for="HolidayName" class="col-form-label required">Holiday Name:</label>
                                     <input type="text" class="form-control" id="HolidayName" name="HolidayName" maxlength="100" onkeypress="return alphaNumericOnly(event);" required>
                                 </div>
+
+                                <select id="selectholiday" class="form-select" required">
+                                    <option value="0" disabled>Select</option>
+                                    <option value="1">Regular Holiday</option>
+                                    <option value="2">Special Holiday</option>                            
+                                </select>
+
                                 <div class="form-group">
                                     <label for="Description" class="col-form-label">Description:</label>
                                     <textarea class="form-control" id="Description" name="Description" maxlength="255"></textarea>
@@ -231,7 +244,8 @@
                         HolidayId: '#HolidayId',
                         HolidayDate: '#HolidayDate',
                         HolidayName: '#HolidayName',
-                        Description: '#Description'
+                        Description: '#Description',
+                        HolidayType: '#selectholiday'                        
                     };
 
                     $.each(fields, (key, selector) => {

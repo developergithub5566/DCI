@@ -32,6 +32,7 @@ namespace DCI.Models.ViewModel
         public DateTime DateTo { get; set; } = DateTime.Now;
 
         public bool IsHoliday { get; set; } = false;
+        //public int IsHolidayRegularSpecial { get; set; } = 0;
 
         public int EMPLOYEE_ID { get; set; } = 0;
 

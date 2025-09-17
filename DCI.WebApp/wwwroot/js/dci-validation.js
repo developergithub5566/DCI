@@ -875,3 +875,57 @@ function alphaNumericOnly(e) {
 }
 
 
+function isNumericDecimalKey(evt, el) {
+    const k = evt.key; // more reliable than keyCode for modern browsers
+
+    // Allow navigation/edit keys
+    if (k === 'Backspace' || k === 'Tab' || k === 'ArrowLeft' || k === 'ArrowRight' || k === 'Home' || k === 'End') {
+        return true;
+    }
+
+    // Allow only digits
+    if (k >= '0' && k <= '9') return true;
+
+    // Allow a single decimal point (not as the first char)
+    if (k === '.') {
+        if (el.value.length === 0) { evt.preventDefault(); return false; }
+        if (el.value.indexOf('.') === -1) return true;
+        evt.preventDefault();
+        return false;
+    }
+
+    // Block everything else (e, E, -, +, spaces, etc.)
+    evt.preventDefault();
+    return false;
+}
+
+
+function checkingNumber(el) {
+    let v = el.value;
+
+    // Remove all characters except digits and dot
+    v = v.replace(/[^\d.]/g, '');
+
+    // Remove leading dot
+    v = v.replace(/^\./, '');
+
+    // Only one dot allowed
+    let parts = v.split('.');
+    if (parts.length > 2) {
+        v = parts[0] + '.' + parts[1]; // ignore extra dots
+        parts = v.split('.');
+    }
+
+    // Limit before decimal to 3 digits
+    if (parts[0].length > 3) {
+        parts[0] = parts[0].substring(0, 3);
+    }
+
+    // Limit after decimal to 4 digits
+    if (parts[1] && parts[1].length > 4) {
+        parts[1] = parts[1].substring(0, 4);
+    }
+
+    // Recombine
+    el.value = parts.join('.');
+}

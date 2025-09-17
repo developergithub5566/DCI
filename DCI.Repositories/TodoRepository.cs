@@ -149,39 +149,52 @@ namespace DCI.Repositories
                 int _currentYear = DateTime.Now.Year;
 
                 var contextHdr = _dbContext.LeaveRequestHeader.Where(x => x.LeaveRequestHeaderId == param.TransactionId).FirstOrDefault();
+                var contextDtl = _dbContext.LeaveRequestDetails.Where(x => x.IsActive && x.LeaveRequestHeaderId == contextHdr.LeaveRequestHeaderId).ToList();
+                var emp = _dbContext.Employee.Where(x => x.EmployeeId == contextHdr.EmployeeId).FirstOrDefault();
+                var empDetails = _dbContext.EmployeeWorkDetails.Where(x => x.EmployeeId == contextHdr.EmployeeId).FirstOrDefault();
+
 
                 if (contextHdr != null && param.Status == (int)EnumStatus.Approved)
                 {
-                    var contextLeaveInfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == contextHdr.EmployeeId && x.DateCreated.Date.Year == _currentYear).OrderByDescending(x => x.DateCreated).FirstOrDefault();
-
-                    if (contextHdr.LeaveTypeId == (int)EnumLeaveType.VL)
+                    if (empDetails?.EmployeeStatusId == (int)EnumEmploymentType.Regular)
                     {
-                        contextLeaveInfo.VLBalance = contextLeaveInfo.VLBalance - contextHdr.NoOfDays;                 
+                        var contextLeaveInfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == contextHdr.EmployeeId && x.DateCreated.Date.Year == _currentYear).OrderByDescending(x => x.DateCreated).FirstOrDefault();
+
+                        if (contextHdr.LeaveTypeId == (int)EnumLeaveType.VL)
+                        {
+                            contextLeaveInfo.VLBalance = contextLeaveInfo.VLBalance - contextHdr.NoOfDays;
+                        }
+                        else if (contextHdr.LeaveTypeId == (int)EnumLeaveType.SL)
+                        {
+                            contextLeaveInfo.SLBalance = contextLeaveInfo.SLBalance - contextHdr.NoOfDays;
+                        }
+                        else if (contextHdr.LeaveTypeId == (int)EnumLeaveType.SPL)
+                        {
+                            contextLeaveInfo.SPLBalance = contextLeaveInfo.SPLBalance - contextHdr.NoOfDays;
+                        }
+                        _dbContext.LeaveInfo.Entry(contextLeaveInfo).State = EntityState.Modified;
+                        _dbContext.SaveChanges();
+                      
+                     
+
+                        foreach (var raw in contextDtl)
+                        {
+                            //Update DTR attendance summary status to VL DEDUCTED                    
+                            await _dbContext.tbl_raw_logs.Where(x => x.EMPLOYEE_ID == emp.EmployeeNo && x.DATE_TIME.Date == raw.LeaveDate.Date)
+                                                         .ExecuteUpdateAsync(s => s
+                                                         .SetProperty(r => r.STATUS, r => (int)EnumStatus.VLDeducted));
+                        }
                     }
-                    else if (contextHdr.LeaveTypeId == (int)EnumLeaveType.SL)
+                    else // probitionary and contractual/projectbased
                     {
-                        contextLeaveInfo.SLBalance = contextLeaveInfo.SLBalance - contextHdr.NoOfDays;                       
+                        foreach (var raw in contextDtl)
+                        {
+                            //Update DTR attendance summary status to Payroll DEDUCTED                    
+                            await _dbContext.tbl_raw_logs.Where(x => x.EMPLOYEE_ID == emp.EmployeeNo && x.DATE_TIME.Date == raw.LeaveDate.Date)
+                                                         .ExecuteUpdateAsync(s => s
+                                                         .SetProperty(r => r.STATUS, r => (int)EnumStatus.PayrollDeducted));
+                        }
                     }
-                    else if (contextHdr.LeaveTypeId == (int)EnumLeaveType.SPL)
-                    {
-                        contextLeaveInfo.SPLBalance = contextLeaveInfo.SPLBalance - contextHdr.NoOfDays;                       
-                    }
-                    _dbContext.LeaveInfo.Entry(contextLeaveInfo).State = EntityState.Modified;
-                    _dbContext.SaveChanges();
-
-
-                    var contextDtl = _dbContext.LeaveRequestDetails.Where(x => x.IsActive && x.LeaveRequestHeaderId == contextHdr.LeaveRequestHeaderId).ToList();
-                    var emp = _dbContext.Employee.Where(x => x.EmployeeId == contextHdr.EmployeeId).FirstOrDefault();
-
-
-                    foreach (var raw in contextDtl)
-                    {
-                        //Update DTR attendance summary status to DEDUCTED                    
-                        await _dbContext.tbl_raw_logs.Where(x => x.EMPLOYEE_ID == emp.EmployeeNo && x.DATE_TIME.Date == raw.LeaveDate.Date)
-                                                     .ExecuteUpdateAsync(s => s
-                                                     .SetProperty(r => r.STATUS, r => (int)EnumStatus.NotDeducted));
-                    }
-
                 }
 
                 contextHdr.Status = param.Status;

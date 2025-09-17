@@ -6,6 +6,8 @@
         public DateTime HolidayDate { get; set; } = DateTime.Now;
         public string HolidayName { get; set; } = string.Empty;
         public string? Description { get; set; } = string.Empty;
+        public int HolidayType { get; set; } = 0;
+        public string HolidayTypeName { get; set; } = string.Empty;
         public DateTime DateCreated { get; set; } = DateTime.Now;
         public int CreatedBy { get; set; } = 0;
         public DateTime? DateModified { get; set; } = DateTime.Now;

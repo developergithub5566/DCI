@@ -29,7 +29,7 @@ namespace DCI.Repositories
 
         public async Task<IList<DailyTimeRecordViewModel>> GetAllUndertime(DailyTimeRecordViewModel model)
         {
-            var context = _dbContext.vw_AttendanceSummary.AsQueryable().Where(x => x.STATUS != (int)EnumStatus.Deducted);
+            var context = _dbContext.vw_AttendanceSummary.AsQueryable().Where(x => x.STATUS != (int)EnumStatus.PayrollDeducted);
             int _currentYear = DateTime.Now.Year;
 
             var dateTo = model.DateTo.Date.AddDays(1).AddTicks(-1);
@@ -382,7 +382,8 @@ namespace DCI.Repositories
                         await SaveLeaveForUndertime(lvFormmodel);
 
 
-                        var attendanceList = await _dbContext.vw_AttendanceSummary.Where(x => x.EMPLOYEE_NO == ut.EmpNo && x.DATE >= ut.DateFrom.Date && x.DATE <= dateTo.Date && (x.STATUS != (int)EnumStatus.NotDeducted || x.STATUS != (int)EnumStatus.Deducted)).ToListAsync();
+                        var attendanceList = await _dbContext.vw_AttendanceSummary.Where(x => x.EMPLOYEE_NO == ut.EmpNo && x.DATE >= ut.DateFrom.Date && x.DATE <= dateTo.Date
+                        && (x.STATUS != (int)EnumStatus.NotDeducted || x.STATUS != (int)EnumStatus.PayrollDeducted || x.STATUS != (int)EnumStatus.VLDeducted)).ToListAsync();
 
                         if (leafinfo?.VLBalance >= ut.TotalUndertime)
                         {
@@ -397,7 +398,7 @@ namespace DCI.Repositories
                             //Update DTR attendance summary status to DEDUCTED                    
                             await _dbContext.tbl_raw_logs.Where(x => x.EMPLOYEE_ID == ut.EmpNo && x.DATE_TIME >= ut.DateFrom && x.DATE_TIME <= dateTo)
                                                          .ExecuteUpdateAsync(s => s
-                                                         .SetProperty(r => r.STATUS, r => (int)EnumStatus.Deducted));
+                                                         .SetProperty(r => r.STATUS, r => (int)EnumStatus.VLDeducted));
 
 
                             foreach (var attdnc in attendanceList)
@@ -452,7 +453,7 @@ namespace DCI.Repositories
                 entity.RequestNo = await GenereteRequestNoForUndertime();
                 entity.DateFiled = DateTime.Now;
                 entity.LeaveTypeId = (int)EnumLeaveType.UT;
-                entity.Status = (int)EnumStatus.Deducted;
+                entity.Status = (int)EnumStatus.VLDeducted;
                 entity.Reason = "System-Generated Undertime Deduction.";
                 entity.NoOfDays = param.NoOfDays;
                 entity.ModifiedBy = null;

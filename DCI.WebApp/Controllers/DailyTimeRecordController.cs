@@ -197,10 +197,10 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
-                      model.CurrentUserId = currentUser.UserId;
+                    model.CurrentUserId = currentUser.UserId;
                     model.EmployeeId = currentUser.EmployeeId;
                     model.ApproverId = currentUser.ApproverId;
-             
+
                     //  model.LeaveRequestHeaderId = 4;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -428,7 +428,7 @@ namespace DCI.WebApp.Controllers
                     if (response.IsSuccessStatusCode == true)
                     {
                         model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
-                    }                   
+                    }
                 }
 
                 return View(model);
@@ -466,8 +466,8 @@ namespace DCI.WebApp.Controllers
                     if (response.IsSuccessStatusCode == true)
                     {
                         model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
-                        emp_name = model.Count > 0 ?  model.FirstOrDefault().NAME : string.Empty;
-                        emp_no = model.Count > 0 ?  model.FirstOrDefault().EMPLOYEE_NO : string.Empty;
+                        emp_name = model.Count > 0 ? model.FirstOrDefault().NAME : string.Empty;
+                        emp_no = model.Count > 0 ? model.FirstOrDefault().EMPLOYEE_NO : string.Empty;
 
                     }
                     return Json(new { success = true, data = model, emp = String.Format("{0} - {1}", emp_no, emp_name) });
@@ -494,7 +494,7 @@ namespace DCI.WebApp.Controllers
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
                     //model.CreatedBy = currentUser.UserId;
-                   // model.EmployeeId = currentUser.EmployeeId;
+                    // model.EmployeeId = currentUser.EmployeeId;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/SaveUndertime");
@@ -543,8 +543,8 @@ namespace DCI.WebApp.Controllers
                     {
                         model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
                     }
-         
-                    ViewBag.ApproverHead = currentUser?.ApproverHead;                  
+
+                    ViewBag.ApproverHead = currentUser?.ApproverHead;
 
                 }
                 return View(model);
@@ -598,12 +598,12 @@ namespace DCI.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
-       
+
         public async Task<IActionResult> WFHTimeIn(WFHViewModel param)
         {
             //  List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();
             try
-            {     
+            {
                 //using (var client = new HttpClient())
                 //{
                 //    LoginViewModel loginvm = new LoginViewModel();
@@ -957,7 +957,6 @@ namespace DCI.WebApp.Controllers
                         TimeSpan lastout = new TimeSpan();
                         TimeSpan clockout = new TimeSpan();
 
-                       
                         if (param.IsOfficialBuss)
                         {
                             firstin = TimeSpan.Parse(param.OTTimeFrom);
@@ -971,90 +970,44 @@ namespace DCI.WebApp.Controllers
                             clockout = TimeSpan.Parse(dtrmodel.CLOCK_OUT);
                         }
 
-
                         /* FILTER */
                         bool isHoliday = dtrmodel.IsHoliday;
+                        //int IsHolidayRegularSpecial = dtrmodel.IsHolidayRegularSpecial;
                         bool isRestDay = param.OTDate.DayOfWeek == DayOfWeek.Saturday || param.OTDate.DayOfWeek == DayOfWeek.Sunday;
 
 
                         TimeSpan after8hrs = new TimeSpan(21, 59, 0);
-                        TimeSpan nightDiffStartTime = new TimeSpan(22, 0, 0);
+                        TimeSpan nightDiffStartTime = new TimeSpan(22, 0, 0); //AFTER 10PM
                         TimeSpan nightDiffEndTime = new TimeSpan(6, 0, 0);
                         TimeSpan totalNightdiff;
-                        TimeSpan beforeNightDiff = new TimeSpan(22, 59, 0);
-                        TimeSpan morethan1hr = TimeSpan.FromHours(1);
+                        TimeSpan beforeNightDiff = new TimeSpan(22, 59, 0); //BEFORE 10PM
+                        TimeSpan morethan1hr = TimeSpan.FromHours(1); //MORE THAN 1HR
+                        TimeSpan eightHours = TimeSpan.FromHours(8); //8HRs
+                        TimeSpan lunchBreak = TimeSpan.FromHours(1); //LUNCH BREAK
+
                         List<OvertimeDetailViewModel> otList = new List<OvertimeDetailViewModel>();
 
                         TimeSpan totalWorkingHours = lastout - firstin;
 
                         if (!param.IsOfficialBuss && totalWorkingHours.TotalMinutes == 0)
                         {
-                            return Json(new { success = false, message = "No biometric records found." });
+                            return Json(new { success = false, message = Constants.Msg_NoBiometricsFound });
+                        }
+
+                        if (totalWorkingHours < morethan1hr)
+                        {
+                            return Json(new { success = false, message = Constants.OverTime_Requires1Hr });
                         }
 
 
-                        if (isHoliday == true && isRestDay == false)
+                        //REGULAR or SPECIAL HOLIDAY and REST DAY
+                         if (isHoliday == true && isRestDay == true)
                         {
-
-                            TimeSpan eightHours = TimeSpan.FromHours(8);
-
-                            if (totalWorkingHours > eightHours)
+                            if (totalWorkingHours >= eightHours)
                             {
-                                OvertimeDetailViewModel otSpecialHoliday = new OvertimeDetailViewModel();
-                                otSpecialHoliday.OTDate = param.OTDate.ToString();
-                                otSpecialHoliday.OTDateString = param.OTDate.ToString("yyyy-MM-dd");
-                                otSpecialHoliday.OTTimeFrom = clockout.ToString();
-                                otSpecialHoliday.OTTimeTo = lastout.ToString();
-                                otSpecialHoliday.TotalMinutes = (int)eightHours.TotalMinutes;
-                                otSpecialHoliday.TotalHours = TimeHelper.ConvertMinutesToHHMM((int)eightHours.TotalMinutes);
-                                otSpecialHoliday.OTType = (int)EnumOvertime.SpecialHoliday;
-                                otSpecialHoliday.OTTypeName = Constants.OverTime_SpecialHoliday; 
-                                param.otDetails.Add(otSpecialHoliday);
-
-                                TimeSpan spcHolidayAfter8hrs = lastout - clockout;
-
-
-                                if (spcHolidayAfter8hrs > morethan1hr)
-                                {
-                                    OvertimeDetailViewModel otAfter8hrs = new OvertimeDetailViewModel();
-                                    otAfter8hrs.OTDate = param.OTDate.ToString();
-                                    otAfter8hrs.OTDateString = param.OTDate.ToString("yyyy-MM-dd");
-                                    otAfter8hrs.OTTimeFrom = clockout.ToString();
-                                    otAfter8hrs.OTTimeTo = lastout.ToString();
-                                    otAfter8hrs.TotalMinutes = (int)spcHolidayAfter8hrs.TotalMinutes;
-                                    otAfter8hrs.TotalHours = TimeHelper.ConvertMinutesToHHMM((int)spcHolidayAfter8hrs.TotalMinutes);
-                                    otAfter8hrs.OTType = (int)EnumOvertime.After8hrs;
-                                    otAfter8hrs.OTTypeName = Constants.OverTime_After8hrs;
-                                    param.otDetails.Add(otAfter8hrs);
-                                }
-
-                                if (lastout > nightDiffStartTime)
-                                {
-                                    totalNightdiff = lastout - nightDiffStartTime;
-
-                                    OvertimeDetailViewModel nightdiff = new OvertimeDetailViewModel();
-                                    nightdiff.OTDate = param.OTDate.ToString();
-                                    nightdiff.OTDateString = param.OTDate.ToString("yyyy-MM-dd");
-                                    nightdiff.OTTimeFrom = clockout.ToString();
-                                    nightdiff.OTTimeTo = lastout.ToString();
-                                    nightdiff.TotalMinutes = (int)totalNightdiff.TotalMinutes;
-                                    nightdiff.TotalHours = TimeHelper.ConvertMinutesToHHMM((int)totalNightdiff.TotalMinutes);
-                                    nightdiff.OTType = (int)EnumOvertime.NightDifferential;
-                                    nightdiff.OTTypeName = Constants.OverTime_NightDifferential;
-                                    param.otDetails.Add(nightdiff);
-                                }
+                                totalWorkingHours = totalWorkingHours - lunchBreak;
                             }
-
-                        }
-
-                        else if (isHoliday == true && isRestDay == true)
-                        {
-
-                            TimeSpan eightHours = TimeSpan.FromHours(8);
-                            if (totalWorkingHours > eightHours)
-                            {
-                                totalWorkingHours = totalWorkingHours - morethan1hr; // lunch break
-                            }
+                           // totalWorkingHours = totalWorkingHours < eightHours ? totalWorkingHours : eightHours;
 
                             OvertimeDetailViewModel otSpecialHoliday = new OvertimeDetailViewModel();
                             otSpecialHoliday.OTDate = param.OTDate.ToString();
@@ -1074,7 +1027,7 @@ namespace DCI.WebApp.Controllers
                                 OvertimeDetailViewModel nightdiff = new OvertimeDetailViewModel();
                                 nightdiff.OTDate = param.OTDate.ToString();
                                 nightdiff.OTDateString = param.OTDate.ToString("yyyy-MM-dd");
-                                nightdiff.OTTimeFrom = clockout.ToString();
+                                nightdiff.OTTimeFrom = firstin.ToString();
                                 nightdiff.OTTimeTo = lastout.ToString();
                                 nightdiff.TotalMinutes = (int)totalNightdiff.TotalMinutes;
                                 nightdiff.TotalHours = TimeHelper.ConvertMinutesToHHMM((int)totalNightdiff.TotalMinutes);
@@ -1083,20 +1036,57 @@ namespace DCI.WebApp.Controllers
                                 param.otDetails.Add(nightdiff);
                             }
                         }
-                        else if (isHoliday == false && isRestDay == true)
-                        {
-                            TimeSpan spcHolidayAfter8hrs = lastout - clockout;
 
-                            OvertimeDetailViewModel otAfter8hrs = new OvertimeDetailViewModel();
-                            otAfter8hrs.OTDate = param.OTDate.ToString();
-                            otAfter8hrs.OTDateString = param.OTDate.ToString("yyyy-MM-dd");
-                            otAfter8hrs.OTTimeFrom = clockout.ToString();
-                            otAfter8hrs.OTTimeTo = lastout.ToString();
-                            otAfter8hrs.TotalMinutes = (int)spcHolidayAfter8hrs.TotalMinutes;
-                            otAfter8hrs.TotalHours = TimeHelper.ConvertMinutesToHHMM((int)spcHolidayAfter8hrs.TotalMinutes);
-                            otAfter8hrs.OTType = (int)EnumOvertime.After8hrs;
-                            otAfter8hrs.OTTypeName = Constants.OverTime_After8hrs;
-                            param.otDetails.Add(otAfter8hrs);
+                        //REGULAR or SPECIAL HOLIDAY or REST DAY
+                        else if (isHoliday == true || isRestDay == true)
+                        {
+                            if (totalWorkingHours >= eightHours)
+                            {
+                                totalWorkingHours = totalWorkingHours - lunchBreak;                          
+                            }
+                            totalWorkingHours = totalWorkingHours < eightHours ? totalWorkingHours : eightHours;
+
+                            OvertimeDetailViewModel otSpecialHoliday = new OvertimeDetailViewModel();
+                            otSpecialHoliday.OTDate = param.OTDate.ToString();
+                            otSpecialHoliday.OTDateString = param.OTDate.ToString("yyyy-MM-dd");
+                            otSpecialHoliday.OTTimeFrom = firstin.ToString();
+                            otSpecialHoliday.OTTimeTo = lastout.ToString();
+                            otSpecialHoliday.TotalMinutes = (int)totalWorkingHours.TotalMinutes;
+                            otSpecialHoliday.TotalHours = TimeHelper.ConvertMinutesToHHMM((int)totalWorkingHours.TotalMinutes);
+                            otSpecialHoliday.OTType = (int)EnumOvertime.SpecialHoliday;
+                            otSpecialHoliday.OTTypeName = Constants.OverTime_SpecialHoliday;
+                            param.otDetails.Add(otSpecialHoliday);
+
+                            if(totalWorkingHours >= eightHours)
+                            {
+                                TimeSpan spcHolidayStart8hrs;
+                                TimeSpan spcHolidayAfter8hrs;                              
+
+                                spcHolidayStart8hrs = firstin + eightHours + lunchBreak;
+
+                                if (lastout < nightDiffStartTime)
+                                {
+                                    spcHolidayAfter8hrs = lastout - spcHolidayStart8hrs;
+                                }
+                                else
+                                {
+                                    spcHolidayAfter8hrs = nightDiffStartTime - spcHolidayStart8hrs;
+                                }             
+
+                                if (totalWorkingHours > TimeSpan.Zero)
+                                {
+                                    OvertimeDetailViewModel otAfter8hrs = new OvertimeDetailViewModel();
+                                    otAfter8hrs.OTDate = param.OTDate.ToString();
+                                    otAfter8hrs.OTDateString = param.OTDate.ToString("yyyy-MM-dd");
+                                    otAfter8hrs.OTTimeFrom = firstin.ToString();
+                                    otAfter8hrs.OTTimeTo = lastout.ToString();
+                                    otAfter8hrs.TotalMinutes = (int)spcHolidayAfter8hrs.TotalMinutes;
+                                    otAfter8hrs.TotalHours = TimeHelper.ConvertMinutesToHHMM((int)spcHolidayAfter8hrs.TotalMinutes);
+                                    otAfter8hrs.OTType = (int)EnumOvertime.After8hrs;
+                                    otAfter8hrs.OTTypeName = Constants.OverTime_After8hrs;
+                                    param.otDetails.Add(otAfter8hrs);
+                                }
+                            }                            
 
                             if (lastout > nightDiffStartTime)
                             {
@@ -1105,7 +1095,7 @@ namespace DCI.WebApp.Controllers
                                 OvertimeDetailViewModel nightdiff = new OvertimeDetailViewModel();
                                 nightdiff.OTDate = param.OTDate.ToString();
                                 nightdiff.OTDateString = param.OTDate.ToString("yyyy-MM-dd");
-                                nightdiff.OTTimeFrom = clockout.ToString();
+                                nightdiff.OTTimeFrom = firstin.ToString();
                                 nightdiff.OTTimeTo = lastout.ToString();
                                 nightdiff.TotalMinutes = (int)totalNightdiff.TotalMinutes;
                                 nightdiff.TotalHours = TimeHelper.ConvertMinutesToHHMM((int)totalNightdiff.TotalMinutes);
@@ -1114,6 +1104,40 @@ namespace DCI.WebApp.Controllers
                                 param.otDetails.Add(nightdiff);
                             }
                         }
+
+
+                
+                        //else if (isHoliday == false && isRestDay == true)
+                        //{
+                        //    TimeSpan spcHolidayAfter8hrs = lastout - clockout;
+
+                        //    OvertimeDetailViewModel otAfter8hrs = new OvertimeDetailViewModel();
+                        //    otAfter8hrs.OTDate = param.OTDate.ToString();
+                        //    otAfter8hrs.OTDateString = param.OTDate.ToString("yyyy-MM-dd");
+                        //    otAfter8hrs.OTTimeFrom = clockout.ToString();
+                        //    otAfter8hrs.OTTimeTo = lastout.ToString();
+                        //    otAfter8hrs.TotalMinutes = (int)spcHolidayAfter8hrs.TotalMinutes;
+                        //    otAfter8hrs.TotalHours = TimeHelper.ConvertMinutesToHHMM((int)spcHolidayAfter8hrs.TotalMinutes);
+                        //    otAfter8hrs.OTType = (int)EnumOvertime.After8hrs;
+                        //    otAfter8hrs.OTTypeName = Constants.OverTime_After8hrs;
+                        //    param.otDetails.Add(otAfter8hrs);
+
+                        //    if (lastout > nightDiffStartTime)
+                        //    {
+                        //        totalNightdiff = lastout - nightDiffStartTime;
+
+                        //        OvertimeDetailViewModel nightdiff = new OvertimeDetailViewModel();
+                        //        nightdiff.OTDate = param.OTDate.ToString();
+                        //        nightdiff.OTDateString = param.OTDate.ToString("yyyy-MM-dd");
+                        //        nightdiff.OTTimeFrom = clockout.ToString();
+                        //        nightdiff.OTTimeTo = lastout.ToString();
+                        //        nightdiff.TotalMinutes = (int)totalNightdiff.TotalMinutes;
+                        //        nightdiff.TotalHours = TimeHelper.ConvertMinutesToHHMM((int)totalNightdiff.TotalMinutes);
+                        //        nightdiff.OTType = (int)EnumOvertime.NightDifferential;
+                        //        nightdiff.OTTypeName = Constants.OverTime_NightDifferential;
+                        //        param.otDetails.Add(nightdiff);
+                        //    }
+                        //}
                         else if (param.IsOfficialBuss == true && isHoliday == false && isRestDay == false)
                         {
 
@@ -1131,7 +1155,6 @@ namespace DCI.WebApp.Controllers
                                 overtimeEntryDto.OTTypeName = Constants.OverTime_Regular;
                                 param.otDetails.Add(overtimeEntryDto);
 
-
                                 if (lastout > nightDiffStartTime)
                                 {
                                     totalNightdiff = lastout - nightDiffStartTime;
@@ -1148,7 +1171,6 @@ namespace DCI.WebApp.Controllers
                                     param.otDetails.Add(nightdiff);
 
                                 }
-
                             }
                             else
                             {
@@ -1156,8 +1178,7 @@ namespace DCI.WebApp.Controllers
                             }
                         }
                         else
-                        {
-                            TimeSpan eightHours = TimeSpan.FromHours(8);
+                        {                         
                             var regOt = lastout - clockout;
                             if (regOt >= morethan1hr)
                             {
@@ -1173,7 +1194,6 @@ namespace DCI.WebApp.Controllers
                                     overtimeEntryDto.OTType = (int)EnumOvertime.Regular;
                                     overtimeEntryDto.OTTypeName = Constants.OverTime_Regular;
                                     param.otDetails.Add(overtimeEntryDto);
-
 
                                     if (lastout > nightDiffStartTime)
                                     {

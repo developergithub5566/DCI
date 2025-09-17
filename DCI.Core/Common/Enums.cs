@@ -105,8 +105,8 @@ namespace DCI.Core.Common
         Regular = 1,
         Probationary = 2,
         Contractual = 3,
-        FixedTerm = 4,
-        Resigned = 5,
+        Resigned = 4,
+        FixedTerm = 5,
         AWOL = 6,
     }
 
@@ -133,8 +133,9 @@ namespace DCI.Core.Common
         Cancelled = 6,
         Deleted = 7,
         Active = 8,
-        Deducted = 9,
-        NotDeducted = 10
+        PayrollDeducted = 9,
+        VLDeducted = 10,
+        NotDeducted = 11
     }
 
     public enum EnumLeaveType
@@ -143,13 +144,12 @@ namespace DCI.Core.Common
         VL = 2,
         SL = 3,
         SPL = 4,
-        ML = 5,
         PL = 6,
         MS = 7,
         OB = 8,
         VLMon = 9,
         SLMon = 10,
-        UT =11
+        UT = 11
     }
 
     public enum EnumEmployeeScope
@@ -165,6 +165,12 @@ namespace DCI.Core.Common
         SpecialHoliday = 3,
         After8hrs = 4,
         HolidayOnRestDay = 5
+    }
+
+    public enum EnumHoliday
+    {
+        Regular = 1,
+        Special = 2       
     }
 
     public enum EnumDeductionType

@@ -48,7 +48,7 @@ namespace DCI.Data
         public DbSet<WfhDetail> WfhDetail { get; set; }
         public DbSet<UndertimeHeader> UndertimeHeader { get; set; }
         public DbSet<UndertimeDetail> UndertimeDetail { get; set; }
-
+        public DbSet<WorkLocation> WorkLocation { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

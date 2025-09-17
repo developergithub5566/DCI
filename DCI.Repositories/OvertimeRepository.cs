@@ -60,6 +60,8 @@ namespace DCI.Repositories
                          }).FirstOrDefault() ?? new DailyTimeRecordViewModel();
 
             query.IsHoliday = _dbContext.Holiday.Any(x => x.HolidayDate == model.OTDate);
+            //var IsHolidayRegularSpecial = await _dbContext.Holiday.Where(x => x.HolidayDate == model.OTDate).FirstOrDefaultAsync();
+            //query.IsHolidayRegularSpecial = IsHolidayRegularSpecial != null ? IsHolidayRegularSpecial.HolidayType : 0;
 
             return query;
         }

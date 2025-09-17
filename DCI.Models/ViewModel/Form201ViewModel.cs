@@ -34,7 +34,7 @@ namespace DCI.Models.ViewModel
         public int? ModifiedBy { get; set; }
         public bool IsActive { get; set; } = true;
 
-        public int EmployeeWorkDetailsId { get; set; } = 0;     
+        public int EmployeeWorkDetailsId { get; set; } = 0;
         public string? Email { get; set; }
         public string? SSSNo { get; set; }
         public string? Tin { get; set; }
@@ -52,9 +52,10 @@ namespace DCI.Models.ViewModel
         public int? PositionId { get; set; }
         public string? PositionName { get; set; } = string.Empty;
         public bool IsResigned { get; set; } = false;
-         public DateTime? ResignedDate { get; set; }
+        public DateTime? ResignedDate { get; set; }
         public int? BandLevel { get; set; }
-
+        public int? WorkLocation { get; set; } = 0;
+        public string? WorkLocationName { get; set; } = string.Empty;
         public IList<Position>? PositionList { get; set; }
         public List<SelectListItem>? OptionsPosition { get; set; }
 
@@ -63,5 +64,12 @@ namespace DCI.Models.ViewModel
 
         public IList<EmployeeStatus>? EmployeeStatusList { get; set; }
         public List<SelectListItem>? OptionsEmployeeStatus { get; set; }
+
+        public IList<WorkLocation>? WorkLocationList { get; set; }
+        public List<SelectListItem>? OptionsWorkLocation { get; set; }
+
+        public int CurrentUserId { get; set; } = 0;
+        public decimal VLCredit { get; set; }
+        public decimal SLCredit { get; set; }
     }
 }

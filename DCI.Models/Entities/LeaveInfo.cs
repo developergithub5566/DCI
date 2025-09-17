@@ -9,10 +9,12 @@ namespace DCI.Models.Entities
         public int LeaveId { get; set; }
 
         public int EmployeeId { get; set; }
+        public decimal VLYear { get; set; }
+        public decimal SLYear { get; set; }
 
         public decimal VLBalance { get; set; }
-
         public decimal SLBalance { get; set; }
+
         public decimal SPLBalance { get; set; }
         
         public decimal VLCredit { get; set; }
