@@ -9,7 +9,7 @@
         <div class="col-md-7 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">      
-                    <canvas id="graphDocType"></canvas>
+                    <canvas id="graphEmployeeDept" style="display: block; box-sizing: border-box; height: 300px; width: 696px;"></canvas>
                 </div>
             </div>
         </div>
@@ -17,46 +17,44 @@
             <div class="card">
                 <div class="card-body">
                  
-                    <canvas id="graphStatus"></canvas>
+                    <canvas id="graphEmployeeStatus"></canvas>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="row">
+
+    </div>
+    <br/>
+    <div class="row">
         <div class="list-group">
             <button type="button" class="list-group-item list-group-item-action">
-                <a href="/Report/ReportStatus/"><i class='fa-solid fa-file'></i> Employee List</a>
-            </button>
-            <button type="button" class="list-group-item list-group-item-action">
-                <a href="/Report/ReportUser/"><i class='fa-solid fa-file'></i> 201 File</a>
-            </button>
-
+                <a href="/Report/MasterList/"><i class='fa-solid fa-file'></i> Master List</a>
+            </button>     
 
             <button type="button" class="list-group-item list-group-item-action">
-                @* <a href="/DailyTimeRecord/Attendance/"><i class='fa-solid fa-file'></i> Attedance Summary Report</a> *@
-                <a asp-controller="DailyTimeRecord" asp-action="Attendance" asp-route-id="0"><i class='fa-solid fa-file'></i> Attendance Summary</a>
+             
+                <a asp-controller="Report" asp-action="Attendance" asp-route-id="0"><i class='fa-solid fa-file'></i> Attendance Summary Report</a>
             </button>
         
             <button type="button" class="list-group-item list-group-item-action">
-                <a href="/Report/ReportDepartment/"><i class='fa-solid fa-file'></i> Leave Balance Report</a>
+                <a href="/Report/LeaveList/"><i class='fa-solid fa-file'></i> Leave Balance Report</a>
             </button>
 
-            <button type="button" class="list-group-item list-group-item-action">
-              @*   <a href="/Report/ReportDocType/"><i class='fa-solid fa-file'></i> DTR Correction Summary Report</a> *@
-                <a asp-controller="DailyTimeRecord" asp-action="DTRCorrection" asp-route-id="0"><i class='fa-solid fa-file'></i> DTR Correction Summary</a>
+            <button type="button" class="list-group-item list-group-item-action">       
+                <a asp-controller="Report" asp-action="DTRAdjustment" asp-route-id="0"><i class='fa-solid fa-file'></i> DTR Adjustment Summary Report</a>
             </button>
 
             <button type="button" class="list-group-item list-group-item-action">
                 <a href="/Report/Undertime/"><i class='fa-solid fa-file'></i> Undertime Summary Report</a>
             </button>
             <button type="button" class="list-group-item list-group-item-action">
-                <a href="/Report/ReportAssignTask/"><i class='fa-solid fa-file'></i> Overtime Hours Summary</a>
+                <a href="/Report/Overtime/"><i class='fa-solid fa-file'></i> Overtime Hours Summary Report</a>
             </button>
 
-            <button type="button" class="list-group-item list-group-item-action">
-              @*   <a href="/Report/ReportAssignTask/"><i class='fa-solid fa-file'></i> WFH Summary</a> *@     
-                <a href="/Report/WFH/"><i class='fa-solid fa-file'></i>WFH Summary</a>
+            <button type="button" class="list-group-item list-group-item-action">         
+                <a href="/Report/WFH/"><i class='fa-solid fa-file'></i> WFH Summary Report</a>
             </button>
         </div>
         <hr />
@@ -77,7 +75,7 @@
 
 <script>
         document.addEventListener("DOMContentLoaded", function () {
-        var ctx = document.getElementById('graphStatus').getContext('2d');
+        var ctx = document.getElementById('graphEmployeeStatus').getContext('2d');
         var statusData = @Html.Raw(JsonSerializer.Serialize(Model.StatusData));
 
         // Creating gradient colors for a smooth 2D look
@@ -103,7 +101,7 @@
             data: {
                 labels: statusData.map(item => item.Status),
                 datasets: [{
-                    label: 'Document Status',
+                    label: 'Employee Status',
                     data: statusData.map(item => item.Count),
                     backgroundColor: backgroundColors,
                     hoverBackgroundColor: backgroundColors,
@@ -133,7 +131,7 @@
     });
 
     document.addEventListener("DOMContentLoaded", function () {
-        var ctx = document.getElementById('graphDocType').getContext('2d');
+        var ctx = document.getElementById('graphEmployeeDept').getContext('2d');
         var typeData = @Html.Raw(JsonSerializer.Serialize(Model.TypeData));
 
         // Create gradient colors for a 2D effect
@@ -166,7 +164,7 @@
             data: {
                 labels: typeData.map(item => item.Status),
                 datasets: [{
-                    label: 'Document Type',
+                    label: 'Employee',
                     data: typeData.map(item => item.Count),
                     backgroundColor: colors,
                     borderColor: 'rgba(0, 0, 0, 0.1)', // Slight border for a 2D look

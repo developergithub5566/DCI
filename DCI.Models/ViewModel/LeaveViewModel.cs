@@ -7,6 +7,7 @@ namespace DCI.Models.ViewModel
     {
         public int EmployeeId { get; set; } = 0;
         public string EmpNo { get; set; } = string.Empty;
+        public string EmployeeName { get; set; } = string.Empty;
         public decimal VLBalance { get; set; } = 0;
         public decimal SLBalance { get; set; } = 0;
         public decimal SPLBalance { get; set; } = 0;
@@ -123,16 +124,18 @@ namespace DCI.Models.ViewModel
         public decimal Amount { get; set; }
     }
 
-    //public class LeaveSummaryVL
-    //{
-    //    public int LeaveRequestHeaderId { get; set; }
-    //    public int EmployeeId { get; set; }
-    //    public DateTime DateFiled { get; set; }
-    //    public int LeaveType { get; set; }
-    //    public string Reason { get; set; } = string.Empty;
-    //    public DateTime? DateModified { get; set; }
-    //    public string? ModifiedBy { get; set; }
-    //    public bool IsActive { get; set; }
-    //    public List<Employee> Employee { get; set; } = new();
-    //}
+    public class LeaveReportViewModel
+    {
+        public int EmployeeId { get; set; } = 0;
+        public string EmpNo { get; set; } = string.Empty;
+        public string EmployeeName { get; set; } = string.Empty;
+        public decimal VLBalance { get; set; } = 0;
+        public decimal SLBalance { get; set; } = 0;
+        public decimal SPLBalance { get; set; } = 0;
+
+        public int PendingApplication { get; set; } = 0;
+        public int VLFiled { get; set; } = 0;
+        public int SLFiled { get; set; } = 0;
+    }
+
 }

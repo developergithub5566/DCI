@@ -27,5 +27,8 @@
         public const string OverTime_HolidayOnRestDay = "150% HOLIDAY ON REST DAY (SAT - SUN)";
 		public const string OverTime_Requires1Hr = "Overtime filing requires at least 1 hour.";
 		public const string OverTime_Requires8HrNotBeenMet = "Overtime cannot be filed for this date because the required 8 working hours have not been met.";
+
+        public const string Undertime_Deduction = "Deductions successfully applied to all selected employees.";
+        
     }
 }

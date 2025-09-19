@@ -57,5 +57,12 @@ namespace DCI.API.Controllers
             var result = await _employeeRepository.Update201Form(model);
             return StatusCode(result.statuscode, result.message);           
         }
+
+        [HttpGet]
+        [Route("ReportGraphByStatus")]
+        public async Task<IActionResult> ReportGraphByStatus()
+        {
+            return Ok(await _employeeRepository.ReportGraphByStatus());
+        }
     }
 }

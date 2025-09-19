@@ -1,0 +1,432 @@
+﻿@model DCI.Models.ViewModel.Form201ViewModel
+@using Newtonsoft.Json;
+@using DCI.Core.Common;
+@using DCI.Models.ViewModel;
+
+
+
+<div class="container-fluid">
+    @*    <div class="spinner-overlay">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div> *@
+    <div class="d-sm-flex align-items-center justify-content-between mb-3">
+        <h5 class="m-0 font-weight-bold text-gray-800">201 File</h5>
+        <div class="upperRightDivBtn">
+        </div>
+    </div>
+
+    <div class="col-12 p0">
+        <ul class="breadcrumb">
+            <li><a href="/Home/Index/">Home</a></li>
+            <li><a href="/Report/Index/">Reports</a></li>
+            <li><a href="/Report/MasterList/">Master List</a></li>
+            <li>201 File</li>
+        </ul>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="card shadow mb-4">
+                <!-- Card Body -->
+                <div class="card-body EMProfileDiv">
+                    <label class="employeeType">@Model.EmployeeStatusName</label>
+                    <img src="~/icon/default_male.png" class="profilePic">
+                    <label class="employeeNo">@Model.EmployeeNo</label>
+                    <label class="employeeName">@Model.Firstname  @Model.Lastname</label>
+                    <label class="employeePosition">@Model.DepartmentName</label>
+                    <hr>
+
+                    <ul class="ULBasicInfo">
+                        <li>
+                            <label>Company Email</label>
+                            <label>@Model.Email</label>
+                        </li>
+                        <li>
+                            <label>Company Mobile No.</label>
+                            <label>@Model.MobileNoOffice</label>
+                        </li>
+                        <li>
+                            <label>Personal Mobile No.</label>
+                            <label>@Model.MobileNoPersonal</label>
+                        </li>
+                        <li>
+                            <label>Address</label>
+                            <label>@Model.PresentAddress</label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex bg-light flex-row align-items-center justify-content-between">
+                    <h6 class="m-0  small font-weight-bold text-dark"><i class="fa-solid fa-user" aria-hidden="true"></i> &nbsp; Personal Information</h6>
+               @*      <button class="btn btnPrimary float-right text-xs" type="submit" onclick="saveForm()">
+                        <span class="icon text-white">
+                            <i class="fa-regular fa-floppy-disk" aria-hidden="true"></i> Save
+                        </span>
+                    </button> *@
+                </div>
+
+                <!-- Card Body -->
+                <form id="createForm">
+                    <div class="card-body">
+                        <div class="row">
+                            <input type="hidden" id="EmployeeId" name="EmployeeId" value="@Model.EmployeeId">
+                            <div class="col-lg-4">
+                                <div class="form-group mb0 text-center">
+                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.Firstname) ? "-" : Model.Firstname)</label>
+                                    <label class="bottomLabelText">First Name</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group mb10 text-center">
+                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.Middlename) ? "-" : Model.Middlename)</label>
+                                    <label class="bottomLabelText">Middle Name</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group mb10 text-center">
+                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.Lastname) ? "-" : Model.Lastname)</label>
+                                    <label class="bottomLabelText">Last Name</label>
+                                </div>
+                            </div>
+                            @*          <div class="col-lg-4">
+                                <div class="form-group mb10 text-center">
+                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.Prefix) ? "-" : Model.Prefix)</label>
+                                    <label class="bottomLabelText">Prefix</label>
+                                </div>
+                            </div> *@
+                            <div class="col-lg-4">
+                                <div class="form-group mb10 text-center">
+                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.Suffix) ? "-" : Model.Suffix)</label>
+                                    <label class="bottomLabelText">Suffix</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group mb10 text-center">
+                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.Nickname) ? "-" : Model.Nickname)</label>
+                                    <label class="bottomLabelText">Nickname</label>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <div class="form-group mb10 text-center">
+                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.Sex) ? "-" : Model.Sex)</label>
+                                    <label class="bottomLabelText">Sex</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group mb10 text-center">
+                                    <label class="topLabelText">XX</label>
+                                    <label class="bottomLabelText">Civil Status</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group mb10 text-center">
+                                    <label class="topLabelText">@(Model.DateBirth?.ToString("MMMM dd, yyyy") ?? "-") </label>
+                                    <label class="bottomLabelText">Date of Birth</label>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <div class="form-group mb10 text-center">
+                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.SSSNo) ? "00-0000000-0" : Model.SSSNo)</label>
+                                    <label class="bottomLabelText">SSS</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group mb10 text-center">
+                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.Tin) ? "000-000-000" : Model.Tin)</label>
+                                    <label class="bottomLabelText">TIN</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group mb10 text-center">
+                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.Pagibig) ? "0000-0000-0000" : Model.Pagibig)</label>
+                                    <label class="bottomLabelText">Pagibig(HDMF)</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group mb10 text-center">
+                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.Philhealth) ? "00-000000000-0" : Model.Philhealth)</label>
+                                    <label class="bottomLabelText">Philhealth</label>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <div class="form-group mb10 text-center">
+                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.NationalId) ? "0000-0000-0000-0000" : Model.NationalId)</label>
+                                    <label class="bottomLabelText">National ID</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group mb10 text-center">                                    
+                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.ContactPerson) ? "" : Model.ContactPerson)</label>
+                                    <label class="bottomLabelText">Contact Person</label>
+
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group mb10 text-center">
+                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.ContactPersonNo) ? "" : Model.ContactPersonNo)</label>
+                                    <label class="bottomLabelText">Contact Person Number</label>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+
+            <div class="card shadow mb-4">
+
+                <div class="card-header py-3 d-flex bg-light flex-row align-items-center justify-content-between">
+                    <h6 class="m-0  small font-weight-bold text-dark"><i class="fa-regular fa-id-card" aria-hidden="true"></i> &nbsp; Contact Information</h6>
+                    @*   <button class="btn btnPrimary float-right text-xs" type="submit">
+                            <i class="fa-regular fa-floppy-disk" aria-hidden="true"></i> Save
+                        </button> *@
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group mb10 text-center">
+                                <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.Email) ? "-" : Model.Email)</label>
+                                <label class="bottomLabelText">Company Email</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group mb10 text-center">
+                                <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.MobileNoOffice) ? "-" : Model.MobileNoOffice)</label>
+                                <label class="bottomLabelText">Company Mobile No.</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group mb10 text-center">
+                                <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.EmailPersonal) ? "" : Model.EmailPersonal)</label>
+                                <label class="bottomLabelText">Personal Email</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group mb10 text-center">
+                                <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.MobileNoPersonal) ? "" : Model.MobileNoPersonal)</label>
+                                <label class="bottomLabelText">Personal Mobile No.</label>
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-12">
+                            <div class="form-group mb10 text-center">
+                                <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.PresentAddress) ? "-" : Model.PresentAddress)</label>
+                                <label class="bottomLabelText">Present Address</label>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <div class="form-group mb10 text-center">
+                                <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.PermanentAddress) ? "-" : Model.PermanentAddress)</label>
+                                <label class="bottomLabelText">Permanent/Provincial Address</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex bg-light flex-row align-items-center justify-content-between">
+                    <h6 class="m-0  small font-weight-bold text-dark"><i class="fa-solid fa-briefcase" aria-hidden="true"></i> &nbsp; Job Information</h6>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body">
+
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <div class="form-group mb10 text-center">
+                                <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.EmployeeNo) ? "-" : Model.EmployeeNo)</label>
+                                <label class="bottomLabelText">Employee No</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group mb10 text-center">
+                                <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.PositionName) ? "-" : Model.PositionName)</label>
+                                <label class="bottomLabelText">Position</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-5">
+                            <div class="form-group mb10 text-center">
+                                <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.DepartmentName) ? "-" : Model.DepartmentName)</label>
+                                <label class="bottomLabelText">Department</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group mb10 text-center">
+                                <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.EmployeeStatusName) ? "-" : Model.EmployeeStatusName)</label>
+                                <label class="bottomLabelText">Employment Status</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="form-group mb10 text-center">
+                                <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.DateHired.ToString()) ? "-" : Model.DateHired?.ToString("MMMM dd, yyyy"))</label>
+                                <label class="bottomLabelText">Date Hired</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="form-group mb10 text-center">
+                                <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.DateRegularized.ToString()) ? "-" : Model.DateRegularized?.ToString("MMMM dd, yyyy"))</label>
+                                <label class="bottomLabelText">Date of Regularization</label>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-2">
+                            <div class="form-group mb10 text-center">
+                                @*   <label class="topLabelText">P100,000.00</label> *@
+                                <label class="topLabelText">******</label>
+                                <label class="bottomLabelText">Salary</label>
+                            </div>
+                        </div>
+                        @*    <div class="col-lg-2">
+                                <div class="form-group mb10 text-center">
+                                    <label class="topLabelText">@Model.BandLevel</label>
+                                    <label class="bottomLabelText">Band Level</label>
+                                </div>
+                            </div> *@
+                        <div class="col-lg-5">
+                            <div class="form-group mb10 text-center">
+                                <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.WorkLocationName) ? "-" : Model.WorkLocationName)</label>
+                                <label class="bottomLabelText">Work Location</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 mt20">
+                        <!-- Card Body -->
+                        <div class="table-responsive ">
+                            <div id="dataTable_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+                                <div class="row"><div class="col-sm-12 col-md-6"></div><div class="col-sm-12 col-md-6"></div></div><div class="row">
+                                    <div class="col-sm-12">
+
+
+                                        <table class="table table-striped nowrap dataTable no-footer" id="dataTable" cellspacing="0" role="grid" aria-describedby="dataTable_info" style=" table-layout: auto; border-collapse: collapse;">
+                                            <thead>
+                                                <tr role="row"><th colspan="4" class="text-center bg-gray-800 " rowspan="1"><span class="text-white">Employment History</span></th></tr>
+                                                <tr role="row"><th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Date Start: activate to sort column ascending" style="width: 282px;"><span>Date Start</span></th><th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Department: activate to sort column ascending" style="width: 331px;"><span>Company</span></th><th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: 330px;"><span>Position</span></th><th style="width:50px;" class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Action: activate to sort column ascending"><span>Action</span></th></tr>
+                                            </thead>
+                                            <tbody>
+
+                                                @*       <tr role="row" class="odd">
+                                                        <td>August 01, 2023</td>
+                                                        <td>Human Resources</td>
+                                                        <td>Department Head</td>
+                                                        <td class="text-center">
+                                                            <div class="dropdown">
+                                                                <a href="#" class="dropdown-toggle text-lg" data-toggle="dropdown">
+                                                                    <i class="fa-solid fa-ellipsis text-dark" aria-hidden="true"></i>
+                                                                </a>
+                                                                <ul class="dropdown-menu">
+                                                                    <li>
+                                                                        <a class="cursorPointer text-dark" onclick="viewJobDetails('1','1')">
+                                                                            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> View Details
+                                                                        </a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
+                                                    </tr> *@
+                                                <tr>
+                                                    <td colspan="5" class="text-center text-muted">
+                                                        <strong>For Phase 2</strong>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+                                </div><div class="row"><div class="col-sm-12 col-md-5"><div class="dataTables_info" id="dataTable_info" role="status" aria-live="polite">Showing 1 to 1 of 1 entries</div></div><div class="col-sm-12 col-md-7"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex bg-light flex-row align-items-center justify-content-between">
+                    <h6 class="m-0  small font-weight-bold text-dark"><i class="fa fa-graduation-cap" aria-hidden="true"></i> &nbsp; Educational Background</h6>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body">
+
+                    <div class="row">
+                    </div>
+
+                    <div class="col-12 mt20">
+                        <!-- Card Body -->
+                        <div class="table-responsive ">
+                            <div id="dataTable_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+                                <div class="row"><div class="col-sm-12 col-md-6"></div><div class="col-sm-12 col-md-6"></div></div><div class="row">
+                                    <div class="col-sm-12">
+
+
+                                        <table class="table table-striped nowrap dataTable no-footer" id="dataTable" cellspacing="0" role="grid" aria-describedby="dataTable_info" style=" table-layout: auto; border-collapse: collapse;">
+                                            <thead>
+                                                <tr role="row"><th colspan="4" class="text-center bg-gray-800 " rowspan="1"><span class="text-white">School History</span></th></tr>
+                                                <tr role="row"><th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Date Start: activate to sort column ascending" style="width: 282px;"><span>Date Start</span></th><th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Department: activate to sort column ascending" style="width: 331px;"><span>School</span></th><th class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: 330px;"><span>Position</span></th><th style="width:50px;" class="sorting" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Action: activate to sort column ascending"><span>Action</span></th></tr>
+                                            </thead>
+                                            <tbody>
+
+
+                                                <tr>
+                                                    <td colspan="5" class="text-center text-muted">
+                                                        <strong>For Phase 2</strong>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+                                </div><div class="row"><div class="col-sm-12 col-md-5"><div class="dataTables_info" id="dataTable_info" role="status" aria-live="polite">Showing 1 to 1 of 1 entries</div></div><div class="col-sm-12 col-md-7"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+        </div>
+
+    </div>
+
+</div>
+
+@section scripts {
+
+    <script type="text/javascript">
+        var js = jQuery.noConflict(true);
+
+        $('.spinner-overlay').show();
+
+        setTimeout(() => {
+            $('.spinner-overlay').hide();
+        }, 200);
+
+        $(document).ready(function () {
+
+
+        });
+
+   
+
+    </script>
+}

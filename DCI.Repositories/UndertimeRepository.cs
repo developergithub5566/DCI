@@ -341,15 +341,7 @@ namespace DCI.Repositories
 
             try
             {
-                //var leaveInfo = (from li in _dbContext.LeaveInfo
-                //                 join emp in _dbContext.Employee on li.EmployeeId equals emp.EmployeeId
-                //                 where li.IsActive && li.DateCreated.Year == _currentYear
-                //                 group new { li, emp } by li.EmployeeId into g
-                //                 select new
-                //                 {
-                //                     Leave = g.OrderByDescending(x => x.li.DateCreated).FirstOrDefault().li,
-                //                     EmpNo = g.OrderByDescending(x => x.li.DateCreated).FirstOrDefault().emp.EmployeeNo
-                //                 }).ToList();
+ 
 
                 foreach (var ut in model)
                 {
@@ -357,6 +349,7 @@ namespace DCI.Repositories
                     {
                         var dateTo = ut.DateTo.Date.AddDays(1).AddTicks(-1);
                         var emp = _dbContext.Employee.Where(x => x.EmployeeNo == ut.EmpNo).FirstOrDefault();
+                        var workdtls = _dbContext.EmployeeWorkDetails.Where(x => x.EmployeeId == emp.EmployeeId).FirstOrDefault();
                         //var leafinfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == emp.EmployeeId).FirstOrDefault();
                         var leafinfo = _dbContext.LeaveInfo.Where(li => li.IsActive && li.EmployeeId == emp.EmployeeId && li.DateCreated.Year == DateTime.Now.Year).OrderByDescending(li => li.DateCreated).FirstOrDefault();
 
@@ -382,10 +375,14 @@ namespace DCI.Repositories
                         await SaveLeaveForUndertime(lvFormmodel);
 
 
-                        var attendanceList = await _dbContext.vw_AttendanceSummary.Where(x => x.EMPLOYEE_NO == ut.EmpNo && x.DATE >= ut.DateFrom.Date && x.DATE <= dateTo.Date
-                        && (x.STATUS != (int)EnumStatus.NotDeducted || x.STATUS != (int)EnumStatus.PayrollDeducted || x.STATUS != (int)EnumStatus.VLDeducted)).ToListAsync();
+                        //var attendanceList = await _dbContext.vw_AttendanceSummary.Where(x => x.EMPLOYEE_NO == ut.EmpNo && x.DATE >= ut.DateFrom.Date && x.DATE <= dateTo.Date
+                        //&& (x.STATUS != (int)EnumStatus.NotDeducted || x.STATUS != (int)EnumStatus.PayrollDeducted || x.STATUS != (int)EnumStatus.VLDeducted)).ToListAsync();
 
-                        if (leafinfo?.VLBalance >= ut.TotalUndertime)
+                        var attendanceList = await _dbContext.vw_AttendanceSummary.Where(x => x.EMPLOYEE_NO == ut.EmpNo && x.DATE >= ut.DateFrom.Date && x.DATE <= dateTo.Date
+                                                                                                                                                      && x.STATUS == 0).ToListAsync();
+
+                        // kung may remaining leave pa
+                        if (leafinfo?.VLBalance >= ut.TotalUndertime && workdtls.EmployeeStatusId == (int)EnumEmploymentType.Regular)
                         {
                             leafinfo.VLBalance = leafinfo.VLBalance - ut.TotalUndertime ?? 0;
                             // leafinfo.DateModified = DateTime.Now;
@@ -410,9 +407,14 @@ namespace DCI.Repositories
                                 await _dbContext.UndertimeDetail.AddAsync(otd);
                                 await _dbContext.SaveChangesAsync();
                             }
-                        }
-                        else
+                        } // kapag wala ng leave
+                        else 
                         {
+                            //Update DTR attendance summary status to Payroll DEDUCTED                    
+                            await _dbContext.tbl_raw_logs.Where(x => x.EMPLOYEE_ID == ut.EmpNo && x.DATE_TIME >= ut.DateFrom && x.DATE_TIME <= dateTo)
+                                                         .ExecuteUpdateAsync(s => s
+                                                         .SetProperty(r => r.STATUS, r => (int)EnumStatus.PayrollDeducted));
+
                             foreach (var attdnc in attendanceList)
                             {
                                 otd.UndertimeHeaderId = oth.UndertimeHeaderId;
@@ -428,7 +430,7 @@ namespace DCI.Repositories
                     }
                 }
 
-                return (StatusCodes.Status200OK, "Deductions successfully applied to all selected employees.");
+                return (StatusCodes.Status200OK, Constants.Undertime_Deduction);
             }
             catch (Exception ex)
             {
@@ -487,7 +489,7 @@ namespace DCI.Repositories
                 notifvm.ModuleId = (int)EnumModulePage.Undertime;
                 notifvm.TransactionId = entity.LeaveRequestHeaderId;
                 notifvm.AssignId = param.ApproverId;
-                notifvm.URL = "/Todo/Index/?leaveId=" + entity.LeaveRequestHeaderId;
+                notifvm.URL = "/DailyTimeRecord/Undertime";
                 notifvm.MarkRead = false;
                 notifvm.CreatedBy = param.EmployeeId;
                 notifvm.IsActive = true;
@@ -624,11 +626,15 @@ namespace DCI.Repositories
                     UNDER_TIME = attdnce.UNDER_TIME,
                     TOTAL_WORKING_HOURS = attdnce.TOTAL_WORKING_HOURS,
                     DeductionType = ot.DeductionType,
-                    DeductionTypeName = ot.DeductionType == 1 ? "VL" : "Payroll",
+                     DeductionTypeName = ot.DeductionType == 1 ? "Payroll" : (ot.DeductionType == 2 ? "Vacation Leave" : "Sick Leave"),
+                   // DeductionTypeName = EnumHelper.GetEnumDescriptionByTypeValue(EnumDeductionType ,(int)EnumDeductionType.VacationLeave))
                 })
                 .AsNoTracking()
                 .ToListAsync();
 
+
+
+           // var dsad = EnumHelper.GetEnumDescriptionByTypeValue(DCI.Core.Common.EnumDeductionType, 1);
             return rows;
         }
 

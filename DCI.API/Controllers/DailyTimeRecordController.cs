@@ -202,8 +202,12 @@ namespace DCI.API.Controllers
             return Ok(await _overtimeRepository.SaveOvertime(param));
         }
 
-      
-
+        [HttpPost]
+        [Route("GetAllLeaveReport")]
+        public async Task<IActionResult> GetAllLeaveReport([FromBody] LeaveViewModel model)
+        {
+            return Ok(await _leaveRepository.GetAllLeaveReport());
+        }        
 
     }
 }

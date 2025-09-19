@@ -18,16 +18,18 @@
                 <span class="icon text-white"><i class="fa-solid fa-file-pen text-xs"></i></span>
                 <span class="text"><small>Request Leave</small></span>
             </button> *@
-            <a href="#" title="Request Leave" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#" onclick="newForm()">
+@*             <a href="#" title="Request Leave" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#" onclick="newForm()">
                 <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
                 <span class="text text-white"><small>File Leave</small></span>
-            </a>
+            </a> *@
         </div>
     </div>
     <div class="col-12 p0">
         <ul class="breadcrumb">
             <li><a href="~/Home/Index">Dashboard</a></li>
-            <li>Leave Application</li>
+            <li><a href="~/Report/Index">Reports</a></li>
+            <li><a href="~/Report/LeaveList">Leave List</a></li>
+            <li>@Model.EmpNo - @Model.EmployeeName</li>
         </ul>
     </div>
 
@@ -41,10 +43,10 @@
                                 <span class="text-uppercase"> Vacation Leave</span> <br>
                                 <small class="text-secondary">(Remaining Balance)</small>
                             </div>
-                            <div class="h3 mb-0 font-weight-bold text-dark" >@Model.VLBalance</div>
+                            <div class="h3 mb-0 font-weight-bold text-dark">@Model.VLBalance</div>
                         </div>
                         <div class="col-auto">
-                   
+
                             <i class="fa-solid fa-plane fa-2x text-gray-300"></i>
                         </div>
                     </div>
@@ -60,7 +62,7 @@
                                 <span class="text-uppercase"> Sick Leave</span> <br>
                                 <small class="text-secondary">(Remaining Balance)</small>
                             </div>
-                            <div class="h3 mb-0 font-weight-bold text-dark" >@Model.SLBalance</div>
+                            <div class="h3 mb-0 font-weight-bold text-dark">@Model.SLBalance</div>
                         </div>
                         <div class="col-auto">
                             <i class="fa-solid fa-temperature-high fa-2x text-gray-300"></i>
@@ -94,12 +96,12 @@
             <div class="card shadow mb-4">
                 <!-- Card Header -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0  small font-weight-bold text-gray-800">Data</h6>
+                    <h6 class="m-0  small font-weight-bold text-gray-800">@Model.EmpNo - @Model.EmployeeName</h6>
                 </div>
 
                 <!-- Card Body -->
                 <div class="card-body">
-            @*         <div id="accordion">
+                    @*         <div id="accordion">
                         <button type="button" class="btn btnSecondary btn-icon-split pr10" data-toggle="collapse" href="#collapseFilter">
                             <span class="icon text-white">
                                 <i class="fa-solid fa-filter text-xs"></i>
@@ -218,7 +220,7 @@
         <div class="col-xl-12">
             <div class="card shadow mb-4">
                 <!-- Card Header -->
-        @*         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                @*         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0  small font-weight-bold text-gray-800">Data</h6>
                 </div> *@
                 <!-- Card Body -->
@@ -310,9 +312,9 @@
                                 </tr>
                             </thead>
                             <tbody id="tblSL">
-                               
+
                                 @foreach (var sl in Model.slSummaries)
-                                {                                 
+                                {
                                     string rowClass = sl.AsOf == currentMonth ? "table-success" : "";
 
                                     <tr class='@rowClass'>
@@ -342,8 +344,8 @@
                     </button>
                 </div>
                 <form id="createForm">
-                <div class="modal-body">
-             
+                    <div class="modal-body">
+
                         <input type="hidden" id="SelectedDatesJson" name="SelectedDates" />
                         <input type="hidden" id="dateSelected" name="dateSelected" />
 
@@ -365,7 +367,7 @@
                             <div class="form-group">
                                 <label class="frmText"><span class="required">*</span> No. of Days</label>
                                 @*  <input type="number" min="0" step="any" name="NO_DAYS" class="form-control frmField" autocomplete="off"> *@
-                               @*  <input type="text" step="any" id="NoOfDays" name="NoOfDays" class="form-control frmField" autocomplete="off" onkeypress="return isNumericDecimalKey(event,this);"> *@
+                                @*  <input type="text" step="any" id="NoOfDays" name="NoOfDays" class="form-control frmField" autocomplete="off" onkeypress="return isNumericDecimalKey(event,this);"> *@
                                 <input type="text" id="NoOfDays" name="NoOfDays" class="form-control frmField" autocomplete="off" onkeypress="return isNumericDecimalKey(event, this)" oninput="checkingNumber(this)" />
                             </div>
                         </div>
@@ -406,39 +408,39 @@
                             <div class="form-group">
                                 <label class="frmText" id="ApproverLabel"> </label><br>
                                 <label class="font-weight-bold mb0 text-danger" id="deptHeadName"></label>
-                                 <label class="d-block mt0 text-left text-xs" id="ApprovalDate"></label>
+                                <label class="d-block mt0 text-left text-xs" id="ApprovalDate"></label>
                                 <label class="d-block mt0 text-left text-xs" id="ApprovalRemarks"></label>
-                       @*          <label class="d-block mt0 text-left text-xs">(Department Head)</label> *@
+                                @*          <label class="d-block mt0 text-left text-xs">(Department Head)</label> *@
                             </div>
                         </div>
-              
-                </div>
-                <div class="modal-footer pt0">
-                    <div id="btnSubmit">
-                        <button class="btn btnPrimary btn-icon-split d-block" type="submit" onclick="save()">
-                            <span class="icon text-white-50">
-                                <i class="fa-regular fa-file-lines text-xs"></i>
-                            </span>
-                            <span class="text text-white"><small>Submit </small></span>
-                        </button>
-                    </div>
-                    <div id="btnCancel">
-                        <button class="btn btnDanger btn-icon-split d-block" type="button" onclick="cancel()">
-                            <span class="icon text-white">
-                                <i class="fa-regular fa-file-lines text-xs"></i>
-                            </span>
-                            <span class="text text-white"><small>Cancel Request</small></span>
-                        </button>
-                    </div>
-                    <button class="btn btnSecondary btn-icon-split d-block" data-dismiss="modal">
-                        <span class="icon text-white">
-                            <i class="fa-solid fa-xmark text-xs"></i>
-                        </span>
-                        <span class="text text-white"><small>Close </small></span>
-                    </button>
 
-                </div>
-                      </form>
+                    </div>
+                    <div class="modal-footer pt0">
+                        <div id="btnSubmit">
+                            <button class="btn btnPrimary btn-icon-split d-block" type="submit" onclick="save()">
+                                <span class="icon text-white-50">
+                                    <i class="fa-regular fa-file-lines text-xs"></i>
+                                </span>
+                                <span class="text text-white"><small>Submit </small></span>
+                            </button>
+                        </div>
+                        <div id="btnCancel">
+                            <button class="btn btnDanger btn-icon-split d-block" type="button" onclick="cancel()">
+                                <span class="icon text-white">
+                                    <i class="fa-regular fa-file-lines text-xs"></i>
+                                </span>
+                                <span class="text text-white"><small>Cancel Request</small></span>
+                            </button>
+                        </div>
+                        <button class="btn btnSecondary btn-icon-split d-block" data-dismiss="modal">
+                            <span class="icon text-white">
+                                <i class="fa-solid fa-xmark text-xs"></i>
+                            </span>
+                            <span class="text text-white"><small>Close </small></span>
+                        </button>
+
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -517,22 +519,22 @@
 
                              let nodays = 0.0000;
 
-                                  
+
                                                             fp =    flatpickr("#dateCovered", {
-                                                                           mode: "multiple",                                                                         
+                                                                           mode: "multiple",
                                                                            enableTime: false,
                                                                            dateFormat: "Y-m-d",
                                                                            onChange: function(selectedDates, dateStr, instance) {
                                                                              // Update number of selected days
                                                                              let nodays = selectedDates.length;
-                                                                            // alert("nodays" + nodays); 
+                                                                            // alert("nodays" + nodays);
                                                                                     let amount =     $('#SelectedLeaveTypeAmount').val();
                                                                                     //   let iMultiple =     $('#isMultiple').val();
                                                                                             //   alert("amount" + amount);
                                                                             //   console.log(nodays);
 
                                                                           let total = amount * nodays;
-                                                                     
+
                                                                          let formattedDays = total.toFixed(4);
                                                                              $('#NoOfDays').val(formattedDays);
 
@@ -543,13 +545,13 @@
                                                                              //     console.log("false daw")
                                                                              //         fp.set("mode", "single");
                                                                              // }
-                                                                                     
+
 
                                                                              let selectedDateStrings = selectedDates.map(date =>
                                                                                instance.formatDate(date, "Y-m-d")
                                                                              );
 
-                                                                                  
+
 
                                                                              $('#SelectedDatesJson').val(JSON.stringify(selectedDateStrings));
                                                                            }
@@ -714,7 +716,7 @@
                                   let nodays = 0.0000;
                                   $('#NoOfDays').val(nodays.toFixed(4));
                                   $('#Reason').val('');
-                              
+
                                     const formData = new FormData();
                                   formData.append('LeaveRequestHeaderId', leaveHdrId);
 
@@ -800,7 +802,7 @@
                                                           document.getElementById('deptHeadName').textContent = 'HR Processed Undertime Deduction';
                                                             document.getElementById('ApproverLabel').textContent = 'Deducted By:';
 
-                                                                   
+
                                      }
 
 
@@ -833,7 +835,7 @@
                                      });
                                  }
                                  $('.spinner-overlay').hide();
-                                       
+
                              },
                              error: function () {
                                  $('.spinner-overlay').hide();
@@ -918,14 +920,14 @@
                      let leave =  $('#leaveTypeSelect').val();
                       console.log("getleave" + leave);
                      let  _amount = 0.0000;
-                    
+
 
                     if(leave ==1){
 
                        _amount = 0.5000;
                        $('#SelectedLeaveTypeAmount').val(_amount);
                            $('#isMultiple').val(0);
-                       
+
                     }else{
                         _amount = 1.0000;
                        $('#SelectedLeaveTypeAmount').val(_amount);
@@ -952,7 +954,7 @@
                //              });
                //          }
 
-                       
+
 
                     // function GetLeaveTypeAmount() {
                     //     let leave = $('#leaveTypeSelect').val();
@@ -961,12 +963,12 @@
 
                     //     if (leave == 1) {
                     //         isMultiple = false;
-                    //         _amount = 0.5000;                               
+                    //         _amount = 0.5000;
                     //     } else {
                     //         _amount = 1.0000;
                     //     }
 
-                       
+
 
                     //     // Destroy old flatpickr if it exists
                     //     if (fp) {
@@ -980,11 +982,11 @@
                     //     });
 
 
-                    
+
                     //      $('#SelectedLeaveTypeAmount').val(_amount);
                     //          fp.clear();
                     //        }
-                        
+
 
                        function isNumericDecimalKey(evt, el) {
                             const k = evt.key; // more reliable than keyCode for modern browsers
@@ -1010,19 +1012,19 @@
                             return false;
                         }
 
-      
+
 
 
          function getLeaveByYear() {
 
-           
+
                   var _year = document.getElementById("yearSelect").value;
-                 
+
                     $.ajax({
                               type: 'POST',
                               url: '@Url.Action("LeaveDropdown", "DailyTimeRecord")',
                               data: { filteryear : _year},
-                                 
+
                               success: function (response) {
                                   if (response.success) {
 
@@ -1030,8 +1032,8 @@
                                             var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
                                                               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
                                             var currentMonth = monthNames[now.getMonth()] + "-" + now.getFullYear();
-                                         
-                                                                       
+
+
                                        var tbodytableVL = $("#tblVL");
                                                 tbodytableVL.empty();
 

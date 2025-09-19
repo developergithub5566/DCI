@@ -73,7 +73,7 @@ namespace DCI.Repositories
                         join usr in _dbContext.User on ot.CreatedBy equals usr.UserId
                         join emp in _dbContext.Employee on usr.EmployeeId equals emp.EmployeeId
                         join stat in _dbContext.Status on ot.StatusId equals stat.StatusId
-                        where ot.IsActive && ot.CreatedBy == model.CurrentUserId
+                        where ot.IsActive
                         select new OvertimeViewModel
                         {
                             OTHeaderId = ot.OTHeaderId,
@@ -87,6 +87,13 @@ namespace DCI.Repositories
                             Total = _dbContext.OvertimeDetail.Where(x => x.OTHeaderId == ot.OTHeaderId).Sum(x => x.TotalMinutes)
                         };
 
+            if ((int)EnumEmployeeScope.PerEmployee == model.ScopeTypeEmp)
+            {
+                //var usr = _dbContext.User.Where(x => x.UserId == model.CurrentUserId).FirstOrDefault();
+                //var emp = _dbContext.Employee.Where(x => x.EmployeeId == usr.EmployeeId).FirstOrDefault();
+                //if (emp != null)
+                    query = query.Where(x => x.CreatedBy == model.CurrentUserId);
+            }
 
             return await query.ToListAsync();
         }

@@ -401,5 +401,36 @@ namespace DCI.Repositories
             }
         }
 
+        public async Task<ReportGraphsDataViewModel> ReportGraphByStatus()
+        {
+            ReportGraphsDataViewModel model = new ReportGraphsDataViewModel();
+
+            var _statusData = await (from emp in _dbContext.Employee
+                                     join wrkdtls in _dbContext.EmployeeWorkDetails on emp.EmployeeId equals wrkdtls.EmployeeId
+                                     join stat in _dbContext.EmployeeStatus on wrkdtls.EmployeeStatusId equals stat.EmployeeStatusId
+                                     where emp.IsActive == true
+                                     group emp by stat.EmployeeStatusName into g
+                                     select new ReportGraphViewModel
+                                     {
+                                         Status = g.Key, // StatusName from the group
+                                         Count = g.Count() // Count of documents per status
+                                     }).ToListAsync();
+
+            var _docTypeData = await (from emp in _dbContext.Employee
+                                      join wrkdtls in _dbContext.EmployeeWorkDetails on emp.EmployeeId equals wrkdtls.EmployeeId
+                                      join dep in _dbContext.Department on wrkdtls.DepartmentId equals dep.DepartmentId
+                                      where emp.IsActive == true
+                                      group dep by dep.DepartmentName into g
+                                      select new ReportGraphViewModel
+                                      {
+                                          Status = g.Key, // StatusName from the group
+                                          Count = g.Count() // Count of documents per status
+                                      }).ToListAsync();
+
+            model.StatusData = _statusData;
+            model.TypeData = _docTypeData;
+            return model;
+        }
+
     }
 }

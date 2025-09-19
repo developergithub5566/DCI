@@ -175,7 +175,16 @@ namespace DCI.Core.Common
 
     public enum EnumDeductionType
     {
-        VacationLeave = 1,
-        Payroll = 2,
+        [Description("Payroll")]
+        Payroll = 1,
+        VacationLeave = 2,
+        SickLeave = 3,
+        SpecialLeave = 4
+    }
+
+    public enum EnumSource
+    {
+        BIOMETRICS = 1,
+        REMOTE = 2
     }
 }

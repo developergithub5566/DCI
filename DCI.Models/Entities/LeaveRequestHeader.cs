@@ -21,6 +21,7 @@ namespace DCI.Models.Entities
         public Employee? Employee { get; set; }
         [Column(TypeName = "decimal(7,4)")]
         public decimal NoOfDays { get; set; }
+        public int? DeductionType { get; set; } = 0;
         public virtual ICollection<LeaveRequestDetails> LeaveRequestDetailsList { get; set; }
     }
 }

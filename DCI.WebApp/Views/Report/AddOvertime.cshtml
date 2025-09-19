@@ -56,25 +56,25 @@
         </div>
     </div>
     <div class="d-sm-flex align-items-center justify-content-between mb-3">
-        <h6 class="m-0 font-weight-bold text-gray-800">@ViewBag.BreadCrumbLabel</h6>
+        <h6 class="m-0 font-weight-bold text-gray-800">Overtime </h6>
         <div class="upperRightDivBtn">
-            <a href="#" title="Add Overtime" class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")" data-toggle="modal" data-target="#" onclick="newForm()" id="AddOvertime">
+       @*      <a href="#" title="Add Overtime" class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")" data-toggle="modal" data-target="#" onclick="newForm()" id="AddOvertime">
                 <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
                 <span class="text text-white"><small>Add Overtime</small></span>
             </a>
             <a href="#" title="Submit" class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")" data-toggle="modal" data-target="#" onclick="save()" id="Submit">
                 <span class="icon text-white"><i class="fa fa-paper-plane" aria-hidden="true"></i></span>
                 <span class="text text-white"><small>Submit</small></span>
-            </a>
+            </a> *@
         </div>
 
     </div>
     <div class="col-12 p0">
         <ul class="breadcrumb">
             <li><a href="~/Home/Index">Dashboard</a></li>
-            <li><a href="~/DailyTimeRecord/Overtime">Daily Time Record</a></li>
-            <li><a href="~/DailyTimeRecord/Overtime">Overtime</a></li>
-            <li><a href="#">File Overtime</a></li>
+            <li><a href="~/Report/Index">Report</a></li>
+            <li><a href="~/Report/Overtime">Overtime Summary Report</a></li>
+            <li><a href="#">@Model.RequestNo</a></li>
         </ul>
     </div>
 
@@ -87,7 +87,7 @@
                 <div id="otinfo">
                     @* hidden *@
                     <div class="row">
-                        <input type="hidden" id="OTHeaderId" name="OTHeaderId"  value="@Model.OTHeaderId"/>
+                        <input type="hidden" id="OTHeaderId" name="OTHeaderId" value="@Model.OTHeaderId" />
                         <input type="hidden" id="EmployeeId" name="EmployeeId" value="@Model.EmployeeId" />
                         <div class="col-md-6">
                             <label class="frmText">Request No</label>
@@ -98,7 +98,7 @@
                             <input type="text" min="0" step="any" id="StatusId" name="StatusId" class="form-control frmField" readonly="true" value="@Model.StatusName">
                         </div>
                     </div>
-                    <div class="row">                  
+                    <div class="row">
                         <div class="col-md-6">
                             <label class="frmText" id="ApproverLabel">For Approval of: </label>
                             <input type="text" min="0" step="any" id="ApprovedBy" name="ApprovedBy" class="form-control frmField" readonly="true" value="@Model.ApprovedBy">
@@ -113,22 +113,22 @@
                 <div class="row">
                     <div class="col-md-6">
                         <label class="frmText"><span class="required">*</span>Remarks</label>
-                        <input type="text" id="Remarks" name="Remarks" class="form-control frmField" value="@Model.Remarks" required autocomplete="off">
+                        <input type="text" id="Remarks" name="Remarks" class="form-control frmField" value="@Model.Remarks" required autocomplete="off" readonly>
                     </div>
 
-                </div>         
+                </div>
 
 
                 <table id="otTable" class="table table-bordered mt-3">
                     <thead>
-                        <tr>                 
+                        <tr>
                             <th>Overtime Type</th>
                             <th>Date</th>
                             <th>Time From</th>
                             <th>Time To</th>
                             <th>Total Hours</th>
                             <th hidden>Total Minutes</th>
-                            <th>Action</th>
+           @*                  <th>Action</th> *@
                         </tr>
                     </thead>
                     <tbody>
@@ -138,7 +138,7 @@
                             @foreach (var item in Model.otDetails.Select((value, index) => new { value, index }))
                             {
                                 <tr>
-                                  
+
                                     <td>
                                         @item.value.OTTypeName
                                     </td>
@@ -174,11 +174,11 @@
                                         <input type="hidden" name="OvertimeEntries[@item.index].TotalHours" value="@item.value.TotalHours" />
                                         <input type="hidden" name="OvertimeEntries[@item.index].TotalMinutes" value="@item.value.TotalMinutes" />
                                     </td>
-                                    <td>
+                            @*         <td>
                                         <button type="button" class="btn btn-sm btn-danger remove-row">Remove</button>
-                                    </td>
+                                    </td> *@
                                 </tr>
-                            }                            
+                            }
                         }
                         else
                         {
@@ -207,8 +207,7 @@
                         <form id="createForm">
                             <div class="modal-body">
                                 <div class="form-group">
-
-                                    <div class="form-check form-check-inline" >
+                                    <div class="form-check form-check-inline">
                                         <input type="checkbox" class="form-check-input" id="chkOB" name="chkOB">
                                         <label class="form-check-label" for="chkOB">Official Business</label>
                                     </div>
@@ -280,13 +279,13 @@
 
 
                             $(document).ready(function () {
-                             
+
                                   var otHeaderId = $('#OTHeaderId').val();
                                    var statusName = $('#StatusId').val();
-                                 
+
                                   if(otHeaderId > 0){
                                         // $("#otinfo").prop("hidden", false);
-                                       
+
                                   }else{
                                         //$("#otinfo").prop("hidden", true);
                                   }
@@ -294,7 +293,7 @@
                                          $("#AddOvertime").prop("hidden", true);
                                                $("#Submit").prop("hidden", true);
                                   }
-                                  
+
 
 
                                   document.getElementById("timeparam").style.display = 'none';
@@ -346,7 +345,7 @@
                                            const _remarks = $('#Remarks').val();
 
                                                  if(entries.length ==0){
-                       
+
                                                      Swal.fire({
                                                                 text: "Please file overtime before submitting.",
                                                                 icon: "error"
@@ -362,13 +361,13 @@
                                            return;
                                        }
 
-                                                
+
 
                                const _otHeaderId =$('#OTHeaderId').val();
                                const _otdate =$('#OTDate').val();
                                const _timefrom =  $('#OTTimeFrom').val();
                                const _timeto = $('#OTTimeTo').val();
-                   
+
                                const ischkOB = document.getElementById("chkOB");
 
                                   const payload = {
@@ -749,7 +748,7 @@
                         $('#otTable tbody tr').each(function () {
                             const row = $(this);
                             const entry = {
-                            
+
                                                                     employeeNo: '',
                                                          otDetailId:  row.find('input[name*=".OTDetailId"]').val() ,
                                                          otHeaderId: row.find('input[name*=".OTHeaderId"]').val() ,

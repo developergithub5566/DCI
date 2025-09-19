@@ -37,6 +37,9 @@ namespace DCI.Repositories
             LeaveViewModel model = new LeaveViewModel();
             model.EmployeeId = param.EmployeeId;
 
+            var work = _dbContext.Employee.Where(x => x.EmployeeId == param.EmployeeId).FirstOrDefault();
+            model.EmpNo = work?.EmployeeNo ?? string.Empty;
+            model.EmployeeName = work != null ? work.Firstname + " " + work.Lastname : string.Empty;
             int _currentYear = DateTime.Now.Year;
 
             var leaveinfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == param.EmployeeId && x.DateCreated.Date.Year == _currentYear && x.IsActive).OrderByDescending(x => x.DateCreated).FirstOrDefault();
@@ -89,7 +92,7 @@ namespace DCI.Repositories
 
             int selectedYear = param.FilterYear > 0 ? param.FilterYear : _currentYear;
 
-          
+
             if (workdtls != null && (workdtls.EmployeeStatusId == (int)EnumEmploymentType.Regular || workdtls.EmployeeStatusId == (int)EnumEmploymentType.Probationary))
             {
                 model.vlSummaries = GetLeaveSummary(param.EmployeeId, selectedYear, "VL", false);
@@ -384,6 +387,45 @@ namespace DCI.Repositories
             string formattedA = setA.ToString("D4");
             string formattedB = setB.ToString("D4");
             return $"{formattedA}";
+        }
+
+        public async Task<IList<LeaveReportViewModel>> GetAllLeaveReport()
+        {
+            var data = _dbContext.Employee
+      .AsNoTracking()
+      .Where(emp => emp.IsActive)
+      .Join(
+          _dbContext.EmployeeWorkDetails
+              .AsNoTracking()
+              .Where(wrk => wrk.ResignedDate == null),
+          emp => emp.EmployeeId,
+          wrk => wrk.EmployeeId,
+          (emp, wrk) => emp
+      )
+      .GroupJoin(
+          _dbContext.LeaveInfo.AsNoTracking(),
+          emp => emp.EmployeeId,
+          lvinfo => lvinfo.EmployeeId,
+          (emp, lvinfos) => new { emp, lvinfo = lvinfos.OrderByDescending(l => l.DateCreated).FirstOrDefault() } // ✅ latest only
+      )
+      .Where(x => x.lvinfo != null) // avoid employees with no LeaveInfo
+      .Select(x => new LeaveReportViewModel
+      {
+          EmployeeId = x.emp.EmployeeId,
+          EmpNo = x.emp.EmployeeNo,
+          EmployeeName = string.Concat(x.emp.Firstname, " ", x.emp.Lastname),
+          VLBalance = x.lvinfo.VLBalance,
+          SLBalance = x.lvinfo.SLBalance,
+          SPLBalance = x.lvinfo.SPLBalance,
+          PendingApplication = 0,
+          VLFiled = 0,
+          SLFiled = 0
+      })
+      .OrderByDescending(x => x.EmployeeName)
+      .ToList();
+
+            return data;
+
         }
     }
 }

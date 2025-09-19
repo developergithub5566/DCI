@@ -7,6 +7,7 @@ using DCI.Models.Entities;
 using DCI.Models.ViewModel;
 using DCI.WebApp.Configuration;
 using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Office2016.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -56,13 +57,13 @@ namespace DCI.WebApp.Controllers
                     {
                         model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
                     }
-                    ViewBag.BreadCrumbLabelA = "DTR Management";
-                    ViewBag.BreadCrumbLabelB = "Attendance Summary";
-                    if ((int)EnumEmployeeScope.PerEmployee == param.ScopeTypeEmp)
-                    {
-                        ViewBag.BreadCrumbLabelA = "Daily Time Record";
-                        ViewBag.BreadCrumbLabelB = "Attendance";
-                    }
+                    //ViewBag.BreadCrumbLabelA = "DTR Management";
+                    //ViewBag.BreadCrumbLabelB = "Attendance Summary";
+                    //if ((int)EnumEmployeeScope.PerEmployee == param.ScopeTypeEmp)
+                    //{
+                    //    ViewBag.BreadCrumbLabelA = "Daily Time Record";
+                    //    ViewBag.BreadCrumbLabelB = "Attendance";
+                    //}
                 }
 
                 return View(model);
@@ -774,7 +775,7 @@ namespace DCI.WebApp.Controllers
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
 
-
+                    param.ScopeTypeEmp = (int)EnumEmployeeScope.PerEmployee;
                     param.CurrentUserId = currentUser.UserId;
 
 
@@ -830,8 +831,8 @@ namespace DCI.WebApp.Controllers
                     {
                         model = JsonConvert.DeserializeObject<OvertimeViewModel>(responseBody)!;
 
-                        model.ApprovedBy = model.OTHeaderId == 0 ? currentUser.ApproverHead : string.Empty;
-                        model.StatusName = model.OTHeaderId == 0 ? "Draft" : string.Empty;
+                        model.ApprovedBy = model.OTHeaderId == 0 ? currentUser.ApproverHead : model.ApprovedBy;
+                        model.StatusName = model.OTHeaderId == 0 ? "Draft" : model.StatusName;
 
                         return View(model);
                     }

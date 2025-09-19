@@ -163,14 +163,17 @@ namespace DCI.Repositories
                         if (contextHdr.LeaveTypeId == (int)EnumLeaveType.VL)
                         {
                             contextLeaveInfo.VLBalance = contextLeaveInfo.VLBalance - contextHdr.NoOfDays;
+                            contextHdr.DeductionType = (int)EnumDeductionType.Payroll;
                         }
                         else if (contextHdr.LeaveTypeId == (int)EnumLeaveType.SL)
                         {
                             contextLeaveInfo.SLBalance = contextLeaveInfo.SLBalance - contextHdr.NoOfDays;
+                            contextHdr.DeductionType = (int)EnumDeductionType.SickLeave;
                         }
                         else if (contextHdr.LeaveTypeId == (int)EnumLeaveType.SPL)
                         {
                             contextLeaveInfo.SPLBalance = contextLeaveInfo.SPLBalance - contextHdr.NoOfDays;
+                            contextHdr.DeductionType = (int)EnumDeductionType.SpecialLeave;
                         }
                         _dbContext.LeaveInfo.Entry(contextLeaveInfo).State = EntityState.Modified;
                         _dbContext.SaveChanges();
@@ -194,6 +197,7 @@ namespace DCI.Repositories
                                                          .ExecuteUpdateAsync(s => s
                                                          .SetProperty(r => r.STATUS, r => (int)EnumStatus.PayrollDeducted));
                         }
+                        contextHdr.DeductionType = (int)EnumDeductionType.Payroll;
                     }
                 }
 
