@@ -170,7 +170,8 @@ namespace DCI.Core.Common
     public enum EnumHoliday
     {
         Regular = 1,
-        Special = 2       
+        Special = 2,
+        Suspension = 3, //paano kapag late pumasok
     }
 
     public enum EnumDeductionType

@@ -27,12 +27,12 @@ namespace DCI.API.Controllers
         IEmailRepository _emailRepository;
         IEmployeeRepository _employeeRepository;
         IHolidayRepository _holidayRepository;
-
+        IPositionRepository _positionRepository;
 
         public MaintenanceController(IModulePageRepository modulePageRepository, IModuleInRoleRepository moduleInRoleRepository,
             IRoleRepository roleRepository, IUserRepository userRepository, IDepartmentRepository DepartmentRepository, IEmploymentTypeRepository employmentTypeRepository,
             IUserRoleRepository userRoleRepository, IAuditLogRepository auditLogRepository, IAnnouncementRepository announcementRepository,IEmailRepository emailRepository,
-            IEmployeeRepository employeeRepository, IHolidayRepository holidayRepository)
+            IEmployeeRepository employeeRepository, IHolidayRepository holidayRepository, IPositionRepository positionRepository)
         {
             this._userRepository = userRepository;
             this._moduleInRoleRepository = moduleInRoleRepository;
@@ -47,6 +47,7 @@ namespace DCI.API.Controllers
             this._emailRepository = emailRepository;
             this._employeeRepository = employeeRepository;
             _holidayRepository = holidayRepository;
+            _positionRepository = positionRepository;
         }
 
 
@@ -443,6 +444,37 @@ namespace DCI.API.Controllers
         public async Task<IActionResult> DeleteHoliday([FromBody] HolidayViewModel model)
         {
             var result = await _holidayRepository.Delete(model);
+            return StatusCode(result.statuscode, result.message);
+        }
+        #endregion
+
+        #region Position
+        [HttpGet]
+        [Route("GetAllPosition")]
+        public async Task<IActionResult> GetAllPosition()
+        {
+            return Ok(await _positionRepository.GetAllPosition());
+        }
+
+        [HttpPost]
+        [Route("GetPositionById")]
+        public async Task<IActionResult> GetPositionById([FromBody] PositionViewModel model)
+        {
+            return Ok(await _positionRepository.GetPositionById(model.PositionId));
+        }
+
+        [HttpPost]
+        [Route("SavePosition")]
+        public async Task<IActionResult> SavePosition([FromBody] PositionViewModel model)
+        {
+            var result = await _positionRepository.Save(model);
+            return StatusCode(result.statuscode, result.message);
+        }
+        [HttpPost]
+        [Route("DeletePosition")]
+        public async Task<IActionResult> DeletePosition([FromBody] PositionViewModel model)
+        {
+            var result = await _positionRepository.Delete(model);
             return StatusCode(result.statuscode, result.message);
         }
         #endregion

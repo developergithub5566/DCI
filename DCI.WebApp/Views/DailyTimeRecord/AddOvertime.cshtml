@@ -40,7 +40,7 @@
     else
     {
         var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
-                    .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.DailyTimeRecord);
+                    .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Overtime);
         canView = module?.View ?? false;
         canAdd = module?.Add ?? false;
         canEdit = module?.Update ?? false;
@@ -215,7 +215,7 @@
                                     </br>
                                     <label class="frmText"><span class="required">*</span> Date: </label>
                                     <div class="input-group">
-                                        <input type="text" name="OTDate" id="OTDate" class="form-control frmField" autocomplete="off">
+                                        <input type="text" name="OTDate" id="OTDate" class="form-control frmField" onchange="checkOvertimeDate()">
                                         <div class="input-group-prepend prependBtn">
                                             <i class="fa fa-calendar"></i>
                                         </div>
@@ -226,7 +226,7 @@
                                     <div id="timeparam">
                                         <label class="frmText"><span class="required">*</span> Time From: </label>
                                         <div class="input-group">
-                                            <input type="text" name="OTTimeFrom" id="OTTimeFrom" class="form-control frmField" autocomplete="off">
+                                            <input type="text" name="OTTimeFrom" id="OTTimeFrom" class="form-control frmField">
                                             <div class="input-group-prepend prependBtn">
                                                 <i class="fa fa-calendar"></i>
                                             </div>
@@ -297,7 +297,7 @@
                                   
 
 
-                                  document.getElementById("timeparam").style.display = 'none';
+                                //  document.getElementById("timeparam").style.display = 'none';
 
 
                                 js('#tblDTR').DataTable({
@@ -336,10 +336,60 @@
                                                     }
                                                 });
 
-
-
                             });
 
+
+                         
+                             function checkOvertimeDate() {
+                               event.preventDefault();
+
+                              var _date =  $('#OTDate').val();
+                                        const payload = {
+                                                        OTType : 0,
+                                                        OTTypeName : '',
+                                                        OTDate: _date,
+                                                        OTTimeFrom : '',
+                                                        OTTimeTo : '',
+                                                        TotalMinutes : 0,
+                                                        TotalHours: '',
+                                                           EmployeeNo: '',
+                                                    }
+
+                                         $.ajax({
+                                              type: 'POST',
+                                              url: '@Url.Action("CheckOvertimeDate", "DailyTimeRecord")',
+                                               data: JSON.stringify(payload),
+                                                    contentType: 'application/json; charset=utf-8',
+                                              success: function (response) {
+                                                
+                                                  if (response.success) {
+                                                                 
+                                                                   // Swal.fire({
+                                                                   //     text: response.message,
+                                                                   //     icon: "success",
+                                                                   //     confirmButtonText: "Ok"
+                                                                   // }).then((result) => {
+                                                                       
+                                                                   // });
+                                                  } else {
+
+                                                      Swal.fire({
+                                                          text: response.message,
+                                                          icon: "error"
+                                                      });
+                                                  }
+                                                  $('.spinner-overlay').hide();
+                                              },
+                                              error: function () {
+                                                  $('.spinner-overlay').hide();
+                                                  Swal.fire({
+                                                      text: "An error occurred. Please try again.",
+                                                      icon: "error"
+                                                  });
+                                              }
+                                          });//ajax
+
+                             }
 
                              function save() {
                                const entries = collectOvertimeEntries();
@@ -723,7 +773,7 @@
                      });
 
                                document.getElementById('chkOB').addEventListener('click', function () {
-                                      document.getElementById("timeparam").style.display = this.checked ? 'block' : 'none';
+                                    //  document.getElementById("timeparam").style.display = this.checked ? 'block' : 'none';
                              });
 
 

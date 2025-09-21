@@ -63,6 +63,19 @@ namespace DCI.Repositories
             //var IsHolidayRegularSpecial = await _dbContext.Holiday.Where(x => x.HolidayDate == model.OTDate).FirstOrDefaultAsync();
             //query.IsHolidayRegularSpecial = IsHolidayRegularSpecial != null ? IsHolidayRegularSpecial.HolidayType : 0;
 
+            if(model.IsOfficialBuss)
+            {
+                var x = (from hdr in _dbContext.LeaveRequestHeader
+                         join dtl in _dbContext.LeaveRequestDetails on hdr.LeaveRequestHeaderId equals dtl.LeaveRequestHeaderId
+                         where hdr.IsActive && dtl.LeaveDate.Date == model.OTDate.Date && hdr.LeaveTypeId == (int)EnumLeaveType.OB
+                         select new
+                         {
+                             Exist = hdr.LeaveRequestHeaderId
+                         });
+
+                query.IsNoOBFileRecord = x.Count() == 0 ? true : false;
+              }
+
             return query;
         }
 
@@ -348,7 +361,18 @@ namespace DCI.Repositories
             }
         }
 
-
+        public async Task<OvertimeEntryDto> CheckOvertimeDate(OvertimeEntryDto model)
+        {
+            var data = (from ot in _dbContext.vw_AttendanceSummary                        
+                        where ot.DATE.Date == model.OTDate.Date
+                        select new OvertimeEntryDto
+                        {
+                            OTDate   = ot.DATE,
+                            OTTimeFrom = ot.FIRST_IN,
+                            OTTimeTo = ot.LAST_OUT
+                        }).FirstOrDefault();
+            return data;
+        }            
 
         private async Task<string> GenereteRequestNo()
         {

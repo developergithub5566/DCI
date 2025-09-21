@@ -8,6 +8,7 @@ using DCI.Models.ViewModel;
 using DCI.WebApp.Configuration;
 using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using DocumentFormat.OpenXml.Office2016.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -990,6 +991,12 @@ namespace DCI.WebApp.Controllers
 
                         TimeSpan totalWorkingHours = lastout - firstin;
 
+
+                        if (param.IsOfficialBuss && dtrmodel.IsNoOBFileRecord)
+                        {
+                            return Json(new { success = false, message = Constants.Msg_NoOfficialBusinessRecord });
+                        }
+
                         if (!param.IsOfficialBuss && totalWorkingHours.TotalMinutes == 0)
                         {
                             return Json(new { success = false, message = Constants.Msg_NoBiometricsFound });
@@ -1240,6 +1247,46 @@ namespace DCI.WebApp.Controllers
                 Log.CloseAndFlush();
             }
             return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
+        public async Task<IActionResult> CheckOvertimeDate([FromBody] OvertimeEntryDto param)
+        {
+            OvertimeEntryDto model = new OvertimeEntryDto();
+           // OvertimeEntryDto param = new OvertimeEntryDto();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    //var currentUser = _userSessionHelper.GetCurrentUser();
+                    //   param.CurrentUserId = currentUser.UserId;
+
+                   // param.OTDate = OTDate ?? DateTime.Now;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/CheckOvertimeDate");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode)
+                    {
+                        model = JsonConvert.DeserializeObject<OvertimeEntryDto>(responseBody)!;
+                        return Json(new { success = true, data = model });
+                    }
+                    return Json(new { success = false, data = model });
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            //  return Json(new { success = false, message = "An error occurred. Please try again." });
         }
     }
 }

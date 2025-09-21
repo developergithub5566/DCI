@@ -40,6 +40,7 @@ namespace DCI.Models.ViewModel
         public string RequestNo { get; set; } = string.Empty;
         public decimal VLBalance { get; set; } = 0;
 
+        public bool IsNoOBFileRecord { get; set; } = false;
     }
     public class DTRCorrectionViewModel
     {

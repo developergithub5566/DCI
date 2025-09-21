@@ -175,15 +175,12 @@ namespace DCI.Repositories
                              DepartmentHead = depthead.Firstname + " " + depthead.Lastname// + " " + depthead.Suffix
                          }).FirstOrDefault();
 
-
             return query;
         }
 
 
         public async Task<(int statuscode, string message)> SaveDTRCorrection(DTRCorrectionViewModel param)
-        {
-           
-
+        { 
             try
             {
                 if (param.DtrId == 0)

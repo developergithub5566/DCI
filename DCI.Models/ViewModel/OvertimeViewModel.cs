@@ -29,7 +29,8 @@ namespace DCI.Models.ViewModel
 
         public int CurrentUserId { get; set; } = 0;
 
-        public bool IsOfficialBuss { get; set; } = false;      
+        public bool IsOfficialBuss { get; set; } = false;
+    
 
         public string Fullname { get; set; } = string.Empty;
         public string RecommendedBy { get; set; } = string.Empty;

@@ -203,6 +203,13 @@ namespace DCI.API.Controllers
         }
 
         [HttpPost]
+        [Route("CheckOvertimeDate")]
+        public async Task<IActionResult> CheckOvertimeDate([FromBody] OvertimeEntryDto param)
+        {
+            return Ok(await _overtimeRepository.CheckOvertimeDate(param));
+        }
+
+        [HttpPost]
         [Route("GetAllLeaveReport")]
         public async Task<IActionResult> GetAllLeaveReport([FromBody] LeaveViewModel model)
         {
