@@ -455,6 +455,14 @@
                           dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
                             buttons: [
                                 {
+                            extend: 'excel',
+                             text: 'Export to Excel',
+                            title: ' Undertime Summary Report',
+                            exportOptions: {
+                                columns: ':not(:last-child)' // Excludes the last column
+                            }
+                          },
+                                {
                                     extend: 'pdfHtml5',
                                     text: 'Export PDF',
                                     title: 'Employee Report',

@@ -46,7 +46,7 @@
 						<label class="title">Welcome!</label>
 						<p class="desc">Please sign in to your account to continue.</p>
 
-						<form asp-action="Login" method="post" id="LoginAccess">
+						<form asp-action="Login" method="post" id="LoginAccess" onsubmit="showLoading()">
 							<div class="form-group">
 								<input type="text" class="form-control inputLogin" id="email" name="email" placeholder="Email" required>
 							</div>
@@ -57,8 +57,14 @@
 
 							<a asp-controller="Account" asp-action="ForgotPassword"> Forgot Password? </a>
 							<div class="text-center mt-3">
-								<button type="submit" class="btn btn-primary btn-block w-100">Login</button>
+								<button type="submit" id="LoginBtn"  class="btn btn-primary btn-block w-100">Sign in</button>
+
+								<button type="submit" id="LoginLoading" class="btn btn-primary btn-block w-100 d-none" disabled>
+									<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+									<span>Signing in...</span>
+								</button>
 							</div>
+						
 						</form>
 						
 						@if (ViewBag.Message != null)
@@ -95,4 +101,9 @@
 </body>
 
 
-								
+<script>
+	function showLoading() {
+		document.getElementById('LoginBtn').classList.add('d-none');
+		document.getElementById('LoginLoading').classList.remove('d-none');
+	}
+</script>							
