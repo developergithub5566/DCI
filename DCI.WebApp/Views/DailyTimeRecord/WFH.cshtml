@@ -83,20 +83,45 @@
             <label class="mb0">Data</label>
         </div>
         <div class="card-body">
+            <div id="accordion">
+                <form id="frmFilter" class="row">
+                    <div class="form-group col-3">
+                        <label class="frmText">Date Covered From: </label>
+                        <div class="input-group">
+
+                            <input type="text" name="minDate" id="minDate" class="form-control frmField" autocomplete="off">
+                            <div class="input-group-prepend prependBtn">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            <label for="minDate" generated="true" class="error"></label>
+                        </div>
+                    </div>
+                    <div class="form-group col-3">
+                        <label class="frmText">Date Covered To: </label>
+                        <div class="input-group">
+
+
+                            <input type="text" name="maxDate" id="maxDate" class="form-control frmField" autocomplete="off">
+                            <div class="input-group-prepend prependBtn">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            <label for="maxDate" generated="true" class="error"></label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
             <div class="table-responsive mt20">
                 <table class="table table-bordered" id="tblDTR">
                     <thead>
                         <tr>
-                            <th>
+                          <th>
                                 <label>Employee No.</label>
                             </th>
-                            @if (@ViewBag.BreadCrumbLabel == "WFH Summary")
-                            {
-                                <th>
+                              
+                            <th>
                                     <label>Name</label>
-                                </th>
-                            }
-
+                                </th>   
                             <th>
                                 <label>Date</label>
                             </th>
@@ -130,14 +155,13 @@
                                 <td>
                                     @item.EMPLOYEE_NO
                                 </td>
-                                @if (@ViewBag.BreadCrumbLabel == "WFH Summary")
-                                {
-                                    <th>
-                                        @item.NAME
-                                    </th>
-                                }
+
                                 <td>
-                                    @item.DATE.ToShortDateString()
+                                        @item.NAME
+                                    </td>
+                            
+                                <td> 
+                                    @item.DATE.ToString("yyyy-MM-dd")
                                 </td>
                                 <td>
                                     @item.FIRST_IN
@@ -169,8 +193,7 @@
                                     <td class="text-center"><strong><span class='btn-success applicationStatus'>@item.STATUSNAME</span></strong></td>
                                 }
                                 <td>
-                                    REMOTE
-                                    @*   <span class="btnSuccess applicationStatus">REMOTE</span> *@
+                                    REMOTE                           
                                 </td>
 
                                 <td class="text-center">
@@ -467,13 +490,9 @@
                         </div>
                         <form id="wfhInfo">
                             <div class="modal-body">
-
-
                                 <table class="table table-bordered text-dark text-xs">
                                     <thead>
                                         <tr>
-
-
                                             <th>
                                                 <label>Date</label>
                                             </th>
@@ -525,7 +544,15 @@
             <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.print.min.js"></script>
             <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
             <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.1/css/buttons.dataTables.css">
+            @*  Flat pickr Date*@
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
+            <script src="https://cdn.datatables.net/datetime/1.6.0/js/dataTables.dateTime.min.js"></script>
+            @*  Date Range*@
+            <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
+
+          
 
             <script type="text/javascript">
                         var js = jQuery.noConflict(true);
@@ -538,8 +565,33 @@
 
 
                         $(document).ready(function () {
-                            
-                            js('#tblDTR').DataTable({
+                               flatpickr("#minDate", {
+                                   dateFormat: "Y-m-d",
+                                   defaultDate: new Date()
+
+                                });
+
+                                  flatpickr("#maxDate", {
+                                   dateFormat: "Y-m-d",
+                                   defaultDate: new Date()
+                                });
+
+                                    // Create custom filtering function
+                        js.fn.dataTable.ext.search.push(function (settings, data) {
+                        let min = $('#minDate').val();   // e.g. "2025-09-10"
+                        let max = $('#maxDate').val();   // e.g. "2025-09-20"
+                        let date = (data[2] || '').trim(); // use correct column index! (2 = 3rd col)
+
+                        if (!date) return false;
+                        
+                        if (min && date < min) return false;
+                        if (max && date > max) return false;
+
+                        return true;
+                    });
+
+
+                        let table =    js('#tblDTR').DataTable({
                                       dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
                          buttons: [
                          
@@ -556,6 +608,14 @@
                          pageLength: 10 ,// Default entries per page
                                  order: [[2, 'desc']]
                             });
+
+                                   // Event listener for date inputs
+                        $('#minDate, #maxDate').on('change', function () {
+                            table.draw();
+                        });
+
+
+
                             realTime();
 
 
