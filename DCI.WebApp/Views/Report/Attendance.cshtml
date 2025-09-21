@@ -79,6 +79,35 @@
             <label class="mb0">Data</label>
         </div>
         <div class="card-body">
+
+
+            <div id="accordion">
+                   <form id="frmFilter"  class="row">
+                <div class="form-group col-3">
+                    <label class="frmText">Date Covered From: </label>
+                    <div class="input-group">
+
+                        <input type="text" name="minDate" id="minDate" class="form-control frmField" autocomplete="off">
+                        <div class="input-group-prepend prependBtn">
+                            <i class="fa fa-calendar"></i>
+                        </div>
+                        <label for="minDate" generated="true" class="error"></label>
+                    </div>
+                </div>
+                <div class="form-group col-3">
+                    <label class="frmText">Date Covered To: </label>
+                    <div class="input-group">
+
+
+                        <input type="text" name="maxDate" id="maxDate" class="form-control frmField" autocomplete="off">
+                        <div class="input-group-prepend prependBtn">
+                            <i class="fa fa-calendar"></i>
+                        </div>
+                        <label for="maxDate" generated="true" class="error"></label>
+                    </div>
+                </div>
+                </form>
+            </div>
             <div class="table-responsive mt20">
                 <table class="table table-bordered" id="tblDTR">
                     <thead>
@@ -124,7 +153,8 @@
                                     @item.NAME
                                 </td>
                                 <td>
-                                    @item.DATE.ToShortDateString()
+                                    @item.DATE.ToString("yyyy-MM-dd")
+                                  @*   @item.DATE.ToShortDateString() *@
                                 </td>
                                 <td>
                                     @item.FIRST_IN
@@ -178,8 +208,8 @@
                     </tbody>
                 </table>
             </div>
-</<div>
-</div>
+            </<div>
+            </div>
 
 
             <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -255,13 +285,60 @@
                 </div>
             </div>
 
-@section scripts {
+            @section scripts {
+        @*         <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
+                <script src="https://cdn.datatables.net/datetime/1.6.0/js/dataTables.dateTime.min.js"></script>
+                <link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.css">
+                <link rel="stylesheet" href="https://cdn.datatables.net/datetime/1.6.0/css/dataTables.dateTime.min.css">
+             *@
+              @*   
+                  <script type="text/javascript">
+                                                   $(document).ready(function () {
+                        // Create custom filtering function
+                        js.fn.dataTable.ext.search.push(function (settings, data) {
+                        let min = $('#minDate').val();   // e.g. "2025-09-10"
+                        let max = $('#maxDate').val();   // e.g. "2025-09-20"
+                        let date = (data[2] || '').trim(); // use correct column index! (2 = 3rd col)
+
+                        if (!date) return false;
+
+                        // ✅ String comparison works for YYYY-MM-DD format
+                        if (min && date < min) return false;
+                        if (max && date > max) return false;
+
+                        return true;
+                    });
+
+                        let table = js('#tblDTR').DataTable({
+                            dom: 'Bfrtip',
+                            buttons: [
+                                {
+                                    extend: 'pdfHtml5',
+                                    text: 'Export PDF',
+                                    title: 'Employee Report',
+                                    exportOptions: {
+                                        columns: ':visible'
+                                    }
+                                }
+                            ],
+                            pageLength: 20,
+                            lengthMenu: [[5, 10, 25, -1], [5, 10, 25, "All"]]
+                        });
+
+                        // Event listener for date inputs
+                        $('#minDate, #maxDate').on('change', function () {
+                            table.draw();
+                        });
+                    });
+                </script> *@
+      
 
                 <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
                 <script src="~/js/dci-validation.js"></script>
 
 
-    @*  Export Button*@
+            @*  Export Button*@
                 <script src="https://cdn.datatables.net/buttons/3.2.1/js/dataTables.buttons.js"></script>
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
@@ -270,6 +347,13 @@
                 <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.print.min.js"></script>
                 <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
                 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.1/css/buttons.dataTables.css">
+
+                <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+              
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
+                <script src="https://cdn.datatables.net/datetime/1.6.0/js/dataTables.dateTime.min.js"></script>
 
 
                 <script type="text/javascript">
@@ -283,34 +367,116 @@
 
 
                         $(document).ready(function () {
-                            js('#tblDTR').DataTable({
-                                            dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
-                         buttons: [
-                             {
-                                 extend: 'excel',
-                                    text: 'Export to Excel',
-                                 title: 'Attendance Summary Report',
-                                 exportOptions: {
-                                     columns: ':not(:last-child)' // Excludes the last column
-                                 }
-                             },
-                             {
-                                 extend: 'pdf',
-                                 text: 'Export to PDF',
-                                 title: 'Attendance Summary Report',
-                                 exportOptions: {
-                                     columns: ':not(:last-child)' // Excludes the last column
-                                 }
-                             }
-                         ],
-                         lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
-                         pageLength: 10 ,// Default entries per page
-                                 order: [[2, 'desc']]
-                            });
+                       
+
+                                  flatpickr("#minDate", {
+                                   dateFormat: "Y-m-d",
+                                   defaultDate: new Date()
+
+                                });
+
+                                  flatpickr("#maxDate", {
+                                   dateFormat: "Y-m-d",
+                                   defaultDate: new Date()
+                                });
+                    //             let minDate, maxDate;
+
+                    //                  DataTable.ext.search.push(function (settings, data, dataIndex) {
+                    //     let min = minDate.val();
+                    //     let max = maxDate.val();
+                    //     let date = new Date(data[4]);
+
+                    //     if (
+                    //         (min === null && max === null) ||
+                    //         (min === null && date <= max) ||
+                    //         (min <= date && max === null) ||
+                    //         (min <= date && date <= max)
+                    //     ) {
+                    //         return true;
+                    //     }
+                    //     return false;
+                    // });
+
+                    // // Create date inputs
+                    // minDate = new DateTime('#min', {
+                    //     format: 'MMMM Do YYYY'
+                    // });
+                    // maxDate = new DateTime('#max', {
+                    //     format: 'MMMM Do YYYY'
+                    // });
 
 
+
+                    //                     let table = js('#tblDTR').DataTable({
+                    //     dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
+                    //     buttons: [
+                    //         {
+                    //             extend: 'excel',
+                    //             text: 'Export to Excel',
+                    //             title: 'Attendance Summary Report',
+                    //             exportOptions: {
+                    //                 columns: ':not(:last-child)'
+                    //             }
+                    //         },
+                    //         {
+                    //             extend: 'pdf',
+                    //             text: 'Export to PDF',
+                    //             title: 'Attendance Summary Report',
+                    //             exportOptions: {
+                    //                 columns: ':not(:last-child)'
+                    //             }
+                    //         }
+                    //     ],
+                    //     lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                    //     pageLength: 10,
+                    //     order: [[2, 'desc']]
+                    // });
+
+                    // // Trigger filter when date inputs change
+                    // $('#minDate, #maxDate').on('change', function () {
+                    //     table.draw();
+                    // });
+                             // Create custom filtering function
+                        js.fn.dataTable.ext.search.push(function (settings, data) {
+                        let min = $('#minDate').val();   // e.g. "2025-09-10"
+                        let max = $('#maxDate').val();   // e.g. "2025-09-20"
+                        let date = (data[2] || '').trim(); // use correct column index! (2 = 3rd col)
+
+                        if (!date) return false;
+
+                        // ✅ String comparison works for YYYY-MM-DD format
+                        if (min && date < min) return false;
+                        if (max && date > max) return false;
+
+                        return true;
+                    });
+
+                        let table = js('#tblDTR').DataTable({
+                          dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
+                            buttons: [
+                                {
+                                    extend: 'pdfHtml5',
+                                    text: 'Export PDF',
+                                    title: 'Employee Report',
+                                    exportOptions: {
+                                        columns: ':visible'
+                                    }
+                                }
+                            ],
+                            pageLength: 20,
+                            lengthMenu: [[5, 10, 25, -1], [5, 10, 25, "All"]]
                         });
 
+                        // Event listener for date inputs
+                        $('#minDate, #maxDate').on('change', function () {
+                            table.draw();
+                        });
+
+
+
+                        }); //end document Onready
+
+                                        
 
                         function newForm(dtr) {
                            // console.log(dtr)
@@ -348,5 +514,32 @@
 
 
 
+                          //    $('#tblDTR').DataTable({
+                         //                    dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
+                         // buttons: [
+                         //     {
+                         //         extend: 'excel',
+                         //            text: 'Export to Excel',
+                         //         title: 'Attendance Summary Report',
+                         //         exportOptions: {
+                         //             columns: ':not(:last-child)' // Excludes the last column
+                         //         }
+                         //     },
+                         //     {
+                         //         extend: 'pdf',
+                         //         text: 'Export to PDF',
+                         //         title: 'Attendance Summary Report',
+                         //         exportOptions: {
+                         //             columns: ':not(:last-child)' // Excludes the last column
+                         //         }
+                         //     }
+                         // ],
+                         // lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
+                         // pageLength: 10 ,// Default entries per page
+                         //         order: [[2, 'desc']]
+                         //    });
+
+
+
                 </script>
-}
+            }
