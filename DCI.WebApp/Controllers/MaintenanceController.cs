@@ -1626,12 +1626,14 @@ namespace DCI.WebApp.Controllers
             }
 
         }
-        public async Task<IActionResult> EditPosition(PositionViewModel model)
+        public async Task<IActionResult> EditPosition(int PositionId)
         {
             try
             {
                 using (var _httpclient = new HttpClient())
                 {
+                    PositionViewModel model = new PositionViewModel();
+                    model.PositionId = PositionId;
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/GetPositionById");
                     request.Content = stringContent;

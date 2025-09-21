@@ -99,7 +99,7 @@
         <ul class="breadcrumb">
             <li><a href="~/Home/Index">Dashboard</a></li>
             <li><a href="~/Report/Index">Reports</a></li>
-            <li>Undertime</li>
+            <li>Undertime Summary Report</li>
         </ul>
     </div>
 
@@ -228,11 +228,11 @@
             <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
             <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.html5.min.js"></script>
             <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.print.min.js"></script>
-            <script src="https://cdn.datatables.net/searchpanes/2.3.3/js/dataTables.searchPanes.js"></script>
-            <script src="https://cdn.datatables.net/searchpanes/2.3.3/js/searchPanes.dataTables.js"></script>
-
             <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
             <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.1/css/buttons.dataTables.css">
+
+@*             <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
+            <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.1/css/buttons.dataTables.css"> *@
 
             <script type="text/javascript">
                 var js = jQuery.noConflict(true);
@@ -246,31 +246,31 @@
 
                 $(document).ready(function () {
 
-                    loadData();
+                  //  loadData();
 
-                    // $('#underTable').DataTable({
-                    // dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
-                    // buttons: [
-                    //     {
-                    //         extend: 'excel',
-                    //         text: 'Excel',
-                    //         title: 'Document Report',
-                    //         exportOptions: {
-                    //             columns: ':not(:last-child)' // Excludes the last column
-                    //         }
-                    //     },
-                    //     {
-                    //         extend: 'pdf',
-                    //         text: 'PDF',
-                    //         title: 'Document Report',
-                    //         exportOptions: {
-                    //             columns: ':not(:last-child)' // Excludes the last column
-                    //         }
-                    //     }
-                    // ],
-                    // lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
-                    // pageLength: 10 // Default entries per page
-                    // });
+                    js('#tblUndertime').DataTable({
+                    dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
+                    buttons: [
+                        {
+                            extend: 'excel',
+                             text: 'Export to Excel',
+                            title: ' Undertime Summary Report',
+                            exportOptions: {
+                                columns: ':not(:last-child)' // Excludes the last column
+                            }
+                        },
+                        {
+                            extend: 'pdf',
+                             text: 'Export to PDF',
+                            title: ' Undertime Summary Report',
+                            exportOptions: {
+                                columns: ':not(:last-child)' // Excludes the last column
+                            }
+                        }
+                    ],
+                    lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
+                    pageLength: 10 // Default entries per page
+                    });
 
 
                       document.getElementById("statusDocType").addEventListener("change", function (event) {

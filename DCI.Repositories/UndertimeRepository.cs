@@ -626,7 +626,7 @@ namespace DCI.Repositories
                     UNDER_TIME = attdnce.UNDER_TIME,
                     TOTAL_WORKING_HOURS = attdnce.TOTAL_WORKING_HOURS,
                     DeductionType = ot.DeductionType,
-                     DeductionTypeName = ot.DeductionType == 1 ? "Payroll" : (ot.DeductionType == 2 ? "Vacation Leave" : "Sick Leave"),
+                    DeductionTypeName = ot.DeductionType == 1 ? "Payroll" : (ot.DeductionType == 2 ? "Vacation Leave" : "Sick Leave"),
                    // DeductionTypeName = EnumHelper.GetEnumDescriptionByTypeValue(EnumDeductionType ,(int)EnumDeductionType.VacationLeave))
                 })
                 .AsNoTracking()

@@ -35,7 +35,7 @@ namespace DCI.Repositories
                                 PositionCode = post.PositionCode,
                                 PositionName = post.PositionName,
                                 Description = post.Description,
-                                CreatedName = user.Lastname,
+                                CreatedName =user.Firstname + " " + user.Lastname,
                                 CreatedBy = post.CreatedBy,
                                 DateCreated = post.DateCreated
                             };

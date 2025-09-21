@@ -155,11 +155,8 @@
                                 <input type="hidden" id="PositionId" name="PositionId" value="0">                               
                                 <label for="PositionCode" class="col-form-label required">Position Code:</label>
                                 <div class="input-group">
-
-                                    <input type="text" name="PositionCode" id="PositionCode" class="form-control" autocomplete="off">
-                                    <div class="input-group-prepend prependBtn">
-                                        <i class="fa fa-calendar"></i>
-                                    </div>
+                                    <input type="text" class="form-control" id="PositionCode" name="PositionCode" maxlength="5" onkeypress="return alphaNumericOnly(event);" required>                                
+                                
                                     <label for="PositionCode" generated="true" class="error"></label>
                                 </div>
                                 <div class="form-group">
@@ -228,7 +225,7 @@
                     const formData = new FormData();
                     const fields = {
                         PositionId: '#PositionId',
-                        PositionDate: '#PositionDate',
+                        PositionCode: '#PositionCode',
                         PositionName: '#PositionName',
                         Description: '#Description'                     
                     };
@@ -292,7 +289,7 @@
                                 success: function (response) {
                                     if (response.success) {
                                     $('#PositionId').val("0");
-                                    $('#PositionDate').val("");
+                                    $('#PositionCode').val("");
                                     $('#PositionName').val("");
                                     $('#Description').val("");
 
@@ -327,9 +324,9 @@
                                 data: { PositionId: id },
                                 success: function (response) {
                                     if (response.success) {
-                                        $('#PositionId').val(response.data.PositionId);
-                                        $('#PositionDate').val(response.data.PositionDate);
-                                        $('#PositionName').val(response.data.PositionName);
+                                        $('#PositionId').val(response.data.positionId);
+                                        $('#PositionCode').val(response.data.positionCode);
+                                        $('#PositionName').val(response.data.positionName);
                                         $('#Description').val(response.data.description);
 
 

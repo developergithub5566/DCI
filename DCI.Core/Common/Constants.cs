@@ -5,7 +5,7 @@
 		public const string DefaultSMTP = "172.16.1.39";
 		public const string DocNo = "172.16.1.39";
 		public const string CompanyCode = "DCI";
-		public const string AppCode = "DMS";
+		public const string AppCode = "ESS";
 		public const string DocControlNo = "CN";
 
 		public const string Msg_ErrorMessage = "An error occurred. Please try again.";
@@ -28,7 +28,7 @@
 		public const string OverTime_Requires1Hr = "Overtime filing requires at least 1 hour.";
 		public const string OverTime_Requires8HrNotBeenMet = "Overtime cannot be filed for this date because the required 8 working hours have not been met.";
 
-        public const string Msg_NoOfficialBusinessRecord  = "No Official Business record found for the specific date. File Official Business and the approved before file overtime";
+        public const string Msg_NoOfficialBusinessRecord  = "No Official Business record was found for the selected date. Please file and secure approval for Official Business before submitting an overtime request.";
 
         public const string Undertime_Deduction = "Deductions successfully applied to all selected employees.";
         

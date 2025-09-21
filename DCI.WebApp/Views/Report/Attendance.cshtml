@@ -56,7 +56,7 @@
         </div>
     </div>
     <div class="d-sm-flex align-items-center justify-content-between mb-3">
-        <h6 class="m-0 font-weight-bold text-gray-800">Attendance Summary</h6>
+        <h6 class="m-0 font-weight-bold text-gray-800">Attendance Summary Report</h6>
         @*        <div class="upperRightDivBtn">
             <a href="#" title="Add Department" class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")" data-toggle="modal" data-target="#" onclick="newForm()">
                 <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
@@ -69,7 +69,7 @@
         <ul class="breadcrumb">
             <li><a href="~/Home/Index">Dashboard</a></li>
             <li><a href="~/Report/Index">Reports</a></li>
-            <li><a href="#">Attendance Summary</a></li>
+            <li><a href="#">Attendance Summary Report</a></li>
             @*         <li><a asp-controller="DailyTimeRecord" asp-action="Attendance" asp-route-id="1">Attendance</a></li> *@
         </ul>
     </div>
@@ -288,16 +288,16 @@
                          buttons: [
                              {
                                  extend: 'excel',
-                                 text: 'Excel',
-                                 title: 'Document Report',
+                                    text: 'Export to Excel',
+                                 title: 'Attendance Summary Report',
                                  exportOptions: {
                                      columns: ':not(:last-child)' // Excludes the last column
                                  }
                              },
                              {
                                  extend: 'pdf',
-                                 text: 'PDF',
-                                 title: 'Document Report',
+                                 text: 'Export to PDF',
+                                 title: 'Attendance Summary Report',
                                  exportOptions: {
                                      columns: ':not(:last-child)' // Excludes the last column
                                  }

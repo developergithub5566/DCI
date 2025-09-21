@@ -65,7 +65,7 @@
         <ul class="breadcrumb">
             <li><a href="~/Home/Index">Dashboard</a></li>
             <li><a href="~/Report/Index">Reports</a></li>
-            <li><a href="#">DTR Adjustment Summary</a></li>
+            <li><a href="#">DTR Adjustment Summary Report</a></li>
         </ul>
     </div>
 
@@ -281,16 +281,16 @@
                          buttons: [
                              {
                                  extend: 'excel',
-                                 text: 'Excel',
-                                 title: 'Document Report',
+                                   text: 'Export to Excel',
+                                 title: 'DTR Adjustment Report',
                                  exportOptions: {
                                      columns: ':not(:last-child)' // Excludes the last column
                                  }
                              },
                              {
                                  extend: 'pdf',
-                                 text: 'PDF',
-                                 title: 'Document Report',
+                                    text: 'Export to PDF',
+                                 title: 'DTR Adjustment Report',
                                  exportOptions: {
                                      columns: ':not(:last-child)' // Excludes the last column
                                  }

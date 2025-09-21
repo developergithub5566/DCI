@@ -98,7 +98,7 @@
                                 <label>Status</label>
                             </th>
                             <th>
-                                <label>Date Created</label>
+                                <label>Date Filed</label>
                             </th>
                           
                             <th>
@@ -116,10 +116,23 @@
                                 </td>
                                 <td>
                                     @item.Fullname
-                                </td>                               
-                                <td>
-                                    @item.StatusName
                                 </td>
+                                @if (item.StatusName == "Approved")
+                                {
+                                    <td class="text-center"><strong><span class='btnPrimary applicationStatus'>@item.StatusName</span></strong></td>
+                                }
+                                else if (item.StatusName == "Rejected")
+                                {
+                                    <td class="text-center"><strong><span class='btn-danger applicationStatus'>@item.StatusName</span></strong></td>
+                                }
+                                else if (item.StatusName == "Deducted")
+                                {
+                                    <td class="text-center"><strong><span class='btn-danger applicationStatus'>@item.StatusName</span></strong></td>
+                                }
+                                else
+                                {
+                                    <td class="text-center"><strong><span class='btn-success applicationStatus'>@item.StatusName</span></strong></td>
+                                }
                                 <td>
                                     @item.DateCreated
                                 </td>
@@ -214,19 +227,11 @@
                         $(document).ready(function () {
                                 js('#tblDTR').DataTable({
                                       dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
-                         buttons: [
-                             {
-                                 extend: 'excel',
-                                 text: 'Excel',
-                                 title: 'Document Report',
-                                 exportOptions: {
-                                     columns: ':not(:last-child)' // Excludes the last column
-                                 }
-                             },
+                         buttons: [                         
                              {
                                  extend: 'pdf',
-                                 text: 'PDF',
-                                 title: 'Document Report',
+                                 text: 'Export to PDF',
+                                 title: 'WFH Application Report',
                                  exportOptions: {
                                      columns: ':not(:last-child)' // Excludes the last column
                                  }
