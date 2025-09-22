@@ -311,19 +311,6 @@
 
 @section scripts {
 
-           
-     @*            <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
-                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"> *@
-
-                @*  Export Button*@
-                <script src="https://cdn.datatables.net/buttons/3.2.1/js/dataTables.buttons.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-                <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.html5.min.js"></script>
-                <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.print.min.js"></script>
-
-
 
 
             
@@ -340,10 +327,9 @@
 
 
                         $(document).ready(function () {
-                            flatpickr("#minDate", {
+                                flatpickr("#minDate", {
                                    dateFormat: "Y-m-d",
                                    defaultDate: new Date()
-
                                 });
 
                                   flatpickr("#maxDate", {
@@ -353,19 +339,27 @@
 
 
                                     // Create custom filtering function
-                        js.fn.dataTable.ext.search.push(function (settings, data) {
-                        let min = $('#minDate').val();   // e.g. "2025-09-10"
-                        let max = $('#maxDate').val();   // e.g. "2025-09-20"
-                        let date = (data[2] || '').trim(); // use correct column index! (2 = 3rd col)
+                               js.fn.dataTable.ext.search.push(function (settings, data) {
+                                    let min = $('#minDate').val();   // e.g. "2025-09-01"
+                                    let max = $('#maxDate').val();   // e.g. "2025-09-10"
+                                    let rawDateTime = (data[2] || '').trim(); // adjust index to your date column
+                                    // rawDateTime = "2025-09-09 15:45"
 
-                        if (!date) return false;
+                                    if (!rawDateTime) return false;
 
-                        // ✅ String comparison works for YYYY-MM-DD format
-                        if (min && date < min) return false;
-                        if (max && date > max) return false;
+                                    // Parse row datetime
+                                    let rowDate = new Date(rawDateTime.replace(' ', 'T'));
+                                    // "2025-09-09 15:45" → "2025-09-09T15:45" → valid ISO date
 
-                        return true;
-                    });
+                                    // Parse min/max (flatpickr gives YYYY-MM-DD)
+                                    let minDate = min ? new Date(min + "T00:00:00") : null;
+                                    let maxDate = max ? new Date(max + "T23:59:59") : null;
+
+                                    if (minDate && rowDate < minDate) return false;
+                                    if (maxDate && rowDate > maxDate) return false;
+
+                                    return true;
+                                });
 
                          let table =       js('#tblDTR').DataTable({
                                       dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',

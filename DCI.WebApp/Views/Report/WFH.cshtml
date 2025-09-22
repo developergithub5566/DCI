@@ -83,6 +83,34 @@
             <label class="mb0">Data</label>
         </div>
         <div class="card-body">
+               <div id="accordion">
+                   <form id="frmFilter"  class="row">
+                <div class="form-group col-3">
+                    <label class="frmText">Date Covered From: </label>
+                    <div class="input-group">
+
+                        <input type="text" name="minDate" id="minDate" class="form-control frmField" autocomplete="off">
+                        <div class="input-group-prepend prependBtn">
+                            <i class="fa fa-calendar"></i>
+                        </div>
+                        <label for="minDate" generated="true" class="error"></label>
+                    </div>
+                </div>
+                <div class="form-group col-3">
+                    <label class="frmText">Date Covered To: </label>
+                    <div class="input-group">
+
+
+                        <input type="text" name="maxDate" id="maxDate" class="form-control frmField" autocomplete="off">
+                        <div class="input-group-prepend prependBtn">
+                            <i class="fa fa-calendar"></i>
+                        </div>
+                        <label for="maxDate" generated="true" class="error"></label>
+                    </div>
+                </div>
+                </form>
+            </div>
+
             <div class="table-responsive mt20">
                 <table class="table table-bordered" id="tblDTR">
                     <thead>
@@ -134,7 +162,7 @@
                                             </td>
                                                          
                                     <td>
-                                    @item.DATE.ToShortDateString()
+                                    @item.DATE.ToString("yyyy-MM-dd")
                                     </td>
                                     <td>
                                     @item.FIRST_IN
@@ -466,22 +494,10 @@
 
 
         @section scripts {
-
-                <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
+            
                 <script src="~/js/dci-validation.js"></script>
 
-            @*            <link href='https://192.168.1.100/DCI-ESS-STG/CSS/TEMPLATE/THEME/bootstrap-datepicker.standalone.min.css' rel='stylesheet'>
-                <script src='https://192.168.1.100/DCI-ESS-STG/JS/TEMPLATE/THEME/bootstrap-datepicker.min.js'></script> *@
-
-            @*  Export Button*@
-                <script src="https://cdn.datatables.net/buttons/3.2.1/js/dataTables.buttons.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-                <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.html5.min.js"></script>
-                <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.print.min.js"></script>
-                <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
-                <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.1/css/buttons.dataTables.css">
+   
 
 
                 <script type="text/javascript">
@@ -495,7 +511,33 @@
 
 
                             $(document).ready(function () {
-                                js('#tblDTR').DataTable({
+
+                                  flatpickr("#minDate", {
+                                   dateFormat: "Y-m-d",
+                                    defaultDate: new Date()
+                                });
+
+                                  flatpickr("#maxDate", {
+                                   dateFormat: "Y-m-d",
+                                   defaultDate: new Date()
+                                });
+                
+                             // Create custom filtering function
+                        js.fn.dataTable.ext.search.push(function (settings, data) {
+                        let min = $('#minDate').val();   // e.g. "2025-09-10"
+                        let max = $('#maxDate').val();   // e.g. "2025-09-20"
+                        let date = (data[2] || '').trim(); // use correct column index! (2 = 3rd col)
+
+                        if (!date) return false;
+                      
+                        if (min && date < min) return false;
+                        if (max && date > max) return false;
+
+                        return true;
+                    });
+
+
+                       let table =      js('#tblDTR').DataTable({
                                           dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
                              buttons: [
                                  {
@@ -519,6 +561,12 @@
                              pageLength: 10 ,// Default entries per page
                                      order: [[2, 'desc']]
                                 });
+                                   $('#minDate, #maxDate').on('change', function () {
+                            table.draw();
+                        });
+
+
+
                                 realTime();
 
 
