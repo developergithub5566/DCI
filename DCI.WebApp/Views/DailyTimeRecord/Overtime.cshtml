@@ -283,11 +283,14 @@
                                    dateFormat: "Y-m-d",
                                    defaultDate: new Date()
                                 });
-                
-                                 // Create custom filtering function
-                                   js.fn.dataTable.ext.search.push(function (settings, data) {
-                                        let min = $('#minDate').val();   // e.g. "2025-09-01"
-                                        let max = $('#maxDate').val();   // e.g. "2025-09-10"
+
+
+
+                                              let min = null;
+                                         let max = null;
+                               js.fn.dataTable.ext.search.push(function (settings, data) {
+                                         min = $('#minDate').val();   // e.g. "2025-09-01"
+                                         max = $('#maxDate').val();   // e.g. "2025-09-10"
                                         let rawDateTime = (data[2] || '').trim(); // adjust index to your date column
                                         // rawDateTime = "2025-09-09 15:45"
 
@@ -315,12 +318,51 @@
                                          {
                                              extend: 'pdf',
                                              text: 'Export to PDF',
-                                             title: 'Overtime Report',
+                                                 title: 'Overtime Report',
                                              exportOptions: {
                                                  columns: ':not(:last-child)' // Excludes the last column
-                                             }
-                                         }
-                                     ],
+                                                 },
+                                    customize: function (doc) {
+                                            doc.watermark = {
+                                                                        text: 'Property of DBP Data Center, Inc.',   // watermark text
+                                                                        color: 'red',
+                                                                        opacity: 0.1,
+                                                                        bold: true,
+                                                                        italics: false
+                                                                    };
+
+                                                                    doc.content.splice(1, 0,
+                                                                        {
+                                                                            text: 'Period: ' + min + " to " + max,
+                                                                            alignment: 'center',
+                                                                            margin: [0, 0, 0, 4], // tighter spacing
+                                                                            fontSize: 10,
+                                                                            italics: true
+                                                                        },
+                                                                        {
+                                                                            text: 'Prepared by: ' + '@Html.Raw(ViewBag.Fullname)', // dynamic from Razor
+                                                                            alignment: 'center',
+                                                                            margin: [0, 0, 0, 12],
+                                                                            fontSize: 10,
+                                                                            bold: true
+                                                                        }
+
+                                        // Footer with Date Printed + Page count
+                                        var now = new Date();
+                                        var jsDate = now.toLocaleString();
+
+                                        doc['footer'] = function (currentPage, pageCount) {
+                                            return {
+                                                columns: [
+                                                    { text: 'Date Printed: ' + jsDate, alignment: 'left', margin: [20, 0] },
+                                                    { text: 'Page ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', margin: [0, 0, 20, 0] }
+                                                ],
+                                                margin: [20, 0]
+                                            };
+                                        };
+                                    }
+                                }
+                            ],
                                      lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
                                      pageLength: 10 ,// Default entries per page
 

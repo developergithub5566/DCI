@@ -521,11 +521,13 @@
                                    dateFormat: "Y-m-d",
                                    defaultDate: new Date()
                                 });
-                
-                             // Create custom filtering function
-                        js.fn.dataTable.ext.search.push(function (settings, data) {
-                        let min = $('#minDate').val();   // e.g. "2025-09-10"
-                        let max = $('#maxDate').val();   // e.g. "2025-09-20"
+
+                        let min = null;
+                                  let max = null;
+
+                     js.fn.dataTable.ext.search.push(function (settings, data) {
+                      min = $('#minDate').val();   // e.g. "2025-09-10"
+                      max = $('#maxDate').val();   // e.g. "2025-09-20"
                         let date = (data[2] || '').trim(); // use correct column index! (2 = 3rd col)
 
                         if (!date) return false;
@@ -554,9 +556,31 @@
                                  title: 'WFH Summary Report',
                                      exportOptions: {
                                          columns: ':not(:last-child)' // Excludes the last column
-                                     }
-                                 }
-                             ],
+                                 },
+                                   customize: function (doc) {
+                                                                 doc.content.splice(1, 0, {
+                                                                    text: 'Period: ' + min + " to " + max,
+                                                                    alignment: 'center',
+                                                                    margin: [0, 0, 0, 12], // left, top, right, bottom
+                                                                    fontSize: 10,
+                                                                    italics: true
+                                                                });
+                                                            // Add "Date Printed" at bottom-right
+                                                            var now = new Date();
+                                                            var jsDate = now.toLocaleString(); // e.g. 9/21/2025, 3:25:10 PM
+
+                                                            doc['footer'] = function (currentPage, pageCount) {
+                                                                return {
+                                                                    columns: [
+                                                                        { text: 'Date Printed: ' + jsDate, alignment: 'left', margin: [20, 0] },
+                                                                        { text: 'Page ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', margin: [0, 0, 20, 0] }
+                                                                    ],
+                                                                    margin: [20, 0]
+                                                                };
+                                                            };
+                                                        }
+                                                    }
+                                                ],
                              lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
                              pageLength: 10 ,// Default entries per page
                                      order: [[2, 'desc']]

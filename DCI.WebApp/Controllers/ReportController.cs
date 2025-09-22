@@ -74,7 +74,7 @@ namespace DCI.WebApp.Controllers
                 }
             }
             return View(model);
-          
+
         }
 
         public async Task<IActionResult> LoadData(DocumentViewModel param)
@@ -271,7 +271,7 @@ namespace DCI.WebApp.Controllers
         }
 
 
- 
+
 
         public async Task<IActionResult> Undertime(DailyTimeRecordViewModel param)
         {
@@ -293,7 +293,7 @@ namespace DCI.WebApp.Controllers
                     if (response.IsSuccessStatusCode == true)
                     {
                         model = JsonConvert.DeserializeObject<List<UndertimeHeaderViewModel>>(responseBody)!;
-                    }                   
+                    }
                 }
 
                 return View(model);
@@ -319,7 +319,7 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
-                   // param.CurrentUserId = 1;//currentUser.UserId;
+                    // param.CurrentUserId = 1;//currentUser.UserId;
 
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
@@ -333,7 +333,7 @@ namespace DCI.WebApp.Controllers
                     }
                     // return Json(new { success = true, message = "", data = model });
                     ViewBag.RequestNo = param.RequestNo ?? string.Empty;
-                    
+
                     return View(model);
                 }
 
@@ -417,13 +417,14 @@ namespace DCI.WebApp.Controllers
                     {
                         model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
                     }
-                    ViewBag.BreadCrumbLabelA = "DTR Management";
-                    ViewBag.BreadCrumbLabelB = "Attendance Summary";
-                    if ((int)EnumEmployeeScope.PerEmployee == param.ScopeTypeEmp)
-                    {
-                        ViewBag.BreadCrumbLabelA = "Daily Time Record";
-                        ViewBag.BreadCrumbLabelB = "Attendance";
-                    }
+                    //ViewBag.BreadCrumbLabelA = "DTR Management";
+                    //ViewBag.BreadCrumbLabelB = "Attendance Summary";
+                    //if ((int)EnumEmployeeScope.PerEmployee == param.ScopeTypeEmp)
+                    //{
+                    //    ViewBag.BreadCrumbLabelA = "Daily Time Record";
+                    //    ViewBag.BreadCrumbLabelB = "Attendance";
+                    //}
+                    ViewBag.Fullname = currentUser?.Fullname;
                 }
 
                 return View(model);
@@ -445,8 +446,10 @@ namespace DCI.WebApp.Controllers
             List<Form201ViewModel> model = new List<Form201ViewModel>();
             try
             {
+                var currentUser = _userSessionHelper.GetCurrentUser();
                 using (var _httpclient = new HttpClient())
                 {
+
                     HttpResponseMessage response = await _httpclient.GetAsync(_apiconfig.Value.apiConnection + "api/Maintenance/GetAllEmployee");
                     string responseBody = await response.Content.ReadAsStringAsync();
 
@@ -455,7 +458,7 @@ namespace DCI.WebApp.Controllers
                         model = JsonConvert.DeserializeObject<List<Form201ViewModel>>(responseBody)!;
                     }
                 }
-
+                ViewBag.Fullname = currentUser?.Fullname;
                 return View(model);
 
             }
@@ -556,8 +559,8 @@ namespace DCI.WebApp.Controllers
                     {
                         list = JsonConvert.DeserializeObject<List<DTRCorrectionViewModel>>(responseBody)!;
 
-                    }             
-                   
+                    }
+
                 }
 
                 return View(list);
@@ -701,7 +704,7 @@ namespace DCI.WebApp.Controllers
         }
 
         public async Task<IActionResult> LeaveList(LeaveViewModel model)
-        {          
+        {
             try
             {
                 List<LeaveReportViewModel> leaveReportViewModel = new List<LeaveReportViewModel>();
@@ -711,7 +714,7 @@ namespace DCI.WebApp.Controllers
                     var currentUser = _userSessionHelper.GetCurrentUser();
                     model.CurrentUserId = currentUser.UserId;
                     model.EmployeeId = currentUser.EmployeeId;
-                    
+
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllLeaveReport");
                     request.Content = stringContent;
@@ -719,7 +722,7 @@ namespace DCI.WebApp.Controllers
                     var responseBody = await response.Content.ReadAsStringAsync();
 
                     if (response.IsSuccessStatusCode == true)
-                    {                   
+                    {
                         leaveReportViewModel = JsonConvert.DeserializeObject<List<LeaveReportViewModel>>(responseBody)!;
                     }
                 }
@@ -740,7 +743,7 @@ namespace DCI.WebApp.Controllers
 
         public async Task<IActionResult> Leave(LeaveViewModel model)
         {
-      
+
             try
             {
                 using (var _httpclient = new HttpClient())

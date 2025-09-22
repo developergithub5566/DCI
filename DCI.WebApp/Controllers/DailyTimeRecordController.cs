@@ -65,6 +65,7 @@ namespace DCI.WebApp.Controllers
                     //    ViewBag.BreadCrumbLabelA = "Daily Time Record";
                     //    ViewBag.BreadCrumbLabelB = "Attendance";
                     //}
+                    ViewBag.Fullname = currentUser?.Fullname;
                 }
 
                 return View(model);
@@ -135,6 +136,7 @@ namespace DCI.WebApp.Controllers
                     {
                         model = JsonConvert.DeserializeObject<LeaveViewModel>(responseBody)!;
                     }
+                    ViewBag.Fullname = currentUser?.Fullname;
                 }
 
                 return View(model);
@@ -316,6 +318,7 @@ namespace DCI.WebApp.Controllers
                     {
                         ViewBag.BreadCrumbLabel = "DTR Adjustment";
                     }
+                    ViewBag.Fullname = currentUser?.Fullname;
                 }
 
                 return View(list);
@@ -547,7 +550,7 @@ namespace DCI.WebApp.Controllers
                     }
 
                     ViewBag.ApproverHead = currentUser?.ApproverHead;
-
+                    ViewBag.Fullname = currentUser?.Fullname;
                 }
                 return View(model);
             }
@@ -718,7 +721,7 @@ namespace DCI.WebApp.Controllers
                     {
                         model = JsonConvert.DeserializeObject<List<WFHHeaderViewModel>>(responseBody)!;
                     }
-
+                    ViewBag.Fullname = currentUser?.Fullname;
                 }
                 return View(model);
             }
@@ -794,7 +797,7 @@ namespace DCI.WebApp.Controllers
                             x.TotalString = TimeHelper.ConvertMinutesToHHMM((int)x.Total);
                         }
                     }
-
+                    ViewBag.Fullname = currentUser?.Fullname;
                 }
                 return View(model);
             }

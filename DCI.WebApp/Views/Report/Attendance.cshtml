@@ -320,9 +320,11 @@
                                 });
                 
                              // Create custom filtering function
+                                  let min = null;
+                                     let max = null;
                         js.fn.dataTable.ext.search.push(function (settings, data) {
-                        let min = $('#minDate').val();   // e.g. "2025-09-10"
-                        let max = $('#maxDate').val();   // e.g. "2025-09-20"
+                         min = $('#minDate').val();   // e.g. "2025-09-10"
+                         max = $('#maxDate').val();   // e.g. "2025-09-20"
                         let date = (data[2] || '').trim(); // use correct column index! (2 = 3rd col)
 
                         if (!date) return false;
@@ -333,29 +335,71 @@
                         return true;
                     });
 
-                        let table = js('#tblDTR').DataTable({
-                          dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
-                            buttons: [
-                                {
-                            extend: 'excel',
-                             text: 'Export to Excel',
-                            title: ' Undertime Summary Report',
-                            exportOptions: {
-                                columns: ':not(:last-child)' // Excludes the last column
-                            }
-                          },
-                                {
-                                    extend: 'pdfHtml5',
-                                    text: 'Export PDF',
-                                    title: 'Employee Report',
-                                    exportOptions: {
-                                        columns: ':visible'
-                                    }
+                                        let table = js('#tblDTR').DataTable({
+                        dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
+                        buttons: [
+                            {
+                                extend: 'excel',
+                                text: 'Export to Excel',
+                                title: 'Attendance Summary Report',
+                                exportOptions: {
+                                    columns: ':not(:last-child)' // Excludes the last column
                                 }
-                            ],
-                            pageLength: 20,
-                            lengthMenu: [[ 10, 25, -1], [ 10, 25, "All"]]
-                        });
+                            },
+                            {
+                                extend: 'pdfHtml5',   // correct, now wrapped in {}
+                                text: 'Export to PDF',
+                                title: 'Attendance Summary Report',
+                                exportOptions: {
+                                    columns: ':not(:last-child)' // Excludes the last column
+                                },
+                                customize: function (doc) {
+                                       doc.watermark = {
+                                                                    text: 'Property of DBP Data Center, Inc.',   // watermark text
+                                                                    color: 'red',
+                                                                    opacity: 0.1,
+                                                                    bold: true,
+                                                                    italics: false
+                                                                };
+
+                                                                doc.content.splice(1, 0,
+                                                                    {
+                                                                        text: 'Period: ' + min + " to " + max,
+                                                                        alignment: 'center',
+                                                                        margin: [0, 0, 0, 4], // tighter spacing
+                                                                        fontSize: 10,
+                                                                        italics: true
+                                                                    },
+                                                                    {
+                                                                        text: 'Prepared by: ' + '@Html.Raw(ViewBag.Fullname)', // dynamic from Razor
+                                                                        alignment: 'center',
+                                                                        margin: [0, 0, 0, 12],
+                                                                        fontSize: 10,
+                                                                        bold: true
+                                                                    }
+                                                                  );
+
+                                    // Footer with Date Printed + Page count
+                                    var now = new Date();
+                                    var jsDate = now.toLocaleString();
+
+                                    doc['footer'] = function (currentPage, pageCount) {
+                                        return {
+                                            columns: [
+                                                { text: 'Date Printed: ' + jsDate, alignment: 'left', margin: [20, 0] },
+                                                { text: 'Page ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', margin: [0, 0, 20, 0] }
+                                            ],
+                                            margin: [20, 0]
+                                        };
+                                    };
+                                }
+                            }
+                        ],
+                        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                        pageLength: 10,
+                        order: [[0, 'desc']]
+                    });
+
 
                         // Event listener for date inputs
                         $('#minDate, #maxDate').on('change', function () {

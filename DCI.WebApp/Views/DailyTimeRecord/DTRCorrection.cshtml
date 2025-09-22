@@ -336,20 +336,22 @@
                                    dateFormat: "Y-m-d",
                                    defaultDate: new Date()
                                 });
-
+                               
+                                let min = null;
+                                let max = null;
 
                                     // Create custom filtering function
                                js.fn.dataTable.ext.search.push(function (settings, data) {
-                                    let min = $('#minDate').val();   // e.g. "2025-09-01"
-                                    let max = $('#maxDate').val();   // e.g. "2025-09-10"
+                                     min = $('#minDate').val();   // e.g. "2025-09-01"
+                                     max = $('#maxDate').val();   // e.g. "2025-09-10"
                                     let rawDateTime = (data[2] || '').trim(); // adjust index to your date column
-                                    // rawDateTime = "2025-09-09 15:45"
+                                
 
                                     if (!rawDateTime) return false;
 
                                     // Parse row datetime
                                     let rowDate = new Date(rawDateTime.replace(' ', 'T'));
-                                    // "2025-09-09 15:45" → "2025-09-09T15:45" → valid ISO date
+                           
 
                                     // Parse min/max (flatpickr gives YYYY-MM-DD)
                                     let minDate = min ? new Date(min + "T00:00:00") : null;
@@ -357,7 +359,7 @@
 
                                     if (minDate && rowDate < minDate) return false;
                                     if (maxDate && rowDate > maxDate) return false;
-
+                                     
                                     return true;
                                 });
 
@@ -367,12 +369,51 @@
                              {
                                  extend: 'pdf',
                                   text: 'Export to PDF',
-                                 title: 'DTR Adjustment Report',
+                                  title: 'DTR Adjustment Report',
                                  exportOptions: {
                                      columns: ':not(:last-child)' // Excludes the last column
-                                 }
-                             }
-                         ],
+                                 },
+                             customize: function (doc) {
+                                                                   doc.watermark = {
+                                                                    text: 'Property of DBP Data Center, Inc.',   // watermark text
+                                                                    color: 'red',
+                                                                    opacity: 0.1,
+                                                                    bold: true,
+                                                                    italics: false
+                                                                };
+
+                                                                doc.content.splice(1, 0,
+                                                                    {
+                                                                        text: 'Period: ' + min + " to " + max,
+                                                                        alignment: 'center',
+                                                                        margin: [0, 0, 0, 4], // tighter spacing
+                                                                        fontSize: 10,
+                                                                        italics: true
+                                                                    },
+                                                                    {
+                                                                        text: 'Prepared by: ' + '@Html.Raw(ViewBag.Fullname)', // dynamic from Razor
+                                                                        alignment: 'center',
+                                                                        margin: [0, 0, 0, 12],
+                                                                        fontSize: 10,
+                                                                        bold: true
+                                                                    }
+                                                                          );
+                                                                // Add "Date Printed" at bottom-right
+                                                                var now = new Date();
+                                                                var jsDate = now.toLocaleString(); // e.g. 9/21/2025, 3:25:10 PM
+
+                                                                doc['footer'] = function (currentPage, pageCount) {
+                                                                    return {
+                                                                        columns: [
+                                                                            { text: 'Date Printed: ' + jsDate, alignment: 'left', margin: [20, 0] },
+                                                                            { text: 'Page ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', margin: [0, 0, 20, 0] }
+                                                                        ],
+                                                                        margin: [20, 0]
+                                                                    };
+                                                                };
+                                                            }
+                                                        }
+                                                    ],
                          lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
                          pageLength: 10 ,// Default entries per page
                                  order: [[2, 'desc']]
