@@ -52,7 +52,7 @@ namespace DCI.Models.ViewModel
         public int RecommendedById { get; set; } = 0;
         public string RecommendedByEmail { get; set; } = string.Empty;
          public int ScopeTypeEmp { get; set; } = 0;
-
+        public string DateCreatedString { get; set; } = string.Empty;
     }
 
     public class OvertimeDetailViewModel

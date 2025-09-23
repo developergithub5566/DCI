@@ -182,24 +182,55 @@
                             <div class="col-sm-4">
                                 <img src="~/images/cake.svg" alt="Birthday Cake" width="100%" class="mb20">
                             </div>
+                            <style>
+                                .bdayList li.bday-today {
+                                    background-color: #ffeeba; /* highlight today */
+                                    border-left: 4px solid #ffc107;
+                                    font-weight: bold;
+                                    padding: 6px;
+                                    border-radius: 4px;
+                                }
+
+                                .bdayList li .cake {
+                                    margin-left: 8px;
+                                }
+
+                                .cake {
+                                    cursor: pointer;
+                                    font-size: 20px;
+                                    transition: transform 0.2s;
+                                }
+
+                                    .cake:hover {
+                                        transform: scale(1.3) rotate(10deg);
+                                    }
+                            </style>
                             <div class="col-sm-8">
                                 <div class="small text-muted">This Month</div>
                                 <div class="h5 font-weight-bold text-gray-900 mb-2">Birthday Celebrators</div>
                                 <ul class="bdayList">
-                                    @foreach (var bday in Model.BirthdayList)
+                                    @foreach (var bday in Model.BirthdayList.OrderBy(b => b.Birthday.HasValue &&                                                                       
+                                                                        b.Birthday.Value.Day == DateTime.Now.Day))
                                     {
-                                        <li>
+                                        var isToday = bday.Birthday.HasValue &&
+                                        bday.Birthday.Value.Month == DateTime.Now.Month &&
+                                        bday.Birthday.Value.Day == DateTime.Now.Day;
+
+                                        <li class="@(isToday ? "bday-today" : "")">
                                             <label class="date">@bday.Birthdate</label>
                                             <label class="name">@bday.EmployeeName</label>
+                                            @if (isToday)
+                                            {
+                                                <span title="click me" class="cake" onclick="throwConfetti()">🎂</span>
+                                            }
                                         </li>
                                     }
                                 </ul>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
             </div>
-        </div>
+        </div>   
 
 
     </div>
@@ -208,6 +239,7 @@
 
 
 @section scripts {
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     <script type="text/javascript">
 
         $('.spinner-overlay').show();
@@ -215,6 +247,18 @@
         setTimeout(() => {
              $('.spinner-overlay').hide();
         }, 200);
+
+
+
+
+        function throwConfetti() {
+            console.log("click")
+                confetti({
+            particleCount: 120,
+            spread: 90,
+            origin: { y: 0.7 }
+              });
+        }
 
     </script>
 }

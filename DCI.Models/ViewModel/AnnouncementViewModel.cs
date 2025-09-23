@@ -28,7 +28,8 @@
     public class BirthdayViewModel
     {
         public string EmployeeName { get; set; } = string.Empty;
-        public string Birthdate { get; set; } = string.Empty;   
+        public string Birthdate { get; set; } = string.Empty;
+        public DateTime? Birthday { get; set; } = null;
     }
 
     public class DashboardViewModel

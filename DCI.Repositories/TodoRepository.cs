@@ -35,6 +35,130 @@ namespace DCI.Repositories
             _dbContext.Dispose();
         }
 
+        public async Task<TodoViewModel> GetAllTodo(TodoViewModel model)
+        {
+            try
+            {
+                var leavequery = await (
+                              from leave in _dbContext.LeaveRequestHeader.AsNoTracking()
+                              join emp in _dbContext.Employee.AsNoTracking() on leave.EmployeeId equals emp.EmployeeId
+                              join stat in _dbContext.Status.AsNoTracking() on leave.Status equals stat.StatusId
+                              where leave.IsActive && leave.Status == (int)EnumStatus.ForApproval
+                              orderby leave.DateFiled descending
+                              select new LeaveRequestHeaderViewModel
+                              {
+                                  LeaveRequestHeaderId = leave.LeaveRequestHeaderId,
+                                  RequestNo = leave.RequestNo,
+                                  EmployeeId = leave.EmployeeId,
+                                  EmployeeName = emp.Firstname + " " + emp.Lastname,
+                                  DateFiled = leave.DateFiled,
+                                  DateFiledString = leave.DateFiled.ToShortDateString(),
+                                  Status = leave.Status,
+                                  StatusName = stat.StatusName,
+                                  Reason = leave.Reason,
+                                  NoofDays = leave.NoOfDays,
+                                  LeaveRequestDetailList = (from dtl in _dbContext.LeaveRequestDetails
+                                                            where dtl.LeaveRequestHeaderId == leave.LeaveRequestHeaderId
+                                                            select new LeaveRequestDetailViewModel
+                                                            {
+                                                                LeaveRequestHeaderId = dtl.LeaveRequestHeaderId,
+                                                                LeaveRequestDetailId = dtl.LeaveRequestDetailId,
+                                                                LeaveDate = dtl.LeaveDate,
+                                                                Amount = dtl.Amount
+                                                            }).ToList()
+                              }).ToListAsync();
+
+                model.leaveList = leavequery;
+                model.LeaveCount = leavequery.Count();
+
+                var dtrquery = await (
+                                    from dtr in _dbContext.DTRCorrection.AsNoTracking()
+                                    //join usr in _dbContext.User.AsNoTracking() on dtr.CreatedBy equals usr.UserId
+                                    join emp in _dbContext.Employee.AsNoTracking() on dtr.EmployeeId equals emp.EmployeeId
+                                    join stat in _dbContext.Status.AsNoTracking() on dtr.Status equals stat.StatusId
+                                    where dtr.IsActive
+                                       && dtr.Status == (int)EnumStatus.ForApproval
+                                       && dtr.ApproverId == model.CurrentUserId
+                                    orderby dtr.DateFiled descending
+                                    select new DTRCorrectionViewModel
+                                    {
+                                        DtrId = dtr.DtrId,
+                                        RequestNo = dtr.RequestNo,
+                                        DateFiled = dtr.DateFiled,
+                                        DtrDateTime = dtr.DtrDateTime,
+                                        DtrType = dtr.DtrType,
+                                        EmployeeName = emp.Firstname + " " + emp.Lastname,
+                                        Status = dtr.Status,
+                                        StatusName = stat.StatusName,
+                                        Reason = dtr.Reason
+                                    }
+                                ).ToListAsync();
+
+                model.dtrList = dtrquery.ToList();
+                model.DTRCount = dtrquery.Count();
+
+                var overtimequery = await (
+                                from ot in _dbContext.OvertimeHeader.AsNoTracking()
+                                join usr in _dbContext.User.AsNoTracking() on ot.CreatedBy equals usr.UserId
+                                join emp in _dbContext.Employee.AsNoTracking() on usr.EmployeeId equals emp.EmployeeId
+                                join stat in _dbContext.Status.AsNoTracking() on ot.StatusId equals stat.StatusId
+                                where ot.IsActive && ot.CreatedBy == model.CurrentUserId
+                                orderby ot.DateCreated descending
+                                select new OvertimeViewModel
+                                {
+                                    OTHeaderId = ot.OTHeaderId,
+                                    RequestNo = ot.RequestNo,
+                                    Fullname = emp.Firstname + " " + emp.Lastname,
+                                    EmployeeId = ot.EmployeeId,
+                                    StatusId = ot.StatusId,
+                                    StatusName = stat.StatusName,
+                                    DateCreated = ot.DateCreated,
+                                    CreatedBy = ot.CreatedBy,
+
+                                    // safe Sum pattern for SQL translation
+                                    Total = _dbContext.OvertimeDetail
+                                                .Where(x => x.OTHeaderId == ot.OTHeaderId)
+                                                .Select(x => (int?)x.TotalMinutes)
+                                                .Sum() ?? 0
+                                }
+                                    ).ToListAsync();
+
+                model.otList = overtimequery;
+                model.OvertimeCount = overtimequery.Count();
+
+                var wfhquery = await (
+                                       from hdr in _dbContext.WfhHeader.AsNoTracking()
+                                       join emp in _dbContext.Employee.AsNoTracking() on hdr.EmployeeId equals emp.EmployeeId
+                                       join stat in _dbContext.Status.AsNoTracking() on hdr.Status equals stat.StatusId
+                                       orderby hdr.DateCreated descending
+                                       select new WFHHeaderViewModel
+                                       {
+                                           WfhHeaderId = hdr.WfhHeaderId,
+                                           RequestNo = hdr.RequestNo,
+                                           Fullname = emp.Lastname + " " + emp.Firstname,
+                                           StatusId = hdr.Status,
+                                           Remarks = hdr.Remarks,
+                                           DateCreated = hdr.DateCreated,
+                                           StatusName = stat.StatusName
+                                       }
+                                   ).ToListAsync();
+
+                model.wfhList = wfhquery;
+                model.WFHCount = wfhquery.Count();
+
+                return model;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return null;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
 
         public async Task<IList<LeaveRequestHeaderViewModel>> GetAllTodoLeave(LeaveViewModel model)
         {
@@ -177,8 +301,8 @@ namespace DCI.Repositories
                         }
                         _dbContext.LeaveInfo.Entry(contextLeaveInfo).State = EntityState.Modified;
                         _dbContext.SaveChanges();
-                      
-                     
+
+
 
                         foreach (var raw in contextDtl)
                         {
@@ -290,7 +414,7 @@ namespace DCI.Repositories
                 notifvm.IsActive = true;
                 await _homeRepository.SaveNotification(notifvm);
 
-         
+
                 return (StatusCodes.Status200OK, String.Format("DTR adjustment request {0} has been {1}.", contextHdr.RequestNo, status));
             }
             catch (Exception ex)
@@ -483,7 +607,7 @@ namespace DCI.Repositories
                 var statusList = _dbContext.Status.AsQueryable().ToList();
                 var approvalLog = _dbContext.ApprovalHistory.AsQueryable().ToList();
                 var dtrcontext = _dbContext.DTRCorrection.AsQueryable().ToList();
-                var wfhcontext  = _dbContext.WfhHeader.AsQueryable().ToList();
+                var wfhcontext = _dbContext.WfhHeader.AsQueryable().ToList();
 
                 var queryLeave = from apprv in approvalLog
                                  join hdr in leaveHdr on apprv.TransactionId equals hdr.LeaveRequestHeaderId
@@ -523,7 +647,7 @@ namespace DCI.Repositories
                                join wfh in wfhcontext on apprv.TransactionId equals wfh.WfhHeaderId
                                join emp in empList on wfh.EmployeeId equals emp.EmployeeId
                                join stat in statusList on wfh.Status equals stat.StatusId
-                               where apprv.IsActive == true && apprv.ApproverId == model.CurrentUserId && apprv.ModulePageId == (int)EnumModulePage.WFH 
+                               where apprv.IsActive == true && apprv.ApproverId == model.CurrentUserId && apprv.ModulePageId == (int)EnumModulePage.WFH
                                select new ApprovalHistoryViewModel
                                {
                                    ApprovalHistoryId = apprv.ApprovalHistoryId,
@@ -634,7 +758,7 @@ namespace DCI.Repositories
                 //notifvm.IsActive = true;
                 //await _homeRepository.SaveNotification(notifvm);
 
-                return (StatusCodes.Status200OK, String.Format("WFH Request No {0} has been {1}.","RequestNo", status));
+                return (StatusCodes.Status200OK, String.Format("WFH Request No {0} has been {1}.", "RequestNo", status));
             }
             catch (Exception ex)
             {

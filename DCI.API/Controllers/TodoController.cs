@@ -27,6 +27,14 @@ namespace DCI.API.Controllers
         //{		
         //	return Ok(await _todoRepository.GetTodoByApproverId(model));
         //}
+        [HttpPost]
+        [Route("GetAllTodo")]
+        public async Task<IActionResult> GetAllTodo([FromBody] TodoViewModel model)
+        {
+            var result = await _todoRepository.GetAllTodo(model);
+            return Ok(result);
+        }
+
 
         [HttpPost]
         [Route("ApprovalLeave")]

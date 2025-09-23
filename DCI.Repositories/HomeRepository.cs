@@ -52,15 +52,22 @@ namespace DCI.Repositories
 
                 int _currentMonth = DateTime.Now.Month;
 
-                model.BirthdayList = (from usr in _dbContext.Employee
-                                      join wrkdtls in _dbContext.EmployeeWorkDetails on usr.EmployeeId equals wrkdtls.EmployeeId
-                                      where usr.IsActive == true && usr.DateBirth.HasValue && usr.DateBirth.Value.Month == _currentMonth 
-                                      && wrkdtls.ResignedDate == null && wrkdtls.IsResigned == false
+                model.BirthdayList = (
+                                      from usr in _dbContext.Employee
+                                      join wrkdtls in _dbContext.EmployeeWorkDetails
+                                          on usr.EmployeeId equals wrkdtls.EmployeeId
+                                      where usr.IsActive
+                                            && usr.DateBirth.HasValue
+                                            && usr.DateBirth.Value.Month == _currentMonth
+                                            && wrkdtls.ResignedDate == null
+                                            && wrkdtls.IsResigned == false
                                       select new BirthdayViewModel
                                       {
                                           EmployeeName = usr.Lastname + ", " + usr.Firstname,
-                                          Birthdate = usr.DateBirth.Value.ToString("MMM dd")
-                                      }).ToList();
+                                          Birthdate = usr.DateBirth.Value.ToString("MMM dd"),
+                                          Birthday = usr.DateBirth
+                                      }
+                                  ).ToList();
 
                 var currentEmail = _dbContext.User.Where(x => x.UserId == model.CurrentUserId).FirstOrDefault();
 

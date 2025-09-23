@@ -15,5 +15,6 @@ namespace DCI.Repositories.Interface
         Task<IList<WFHHeaderViewModel>> GetAllWFH(WFHHeaderViewModel model);
         Task<(int statuscode, string message)> ApprovalWFH(ApprovalHistoryViewModel param);
         Task<(int statuscode, string message)> ApprovalOvertime(ApprovalHistoryViewModel param);
+        Task<TodoViewModel> GetAllTodo(TodoViewModel model);
     }
 }

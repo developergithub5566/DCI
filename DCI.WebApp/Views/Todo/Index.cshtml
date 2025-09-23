@@ -1,0 +1,1262 @@
+﻿@model DCI.Models.ViewModel.TodoViewModel
+@using Newtonsoft.Json;
+@using DCI.Core.Common;
+@using DCI.Models.ViewModel;
+
+<link href="~/css/dcicustom.css" rel="stylesheet" />
+
+@{
+    var modulePageAccess = Context.Session.GetString("ModulePageAccess");
+    var canView = false;
+    var canAdd = false;
+    var canEdit = false;
+    var canDelete = false;
+
+    if (modulePageAccess == null)
+    {
+        <script>
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Logout", "Account")',
+                success: function (response) {
+
+                    Swal.fire({
+                        text: "Your session has timed out. Please log in again.",
+                        icon: "info",
+                        confirmButtonText: "Ok"
+                    }).then((result) => {
+                        window.location.href = '/Account/Logout';
+                    });
+                },
+                error: function () {
+                    Swal.fire({
+                        text: "An error occurred. Please try again.",
+                        icon: "error"
+                    });
+                }
+            })
+        </script>
+    }
+    else
+    {
+        var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
+                    .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Department);
+        canView = module?.View ?? false;
+        canAdd = module?.Add ?? false;
+        canEdit = module?.Update ?? false;
+        canDelete = module?.Delete ?? false;
+    }
+
+}
+
+<div class="container-fluid">
+    <div class="spinner-overlay">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <div class="d-sm-flex align-items-center justify-content-between mb-3">
+    </div>
+    <div class="col-12 p0">
+        <ul class="breadcrumb">
+            <li><a href="~/Home/Index">Dashboard</a></li>
+            <li><a href="#">To Do</a></li>
+        </ul>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header">
+            <label class="mb0">To Do</label>
+        </div>
+        <div class="card-body">
+            <!-- Nav Pills -->
+            <ul class="nav nav-pills mb-3" id="todo-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="leave-tab" data-bs-toggle="pill" data-bs-target="#leave" type="button" role="tab">
+                        Leave  <span class="badge bg-danger ms-2">@Model.LeaveCount</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link " id="wfh-tab" data-bs-toggle="pill" data-bs-target="#wfh" type="button" role="tab">
+                        WFH  <span class="badge bg-danger ms-2">@Model.WFHCount</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="overtime-tab" data-bs-toggle="pill" data-bs-target="#overtime" type="button" role="tab">
+                        Overtime  <span class="badge bg-danger ms-2">@Model.OvertimeCount</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="dtr-tab" data-bs-toggle="pill" data-bs-target="#dtr" type="dtr" role="tab">
+                        DTR Adjustment  <span class="badge bg-danger ms-2">@Model.DTRCount</span>
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="todo-tabs-content">
+
+                <!-- Leave -->
+                <div class="tab-pane fade show active" id="leave" role="tabpanel" aria-labelledby="leave-tab">
+                    <table class="table table-bordered nowrap" id="tblLeave" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <label>Request No</label>
+                                </th>
+                                <th>
+                                    <label>Name</label>
+                                </th>
+                                <th>
+                                    <label>Date Filed</label>
+                                </th>
+                               
+                                <th>
+                                    <label>Date Covered</label>
+                                </th>
+                                <th>
+                                    <label>No. of Days</label>
+                                </th>
+                                <th>
+                                    <label>Status</label>
+                                </th>
+                                <th>
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.leaveList != null && Model.leaveList.Any())
+                            {
+                                @foreach (var item in Model.leaveList)
+                                {
+                                    <tr>
+
+                                        <td>
+                                            @item.RequestNo
+                                        </td>
+                                        <td>
+                                            @item.EmployeeName
+                                        </td>
+                                        <td>
+                                            @item.DateFiled.ToString("yyyy-MM-dd HH:mm")
+                                        </td>
+                                       
+                                        <td>
+                                            <strong>
+                                                @foreach (var dtl in item.LeaveRequestDetailList)
+                                                {
+                                                    <span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>@dtl.LeaveDate.ToShortDateString()</span>
+                                                }
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            @item.NoofDays
+                                        </td>
+                                        <td>
+                                            @item.StatusName
+                                        </td>
+                                        <td>
+                                            <a href="#" onclick="editFormLeave(@item.LeaveRequestHeaderId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+
+                                            <a href="#" id="approved" onclick="approvalFormLeave(@item.LeaveRequestHeaderId,@((int)EnumStatus.Approved))" title="Approve" class="btn btn-info"> <i class="fa fa-check"></i></a>
+                                            <a href="#" id="disapproved" onclick="remarksFormLeave(@item.LeaveRequestHeaderId,@((int)EnumStatus.Rejected))" class="btn btn-danger"> <i class="fa fa-remove"></i></a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted fw-bold">
+                                        No Pending Requests
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- WFH -->
+                <div class="tab-pane fade" id="wfh" role="tabpanel" aria-labelledby="wfh-tab">
+                    <table class="table table-bordered" id="tblWFH">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <label>Request No.</label>
+                                </th>
+                                <th>
+                                    <label>Name</label>
+                                </th>
+                                <th>
+                                    <label>Date Filed</label>
+                                </th>
+                                <th>
+                                    <label>Status</label>
+                                </th>
+                           
+                                <th>
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.wfhList != null && Model.wfhList.Any())
+                            {
+                                @foreach (var item in Model.wfhList)
+                                {
+                                    <tr>
+
+                                        <td>
+                                            @item.RequestNo
+                                        </td>
+                                        <td>
+                                            @item.Fullname
+                                        </td>
+                                        <td>
+                                            @item.DateCreated.ToString("yyyy-MM-dd HH:mm")
+                                        </td>
+                                        <td>
+                                            @item.StatusName
+                                        </td>
+                                   
+
+                                        <td class="text-center">
+                                            <a href="#" onclick='viewWFHdDetails(@item.WfhHeaderId);' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+
+                                            <a href="#" id="approved" onclick="approvalFormWFH(@item.WfhHeaderId,@((int)EnumStatus.Approved))" title="Approve" class="btn btn-info"> <i class="fa fa-check"></i></a>
+                                            <a href="#" id="disapproved" onclick="remarksFormWFH(@item.WfhHeaderId,@((int)EnumStatus.Rejected))" class="btn btn-danger"> <i class="fa fa-remove"></i></a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted fw-bold">
+                                        No Pending Requests
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Overtime -->
+                <div class="tab-pane fade" id="overtime" role="tabpanel" aria-labelledby="overtime-tab">
+                    <table class="table table-bordered" id="tblOvertime">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <label>RequestNo</label>
+                                </th>
+                                <th>
+                                    <label>Name</label>
+                                </th>
+                                <th>
+                                    <label>Date Filed</label>
+                                </th>
+                                <th>
+                                    <label>Total</label>
+                                </th>
+                                <th>
+                                    <label>Status</label>
+                                </th>
+
+                            
+
+                                <th>
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.otList != null && Model.otList.Any())
+                            {
+                                @foreach (var item in Model.otList)
+                                {
+                                    <tr>
+
+                                        <td>
+                                            @item.RequestNo
+                                        </td>
+                                        <td>
+                                            @item.Fullname
+                                        </td>
+                                        <td>
+                                            @item.DateCreated.ToString("yyyy-MM-dd HH:mm")
+                                        </td>
+                                        <td>
+                                            @item.TotalString
+                                        </td>
+                                        <td>
+                                            @item.StatusName
+                                        </td>
+                                     
+
+                                        <td>
+
+                                            <a href="#" onclick='viewFormOT(@item.OTHeaderId)' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+                                            <a href="#" id="approvedOT" onclick="approvalFormOvertime(@item.OTHeaderId,@((int)EnumStatus.Approved))" title="Approve" class="btn btn-info"> <i class="fa fa-check"></i></a>
+                                            <a href="#" id="disapprovedOT" onclick="remarksFormOvertime(@item.OTHeaderId,@((int)EnumStatus.Rejected))" class="btn btn-danger"> <i class="fa fa-remove"></i></a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted fw-bold">
+                                        No Pending Requests
+                                    </td>
+                                </tr>
+
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- DTR -->
+                <div class="tab-pane fade" id="dtr" role="tabpanel" aria-labelledby="dtr-tab">
+                    <table class="table table-bordered nowrap" id="tblDtr" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+
+                                <th>
+                                    <label>Request No</label>
+                                </th>
+                                <th>
+                                    <label>Name</label>
+                                </th>
+                                <th>
+                                    <label>Date Filed</label>
+                                </th>
+                                <th>
+                                    <label>Type</label>
+                                </th>
+                                <th>
+                                    <label>DTR Date & Time</label>
+                                </th>
+
+                        
+                                <th>
+                                    <label>Status</label>
+                                </th>
+                               
+                                <th>
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.dtrList != null && Model.dtrList.Any())
+                            {
+                                @foreach (var item in Model.dtrList)
+                                {
+                                    <tr>
+
+                                        <td>
+                                            @item.RequestNo
+                                        </td>
+                                        <td>
+                                            @item.EmployeeName
+                                        </td>
+                                        <td>
+                                            @item.DateFiled.ToString("yyyy-MM-dd HH:mm")
+                                        </td>
+                                        <td>
+                                            @if (item.DtrType == 1)
+                                            {
+                                                @("Time In")
+                                                ;
+                                            }
+                                            else
+                                            {
+                                                @("Time Out")
+                                                ;
+                                            }
+                                        </td>
+
+                                        <td>
+                                            @item.DtrDateTime.ToString("yyyy-MM-dd HH:mm")
+                                        </td>
+                                       
+                                        <td>
+                                            @item.StatusName
+                                        </td>
+                                       
+
+                                        <td>
+                                            <a href="javascript:void(0)" onclick="editForm(@item.DtrId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+
+                                            <a href="javascript:void(0)" id="approved" onclick="approvalForm(@item.DtrId,@((int)EnumStatus.Approved))" title="Approve" class="btn btn-info"> <i class="fa fa-check"></i></a>
+                                            <a href="javascript:void(0)" id="disapproved" onclick="remarksForm(@item.DtrId,@((int)EnumStatus.Rejected))" class="btn btn-danger"> <i class="fa fa-remove"></i></a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted fw-bold">
+                                        No Pending Requests
+                                    </td>
+                                </tr>
+
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+    </<div>
+</div>
+
+
+            <!-- Leave modal -->
+
+            <div class="modal fade" id="leavecreatemodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel"><label id="lblReq"></label></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="leavecreateForm">
+                            <div class="modal-body">
+                                <table class="viewDetailsTbl table table-striped">
+                                    <tbody>
+                                        
+                                        <tr>
+                                            <th>Date Filed:</th>
+                                            <th class="tblDate">  <label id="lblDateFiled"></label>  </th>
+                                        </tr>
+
+                                        <tr>
+                                            <th>Employee Name:</th>
+                                            <th class="tblName"> <label id="lblName"></label> </th>
+                                        </tr>
+                                        <tr>
+                                            <th>DTR Covered:</th>
+                                            <td><div id="dateContainer"></div></td>
+                                        </tr>
+                                        <tr>
+                                            <th>No. of Days:</th>
+                                            <th class="tblTimeIn"><label id="lblNoDays"></label></th>
+                                        </tr>
+                                        <tr>
+                                            <th>Status:</th>
+                                            <td class="tblStatus"><span class="btnSuccess applicationStatus"><label id="lblStatus"></label></span></td>
+                                            <th class="tblStatus"><label id="lblStatus"></label></th>
+                                        </tr>
+                                        <tr>
+                                            <th>Reason:</th>
+                                            <th class="tblTimeOut"><label id="lblReason"></label></th>
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><small>Close</small></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leave Remarks modal -->
+            <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="remarksmodal" aria-hidden="true" id="leaveremarksmodal" data-backdrop="static">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Required</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col">
+                                    <label for="Remarks" class="col-form-label required">Remarks:</label>
+                                    <textarea rows="2" class="form-control" id="Remarks_Approval_Leave" name="Remarks_Approval_Leave"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-info" onclick="approvalRemarksFormLeave()" id="btnApprove">Submit</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- WFH modal -->
+            <div class="modal fade" id="filewfhmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">WFH</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="wfhInfo">
+                            <div class="modal-body">
+                                <input type="hidden" id="WfhHeaderId" name="WfhHeaderId">
+                                <table class="table table-bordered text-dark text-xs">
+                                    <thead>
+                                        <tr>
+
+                                            <th>
+                                                <label>Date</label>
+                                            </th>
+                                            <th>
+                                                <label>Time In</label>
+                                            </th>
+                                            <th>
+                                                <label>Time Out</label>
+                                            </th>
+                                            <th>
+                                                <label>Total Working Hours</label>
+                                            </th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblFileforWFH">
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <a href="#" id="approvedWFH" onclick="approvalFormWFH($('#WfhHeaderId').val(),@((int)EnumStatus.Approved))" title="Approve" class="btn btn-info"> Approve</a>
+                                <a href="#" id="disapprovedWFH" onclick="remarksFormWFH($('#WfhHeaderId').val(),@((int)EnumStatus.Rejected))" class="btn btn-danger"> Disapprove</a>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><small>Close</small></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WFH Remarks modal -->
+            <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="remarksmodalWFH" aria-hidden="true" id="remarksmodalWFH">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Required</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col">
+                                    <label for="Remarks" class="col-form-label required">Remarks:</label>
+                                    <textarea rows="2" class="form-control" id="Remarks_Approval_WFH" name="Remarks_Approval_WFH"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-info" onclick="approvalRemarksFormWFH()" id="btnApprove">Submit</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overtime modal -->
+            <div class="modal fade" id="otModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Overtime Approval</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="otInfo">
+                            <div class="modal-body">
+
+                                <table class="viewDetailsTbl table table-striped">
+                                    <tbody>
+                                        <tr>
+                                            <input type="hidden" id="OTHeaderId" name="OTHeaderId" value="0" />
+                                            <th>Request No:</th>
+                                            <th class="tblDate">  <label id="lblReqNoOT"></label>  </th>
+                                        </tr>                          
+                                        <tr>
+                                            <th>Name :</th>
+                                            <th class="tblEmNo">  <label id="lblNameOT"></label></th>
+                                        </tr>
+                                        <tr>
+                                            <th>Date Filed :</th>
+                                            <th class="tblEmNo">  <label id="lblDateFiledOT"></label></th>
+                                        </tr>
+                                        <tr>
+                                            <th>Status:</th>
+                                            <td class="tblStatus"><span class="btnSuccess applicationStatus"><label id="lblStatusOT"></label></span></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Remarks:</th>                                         
+                                            <th class="tblEmNo">  <label id="lblremarksOT"></label></th>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
+
+                                <table class="table table-bordered text-dark text-xs">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <label>Overtime Type</label>
+                                            </th>
+                                            <th>
+                                                <label>Date</label>
+                                            </th>
+                                            <th>
+                                                <label>Time From</label>
+                                            </th>
+                                            <th>
+                                                <label>Time To</label>
+                                            </th>
+                                            <th>
+                                                <label>Total Hours</label>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblOvertimeDetails">
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <a href="#" id="approved" onclick="approvalFormOvertime($('#OTHeaderId').val(),@((int)EnumStatus.Approved))" title="Approve" class="btn btn-info"> Approve</a>
+                                <a href="#" id="disapproved" onclick="remarksFormOvertime($('#OTHeaderId').val(),@((int)EnumStatus.Rejected))" class="btn btn-danger"> Disapprove</a>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><small>Close</small></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overtime Remarks modal -->
+            <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="remarksmodalovertime" aria-hidden="true" id="remarksmodalovertime">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Required</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col">
+                                    <label for="Remarks" class="col-form-label required">Remarks:</label>
+                                    <textarea rows="2" class="form-control" id="Remarks_Approval_Overtime" name="Remarks_Approval_Overtime"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-info" onclick="approvalRemarksFormOvertime()" id="btnApprove">Submit</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- DTR modal -->
+            <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="remarksmodal" aria-hidden="true" id="remarksmodaldtr">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Required</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col">
+                                    <label for="Remarks" class="col-form-label required">Remarks:</label>
+                                    <textarea rows="2" class="form-control" id="Remarks_Approval" name="Remarks_Approval"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-info" onclick="approvalRemarksForm()" id="btnApprove">Submit</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DTR Remarks modal -->
+            <div class="modal fade" id="remarksmodaldtr" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">DTR Adjustment</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="createForm">
+                            <div class="modal-body">
+
+                                <form class="row" id="frmDTRCorrection" method="POST">
+                                    <input type="hidden" name="DTR_DATE">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label class="frmText"><span class="required">*</span>DTR Date & Time</label>
+                                            <div class="input-group">
+                                                <input type="text" name="dateCovered" id="dateCovered" class="form-control frmField" autocomplete="off">
+                                                <div class="input-group-prepend prependBtn">
+                                                    <i class="fa fa-calendar"></i>
+                                                </div>
+                                            </div>
+                                            <label for="dateCovered" generated="true" class="error"></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label class="frmText"><span class="required">*</span> Type</label>
+                                            <select class="form-control frmField" name="DtrType" id="DtrType">
+                                                <option value="0">Select</option>
+                                                <option value="1" class="TIME_IN">Time In</option>
+                                                <option value="2" class="TIME_OUT">Time Out</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <label class="frmText"><span class="required">*</span> Reason:</label>
+                                            <textarea class="form-control frmField" name="Reason" id="Reason"></textarea>
+                                        </div>
+                                    </div>
+                                  
+                                </form>
+                            </div>
+
+                        
+                            <div class="modal-footer pt0">
+                            
+                                <button class="btn btnSecondary btn-icon-split d-block" data-dismiss="modal">
+                                    <span class="icon text-white">
+                                        <i class="fa-solid fa-xmark text-xs"></i>
+                                    </span>
+                                    <span class="text text-white"><small>Close </small></span>
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <input type="hidden" id="HiddenDocId" name="HiddenDocId" value="">
+            <input type="hidden" id="HiddenAction" name="HiddenAction" value="">     
+
+            <input type="hidden" id="HiddenLeaveId" name="HiddenLeaveId" value="">
+            <input type="hidden" id="HiddenActionLeave" name="HiddenActionLeave" value="">
+
+            <input type="hidden" id="HiddenWFHId" name="HiddenWFHId" value="">
+            <input type="hidden" id="HiddenActionWFH" name="HiddenActionWFH" value="">
+
+            <input type="hidden" id="HiddenOvertimeId" name="HiddenOvertimeId" value="">
+            <input type="hidden" id="HiddenActionOvertime" name="HiddenActionOvertime" value="">
+
+            <input type="hidden" id="HiddenDTRId" name="HiddenDTRId" value="">
+            <input type="hidden" id="HiddenActionDtr" name="HiddenActionDtr" value="">
+
+
+@section scripts {             
+                <script src="~/js/dci-validation.js"></script>
+            
+
+
+                <script type="text/javascript">
+                        var js = jQuery.noConflict(true);
+                                         
+
+
+                         $('.spinner-overlay').show();
+
+                    setTimeout(() => {
+                        $('.spinner-overlay').hide();
+                    }, 200);
+
+
+                        $(document).ready(function () {
+
+                        });
+
+
+
+                    function editFormLeave(leaveHdrId) {
+                        const formData = new FormData();
+                        formData.append('LeaveRequestHeaderId', leaveHdrId);
+
+                        js.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("RequestLeave", "DailyTimeRecord")',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function (response) {
+                                if (response.success) {
+                                    console.log(response);
+
+                                    document.getElementById('lblReq').textContent = response.data.leaveRequestHeader.requestNo;
+                                    document.getElementById('lblDateFiled').textContent = response.data.leaveRequestHeader.dateFiledString;
+                                    document.getElementById('lblName').textContent = response.data.leaveRequestHeader.employeeName;
+                                    document.getElementById('lblNoDays').textContent = response.data.leaveRequestHeader.noofDays;
+                                    document.getElementById('lblStatus').textContent = response.data.leaveRequestHeader.statusName;
+                                    document.getElementById('lblReason').textContent = response.data.leaveRequestHeader.reason;
+
+                                    var container = $('#dateContainer');
+                                    container.empty();
+
+
+                                    response.data.leaveDateList.forEach(function (date) {
+                                        var span = `<span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>${date}</span>`;
+                                        container.append(span);
+                                    });
+
+                                    js('#leavecreatemodal').modal('show');
+                                } else {
+                                    Swal.fire({
+                                        text: response.message,
+                                        icon: "error"
+                                    });
+                                }
+                                $('.spinner-overlay').hide();
+                            },
+                            error: function () {
+                                $('.spinner-overlay').hide();
+                                Swal.fire({
+                                    text: "An error occurred. Please try again.",
+                                    icon: "error"
+                                });
+                            }
+                        });
+                        js('#leavecreatemodal').modal('show');
+                    }
+
+                    function approvalRemarksFormLeave() {
+
+                        if ($('#Remarks_Approval_Leave').val() == "") {
+                            Swal.fire({
+                                text: "Please input remarks",
+                                icon: "error"
+                            });
+                        }
+                        else {
+
+
+                            const _transId = $('#HiddenLeaveId').val();
+                            const _action = $('#HiddenActionLeave').val();
+
+                            $('.spinner-overlay').show();
+
+                            $.ajax({
+                                type: 'POST',
+                                url: '@Url.Action("ApprovalLeave", "Todo")',
+                                data: { TransactionId: _transId, Status: _action, Remarks: $('#Remarks_Approval_Leave').val() },
+                                success: function (response) {
+                                    if (response.success) {
+                                        Swal.fire({
+                                            text: response.message,
+                                            icon: "success",
+                                            confirmButtonText: "Ok"
+                                        }).then((result) => {
+                                            location.reload();
+                                        });
+
+                                    } else {
+                                        Swal.fire({
+                                            text: response.message,
+                                            icon: "error"
+                                        });
+                                    }
+                                    $('.spinner-overlay').hide();
+                                },
+                                error: function () {
+                                    $('.spinner-overlay').hide();
+                                    Swal.fire({
+                                        text: "An error occurred. Please try again.",
+                                        icon: "error"
+                                    });
+                                }
+                            });
+
+                        }
+                    }
+
+                    function approvalFormLeave(leaveId, status) {
+                        Swal.fire({
+                            text: "Are you sure you want to submit this record?",
+                            icon: "question",
+                            showCancelButton: true,
+                            confirmButtonText: "Ok"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $('.spinner-overlay').show();
+                                $.ajax({
+                                    type: 'POST',
+                                    url: '@Url.Action("ApprovalLeave", "Todo")',
+                                    data: { TransactionId: leaveId, Status: status, Remarks: $('#Remarks_Approval_Leave').val() },
+
+                                    success: function (response) {
+                                        if (response.success) {
+                                            Swal.fire({
+                                                text: response.message,
+                                                icon: "success",
+                                                confirmButtonText: "Ok"
+                                            }).then((result) => {
+                                                location.reload();
+                                            });
+
+                                        } else {
+                                            Swal.fire({
+                                                text: response.message,
+                                                icon: "error"
+                                            });
+                                        }
+                                        $('.spinner-overlay').hide();
+                                    },
+                                    error: function () {
+                                        $('.spinner-overlay').hide();
+                                        Swal.fire({
+                                            text: "An error occurred. Please try again.",
+                                            icon: "error"
+                                        });
+                                    }
+                                }); //ajax
+
+                            }
+                        }); //swal alert
+                    }
+
+                    function remarksFormLeave(leaveId, status) {
+                        $('#Remarks_Approval_Leave').val("");
+                        $('#HiddenLeaveId').val(leaveId);
+                        $('#HiddenActionLeave').val(status);
+                        js('#leaveremarksmodal').modal('show');
+                    }
+
+
+                    function viewWFHdDetails(headerId){
+                       $('#HiddenHeaderId').val(headerId);
+                          $('#WfhHeaderId').val(headerId);
+
+                                          $.ajax({
+                                              type: 'POST',
+                                              url: '@Url.Action("WFHApplicationDetails", "DailyTimeRecord")',
+                                                data: { WFHHeaderId: headerId },
+                                              success: function (response) {
+                                                  if (response.success) {
+
+                                                      console.log(response.data);
+
+                                                           var tbodytable = $("#tblFileforWFH");
+                                                    tbodytable.empty();
+
+                                                    if (response.data.length > 0) {
+                                                        $.each(response.data, function(index, item) {
+                                                            var row = `<tr>
+
+                                                                                 <td>${item.date}</td>
+                                                                                    <td>${item.timeIn}</td>
+                                                                                    <td>${item.timeOut}</td>
+                                                                                       <td>${item.totalWorkingHours}</td>
+                                                                        </tr>`;
+                                                            tbodytable.append(row);
+                                                        });
+                                                    } else {
+                                                        tbodytable.html(`<tr><td colspan="4" class="text-center">No record found.</td></tr>`);
+                                                    }
+
+                                                      js('#filewfhmodal').modal('show');
+
+                                                  } else {
+                                                      Swal.fire({
+                                                          text: response.message,
+                                                          icon: "error"
+                                                      });
+                                                  }
+                                                  $('.spinner-overlay').hide();
+                                              },
+                                              error: function () {
+                                                  $('.spinner-overlay').hide();
+                                                  Swal.fire({
+                                                      text: "An error occurred. Please try again.",
+                                                      icon: "error"
+                                                  });
+                                              }
+                                          });
+                }
+
+                    function approvalFormWFH(headerId,status) {
+
+                             $('.spinner-overlay').show();
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("ApprovalWFH", "Todo")',
+                            data: { TransactionId : headerId , Status: status, Remarks: $('#Remarks_Approval_WFH').val() },
+
+                            success: function (response) {
+                                if (response.success) {
+                                                        Swal.fire({
+                                                            text: response.message,
+                                                            icon: "success",
+                                                            confirmButtonText: "Ok"
+                                                        }).then((result) => {
+                                                            location.reload();
+                                                        });
+
+                                        } else {
+                                    Swal.fire({
+                                        text: response.message,
+                                        icon: "error"
+                                    });
+                                }
+                                 $('.spinner-overlay').hide();
+                            },
+                            error: function () {
+                                 $('.spinner-overlay').hide();
+                                Swal.fire({
+                                    text: "An error occurred. Please try again.",
+                                    icon: "error"
+                                });
+                            }
+                        });
+
+
+                }
+
+                    function remarksFormWFH(headerId,status) {
+
+                      $('#Remarks_Approval_WFH').val("");
+                      $('#HiddenWFHId').val(headerId);
+                       $('#WfhHeaderId').val(headerId);
+                      $('#HiddenActionWFH').val(status);
+                       js('#remarksmodalWFH').modal('show');
+                 }
+
+                    function approvalRemarksFormWFH() {
+
+                              if($('#Remarks_Approval').val() == "")
+                              {
+                                     Swal.fire({
+                                                    text: "Please input remarks",
+                                                    icon: "error"
+                                                });
+                              }
+                              else
+                              {
+
+
+                                 const _transId =  $('#HiddenWFHId').val();
+                                  const _action =  $('#HiddenActionWFH').val();
+
+                                                      $('.spinner-overlay').show();
+
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: '@Url.Action("ApprovalWFH", "Todo")',
+                                        data: { TransactionId: _transId , Status: _action, Remarks: $('#Remarks_Approval_WFH').val() },
+                                        success: function (response) {
+                                            if (response.success) {
+                                                                    Swal.fire({
+                                                                        text: response.message,
+                                                                        icon: "success",
+                                                                        confirmButtonText: "Ok"
+                                                                    }).then((result) => {
+                                                                        location.reload();
+                                                                    });
+
+                                                    } else {
+                                                Swal.fire({
+                                                    text: response.message,
+                                                    icon: "error"
+                                                });
+                                            }
+                                                  $('.spinner-overlay').hide();
+                                        },
+                                        error: function () {
+                                                  $('.spinner-overlay').hide();
+                                            Swal.fire({
+                                                text: "An error occurred. Please try again.",
+                                                icon: "error"
+                                            });
+                                        }
+                                    });
+                               }
+                   }
+
+
+                    function viewFormOT(id) {
+
+                                          $.ajax({
+                                              type: 'POST',
+                                             url: '@Url.Action("AddOvertimeJson", "DailyTimeRecord")',
+                                            data: { OTHeaderId: id },
+                                              success: function (response) {
+                                                  if (response.success) {
+                                                      console.log(response.data);
+                                                      $("#OTHeaderId").val(response.data.otHeaderId)
+                                                        // document.getElementById('OTHeaderId').text =response.data.otHeaderId;
+                                       document.getElementById('lblReqNoOT').textContent =response.data.requestNo;
+                                  // document.getElementById('lblRecommend').textContent =response.data.recommendedBy;
+                                document.getElementById('lblNameOT').textContent =response.data.fullname;
+                                        document.getElementById('lblDateFiledOT').textContent =  response.data.dateCreatedString;
+                                    document.getElementById('lblStatusOT').textContent =response.data.statusName;
+                              document.getElementById('lblremarksOT').textContent =response.data.remarks;
+
+
+                                                   var tbodytable = $("#tblOvertimeDetails");
+                                                    tbodytable.empty();
+
+
+                                                    if (response.data.otDetails.length > 0) {
+                                                        $.each(response.data.otDetails, function(index, item) {
+                                                            var row = `<tr>
+                                                                             <td>${item.otTypeName}</td>
+                                                                                <td>${item.otDateString}</td>
+                                                                                <td>${item.otTimeFrom}</td>
+                                                                                   <td>${item.otTimeTo}</td>
+                                                                            <td>${item.totalHours}</td>
+                                                                        </tr>`;
+                                                            tbodytable.append(row);
+                                                        });
+                                                    } else {
+                                                        tbodytable.html(`<tr><td colspan="5" class="text-center">No record found.</td></tr>`);
+                                                    }
+
+                                                      js('#otModal').modal('show');
+
+                                                  } else {
+                                                      Swal.fire({
+                                                          text: response.message,
+                                                          icon: "error"
+                                                      });
+                                                  }
+                                                  $('.spinner-overlay').hide();
+                                              },
+                                              error: function () {
+                                                  $('.spinner-overlay').hide();
+                                                  Swal.fire({
+                                                      text: "An error occurred. Please try again.",
+                                                      icon: "error"
+                                                  });
+                                              }
+                                          });
+
+
+                                js('#otModal').modal('show');
+                        }
+
+                    function approvalFormOvertime(headerId,status) {
+
+                                 $('.spinner-overlay').show();
+                            $.ajax({
+                                type: 'POST',
+                                url: '@Url.Action("ApprovalWFH", "Todo")',
+                                data: { TransactionId : headerId , Status: status, Remarks: $('#Remarks_Approval_Overtime').val() },
+
+                                success: function (response) {
+                                    if (response.success) {
+                                                            Swal.fire({
+                                                                text: response.message,
+                                                                icon: "success",
+                                                                confirmButtonText: "Ok"
+                                                            }).then((result) => {
+                                                                location.reload();
+                                                            });
+
+                                            } else {
+                                        Swal.fire({
+                                            text: response.message,
+                                            icon: "error"
+                                        });
+                                    }
+                                     $('.spinner-overlay').hide();
+                                },
+                                error: function () {
+                                     $('.spinner-overlay').hide();
+                                    Swal.fire({
+                                        text: "An error occurred. Please try again.",
+                                        icon: "error"
+                                    });
+                                }
+                            });
+                    }
+
+                    function remarksFormOvertime(headerId,status) {
+
+                          $('#Remarks_Approval_Overtime').val("");
+                          $('#HiddenOvertimeId').val(headerId);
+                                 // $('#WfhHeaderId').val(headerId);
+                          $('#HiddenActionOvertime').val(status);
+                           js('#remarksmodalovertime').modal('show');
+                     }
+
+                    function approvalRemarksFormOvertime() {
+                                console.log($('#Remarks_Approval_Overtime').val())
+                                 if($('#Remarks_Approval_Overtime').val() == "")
+                                 {
+                                        Swal.fire({
+                                                       text: "Please input remarks",
+                                                       icon: "error"
+                                                   });
+                                 }
+                                 else
+                                 {
+                                                                
+
+                                    $('.spinner-overlay').show();
+
+                                       $.ajax({
+                                           type: 'POST',
+                                           url: '@Url.Action("ApprovalWFH", "Todo")',
+                                           data: { TransactionId: $('#HiddenOvertimeId').val() , Status: $('#HiddenActionOvertime').val(), Remarks: $('#Remarks_Approval_Overtime').val() },
+                                           success: function (response) {
+                                               if (response.success) {
+                                                                       Swal.fire({
+                                                                           text: response.message,
+                                                                           icon: "success",
+                                                                           confirmButtonText: "Ok"
+                                                                       }).then((result) => {
+                                                                           location.reload();
+                                                                       });
+
+                                                       } else {
+                                                   Swal.fire({
+                                                       text: response.message,
+                                                       icon: "error"
+                                                   });
+                                               }
+                                                     $('.spinner-overlay').hide();
+                                           },
+                                           error: function () {
+                                                     $('.spinner-overlay').hide();
+                                               Swal.fire({
+                                                   text: "An error occurred. Please try again.",
+                                                   icon: "error"
+                                               });
+                                           }
+                                       });
+                                  }
+                      }
+
+                    
+
+               
+                </script>
+}

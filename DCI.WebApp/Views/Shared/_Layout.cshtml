@@ -95,17 +95,9 @@
                                        
                    
                     @if (module.ModulePageId == (int)EnumModulePage.Todo)
-                    {
-                      @*   <hr class='sidebar-divider'>
-                        <a href="/Todo/Index/" class='mainModule'>
-                            <div class='sidebar-heading mainModuleActive'>
-                                <i class='fa-solid fa-check'></i>
-                                <span>To Do</span>
-                                <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
-                            </div>
-                        </a> *@
+                    {                  
 
-                    <hr class='sidebar-divider'>
+          @*           <hr class='sidebar-divider'>
                         <div role="group">
                             <a href="#" id="btnGroupDrop1" class="mainModule" data-bs-toggle="dropdown" aria-expanded="false">
                                 <div class='sidebar-heading mainModuleActive'>
@@ -120,7 +112,15 @@
                                          <li><a class="dropdown-item" href="/Todo/Overtime/">Overtime</a></li>     
                                            <li><a class="dropdown-item" href="/Todo/WFH/">WFH</a></li>     
                             </ul>
-                        </div>
+                        </div> *@
+                             <hr class='sidebar-divider'>
+                            <a href="/Todo/Index/" class='mainModule'>
+                                <div class='sidebar-heading mainModuleActive'>
+                                    <i class='fa-solid fa-list-ul'></i>
+                                    <span>To Do</span>
+                                    <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
+                                </div>
+                            </a>
                     }                   
 
                     @if (module.ModulePageId == (int)EnumModulePage.Administration)
@@ -569,6 +569,7 @@
     <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.print.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.1/css/buttons.dataTables.css">
+
 
 
     @await RenderSectionAsync("Scripts", required: false)

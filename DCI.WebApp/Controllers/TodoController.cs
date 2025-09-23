@@ -59,6 +59,35 @@ namespace DCI.WebApp.Controllers
         //}
 
 
+        public async Task<IActionResult> Index()
+        {
+            TodoViewModel model = new TodoViewModel();
+
+
+            using (var _httpclient = new HttpClient())
+            {
+                
+
+                var currentUser = _userSessionHelper.GetCurrentUser();
+                model.CurrentUserId = currentUser.UserId;
+
+
+                 var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Todo/GetAllTodo");
+
+                request.Content = stringContent;
+                var response = await _httpclient.SendAsync(request);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    model = JsonConvert.DeserializeObject<TodoViewModel>(responseBody)!;
+                }
+
+            }
+
+            return View(model);
+        }
+
 
         public async Task<IActionResult> Leave()
         {

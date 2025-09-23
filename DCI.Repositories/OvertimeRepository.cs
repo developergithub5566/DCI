@@ -170,6 +170,7 @@ namespace DCI.Repositories
                     Remarks = ot.Remarks,
                     DateCreated = ot.DateCreated,
                     CreatedBy = ot.CreatedBy,
+                    DateCreatedString = ot.DateCreated.ToString("yyyy-MM-dd HH:mm"),
 
                     // RecommendedBy = usrApprover != null ? usrApprover.Firstname + " " + usrApprover.Lastname : string.Empty,
                     // ApprovedBy = "MARCO USTARIS",
