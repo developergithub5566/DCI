@@ -419,5 +419,88 @@ namespace DCI.Repositories
             string formattedB = setB.ToString("D4");
             return $"{formattedA}";
         }
+
+        public async Task<List<OvertimePayReport>> GetOvertimeSummaryAsync(int employeeId, DateTime dateFrom, DateTime dateTo)
+
+        {
+            dateFrom = dateFrom.AddMonths(-2);
+            // 1) Base join + filters (only active rows, by employee/date range)
+
+
+            var baseQuery =
+     from h in _dbContext.OvertimeHeader.AsNoTracking()
+     join d in _dbContext.OvertimeDetail.AsNoTracking()
+         on h.OTHeaderId equals d.OTHeaderId
+     where h.IsActive && d.IsActive
+           && (employeeId == 0 || h.EmployeeId == employeeId)
+           && d.OTDate >= dateFrom && d.OTDate <= dateTo
+     select new
+     {
+         h.EmployeeId,
+         h.RequestNo,
+         d.OTDate,
+         d.OTTimeFrom,
+         d.OTTimeTo,
+         d.OTType,
+         d.TotalMinutes
+     };
+
+            var grouped = await baseQuery
+                .GroupBy(g => new
+                {
+                    g.EmployeeId,
+                    g.RequestNo,
+                    Date = g.OTDate.Date,
+                    g.OTTimeFrom,
+                    g.OTTimeTo
+                })
+                .Select(g => new
+                {
+                    g.Key.EmployeeId,
+                    g.Key.RequestNo,
+                    g.Key.Date,
+                    g.Key.OTTimeFrom,
+                    g.Key.OTTimeTo,
+
+                    Regular = g.Where(x => x.OTType == (int)EnumOvertime.Regular)
+                               .Sum(x => (int?)x.TotalMinutes) ?? 0,
+                    NightDifferential = g.Where(x => x.OTType == (int)EnumOvertime.NightDifferential)
+                                         .Sum(x => (int?)x.TotalMinutes) ?? 0,
+                    SpecialHoliday = g.Where(x => x.OTType == (int)EnumOvertime.SpecialHoliday)
+                                      .Sum(x => (int?)x.TotalMinutes) ?? 0,
+                    After8hrs = g.Where(x => x.OTType == (int)EnumOvertime.After8hrs)
+                                 .Sum(x => (int?)x.TotalMinutes) ?? 0,
+                    HolidayOnRestDay = g.Where(x => x.OTType == (int)EnumOvertime.HolidayOnRestDay)
+                                        .Sum(x => (int?)x.TotalMinutes) ?? 0,
+                    TotalMinutes = g.Sum(x => x.TotalMinutes)
+                })
+                .OrderBy(x => x.Date)
+                .ToListAsync();
+
+            var result = grouped.Select(x =>
+            {
+                var ts = TimeSpan.FromMinutes(x.TotalMinutes);
+                string hhmm = $"{(int)ts.TotalHours:00}:{ts.Minutes:00}";
+
+                return new OvertimePayReport
+                {
+                    EmployeeId = x.EmployeeId,
+                    RequestNo = x.RequestNo,
+                    OTDateString = x.Date.ToString("yyyy-MM-dd"),
+                    OTTimeFrom = x.OTTimeFrom.ToString("HH:mm"),
+                    OTTimeTo = x.OTTimeTo.ToString("HH:mm"),
+                    Regular = x.Regular,
+                    NightDifferential = x.NightDifferential,
+                    SpecialHoliday = x.SpecialHoliday,
+                    After8hrs = x.After8hrs,
+                    HolidayOnRestDay = x.HolidayOnRestDay,
+
+                    TotalMinutes = x.TotalMinutes,
+                    TotalHours = hhmm
+                };
+            }).ToList();
+
+            return result;
+        }
     }
 }

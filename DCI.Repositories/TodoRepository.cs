@@ -1,4 +1,5 @@
 ﻿using DCI.Core.Common;
+using DCI.Core.Helpers;
 using DCI.Data;
 using DCI.Models.Entities;
 using DCI.Models.ViewModel;
@@ -602,73 +603,75 @@ namespace DCI.Repositories
         {
             try
             {
-                var leaveHdr = _dbContext.LeaveRequestHeader.AsQueryable().ToList();
-                var empList = _dbContext.Employee.AsQueryable().ToList();
-                var statusList = _dbContext.Status.AsQueryable().ToList();
-                var approvalLog = _dbContext.ApprovalHistory.AsQueryable().ToList();
-                var dtrcontext = _dbContext.DTRCorrection.AsQueryable().ToList();
-                var wfhcontext = _dbContext.WfhHeader.AsQueryable().ToList();
 
-                var queryLeave = from apprv in approvalLog
-                                 join hdr in leaveHdr on apprv.TransactionId equals hdr.LeaveRequestHeaderId
-                                 join emp in empList on hdr.EmployeeId equals emp.EmployeeId
-                                 join stat in statusList on hdr.Status equals stat.StatusId
-                                 where apprv.IsActive == true && apprv.ApproverId == model.CurrentUserId && apprv.ModulePageId == (int)EnumModulePage.Leave
-                                 select new ApprovalHistoryViewModel
-                                 {
-                                     ApprovalHistoryId = apprv.ApprovalHistoryId,
-                                     RequestNo = hdr.RequestNo,
-                                     Requestor = emp.Firstname + " " + emp.Lastname,
-                                     Status = hdr.Status,
-                                     StatusName = stat.StatusName,
-                                     StatusDate = apprv.DateCreated.ToString(),
-                                     ModuleName = "Leave",
-                                     DateCreated = hdr.DateFiled
-                                 };
+                var approvals = _dbContext.ApprovalHistory
+              .AsNoTracking()
+              .Where(a => a.IsActive && a.ApproverId == model.CurrentUserId);
 
-                var queryDTR = from apprv in approvalLog
-                               join dtr in dtrcontext on apprv.TransactionId equals dtr.DtrId
-                               join emp in empList on dtr.EmployeeId equals emp.EmployeeId
-                               join stat in statusList on dtr.Status equals stat.StatusId
-                               where apprv.IsActive == true && apprv.ApproverId == model.CurrentUserId && apprv.ModulePageId == (int)EnumModulePage.DTRCorrection
-                               select new ApprovalHistoryViewModel
-                               {
-                                   ApprovalHistoryId = apprv.ApprovalHistoryId,
-                                   RequestNo = dtr.RequestNo,
-                                   Requestor = emp.Firstname + " " + emp.Lastname,
-                                   Status = dtr.Status,
-                                   StatusName = stat.StatusName,
-                                   StatusDate = apprv.DateCreated.ToString(),
-                                   ModuleName = "DTR Adjustment",
-                                   DateCreated = dtr.DateFiled
-                               };
+                var leaveQ =
+                    from apprv in approvals.Where(a => a.ModulePageId == (int)EnumModulePage.Leave)
+                    join hdr in _dbContext.LeaveRequestHeader.AsNoTracking() on apprv.TransactionId equals hdr.LeaveRequestHeaderId
+                    join emp in _dbContext.Employee.AsNoTracking() on hdr.EmployeeId equals emp.EmployeeId
+                    join stat in _dbContext.Status.AsNoTracking() on hdr.Status equals stat.StatusId
+                    select new ApprovalHistoryViewModel
+                    {
+                        ApprovalHistoryId = apprv.ApprovalHistoryId,
+                        RequestNo = hdr.RequestNo,
+                        Requestor = emp.Firstname + " " + emp.Lastname,
+                        Status = hdr.Status,
+                        StatusName = stat.StatusName,
+                        StatusDate = apprv.DateCreated,
+                        ModuleName = EnumHelper.GetEnumDescriptionByTypeValue(typeof(EnumModulePage), (int)EnumModulePage.Leave),
+                        DateCreated = hdr.DateFiled
+                    };
 
-                var queryWFH = from apprv in approvalLog
-                               join wfh in wfhcontext on apprv.TransactionId equals wfh.WfhHeaderId
-                               join emp in empList on wfh.EmployeeId equals emp.EmployeeId
-                               join stat in statusList on wfh.Status equals stat.StatusId
-                               where apprv.IsActive == true && apprv.ApproverId == model.CurrentUserId && apprv.ModulePageId == (int)EnumModulePage.WFH
-                               select new ApprovalHistoryViewModel
-                               {
-                                   ApprovalHistoryId = apprv.ApprovalHistoryId,
-                                   RequestNo = wfh.RequestNo,
-                                   Requestor = emp.Firstname + " " + emp.Lastname,
-                                   Status = wfh.Status,
-                                   StatusName = stat.StatusName,
-                                   StatusDate = apprv.DateCreated.ToString(),
-                                   ModuleName = "WFH",
-                                   DateCreated = wfh.DateCreated
-                               };
+                var dtrQ =
+                    from apprv in approvals.Where(a => a.ModulePageId == (int)EnumModulePage.DTRCorrection)
+                    join dtr in _dbContext.DTRCorrection.AsNoTracking() on apprv.TransactionId equals dtr.DtrId
+                    join emp in _dbContext.Employee.AsNoTracking() on dtr.EmployeeId equals emp.EmployeeId
+                    join stat in _dbContext.Status.AsNoTracking() on dtr.Status equals stat.StatusId
+                    select new ApprovalHistoryViewModel
+                    {
+                        ApprovalHistoryId = apprv.ApprovalHistoryId,
+                        RequestNo = dtr.RequestNo,
+                        Requestor = emp.Firstname + " " + emp.Lastname,
+                        Status = dtr.Status,
+                        StatusName = stat.StatusName,
+                        StatusDate = apprv.DateCreated,
+                        ModuleName = EnumHelper.GetEnumDescriptionByTypeValue(typeof(EnumModulePage), (int)EnumModulePage.DTRCorrection),
+                        DateCreated = dtr.DateFiled
+                    };
 
-                return queryLeave.Concat(queryDTR).Concat(queryWFH).ToList();
+                var wfhQ =
+                    from apprv in approvals.Where(a => a.ModulePageId == (int)EnumModulePage.WFH)
+                    join wfh in _dbContext.WfhHeader.AsNoTracking() on apprv.TransactionId equals wfh.WfhHeaderId
+                    join emp in _dbContext.Employee.AsNoTracking() on wfh.EmployeeId equals emp.EmployeeId
+                    join stat in _dbContext.Status.AsNoTracking() on wfh.Status equals stat.StatusId
+                    select new ApprovalHistoryViewModel
+                    {
+                        ApprovalHistoryId = apprv.ApprovalHistoryId,
+                        RequestNo = wfh.RequestNo,
+                        Requestor = emp.Firstname + " " + emp.Lastname,
+                        Status = wfh.Status,
+                        StatusName = stat.StatusName,
+                        StatusDate = apprv.DateCreated,
+                        ModuleName = EnumHelper.GetEnumDescriptionByTypeValue(typeof(EnumModulePage), (int)EnumModulePage.WFH),
+                        DateCreated = wfh.DateCreated
+                    };
 
+                // Single translation (UNION ALL) and single round trip
+                var result = await leaveQ
+                    .Concat(dtrQ)
+                    .Concat(wfhQ)
+                    //.OrderByDescending(x => x.StatusDate)
+                    .ToListAsync();
 
-                //  return query.ToList();
+                return result;
             }
             catch (Exception ex)
             {
                 Log.Error(ex.ToString());
-                return null;
+                return new List<ApprovalHistoryViewModel>();
             }
             finally
             {

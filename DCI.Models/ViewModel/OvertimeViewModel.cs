@@ -102,9 +102,11 @@ namespace DCI.Models.ViewModel
         public string EmployeeNo { get; set; } = string.Empty;
     }
 
-    public class OvertimeEntryDtoXX
+    public class OvertimePayReport
     {
+        public int EmployeeId { get; set; } = 0;   
         public string EmployeeNo { get; set; } = string.Empty;
+        public string RequestNo { get; set; } = string.Empty;
         public int OTDetailId { get; set; } = 0;
         public int OTHeaderId { get; set; } = 0;
         public int OTType { get; set; } = 0;
@@ -115,9 +117,14 @@ namespace DCI.Models.ViewModel
         public string OTTimeTo { get; set; } = string.Empty;
         public string TotalHours { get; set; } = string.Empty;
         public int TotalMinutes { get; set; } = 0;
+
+        public DateTime DateFrom { get; set; } = DateTime.Now;
+        public DateTime DateTo { get; set; } = DateTime.Now;
+
+        public int Regular { get; set; } = 0;
+        public int NightDifferential { get; set; } = 0;
+        public int SpecialHoliday { get; set; } = 0;
+        public int After8hrs { get; set; } = 0;
+        public int HolidayOnRestDay { get; set; } = 0;
     }
-        
-
-
-
 }

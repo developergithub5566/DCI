@@ -703,6 +703,45 @@ namespace DCI.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
+        public async Task<IActionResult> OvertimePay(OvertimePayReport param)
+        {
+            List<OvertimePayReport> model = new List<OvertimePayReport>();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+
+                    //  param.ScopeTypeEmp = (int)EnumEmployeeScope.ALL;
+                    // param.CurrentUserId = currentUser.UserId;
+                    param.EmployeeId = currentUser.EmployeeId;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetOvertimeSummaryAsync");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<List<OvertimePayReport>>(responseBody)!;
+
+                    }
+
+                }
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
         public async Task<IActionResult> LeaveList(LeaveViewModel model)
         {
             try

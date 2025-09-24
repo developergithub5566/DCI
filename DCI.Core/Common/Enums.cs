@@ -41,11 +41,16 @@ namespace DCI.Core.Common
         DTRManagement = 15,
         Attendance = 16,
         DailyTimeRecord = 17,
+        [Description("Leave")]
         Leave = 18,
+        [Description("Overtime")]
         Overtime = 19,
         Position = 20,
+        [Description("WFH")]
         WFH = 21,
+        [Description("Undertime")]
         Undertime = 22,
+        [Description("DTR Adjustment")]
         DTRCorrection = 23
     }
 

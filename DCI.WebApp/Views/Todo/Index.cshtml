@@ -387,10 +387,10 @@
                                        
 
                                         <td>
-                                            <a href="javascript:void(0)" onclick="editForm(@item.DtrId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+                                            <a href="javascript:void(0)" onclick="viewDTRDetails(@item.DtrId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
 
-                                            <a href="javascript:void(0)" id="approved" onclick="approvalForm(@item.DtrId,@((int)EnumStatus.Approved))" title="Approve" class="btn btn-info"> <i class="fa fa-check"></i></a>
-                                            <a href="javascript:void(0)" id="disapproved" onclick="remarksForm(@item.DtrId,@((int)EnumStatus.Rejected))" class="btn btn-danger"> <i class="fa fa-remove"></i></a>
+                                            <a href="javascript:void(0)" id="approved" onclick="approvalFormDTR(@item.DtrId,@((int)EnumStatus.Approved))" title="Approve" class="btn btn-info"> <i class="fa fa-check"></i></a>
+                                            <a href="javascript:void(0)" id="disapproved" onclick="remarksFormDTR(@item.DtrId,@((int)EnumStatus.Rejected))" class="btn btn-danger"> <i class="fa fa-remove"></i></a>
                                         </td>
                                     </tr>
                                 }
@@ -668,34 +668,9 @@
                 </div>
             </div>
 
-            <!-- DTR modal -->
-            <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="remarksmodal" aria-hidden="true" id="remarksmodaldtr">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Required</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row">
-                                <div class="col">
-                                    <label for="Remarks" class="col-form-label required">Remarks:</label>
-                                    <textarea rows="2" class="form-control" id="Remarks_Approval" name="Remarks_Approval"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-info" onclick="approvalRemarksForm()" id="btnApprove">Submit</button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- DTR Remarks modal -->
-            <div class="modal fade" id="remarksmodaldtr" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+               <!-- DTR modal -->
+            <div class="modal fade" id="dtrmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -758,6 +733,35 @@
                     </div>
                 </div>
             </div>
+
+
+            <!-- DTR Remarks modal -->
+            <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="remarksmodaldtr" aria-hidden="true" id="remarksmodaldtr">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Required</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col">
+                                    <label for="Remarks" class="col-form-label required">Remarks:</label>
+                                    <textarea rows="2" class="form-control" id="Remarks_Approval_DTR" name="Remarks_Approval_DTR"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-info" onclick="approvalRemarksFormDTR()" id="btnApprove">Submit</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+         
 
             <input type="hidden" id="HiddenDocId" name="HiddenDocId" value="">
             <input type="hidden" id="HiddenAction" name="HiddenAction" value="">     
@@ -1256,6 +1260,150 @@
                       }
 
                     
+                    function viewDTRDetails(dtrId) {
+                                          event.preventDefault();
+
+                                          $.ajax({
+                                              type: 'POST',
+                                              url: '@Url.Action("DTRCorrectionById", "DailyTimeRecord")',
+                                               data: { DtrId: dtrId },
+                                              success: function (response) {
+                                                  if (response.success) {
+                                                         console.log(response);
+                                                                 $('#dateCovered').val(response.data.dtrDateTime.replace("T", " "));
+                                                              $('#DtrType').val(response.data.dtrType);
+                                                              $('#Reason').val(response.data.reason);
+                                                              $('#createForm').find('input, select, textarea').prop('disabled', true);
+                                                              
+                                                          js('#dtrmodal').modal('show');
+                                                  } else {
+                                                      Swal.fire({
+                                                          text: response.message,
+                                                          icon: "error"
+                                                      });
+                                                  }
+                                                  $('.spinner-overlay').hide();
+                                              },
+                                              error: function () {
+                                                  $('.spinner-overlay').hide();
+                                                  Swal.fire({
+                                                      text: "An error occurred. Please try again.",
+                                                      icon: "error"
+                                                  });
+                                              }
+                                          });
+                        }
+
+
+                        function approvalFormDTR(dtrId,status) {
+
+                           Swal.fire({
+                               text: "Are you sure you want to submit this DTR adjustment?",
+                               icon: "question",
+                               showCancelButton: true,
+                               confirmButtonText: "Ok"
+                           }).then((result) => {
+                               if (result.isConfirmed) {
+
+
+                                 $('.spinner-overlay').show();
+                            $.ajax({
+                                type: 'POST',
+                                url: '@Url.Action("ApprovalDtr", "Todo")',
+                                data: { TransactionId : dtrId , Status: status, Remarks: $('#Remarks').val() },
+
+                                success: function (response) {
+                                    if (response.success) {
+                                                            Swal.fire({
+                                                                text: response.message,
+                                                                icon: "success",
+                                                                confirmButtonText: "Ok"
+                                                            }).then((result) => {
+                                                                location.reload();
+                                                            });
+
+                                            } else {
+                                        Swal.fire({
+                                            text: response.message,
+                                            icon: "error"
+                                        });
+                                    }
+                                     $('.spinner-overlay').hide();
+                                },
+                                error: function () {
+                                     $('.spinner-overlay').hide();
+                                    Swal.fire({
+                                        text: "An error occurred. Please try again.",
+                                        icon: "error"
+                                    });
+                                }
+                            });
+
+                             }
+                               });
+
+
+
+                    }
+
+                         function remarksFormDTR(dtrId,status) {
+                          $('#Remarks_Approval_DTR').val("");
+                              $('#HiddenDTRId').val(dtrId);
+                              $('#HiddenActionDtr').val(status);
+                               js('#remarksmodaldtr').modal('show');
+                     }
+
+                         function approvalRemarksFormDTR() {
+
+                          if($('#Remarks_Approval_DTR').val() == "")
+                      {
+                             Swal.fire({
+                                            text: "Please input remarks",
+                                            icon: "error"
+                                        });
+                      }
+                      else
+                      {
+
+
+                         // const _transId =  $('#HiddenHeaderId').val();
+                         //  const _action =  $('#HiddenAction').val();
+
+                                              $('.spinner-overlay').show();
+
+                            $.ajax({
+                                type: 'POST',
+                                url: '@Url.Action("ApprovalDtr", "Todo")',
+                                                    data: { TransactionId:  $('#HiddenDTRId').val() , Status: $('#HiddenActionDtr').val(), Remarks: $('#Remarks_Approval_DTR').val() },
+                                success: function (response) {
+                                    if (response.success) {
+                                                            Swal.fire({
+                                                                text: response.message,
+                                                                icon: "success",
+                                                                confirmButtonText: "Ok"
+                                                            }).then((result) => {
+                                                                location.reload();
+                                                            });
+
+                                            } else {
+                                        Swal.fire({
+                                            text: response.message,
+                                            icon: "error"
+                                        });
+                                    }
+                                          $('.spinner-overlay').hide();
+                                },
+                                error: function () {
+                                          $('.spinner-overlay').hide();
+                                    Swal.fire({
+                                        text: "An error occurred. Please try again.",
+                                        icon: "error"
+                                    });
+                                }
+                            });
+
+                       }
+                       }
 
                
                 </script>

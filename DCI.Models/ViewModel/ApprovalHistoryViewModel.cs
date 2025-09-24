@@ -13,7 +13,7 @@
 		public string? Remarks { get; set; } = string.Empty;
 		public bool IsActive { get; set; } = true;
 		public string StatusName { get; set; } = string.Empty;
-        public string StatusDate { get; set; } = string.Empty;        
+		public DateTime StatusDate { get; set; } = DateTime.Now;   
          public int CurrentUserId { get; set; } = 0;
         public string Requestor { get; set; } = string.Empty;
         public string ModuleName { get; set; } = string.Empty;

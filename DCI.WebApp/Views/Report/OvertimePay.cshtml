@@ -1,0 +1,466 @@
+﻿@model IEnumerable<DCI.Models.ViewModel.OvertimePayReport>
+@using Newtonsoft.Json;
+@using DCI.Core.Common;
+@using DCI.Models.ViewModel;
+
+<link href="~/css/dcicustom.css" rel="stylesheet" />
+
+@{
+    var modulePageAccess = Context.Session.GetString("ModulePageAccess");
+    var canView = false;
+    var canAdd = false;
+    var canEdit = false;
+    var canDelete = false;
+
+    if (modulePageAccess == null)
+    {
+        <script>
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Logout", "Account")',
+                success: function (response) {
+
+                    Swal.fire({
+                        text: "Your session has timed out. Please log in again.",
+                        icon: "info",
+                        confirmButtonText: "Ok"
+                    }).then((result) => {
+                        window.location.href = '/Account/Logout';
+                    });
+                },
+                error: function () {
+                    Swal.fire({
+                        text: "An error occurred. Please try again.",
+                        icon: "error"
+                    });
+                }
+            })
+        </script>
+    }
+    else
+    {
+        var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
+                    .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Reports);
+        canView = module?.View ?? false;
+        canAdd = module?.Add ?? false;
+        canEdit = module?.Update ?? false;
+        canDelete = module?.Delete ?? false;
+    }
+
+}
+
+<div class="container-fluid">
+    <div class="spinner-overlay">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <div class="d-sm-flex align-items-center justify-content-between mb-3">
+        <h6 class="m-0 font-weight-bold text-gray-800">Overtime Summary Report</h6>
+        <div class="upperRightDivBtn">
+        </div>
+
+    </div>
+
+    <div class="col-12 p0">
+        <ul class="breadcrumb">
+            <li><a href="~/Home/Index">Dashboard</a></li>
+            <li><a href="~/Report/Index">Report</a></li>
+            <li><a href="#">Overtime Pay Report</a></li>
+        </ul>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header">
+            <label class="mb0">Data</label>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive mt20">
+                <table class="table table-bordered" id="tblDTR">
+                    <thead>
+                        <tr>
+                            <th style="width:7%">
+                                <label>Date </label>
+                            </th>
+                            <th>
+                                <label>Time In</label>
+                            </th>
+                            <th>
+                                <label>Time Out</label>
+                            </th>
+                            <th>
+                                <label>@DCI.Core.Common.Constants.OverTime_Regular</label>
+                            </th>
+                             <th>
+                                <label>@DCI.Core.Common.Constants.OverTime_NightDifferential</label>
+                            </th>
+                            <th>
+                                <label>@DCI.Core.Common.Constants.OverTime_SpecialHoliday</label>
+                            </th>
+
+                            <th>
+                                <label>@DCI.Core.Common.Constants.OverTime_After8hrs</label>
+                            </th>
+                            <th>
+                                <label>@DCI.Core.Common.Constants.OverTime_HolidayOnRestDay</label>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td>
+                                    @item.OTDateString
+                                </td>
+                                <td>
+                                    @item.OTTimeFrom
+                                </td>
+                                <td>
+                                    @item.OTTimeTo
+                                </td>
+                                <td>
+                                    @item.Regular
+                                </td>
+                                     <td>
+                                    @item.NightDifferential
+                                </td>                               
+                               <td>
+                                    @item.SpecialHoliday
+                                </td>
+
+                                <td>
+                                    @item.After8hrs
+                                </td>
+                                <td>
+                                    @item.HolidayOnRestDay
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+</<div>
+</div>
+
+
+            <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Overtime</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="createForm">
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label class="frmText"><span class="required">*</span> Type</label>
+                                    <select id="leaveTypeSelect" class="form-select" required onchange="GetLeaveTypeAmount()">
+                                        <option value="0">Select</option>
+                                        <option value="1">125% REGULAR (AFTER OFFICE HRS. /MON - FRI / EXCEPT HOLIDAY</option>
+                                        <option value="2">10% NIGHT DIFFERENTIAL (10PM - 6AM) MON - SUN / HOLIDAY</option>
+                                        <option value="3">130% SPECIAL HOLIDAY MON - SUN / SAT-SUN (FIRST 8 HRS.)</option>
+                                        <option value="4">169% AFTER 8 HRS OF 130%</option>
+                                        <option value="5">150% HOLIDAY ON REST DAY (SAT - SUN)</option>
+                                    </select>
+
+
+                                    <label class="frmText"><span class="required">*</span> Date: </label>
+                                    <div class="input-group">
+                                        <input type="text" name="OTDate" id="OTDate" class="form-control frmField" autocomplete="off">
+                                        <div class="input-group-prepend prependBtn">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                    </div>
+                                    <label for="OTDate" generated="true" class="error"></label>
+
+
+
+                                    <label class="frmText"><span class="required">*</span> Time From: </label>
+                                    <div class="input-group">
+                                        <input type="text" name="OTTimeFrom" id="OTTimeFrom" class="form-control frmField" autocomplete="off">
+                                        <div class="input-group-prepend prependBtn">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                    </div>
+                                    <label for="OTTimeFrom" generated="true" class="error"></label>
+
+                                    <label class="frmText"><span class="required">*</span> Time To: </label>
+                                    <div class="input-group">
+                                        <input type="text" name="OTTimeTo" id="OTTimeTo" class="form-control frmField" autocomplete="off">
+                                        <div class="input-group-prepend prependBtn">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                    </div>
+                                    <label for="OTTimeTo" generated="true" class="error"></label>
+
+                                    @* <label class="frmText">Total: </label> *@
+                                    <div id="totalTime"></div>
+                                </div>
+
+
+
+
+                                @*    <table class="viewDetailsTbl table table-striped">
+                                    <tbody>                                     
+                                    </tbody>
+                                </table> *@
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><small>Close</small></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                #tblDTR th {
+                    white-space: normal; /* allow wrapping */
+                    word-wrap: break-word; /* break long words if needed */
+                    max-width: 120px; /* optional: limit column width */
+                    text-align: center; /* keep text centered */
+                    vertical-align: middle;
+                }
+            </style>
+
+@section scripts {
+
+                <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
+                <script src="~/js/dci-validation.js"></script>
+                <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+    @*  Export Button*@
+                <script src="https://cdn.datatables.net/buttons/3.2.1/js/dataTables.buttons.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+                <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.html5.min.js"></script>
+                <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.print.min.js"></script>
+                <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
+                <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.1/css/buttons.dataTables.css">
+
+
+                <script type="text/javascript">
+                            var js = jQuery.noConflict(true);
+                                               let fromTime = null;
+                        let toTime = null;
+
+                                    $('.spinner-overlay').show();
+
+                        setTimeout(() => {
+                            $('.spinner-overlay').hide();
+                        }, 200);
+
+
+                            $(document).ready(function () {
+
+                                   flatpickr("#minDate", {
+                                   dateFormat: "Y-m-d",
+                                   defaultDate: new Date()
+
+                                });
+
+                                  flatpickr("#maxDate", {
+                                   dateFormat: "Y-m-d",
+                                   defaultDate: new Date()
+                                });
+
+                                    // Create custom filtering function
+                                   let min = null;
+                                     let max = null;
+
+                        js.fn.dataTable.ext.search.push(function (settings, data) {
+                         min = $('#minDate').val();   // e.g. "2025-09-10"
+                         max = $('#maxDate').val();   // e.g. "2025-09-20"
+                        let date = (data[2] || '').trim(); // use correct column index! (2 = 3rd col)
+
+                        if (!date) return false;
+                        
+                        if (min && date < min) return false;
+                        if (max && date > max) return false;
+
+                        return true;
+                    });
+
+
+
+                           var table =     js('#tblDTR').DataTable({
+                                          dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
+                             buttons: [
+                                 {
+                                     extend: 'excel',
+                                         text: 'Export to Excel',
+                                     title: 'Overtime Summary Report',
+                                     exportOptions: {
+                                         columns: ':not(:last-child)' // Excludes the last column
+                                     }
+                                 },
+                                 {
+                                     extend: 'pdf',
+                                     text: 'Export to PDF',
+                                     title: 'Overtime Summary Report',
+                                     orientation: 'landscape',
+                                     exportOptions: {
+                                         columns: ':not(:last-child)' // Excludes the last column
+                                     },
+                                 customize: function (doc) {
+                                                                   doc.watermark = {
+                                                                    text: 'Property of DBP Data Center, Inc.',   // watermark text
+                                                                    color: 'red',
+                                                                    opacity: 0.1,
+                                                                    bold: true,
+                                                                    italics: false
+                                                                };
+
+                                                                doc.content.splice(1, 0,
+                                                                    {
+                                                                        text: 'Period: ' + min + " to " + max,
+                                                                        alignment: 'center',
+                                                                        margin: [0, 0, 0, 4], // tighter spacing
+                                                                        fontSize: 10,
+                                                                        italics: true
+                                                                    },
+                                                                    {
+                                                                        text: 'Prepared by: ' + '@Html.Raw(ViewBag.Fullname)', // dynamic from Razor
+                                                                        alignment: 'center',
+                                                                        margin: [0, 0, 0, 12],
+                                                                        fontSize: 10,
+                                                                        bold: true
+                                                                    }
+                                                                  );
+                                                                           // --- Compute totals for a specific column (e.g., 4th column index = 3) ---
+                                                                        // let api = $('#tblDTR').DataTable();
+                                                                        // let intVal = function (i) {
+                                                                        //     return typeof i === 'string'
+                                                                        //         ? i.replace(/[\$,]/g, '') * 1
+                                                                        //         : typeof i === 'number'
+                                                                        //         ? i
+                                                                        //         : 0;
+                                                                        // };
+
+                                                                        // // Compute total for column index 3
+                                                                        // let total = api.column(4, { page: 'all' }).data()
+                                                                        //     .reduce((a, b) => intVal(a) + intVal(b), 0);
+
+                                                                        // // --- Add totals row at the bottom of the table inside PDF ---
+                                                                        // let body = doc.content[doc.content.length - 1].table.body;
+                                                                        // body.push([
+                                                                        //     { text: 'TOTAL', colSpan: 4, alignment: 'right', bold: true },
+                                                                        //     {}, {}, // empty cells for colspan
+                                                                        //     { text: total.toString(), alignment: 'right', bold: true }
+                                                                        // ]);                                                            
+                                                                  
+
+
+                                                                var now = new Date();
+                                                                var jsDate = now.toLocaleString(); // e.g. 9/21/2025, 3:25:10 PM
+
+                                                                doc['footer'] = function (currentPage, pageCount) {
+                                                                    return {
+                                                                        columns: [
+                                                                            { text: 'Date Printed: ' + jsDate, alignment: 'left', margin: [20, 0] },
+                                                                            { text: 'Page ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', margin: [0, 0, 20, 0] }
+                                                                        ],
+                                                                        margin: [20, 0]
+                                                                    };
+                                                                };
+                                                            }
+                                                        }
+                                                    ],
+                             lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
+                             pageLength: 10 ,// Default entries per page
+
+                                     order: [[2, 'desc']]
+                                });
+
+                                  $('#minDate, #maxDate').on('change', function () {
+                                        table.draw();
+                                    });
+
+
+                                       flatpickr("#OTDate", {
+                                                    enableTime: false,
+                                                   dateFormat: "Y-m-d",
+                                                        time_24hr: true,
+                                                                     onChange: function(selectedDates, dateStr, instance) {
+                                                      }
+                                                });
+
+
+
+                                                   flatpickr("#OTTimeFrom", {
+                                                             enableTime: true,
+                                                             noCalendar: true,
+                                                              dateFormat: "H:i",
+                                                              onChange: function(selectedDates) {
+                                                              fromTime = selectedDates[0];
+                                                              calculateDuration();
+                                                            }
+                                                        });
+
+                                                       flatpickr("#OTTimeTo", {
+                                                                 enableTime: true,
+                                                         noCalendar: true,
+                                                        dateFormat: "H:i",
+                                                         onChange: function(selectedDates) {
+                                                      toTime = selectedDates[0];
+                                                      calculateDuration();
+                                                    }
+                                                });
+
+
+
+                            });
+
+
+
+                    function calculateDuration() {
+                          if (fromTime && toTime) {
+                            // Set both times on the same day
+                            const baseDate = new Date();
+                            const from = new Date(baseDate);
+                            from.setHours(fromTime.getHours(), fromTime.getMinutes(), 0, 0);
+
+                            const to = new Date(baseDate);
+                            to.setHours(toTime.getHours(), toTime.getMinutes(), 0, 0);
+
+                            // Handle crossing midnight
+                            if (to < from) {
+                              to.setDate(to.getDate() + 1);
+                            }
+
+                            const diffMs = to - from;
+                            const diffMins = Math.floor(diffMs / 60000);
+                            const hours = Math.floor(diffMins / 60);
+                            const minutes = diffMins % 60;
+
+                            document.getElementById("totalTime").innerText =
+                              `Total: ${hours} hour(s) and ${minutes} minute(s)`;
+                          }
+                        }
+
+                            function newForm(dtr) {
+                               // console.log(dtr)
+
+                                  const timefrom = document.querySelector("#OTTimeFrom")._flatpickr;
+                                                     timefrom.clear();
+                                  const timeto = document.querySelector("#OTTimeTo")._flatpickr;
+                                                                     timeto.clear();
+
+
+
+
+                                    js('#createmodal').modal('show');
+                            }
+
+
+
+
+
+                </script>
+}

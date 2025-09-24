@@ -141,7 +141,7 @@
                                     @item.StatusName
                                 </td>
                                 <td>
-                                    @item.StatusDate
+                                    @item.StatusDate.ToString("MM/dd/yyyy HH:mm")
                                 </td>
 
                             </tr>
@@ -252,7 +252,7 @@
 
                 $(document).ready(function () {
                     js('#tblDocument').DataTable({
-                        order: [[4, 'desc']]
+                        order: [[5, 'desc']]
                     });
 
                     $('#fileUpload').on('change', function () {

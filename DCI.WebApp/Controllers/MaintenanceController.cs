@@ -959,6 +959,8 @@ namespace DCI.WebApp.Controllers
         {
 
             List<AuditLogViewModel> auditmodel = new List<AuditLogViewModel>();
+            var currentUser = _userSessionHelper.GetCurrentUser();
+            param.Username = currentUser.UserId.ToString();
 
             if (param.Id == 0) // all auditlogs from Maintenance
             {
@@ -979,10 +981,7 @@ namespace DCI.WebApp.Controllers
             else if (param.Id == -1) // specific user from activity user
             {
                 using (var _httpclient = new HttpClient())
-                {
-                    var currentUser = _userSessionHelper.GetCurrentUser();
-                    param.Username = currentUser.UserId.ToString();
-
+                {  
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Maintenance/GetAuditLogById");
                     request.Content = stringContent;
@@ -997,6 +996,7 @@ namespace DCI.WebApp.Controllers
                     }
                 }
             }
+            ViewBag.Fullname = currentUser?.Fullname;
             return View(auditmodel);
         }
         #endregion

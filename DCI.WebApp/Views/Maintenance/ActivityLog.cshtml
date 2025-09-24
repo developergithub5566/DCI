@@ -70,6 +70,36 @@
 			<label class="mb0">Data</label>
 		</div>
 		<div class="card-body">
+
+				<div id="accordion">
+					<form id="frmFilter" class="row">
+						<div class="form-group col-3">
+							<label class="frmText">Date Covered From: </label>
+							<div class="input-group">
+
+								<input type="text" name="minDate" id="minDate" class="form-control frmField" autocomplete="off">
+								<div class="input-group-prepend prependBtn">
+									<i class="fa fa-calendar"></i>
+								</div>
+								<label for="minDate" generated="true" class="error"></label>
+							</div>
+						</div>
+						<div class="form-group col-3">
+							<label class="frmText">Date Covered To: </label>
+							<div class="input-group">
+
+
+								<input type="text" name="maxDate" id="maxDate" class="form-control frmField" autocomplete="off">
+								<div class="input-group-prepend prependBtn">
+									<i class="fa fa-calendar"></i>
+								</div>
+								<label for="maxDate" generated="true" class="error"></label>
+							</div>
+						</div>
+					</form>
+				</div>
+
+
 			<div class="table-responsive mt20">
 				<input type="text" class="form-control" id="canExport" name="canExport" value="@canExport" hidden>
 
@@ -116,7 +146,7 @@
 									@item.Username
 								</td>
 								<td>
-									@item.TimeStamp.ToString("yyyy-MM-dd HH:mm tt")
+									@item.TimeStamp.ToString("yyyy-MM-dd HH:mm")
 								</td>
 								<td style="font-size:x-small" width="30%">
 									@item.ChangesSerialized
@@ -135,18 +165,6 @@
 		</div>
 	</div>
 	@section scripts {
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
-		<script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
-
-		@* 	<script src="~/js/file-upload.js"></script> *@
-		<script src="https://cdn.datatables.net/buttons/3.2.1/js/dataTables.buttons.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-		<script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.html5.min.js"></script>
-		<script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.print.min.js"></script>
-		<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
-		<link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.1/css/buttons.dataTables.css">
 
 		<script type="text/javascript">
 			var js = jQuery.noConflict(true);
@@ -158,34 +176,117 @@
 
 
 			$(document).ready(function () {
-				// js('#tblAuditLog').DataTable({
-				// 	order: [[0, 'desc']]
-				// });
+
+
+
+						 flatpickr("#minDate", {
+								   dateFormat: "Y-m-d",
+								   defaultDate: new Date()
+
+								});
+
+								  flatpickr("#maxDate", {
+								   dateFormat: "Y-m-d",
+								   defaultDate: new Date()
+								});
+
+									// Create custom filtering function
+								   let min = null;
+									 let max = null;
+
+									  js.fn.dataTable.ext.search.push(function (settings, data) {
+									 min = $('#minDate').val();   // e.g. "2025-09-01"
+									 max = $('#maxDate').val();   // e.g. "2025-09-10"
+									let rawDateTime = (data[4] || '').trim(); // adjust index to your date column
+									// rawDateTime = "2025-09-09 15:45"
+
+									if (!rawDateTime) return false;
+
+									// Parse row datetime
+									let rowDate = new Date(rawDateTime.replace(' ', 'T'));
+									// "2025-09-09 15:45" → "2025-09-09T15:45" → valid ISO date
+
+									// Parse min/max (flatpickr gives YYYY-MM-DD)
+									let minDate = min ? new Date(min + "T00:00:00") : null;
+									let maxDate = max ? new Date(max + "T23:59:59") : null;
+
+									if (minDate && rowDate < minDate) return false;
+									if (maxDate && rowDate > maxDate) return false;
+
+									return true;
+								});
+
 
 			var table = 	js('#tblAuditLog').DataTable({
 					dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
 					buttons: [
 						{
 							extend: 'excel',
-							text: 'Excel',
-							title: 'Document Report',
+							text: 'Export to Excel',
+							title: 'Activity Report',
 							exportOptions: {
 								 columns: ':visible'
 							}
 						},
 						{
 							extend: 'pdf',
-							text: 'PDF',
-							title: 'Document Report',
+							text: 'Export to PDF',
+							title: 'Activity Report',
 							exportOptions: {
 								 columns: ':visible'
-							}
-						}
-					],
+							},
+								 customize: function (doc) {
+																   doc.watermark = {
+																	text: 'Property of DBP Data Center, Inc.',   // watermark text
+																	color: 'red',
+																	opacity: 0.1,
+																	bold: true,
+																	italics: false
+																};
+
+																doc.content.splice(1, 0,
+																	{
+																		text: 'Period: ' + min + " to " + max,
+																		alignment: 'center',
+																		margin: [0, 0, 0, 4], // tighter spacing
+																		fontSize: 10,
+																		italics: true
+																	},
+																	{
+																		text: 'Prepared by: ' + '@Html.Raw(ViewBag.Fullname)', // dynamic from Razor
+																		alignment: 'center',
+																		margin: [0, 0, 0, 12],
+																		fontSize: 10,
+																		bold: true
+																	}
+																  );
+																// Add "Date Printed" at bottom-right
+																var now = new Date();
+																var jsDate = now.toLocaleString(); // e.g. 9/21/2025, 3:25:10 PM
+
+																doc['footer'] = function (currentPage, pageCount) {
+																	return {
+																		columns: [
+																			{ text: 'Date Printed: ' + jsDate, alignment: 'left', margin: [20, 0] },
+																			{ text: 'Page ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', margin: [0, 0, 20, 0] }
+																		],
+																		margin: [20, 0]
+																	};
+																};
+															}
+														}
+													],
 					lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
-					pageLength: 10, // Default entries per page
+					pageLength: 20, // Default entries per page
 					order: [[0, 'desc']]
 			   });
+							 // Event listener for date inputs
+						$('#minDate, #maxDate').on('change', function () {
+							table.draw();
+						});
+
+
+
 					const _export =  $('#canExport').val();
 					console.log(_export);
 					if(_export == 0){
