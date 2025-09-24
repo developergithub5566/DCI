@@ -75,6 +75,34 @@
             <label class="mb0">Data</label>
         </div>
         <div class="card-body">
+
+            <div id="accordion">
+                <form id="frmFilter" class="row">
+                    <div class="form-group col-3">
+                        <label class="frmText">Date Covered From: </label>
+                        <div class="input-group">
+
+                            <input type="text" name="minDate" id="minDate" class="form-control frmField" autocomplete="off">
+                            <div class="input-group-prepend prependBtn">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            <label for="minDate" generated="true" class="error"></label>
+                        </div>
+                    </div>
+                    <div class="form-group col-3">
+                        <label class="frmText">Date Covered To: </label>
+                        <div class="input-group">
+
+
+                            <input type="text" name="maxDate" id="maxDate" class="form-control frmField" autocomplete="off">
+                            <div class="input-group-prepend prependBtn">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            <label for="maxDate" generated="true" class="error"></label>
+                        </div>
+                    </div>
+                </form>
+            </div>
             <div class="table-responsive mt20">
                 <table class="table table-bordered" id="tblDTR">
                     <thead>
@@ -139,6 +167,18 @@
                             </tr>
                         }
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <th></th> <!-- col 0 -->
+                            <th></th> <!-- col 1 -->
+                            <th style="text-align:right">TOTAL:</th> <!-- col 2 -->
+                            <th></th> <!-- col 3 (Hours) -->
+                            <th></th> <!-- col 4 (OT) -->
+                            <th></th> <!-- col 5 (e.g., Action) -->
+                            <th></th> <!-- col 5 (e.g., Action) -->
+                            <th></th> <!-- col 5 (e.g., Action) -->
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
 </<div>
@@ -229,21 +269,7 @@
 
 @section scripts {
 
-                <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
-                <script src="~/js/dci-validation.js"></script>
-                <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
-                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
-    @*  Export Button*@
-                <script src="https://cdn.datatables.net/buttons/3.2.1/js/dataTables.buttons.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-                <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.html5.min.js"></script>
-                <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.print.min.js"></script>
-                <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
-                <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.1/css/buttons.dataTables.css">
-
+    
 
                 <script type="text/javascript">
                             var js = jQuery.noConflict(true);
@@ -301,7 +327,7 @@
                                      }
                                  },
                                  {
-                                     extend: 'pdf',
+                                     extend: 'pdfHtml5',
                                      text: 'Export to PDF',
                                      title: 'Overtime Summary Report',
                                      orientation: 'landscape',
@@ -309,6 +335,8 @@
                                          columns: ':not(:last-child)' // Excludes the last column
                                      },
                                  customize: function (doc) {
+
+
                                                                    doc.watermark = {
                                                                     text: 'Property of DBP Data Center, Inc.',   // watermark text
                                                                     color: 'red',
@@ -316,6 +344,7 @@
                                                                     bold: true,
                                                                     italics: false
                                                                 };
+
 
                                                                 doc.content.splice(1, 0,
                                                                     {
@@ -326,57 +355,128 @@
                                                                         italics: true
                                                                     },
                                                                     {
-                                                                        text: 'Prepared by: ' + '@Html.Raw(ViewBag.Fullname)', // dynamic from Razor
+                                                                        text: 'Employee Name: ' + '@Html.Raw(ViewBag.Fullname)', // dynamic from Razor
                                                                         alignment: 'center',
                                                                         margin: [0, 0, 0, 12],
                                                                         fontSize: 10,
                                                                         bold: true
                                                                     }
                                                                   );
-                                                                           // --- Compute totals for a specific column (e.g., 4th column index = 3) ---
-                                                                        // let api = $('#tblDTR').DataTable();
-                                                                        // let intVal = function (i) {
-                                                                        //     return typeof i === 'string'
-                                                                        //         ? i.replace(/[\$,]/g, '') * 1
-                                                                        //         : typeof i === 'number'
-                                                                        //         ? i
-                                                                        //         : 0;
-                                                                        // };
 
-                                                                        // // Compute total for column index 3
-                                                                        // let total = api.column(4, { page: 'all' }).data()
-                                                                        //     .reduce((a, b) => intVal(a) + intVal(b), 0);
-
-                                                                        // // --- Add totals row at the bottom of the table inside PDF ---
-                                                                        // let body = doc.content[doc.content.length - 1].table.body;
-                                                                        // body.push([
-                                                                        //     { text: 'TOTAL', colSpan: 4, alignment: 'right', bold: true },
-                                                                        //     {}, {}, // empty cells for colspan
-                                                                        //     { text: total.toString(), alignment: 'right', bold: true }
-                                                                        // ]);                                                            
-                                                                  
+                                                                                    doc.defaultStyle = {
+                                                                                  fontSize: 9,       // smaller text
+                                                                                  bold: false,
+                                                                                  italics: false
+                                                                                };
+                                                                                 const tableObj = doc.content.find(c => c.table);
+                                                                                    if (!tableObj) return; // nothing to do if no table found
 
 
-                                                                var now = new Date();
-                                                                var jsDate = now.toLocaleString(); // e.g. 9/21/2025, 3:25:10 PM
+                                                                                    const body = tableObj.table.body;
+                                                                                    const colCount = body[0].length; // exported column count
 
-                                                                doc['footer'] = function (currentPage, pageCount) {
-                                                                    return {
-                                                                        columns: [
-                                                                            { text: 'Date Printed: ' + jsDate, alignment: 'left', margin: [20, 0] },
-                                                                            { text: 'Page ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', margin: [0, 0, 20, 0] }
-                                                                        ],
-                                                                        margin: [20, 0]
-                                                                    };
-                                                                };
+                                                                                    // compute totals from DataTables API over ALL rows (or current page if you used modifier)
+                                                                                    const api = table; // your DataTable instance
+                                                                                    const intVal = i =>
+                                                                                      typeof i === 'string'
+                                                                                        ? (parseFloat(i.replace(/[\$,]/g, '')) || 0)
+                                                                                        : (typeof i === 'number' ? i : 0);
+
+                                                                                    // NOTE: update these indexes if your Hours/OT columns move after excluding columns
+                                                                                    const totalA = api.column(3, { page: 'all' }).data()
+                                                                                      .reduce((a, b) => intVal(a) + intVal(b), 0);
+
+                                                                                    const totalB = api.column(4, { page: 'all' }).data()
+                                                                                      .reduce((a, b) => intVal(a) + intVal(b), 0);
+                                                                                   
+
+                                                                                      //       const totalD = api.column(6, { page: 'all' }).data()
+                                                                                      // .reduce((a, b) => intVal(a) + intVal(b), 0);
+
+                                                                                    // Build a TOTAL row that matches the exported column count:
+                                                                                    // We want totals in the last 2 columns, and a right-aligned label across the rest.
+                                                                                    const labelSpan = Math.max(1, colCount - 2);
+                                                                                    const fillerCells = Array(labelSpan - 1).fill({}); // fillers for the colSpan
+
+                                                                                    const totalRow = [
+                                                                                      { text: 'TOTAL', colSpan: labelSpan, alignment: 'right', bold: true },
+                                                                                      ...fillerCells,
+                                                                                      { text: totalA.toFixed(2), alignment: 'right', bold: true },
+                                                                                      // { text: totalB.toFixed(2), alignment: 'right', bold: true },
+                                                                                      
+                                                                                      
+                                                                                    ];
+
+                                                                                    body.push(totalRow);
+
+                                                                                                        tableObj.layout = {
+                                                                                                      hLineWidth: function (i, node) { return 0.5; },   // horizontal line width
+                                                                                                      vLineWidth: function (i, node) { return 0.5; },   // vertical line width
+                                                                                                      hLineColor: function (i, node) { return '#000'; },// horizontal line color
+                                                                                                      vLineColor: function (i, node) { return '#000'; },// vertical line color
+                                                                                                      paddingLeft: function (i, node) { return 4; },    // cell padding
+                                                                                                      paddingRight: function (i, node) { return 4; },
+                                                                                                      paddingTop: function (i, node) { return 2; },
+                                                                                                      paddingBottom: function (i, node) { return 2; }
+                                                                                                    };
+
+
+                                                                                    const jsDate = new Date().toLocaleString();
+                                                                                doc.footer = function (currentPage, pageCount) {
+                                                                                  return {
+                                                                                    columns: [
+                                                                                      { text: 'Date Printed: ' + jsDate, alignment: 'left', margin: [20, 0] },
+                                                                                      { text: 'Page ' + currentPage + ' of ' + pageCount, alignment: 'right', margin: [0, 0, 20, 0] }   ,
+                                                                                         { text: 'Prepared By: HR Department', alignment: 'center', margin: [0, 0] },
+                                                                                    ],
+                                                                                    margin: [20, 0]
+                                                                                  };
+                                                                                };
                                                             }
                                                         }
                                                     ],
                              lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
                              pageLength: 10 ,// Default entries per page
 
-                                     order: [[2, 'desc']]
+                                     order: [[2, 'desc']],
+                                                                   footerCallback: function (row, data, start, end, display) {
+                        let api = this.api();
+
+                        let intVal = function (i) {
+                            return typeof i === 'string'
+                                ? parseFloat(i.replace(/[\$,]/g, '')) || 0
+                                : typeof i === 'number' ? i : 0;
+                        };
+
+                        // Page totals (visible rows only)
+                        let pageTotalHours = api
+                            .column(3, { page: 'current' })
+                            .data()
+                            .reduce((a, b) => intVal(a) + intVal(b), 0);
+
+                        let pageTotalOT = api
+                            .column(4, { page: 'current' })
+                            .data()
+                            .reduce((a, b) => intVal(a) + intVal(b), 0);
+
+                          let pageTotalC = api
+                            .column(5, { page: 'current' })
+                            .data()
+                            .reduce((a, b) => intVal(a) + intVal(b), 0);
+
+                                             let pageTotalD = api
+                            .column(6, { page: 'current' })
+                            .data()
+                            .reduce((a, b) => intVal(a) + intVal(b), 0);
+
+                        // Update footer cells
+                        $(api.column(3).footer()).html(pageTotalHours.toFixed(2));
+                        $(api.column(4).footer()).html(pageTotalOT.toFixed(2));
+                                    $(api.column(5).footer()).html(pageTotalC.toFixed(2));
+                                              $(api.column(6).footer()).html(pageTotalD.toFixed(2));
+                    }
                                 });
+
 
                                   $('#minDate, #maxDate').on('change', function () {
                                         table.draw();
@@ -412,12 +512,8 @@
                                                       calculateDuration();
                                                     }
                                                 });
-
-
-
                             });
-
-
+                        
 
                     function calculateDuration() {
                           if (fromTime && toTime) {

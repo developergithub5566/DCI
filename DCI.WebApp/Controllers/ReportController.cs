@@ -708,9 +708,11 @@ namespace DCI.WebApp.Controllers
             List<OvertimePayReport> model = new List<OvertimePayReport>();
             try
             {
+                var currentUser = _userSessionHelper.GetCurrentUser();
+
                 using (var _httpclient = new HttpClient())
                 {
-                    var currentUser = _userSessionHelper.GetCurrentUser();
+                   
 
                     //  param.ScopeTypeEmp = (int)EnumEmployeeScope.ALL;
                     // param.CurrentUserId = currentUser.UserId;
@@ -728,6 +730,7 @@ namespace DCI.WebApp.Controllers
                     }
 
                 }
+                ViewBag.Fullname = currentUser?.Fullname;
                 return View(model);
             }
             catch (Exception ex)
