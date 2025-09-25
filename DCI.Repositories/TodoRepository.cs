@@ -390,15 +390,22 @@ namespace DCI.Repositories
                 var contextHdr = _dbContext.DTRCorrection.Where(x => x.DtrId == param.TransactionId).FirstOrDefault();
                 contextHdr.Status = param.Status;
                 _dbContext.DTRCorrection.Entry(contextHdr).State = EntityState.Modified;
-                _dbContext.SaveChanges();
-
-                //DTRCorrectionViewModel dtr = new DTRCorrectionViewModel();
-                //dtr.DtrId = contextHdr.DtrId;
+                _dbContext.SaveChanges();                         
 
                 var entitiesToViewModel = await _dtrRepository.DTRCorrectionByDtrId(contextHdr.DtrId);
 
-                //Send Email Notification to Requestor
-                await _emailRepository.SendToRequestorDTRAdjustment(entitiesToViewModel);
+
+                tbl_raw_logs raw_logs = new tbl_raw_logs();
+                raw_logs.EMPLOYEE_ID = entitiesToViewModel.EmployeeId.ToString();
+                raw_logs.FULL_NAME = "";
+                raw_logs.DATE_TIME = entitiesToViewModel.DtrDateTime;
+                raw_logs.CREATED_DATE = DateTime.Now;
+                raw_logs.CREATED_BY = "SYSAD";
+                raw_logs.STATUS = 11; //coming from DTR Adjustment
+
+
+                 //Send Email Notification to Requestor
+                 await _emailRepository.SendToRequestorDTRAdjustment(entitiesToViewModel);
                 string status = param.Status == (int)EnumStatus.Approved ? "approved" : "disapproved";
 
                 //Send Application Notification to Requestor

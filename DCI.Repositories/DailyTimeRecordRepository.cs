@@ -152,11 +152,11 @@ namespace DCI.Repositories
 
         public async Task<DTRCorrectionViewModel> DTRCorrectionByDtrId(int dtrId)
         {
-            var query = (from dtr in _dbContext.DTRCorrection.AsQueryable()
+            var query = await (from dtr in _dbContext.DTRCorrection.AsNoTracking()
                          join stat in _dbContext.Status on dtr.Status equals stat.StatusId
                          join emp in _dbContext.EmployeeWorkDetails on dtr.EmployeeId equals emp.EmployeeId
-                         join dept in _dbContext.Department on emp.DepartmentId equals dept.DepartmentId
-                         join depthead in _dbContext.User on dept.ApproverId equals depthead.UserId
+                         //join dept in _dbContext.Department on emp.DepartmentId equals dept.DepartmentId
+                         join depthead in _dbContext.User on dtr.ApproverId equals depthead.UserId
                          where dtr.DtrId == dtrId
                          select new DTRCorrectionViewModel
                          {
@@ -173,7 +173,7 @@ namespace DCI.Repositories
                              CreatedBy = dtr.CreatedBy,
                              IsActive = dtr.IsActive,
                              DepartmentHead = depthead.Firstname + " " + depthead.Lastname// + " " + depthead.Suffix
-                         }).FirstOrDefault();
+                         }).FirstOrDefaultAsync();
 
             return query;
         }

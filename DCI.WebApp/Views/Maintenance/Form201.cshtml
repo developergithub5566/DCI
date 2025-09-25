@@ -328,7 +328,7 @@
                                     @*        <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.EmployeeStatusName) ? "-" : Model.EmployeeStatusName)</label> *@
                                     @*   <select id="empStatusSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" required>                                  
                                 </select> *@
-                                    @Html.DropDownListFor(model => model.EmployeeStatusId, Model.OptionsEmployeeStatus, "SELECT STATUS", new { @class = "bg-gray-100 font-weight-bold form-control frmField text-center" })
+                                    @Html.DropDownListFor(model => model.EmployeeStatusId, Model.OptionsEmployeeStatus, "SELECT STATUS", new { @class = "bg-gray-100 font-weight-bold form-control frmField text-center", @onchange = "splchange()" })
                                     <label class="bottomLabelText">Employment Status</label>
                                 </div>
                             </div>
@@ -439,7 +439,7 @@
                             </div>
                             <div class="col-lg-2">
                                 <div class="form-group mb10 text-center">
-                                    <label class="topLabelText" title="SPL Yearly Credit">3.0000</label>
+                                    <label class="topLabelText" title="SPL Yearly Credit" id="splyearyly">3.0000</label>
                                     <label class="bottomLabelText">Special Leave Credit</label>
                                 </div>
                             </div>
@@ -664,6 +664,13 @@
                     });
                 }
             });
+        }
+
+        function splchange(){
+              document.getElementById('splyearyly').textContent = "0.0000";
+            if(  $('#EmployeeStatusId').val() == 1   ){ //regular
+                    document.getElementById('splyearyly').textContent = "3.0000";
+            }
         }
 
 
