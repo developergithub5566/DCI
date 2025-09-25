@@ -420,30 +420,29 @@ namespace DCI.Repositories
             return $"{formattedA}";
         }
 
-        public async Task<List<OvertimePayReport>> GetOvertimeSummaryAsync(int employeeId, DateTime dateFrom, DateTime dateTo)
-
+        public async Task<OvertimePayReport> GetOvertimeSummaryAsync(OvertimePayReport param)
         {
-            dateFrom = dateFrom.AddMonths(-2);
+            //dateFrom = dateFrom.AddMonths(-2);
             // 1) Base join + filters (only active rows, by employee/date range)
-
+            OvertimePayReport model = new OvertimePayReport();
 
             var baseQuery =
-     from h in _dbContext.OvertimeHeader.AsNoTracking()
-     join d in _dbContext.OvertimeDetail.AsNoTracking()
-         on h.OTHeaderId equals d.OTHeaderId
-     where h.IsActive && d.IsActive
-           && (employeeId == 0 || h.EmployeeId == employeeId)
-           && d.OTDate >= dateFrom && d.OTDate <= dateTo
-     select new
-     {
-         h.EmployeeId,
-         h.RequestNo,
-         d.OTDate,
-         d.OTTimeFrom,
-         d.OTTimeTo,
-         d.OTType,
-         d.TotalMinutes
-     };
+             from h in _dbContext.OvertimeHeader.AsNoTracking()
+             join d in _dbContext.OvertimeDetail.AsNoTracking()
+                 on h.OTHeaderId equals d.OTHeaderId
+             where h.IsActive && d.IsActive
+                   &&h.EmployeeId == param.EmployeeId
+                  // && d.OTDate >= dateFrom && d.OTDate <= dateTo
+             select new
+             {
+                 h.EmployeeId,
+                 h.RequestNo,
+                 d.OTDate,
+                 d.OTTimeFrom,
+                 d.OTTimeTo,
+                 d.OTType,
+                 d.TotalMinutes
+             };
 
             var grouped = await baseQuery
                 .GroupBy(g => new
@@ -477,30 +476,49 @@ namespace DCI.Repositories
                 .OrderBy(x => x.Date)
                 .ToListAsync();
 
+
+
+            var employeeList = await (
+                            from emp in _dbContext.Employee.AsNoTracking()
+                            join dtls in _dbContext.EmployeeWorkDetails.AsNoTracking()
+                                on emp.EmployeeId equals dtls.EmployeeId
+                            where emp.IsActive && dtls.IsActive && !dtls.IsResigned
+                            select new EmployeeViewModel
+                            {
+                                EmployeeId = emp.EmployeeId,
+                                EmployeeNo = emp.EmployeeNo,
+                                Lastname = emp.Lastname,
+                                Firstname = emp.Firstname
+                            }
+                        ).ToListAsync();
+
+
             var result = grouped.Select(x =>
             {
                 var ts = TimeSpan.FromMinutes(x.TotalMinutes);
                 string hhmm = $"{(int)ts.TotalHours:00}:{ts.Minutes:00}";
 
-                return new OvertimePayReport
+                return new OvertimeEmployeeDetails
                 {
                     EmployeeId = x.EmployeeId,
                     RequestNo = x.RequestNo,
                     OTDateString = x.Date.ToString("yyyy-MM-dd"),
                     OTTimeFrom = x.OTTimeFrom.ToString("HH:mm"),
-                    OTTimeTo = x.OTTimeTo.ToString("HH:mm"),
-                    Regular = x.Regular,
-                    NightDifferential = x.NightDifferential,
-                    SpecialHoliday = x.SpecialHoliday,
-                    After8hrs = x.After8hrs,
-                    HolidayOnRestDay = x.HolidayOnRestDay,
-
+                    OTTimeTo = x.OTTimeTo.ToString("HH:mm"), 
+                    Regular = TimeHelper.ConvertMinutesToValue(x.Regular),
+                    NightDifferential = TimeHelper.ConvertMinutesToValue(x.NightDifferential),
+                    SpecialHoliday = TimeHelper.ConvertMinutesToValue(x.SpecialHoliday),
+                    After8hrs =   TimeHelper.ConvertMinutesToValue(x.After8hrs),
+                    HolidayOnRestDay =  TimeHelper.ConvertMinutesToValue(x.HolidayOnRestDay),
                     TotalMinutes = x.TotalMinutes,
-                    TotalHours = hhmm
+                    TotalHours = hhmm,
+                  
                 };
             }).ToList();
 
-            return result;
+            model.EmployeeList = employeeList;
+            model.OvertimeEmployeeDetails = result;
+            return model;
         }
     }
 }

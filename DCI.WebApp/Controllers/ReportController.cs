@@ -705,7 +705,8 @@ namespace DCI.WebApp.Controllers
 
         public async Task<IActionResult> OvertimePay(OvertimePayReport param)
         {
-            List<OvertimePayReport> model = new List<OvertimePayReport>();
+            // List<OvertimePayReport> model = new List<OvertimePayReport>();
+            OvertimePayReport model = new OvertimePayReport();
             try
             {
                 var currentUser = _userSessionHelper.GetCurrentUser();
@@ -725,7 +726,14 @@ namespace DCI.WebApp.Controllers
                     var responseBody = await response.Content.ReadAsStringAsync();
                     if (response.IsSuccessStatusCode == true)
                     {
-                        model = JsonConvert.DeserializeObject<List<OvertimePayReport>>(responseBody)!;
+                        model = JsonConvert.DeserializeObject<OvertimePayReport>(responseBody)!;
+
+                        model.OptionsEmployee = model.EmployeeList?.Select(x =>
+                           new SelectListItem
+                           {
+                               Value = x.EmployeeId.ToString(),
+                               Text = x.Lastname  + " " + x.Firstname
+                           }).ToList();
 
                     }
 

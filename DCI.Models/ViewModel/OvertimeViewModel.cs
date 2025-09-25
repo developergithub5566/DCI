@@ -1,4 +1,6 @@
 ﻿using DCI.Models.Configuration;
+using DCI.Models.Entities;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.VisualBasic;
 
 namespace DCI.Models.ViewModel
@@ -6,7 +8,7 @@ namespace DCI.Models.ViewModel
     public class OvertimeViewModel
     {
         public int OTHeaderId { get; set; } = 0;
-        
+
         public string RequestNo { get; set; } = string.Empty;
 
         public int EmployeeId { get; set; } = 0;
@@ -30,7 +32,7 @@ namespace DCI.Models.ViewModel
         public int CurrentUserId { get; set; } = 0;
 
         public bool IsOfficialBuss { get; set; } = false;
-    
+
 
         public string Fullname { get; set; } = string.Empty;
         public string RecommendedBy { get; set; } = string.Empty;
@@ -51,25 +53,25 @@ namespace DCI.Models.ViewModel
         public string ApproverEmail { get; set; } = string.Empty;
         public int RecommendedById { get; set; } = 0;
         public string RecommendedByEmail { get; set; } = string.Empty;
-         public int ScopeTypeEmp { get; set; } = 0;
+        public int ScopeTypeEmp { get; set; } = 0;
         public string DateCreatedString { get; set; } = string.Empty;
     }
 
     public class OvertimeDetailViewModel
     {
-       // public string EmployeeNo { get; set; } = string.Empty;
+        // public string EmployeeNo { get; set; } = string.Empty;
         public int OTDetailId { get; set; } = 0;
         public int OTHeaderId { get; set; } = 0;
         public int OTType { get; set; } = 0;
         public string OTTypeName { get; set; } = string.Empty;
-    //     public DateTime OTDate { get; set; } = DateTime.Now;
+        //     public DateTime OTDate { get; set; } = DateTime.Now;
         public string OTDate { get; set; } = string.Empty;
         public string OTDateString { get; set; } = string.Empty;
         public string OTTimeFrom { get; set; } = string.Empty;
         public string OTTimeTo { get; set; } = string.Empty;
         public int TotalMinutes { get; set; } = 0;
         public string TotalHours { get; set; } = string.Empty;
-        public bool IsActive { get; set; } = true;   
+        public bool IsActive { get; set; } = true;
 
     }
 
@@ -103,9 +105,21 @@ namespace DCI.Models.ViewModel
     }
 
     public class OvertimePayReport
+    {   
+        public string EmployeeName { get; set; } = string.Empty;
+        public IList<EmployeeViewModel>? EmployeeList { get; set; }
+        public List<SelectListItem>? OptionsEmployee { get; set; }
+        public int EmployeeId { get; set; } = 0;
+        public DateTime DateFrom { get; set; } = DateTime.Now;
+        public DateTime DateTo { get; set; } = DateTime.Now;
+        public List<OvertimeEmployeeDetails>? OvertimeEmployeeDetails { get; set; }
+    }
+
+    public class OvertimeEmployeeDetails
     {
-        public int EmployeeId { get; set; } = 0;   
+        public int EmployeeId { get; set; } = 0;
         public string EmployeeNo { get; set; } = string.Empty;
+        public string EmployeeName { get; set; } = string.Empty;
         public string RequestNo { get; set; } = string.Empty;
         public int OTDetailId { get; set; } = 0;
         public int OTHeaderId { get; set; } = 0;
@@ -121,10 +135,12 @@ namespace DCI.Models.ViewModel
         public DateTime DateFrom { get; set; } = DateTime.Now;
         public DateTime DateTo { get; set; } = DateTime.Now;
 
-        public int Regular { get; set; } = 0;
-        public int NightDifferential { get; set; } = 0;
-        public int SpecialHoliday { get; set; } = 0;
-        public int After8hrs { get; set; } = 0;
-        public int HolidayOnRestDay { get; set; } = 0;
+        public decimal Regular { get; set; } = 0;
+        public decimal NightDifferential { get; set; } = 0;
+        public decimal SpecialHoliday { get; set; } = 0;
+        public decimal After8hrs { get; set; } = 0;
+        public decimal HolidayOnRestDay { get; set; } = 0;
+
     }
+
 }

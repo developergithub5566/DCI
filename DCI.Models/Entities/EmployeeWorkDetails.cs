@@ -21,6 +21,7 @@ namespace DCI.Models.Entities
         public int? Position { get; set; }
         public DateTime? ResignedDate { get; set; }
         public int? BandLevel { get; set; }
+        public int? PayrollType { get; set; }
         public DateTime? DateModified { get; set; }
         public int? ModifiedBy { get; set; }
         public bool IsResigned { get; set; }

@@ -66,12 +66,12 @@
                 <div class="card shadow mb-4">
                     <div class="card-header py-3 d-flex bg-light flex-row align-items-center justify-content-between">
                         <h6 class="m-0  small font-weight-bold text-dark"><i class="fa-solid fa-user" aria-hidden="true"></i> &nbsp; Personal Information</h6>
-                 @*        <button class="btn btnPrimary float-right text-xs" type="submit" onclick="saveForm()">
+                        @*        <button class="btn btnPrimary float-right text-xs" type="submit" onclick="saveForm()">
                             <i class="fa-regular fa-floppy-disk" aria-hidden="true"></i> Save
                         </button> *@
-                        <button class="btn btnPrimary float-right text-xs" type="submit" >
+                        <button class="btn btnPrimary float-right text-xs" type="submit">
                             <span class="icon text-white">
-                            <i class="fa-regular fa-floppy-disk" aria-hidden="true"></i> Save
+                                <i class="fa-regular fa-floppy-disk" aria-hidden="true"></i> Save
                             </span>
                         </button>
 
@@ -85,7 +85,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group mb0 text-center">
 
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" asp-for="Firstname" id="Firstname" name="Firstname" >
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" asp-for="Firstname" id="Firstname" name="Firstname">
                                     <label class="bottomLabelText" asp-for="Firstname">First Name</label>
                                 </div>
                             </div>
@@ -103,7 +103,7 @@
                                     <label class="bottomLabelText">Last Name</label>
                                 </div>
                             </div>
-                      @*       <div class="col-lg-4">
+                            @*       <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
 
                                     <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Prefix" name="Prefix" value="@(string.IsNullOrWhiteSpace(Model.Prefix) ? "-" : Model.Prefix)">
@@ -114,7 +114,7 @@
                                 <div class="form-group mb10 text-center">
 
                                     @*  <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Suffix" name="Suffix" value="@(string.IsNullOrWhiteSpace(Model.Suffix) ? "-" : Model.Suffix)"> *@
-                                    <select id="SexSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" asp-for="Suffix" >
+                                    <select id="SexSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" asp-for="Suffix">
                                         <option value="">SELECT SUFFIX</option>
                                         <option value="1.">Jr.</option>
                                         <option value="2">II</option>
@@ -237,7 +237,7 @@
 
                     <div class="card-header py-3 d-flex bg-light flex-row align-items-center justify-content-between">
                         <h6 class="m-0  small font-weight-bold text-dark"><i class="fa-regular fa-id-card" aria-hidden="true"></i> &nbsp; Contact Information</h6>
-                    @*     <button class="btn btnPrimary float-right text-xs" type="submit">
+                        @*     <button class="btn btnPrimary float-right text-xs" type="submit">
                             <i class="fa-regular fa-floppy-disk" aria-hidden="true"></i> Save
                         </button> *@
                     </div>
@@ -261,7 +261,7 @@
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group mb10 text-center">
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="EmailPersonal" name="EmailPersonal"  value="@(string.IsNullOrWhiteSpace(Model.EmailPersonal) ? "-" : Model.EmailPersonal)">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="EmailPersonal" name="EmailPersonal" value="@(string.IsNullOrWhiteSpace(Model.EmailPersonal) ? "-" : Model.EmailPersonal)">
                                     <label class="bottomLabelText">Personal Email</label>
                                 </div>
                             </div>
@@ -360,7 +360,7 @@
                                     <label class="bottomLabelText">Work Location</label>
                                 </div>
                             </div>
-                        @*     <div class="col-lg-2">
+                            @*     <div class="col-lg-2">
                                 <div class="form-group mb10 text-center">
                                     <select id="bandlevelSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" asp-for="BandLevel" required>
                                         <option value="">SELECT BAND LVL</option>
@@ -417,9 +417,14 @@
                                 </div>
                             </div>
                         </div> *@
-                        <hr class="my-3"> 
+                        <div class="d-flex align-items-center my-3">
+                            <hr class="flex-grow-1">
+                            <span class="mx-2 fw-bold">Leave Credits</span>
+                            <hr class="flex-grow-1">
+                        </div>
+
                         <div class="row">
-                   
+
                             <div class="col-lg-2">
                                 <div class="form-group mb10 text-center">
                                     <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="VLCredit" name="VLCredit" onkeypress="return isNumericDecimalKey(event, this)" oninput="checkingNumber(this)" title="VL Monthly Credit">
@@ -433,16 +438,38 @@
                                 </div>
                             </div>
                             <div class="col-lg-2">
-                                <div class="form-group mb10 text-center">                          
+                                <div class="form-group mb10 text-center">
                                     <label class="topLabelText" title="SPL Yearly Credit">3.0000</label>
                                     <label class="bottomLabelText">Special Leave Credit</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center my-3">
+                            <hr class="flex-grow-1">
+                            <span class="mx-2 fw-bold">Payroll</span>
+                            <hr class="flex-grow-1">
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group mb10 text-center">
+                                    <select id="PayrollTypeSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" asp-for="PayrollType" required>
+                                        <option value="" disabled>SELECT PAYROLL TYPE</option>
+                                        <option value="1">Confidential</option>
+                                        <option value="2">Rank and File</option>
+                                        <option value="3">Contractual/Project Based</option>
+                                        <option value="4">Consultant</option>
+                                    </select>
+                                    <label class="bottomLabelText">Payroll Type</label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </form>
-      
+
         </div>
 
     </div>
@@ -473,7 +500,7 @@
                                     });
 
                                         flatpickr("#DateHired", {
-                                       dateFormat: "Y-m-d",                                    
+                                       dateFormat: "Y-m-d",
                                     });
                                        flatpickr("#DateRegularized", {
                                        dateFormat: "Y-m-d",
@@ -509,7 +536,7 @@
                                                $.ajax({
                                                     type: 'POST',
                                                     url: '@Url.Action("SaveEmployee", "Employee")',
-                                                    data: formData,                                                            
+                                                    data: formData,
                                                     success: function (response) {
                                                         if (response.success) {
 
@@ -549,7 +576,7 @@
 
         function saveForm() {
                 event.preventDefault();
-                  
+
                 var formData = $(this).serialize();
 
                   // const formData = new FormData();
@@ -639,7 +666,7 @@
             });
         }
 
-    
+
 
     </script>
 }

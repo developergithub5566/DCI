@@ -56,6 +56,7 @@ namespace DCI.Models.ViewModel
         public int? BandLevel { get; set; }
         public int? WorkLocation { get; set; } = 0;
         public string? WorkLocationName { get; set; } = string.Empty;
+        public int? PayrollType { get; set; } = 0;
         public IList<Position>? PositionList { get; set; }
         public List<SelectListItem>? OptionsPosition { get; set; }
 

@@ -813,6 +813,43 @@ namespace DCI.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
+        public async Task<IActionResult> OvertimePay(OvertimePayReport param)
+        {          
+            OvertimePayReport model = new OvertimePayReport();
+            try
+            {
+                var currentUser = _userSessionHelper.GetCurrentUser();
+
+                using (var _httpclient = new HttpClient())
+                {          
+                    param.EmployeeId = currentUser.EmployeeId;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetOvertimeSummaryAsync");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<OvertimePayReport>(responseBody)!;
+                    }
+
+                }
+                ViewBag.Fullname = currentUser?.Fullname;
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
         public async Task<IActionResult> AddOvertime(OvertimeViewModel param)
         {
             OvertimeViewModel model = new OvertimeViewModel();

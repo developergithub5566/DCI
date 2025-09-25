@@ -136,6 +136,7 @@ namespace DCI.Repositories
                                                 WorkLocationName = loc.Location,
                                                 EmployeeStatusId = empstat.EmployeeStatusId,
                                                 EmployeeStatusName = empstat.Description,
+                                                PayrollType = dtl.PayrollType,
                                                 DateCreated = emp.DateCreated,
                                                 CreatedBy = emp.CreatedBy,
                                                 DateModified = emp.DateModified,
@@ -211,6 +212,7 @@ namespace DCI.Repositories
                     dtl.ResignedDate = model.ResignedDate;
                     dtl.BandLevel = model.BandLevel;
                     dtl.WorkLocation = model.WorkLocation;
+                    dtl.PayrollType = model.PayrollType;
                     dtl.DateModified = null;
                     dtl.DateModified = null;
                     dtl.IsActive = true;
@@ -269,6 +271,7 @@ namespace DCI.Repositories
                     dtl.ResignedDate = model.ResignedDate;
                     dtl.BandLevel = model.BandLevel;
                     dtl.WorkLocation = model.WorkLocation;
+                    dtl.PayrollType = model.PayrollType;
                     dtl.DateModified = DateTime.Now;
                     dtl.ModifiedBy = model.ModifiedBy;
                     dtl.IsActive = true;

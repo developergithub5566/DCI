@@ -191,7 +191,7 @@ namespace DCI.API.Controllers
         [Route("GetOvertimeSummaryAsync")]
         public async Task<IActionResult> GetOvertimeSummaryAsync([FromBody] OvertimePayReport model)
         {
-            return Ok(await _overtimeRepository.GetOvertimeSummaryAsync(model.EmployeeId,model.DateFrom,model.DateTo));
+            return Ok(await _overtimeRepository.GetOvertimeSummaryAsync(model));
         }
 
 

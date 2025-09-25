@@ -313,29 +313,28 @@
                 
                              // Create custom filtering function
 
-                             let min = null;
-                                     let max = null;
-                           js.fn.dataTable.ext.search.push(function (settings, data) {
-                                     min = $('#minDate').val();   // e.g. "2025-09-01"
-                                     max = $('#maxDate').val();   // e.g. "2025-09-10"
-                                    let rawDateTime = (data[2] || '').trim(); // adjust index to your date column
-                                    // rawDateTime = "2025-09-09 15:45"
+                                              let min = null;
+                                              let max = null;
+                                       js.fn.dataTable.ext.search.push(function (settings, data) {
+                                                 min = $('#minDate').val();   // e.g. "2025-09-01"
+                                                 max = $('#maxDate').val();   // e.g. "2025-09-10"
+                                                let rawDateTime = (data[1] || '').trim(); // adjust index to your date column
+                                
 
-                                    if (!rawDateTime) return false;
+                                                if (!rawDateTime) return false;
 
-                                    // Parse row datetime
-                                    let rowDate = new Date(rawDateTime.replace(' ', 'T'));
-                                    // "2025-09-09 15:45" → "2025-09-09T15:45" → valid ISO date
+                                           
+                                                let rowDate = new Date(rawDateTime.replace(' ', 'T'));                                     
 
-                                    // Parse min/max (flatpickr gives YYYY-MM-DD)
-                                    let minDate = min ? new Date(min + "T00:00:00") : null;
-                                    let maxDate = max ? new Date(max + "T23:59:59") : null;
+                                                
+                                                let minDate = min ? new Date(min + "T00:00:00") : null;
+                                                let maxDate = max ? new Date(max + "T23:59:59") : null;
 
-                                    if (minDate && rowDate < minDate) return false;
-                                    if (maxDate && rowDate > maxDate) return false;
+                                                if (minDate && rowDate < minDate) return false;
+                                                if (maxDate && rowDate > maxDate) return false;
 
-                                    return true;
-                                });
+                                                return true;
+                                            });
 
 
 
@@ -395,9 +394,10 @@
                                                     order: [[0, 'desc']]
                                                 });
 
-                             $('#minDate, #maxDate').on('change', function () {
-                            table.draw();
-                        });
+                                                 $('#minDate, #maxDate').on('change', function () {
+                                                table.draw();
+                                            });
+                 
 
 
                         }); //end docu

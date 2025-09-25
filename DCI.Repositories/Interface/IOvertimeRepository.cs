@@ -10,6 +10,6 @@ namespace DCI.Repositories.Interface
         Task<OvertimeViewModel> AddOvertime(OvertimeViewModel model);
         Task<(int statuscode, string message)> SaveOvertime(OvertimeViewModel param);
         Task<OvertimeEntryDto> CheckOvertimeDate(OvertimeEntryDto model);
-        Task<List<OvertimePayReport>> GetOvertimeSummaryAsync(int employeeId, DateTime dateFrom, DateTime dateTo);
+        Task<OvertimePayReport> GetOvertimeSummaryAsync(OvertimePayReport param);
     }
 }
