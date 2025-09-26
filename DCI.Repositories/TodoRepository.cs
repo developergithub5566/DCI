@@ -386,26 +386,31 @@ namespace DCI.Repositories
                 await _dbContext.ApprovalHistory.AddAsync(entity);
                 await _dbContext.SaveChangesAsync();
 
+                var _user = _dbContext.User.AsNoTracking().Where(x => x.UserId == param.CreatedBy).FirstOrDefault();
+                string _middleInitial = string.IsNullOrWhiteSpace(_user.Middlename) ? string.Empty : _user.Middlename.Substring(0, 1).ToUpper();
 
-                var contextHdr = _dbContext.DTRCorrection.Where(x => x.DtrId == param.TransactionId).FirstOrDefault();
+                var contextHdr = _dbContext.DTRCorrection.AsNoTracking().Where(x => x.DtrId == param.TransactionId).FirstOrDefault();
+
+                tbl_raw_logs raw_logs = new tbl_raw_logs();
+                raw_logs.EMPLOYEE_ID = contextHdr.EmployeeId.ToString();
+                raw_logs.FULL_NAME = _user.Firstname + " " + _middleInitial + " " + _user.Lastname;
+                raw_logs.DATE_TIME = contextHdr.DtrDateTime;
+                raw_logs.CREATED_DATE = DateTime.Now;
+                raw_logs.CREATED_BY = Constants.SYSAD;
+                raw_logs.STATUS = 0;
+                await _dbContext.tbl_raw_logs.AddAsync(raw_logs);
+                await _dbContext.SaveChangesAsync();
+
+                
                 contextHdr.Status = param.Status;
+                contextHdr.RawLogsId = raw_logs.ID;
                 _dbContext.DTRCorrection.Entry(contextHdr).State = EntityState.Modified;
                 _dbContext.SaveChanges();                         
 
-                var entitiesToViewModel = await _dtrRepository.DTRCorrectionByDtrId(contextHdr.DtrId);
+                var entitiesToViewModel = await _dtrRepository.DTRCorrectionByDtrId(contextHdr.DtrId);  
 
-
-                tbl_raw_logs raw_logs = new tbl_raw_logs();
-                raw_logs.EMPLOYEE_ID = entitiesToViewModel.EmployeeId.ToString();
-                raw_logs.FULL_NAME = "";
-                raw_logs.DATE_TIME = entitiesToViewModel.DtrDateTime;
-                raw_logs.CREATED_DATE = DateTime.Now;
-                raw_logs.CREATED_BY = "SYSAD";
-                raw_logs.STATUS = 11; //coming from DTR Adjustment
-
-
-                 //Send Email Notification to Requestor
-                 await _emailRepository.SendToRequestorDTRAdjustment(entitiesToViewModel);
+                //Send Email Notification to Requestor
+                await _emailRepository.SendToRequestorDTRAdjustment(entitiesToViewModel);
                 string status = param.Status == (int)EnumStatus.Approved ? "approved" : "disapproved";
 
                 //Send Application Notification to Requestor

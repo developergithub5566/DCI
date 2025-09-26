@@ -7,8 +7,9 @@
 		public const string CompanyCode = "DCI";
 		public const string AppCode = "ESS";
 		public const string DocControlNo = "CN";
+        public const string SYSAD = "SYSAD";  
 
-		public const string Msg_ErrorMessage = "An error occurred. Please try again.";
+        public const string Msg_ErrorMessage = "An error occurred. Please try again.";
         public const string Msg_NoBiometricsFound = "No biometric records found.";
 
         public const string Email_Subject_SetPassword = "DCI App - Set Password";

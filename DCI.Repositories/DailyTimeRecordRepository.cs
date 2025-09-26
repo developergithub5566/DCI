@@ -194,6 +194,7 @@ namespace DCI.Repositories
                     entity.DtrDateTime = param.DtrDateTime;
                     entity.Status = (int)EnumStatus.ForApproval;
                     entity.ApproverId = param.ApproverId;
+                    entity.RawLogsId = 0;
                     entity.Reason = param.Reason;
                     entity.Filename = param.Filename;
                     entity.FileLocation = param.FileLocation;

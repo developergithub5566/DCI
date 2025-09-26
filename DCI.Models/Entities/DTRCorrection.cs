@@ -28,5 +28,7 @@ namespace DCI.Models.Entities
         public int CreatedBy { get; set; }
 
         public bool IsActive { get; set; }
+
+         public int RawLogsId { get; set; }
     }
 }
