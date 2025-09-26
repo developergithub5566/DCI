@@ -202,6 +202,8 @@
                                                             Hours : "@item.TOTAL_HOURS",
                                                             WorkingHours : "@item.TOTAL_WORKING_HOURS"
                                                                 })' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+
+                                 
                                 </td>
                             </tr>
                         }
@@ -284,6 +286,8 @@
                     </div>
                 </div>
             </div>
+
+    
 
             @section scripts {
      
@@ -428,6 +432,9 @@
                                 document.getElementById('lblWorkingHours').textContent = dtr.WorkingHours;
                                 js('#createmodal').modal('show');
                         }
+
+                           
+
 
                         // function newForm() {
                         //         document.getElementById('lblDate').textContent = 'May 15, 2025';

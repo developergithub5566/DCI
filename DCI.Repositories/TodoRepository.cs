@@ -387,12 +387,19 @@ namespace DCI.Repositories
                 await _dbContext.SaveChangesAsync();
 
                 var _user = _dbContext.User.AsNoTracking().Where(x => x.UserId == param.CreatedBy).FirstOrDefault();
+                var _emp = _dbContext.Employee.AsNoTracking().Where(x => x.EmployeeId == _user.EmployeeId).FirstOrDefault();
                 string _middleInitial = string.IsNullOrWhiteSpace(_user.Middlename) ? string.Empty : _user.Middlename.Substring(0, 1).ToUpper();
 
                 var contextHdr = _dbContext.DTRCorrection.AsNoTracking().Where(x => x.DtrId == param.TransactionId).FirstOrDefault();
+             
+
+                    var totalCount = await _dbContext.tbl_raw_logs
+                                                        .AsNoTracking()
+                                                        .CountAsync();
 
                 tbl_raw_logs raw_logs = new tbl_raw_logs();
-                raw_logs.EMPLOYEE_ID = contextHdr.EmployeeId.ToString();
+                raw_logs.ID = totalCount + 1;
+                raw_logs.EMPLOYEE_ID = _emp.EmployeeNo;
                 raw_logs.FULL_NAME = _user.Firstname + " " + _middleInitial + " " + _user.Lastname;
                 raw_logs.DATE_TIME = contextHdr.DtrDateTime;
                 raw_logs.CREATED_DATE = DateTime.Now;

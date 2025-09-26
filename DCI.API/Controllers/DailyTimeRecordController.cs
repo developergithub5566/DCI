@@ -44,6 +44,13 @@ namespace DCI.API.Controllers
         }
 
         [HttpPost]
+        [Route("GetBiometricLogsByEmployeeId")]
+        public async Task<IActionResult> GetBiometricLogsByEmployeeId([FromBody] DailyTimeRecordViewModel model)
+        {
+            return Ok(await _dtrRepository.GetBiometricLogsByEmployeeId(model));
+        }
+
+        [HttpPost]
         [Route("GetAllLeave")]
         public async Task<IActionResult> GetAllLeave([FromBody] LeaveViewModel model)
         {
@@ -81,6 +88,15 @@ namespace DCI.API.Controllers
         public async Task<IActionResult> DTRCorrectionById([FromBody] DTRCorrectionViewModel model)
         {
             return Ok(await _dtrRepository.DTRCorrectionByDtrId(model.DtrId));
+        }
+
+        [HttpPost]
+        [Route("CancelDTRCorrection")]
+        public async Task<IActionResult> CancelDTRCorrection([FromBody] DTRCorrectionViewModel model)
+        {
+      
+            var result = await _dtrRepository.CancelDTRCorrection(model);
+            return StatusCode(result.statuscode, result.message);
         }
 
         [HttpPost]

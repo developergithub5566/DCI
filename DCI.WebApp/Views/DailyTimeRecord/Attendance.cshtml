@@ -201,6 +201,8 @@
                                                         Hours : "@item.TOTAL_HOURS",
                                                         WorkingHours : "@item.TOTAL_WORKING_HOURS"
                                                             })' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+
+                                    <a href="#" onclick="rawlogsForm('@item.DATE.ToString("yyyy-MM-ddTHH:mm:ss")')" title="logs" class="btn btn-secondary"><i class="fas fa-history"></i></a>
                                 </td>
                             </tr>
                         }
@@ -284,6 +286,39 @@
                 </div>
             </div>
 
+            <div class="modal fade" id="rawlogsmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Biometric Logs</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="wfhInfo">
+                            <div class="modal-body">
+                                <table class="table table-bordered text-dark text-xs">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <label>Date</label>
+                                            </th>
+                                            <th>
+                                                <label>Time In</label>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblRawLogs">
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><small>Close</small></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
 @section scripts { 
                 <script src="~/js/dci-validation.js"></script>          
 
@@ -419,7 +454,55 @@
                                 document.getElementById('lblWorkingHours').textContent = dtr.WorkingHours;
                                 js('#createmodal').modal('show');
                         }
+                          function  rawlogsForm(date){
+                                                  let d = new Date(date); // JS can parse ISO format correctly
+                                                  d.setDate(d.getDate() + 1);
+                                              //alert(d.toISOString() )
+                                                    $.ajax({
+                                                          type: 'POST',
+                                                          url: '@Url.Action("AttendanceLogs", "DailyTimeRecord")',
+                                                                           data: JSON.stringify({
+                                                                        DATE: d.toISOString()
+                                                                    }),
+                                                               contentType: 'application/json',
+                                                          success: function (response) {
+                                                              if (response.success) {
 
+                                                                  console.log(response.data)
+                                                                         var tbodytable = $("#tblRawLogs");
+                                                                        tbodytable.empty();
+
+                                                                        if (response.data.length > 0) {
+                                                                            $.each(response.data, function(index, item) {
+                                                                                var row = `<tr>
+                                                                                                     <td>${item.datestring}</td>
+                                                                                                     <td>${item.firsT_IN}</td>
+
+                                                                                            </tr>`;
+                                                                                tbodytable.append(row);
+                                                                            });
+                                                                        } else {
+                                                                            tbodytable.html(`<tr><td colspan="4" class="text-center">No record found.</td></tr>`);
+                                                                        }
+
+                                                                    js('#rawlogsmodal').modal('show');
+                                                              } else {
+                                                                  Swal.fire({
+                                                                      text: response.message,
+                                                                      icon: "error"
+                                                                  });
+                                                              }
+                                                              $('.spinner-overlay').hide();
+                                                          },
+                                                          error: function () {
+                                                              $('.spinner-overlay').hide();
+                                                              Swal.fire({
+                                                                  text: "An error occurred. Please try again.",
+                                                                  icon: "error"
+                                                              });
+                                                          }
+                                                      });
+                                          }
                         // function newForm() {
                         //         document.getElementById('lblDate').textContent = 'May 15, 2025';
                         //         document.getElementById('lblEmpNo').textContent = '080343';

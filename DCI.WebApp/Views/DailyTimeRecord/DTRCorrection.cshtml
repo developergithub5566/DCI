@@ -188,6 +188,7 @@
                               
                                 <td class="text-center">
                                     <a href="javascript:void(0)" onclick="view(@item.DtrId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+                                    <a href="javascript:void(0)" onclick="cancel(@item.DtrId)" title="View" class="btn btn-secondary"><i class="fas fa-ban"></i></a>
                                 </td>
                             </tr>
                         }
@@ -547,6 +548,45 @@
                                           }
                                       });
                            
+                    }
+
+                    function cancel(id){
+                                Swal.fire({
+                                    text: "Are you sure you want to cancel this application?",
+                                    icon: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonText: "Yes, cancel it!"
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        $.ajax({
+                                            type: 'POST',
+                                            url: '@Url.Action("CancelDTRCorrection", "DailyTimeRecord")',
+                                            data: { DTRId: id },
+                                            success: function (response) {
+                                                if (response.success) {
+                                                    Swal.fire({
+                                                        text: response.message,
+                                                        icon: "success",
+                                                        confirmButtonText: "Ok"
+                                                    }).then((result) => {
+                                                        location.reload();
+                                                    });
+                                                } else {
+                                                    Swal.fire({
+                                                        text: response.message,
+                                                        icon: "error"
+                                                    });
+                                                }
+                                            },
+                                            error: function () {
+                                                Swal.fire({
+                                                    text: "An error occurred. Please try again.",
+                                                    icon: "error"
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
                     }
 
 

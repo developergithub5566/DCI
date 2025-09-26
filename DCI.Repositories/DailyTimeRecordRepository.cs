@@ -119,6 +119,23 @@ namespace DCI.Repositories
 
             return query;
         }
+
+        public async Task<IList<DailyTimeRecordViewModel>> GetBiometricLogsByEmployeeId(DailyTimeRecordViewModel model)
+        {
+            var _emp = await _dbContext.Employee.AsQueryable().Where(x => x.EmployeeId == model.EMPLOYEE_ID).FirstOrDefaultAsync();
+            var empNO = _emp.EmployeeNo ?? string.Empty;
+
+            var query = await (from logs in _dbContext.tbl_raw_logs.AsQueryable()
+                               where logs.EMPLOYEE_ID == empNO && logs.DATE_TIME.Date == model.DATE.Date
+                               select new DailyTimeRecordViewModel
+                               {
+                                   DATESTRING = logs.DATE_TIME.ToString("yyyy-MM-dd"),
+                                   EMPLOYEE_NO = logs.EMPLOYEE_ID,
+                                   FIRST_IN = logs.DATE_TIME.ToString("HH:mm:ss")
+                               }).ToListAsync();
+            return query;
+        }
+
         public async Task<IList<DTRCorrectionViewModel>> GetAllDTRCorrection(DTRCorrectionViewModel model)
         {
             var query = (from dtr in _dbContext.DTRCorrection.AsQueryable()
@@ -247,6 +264,32 @@ namespace DCI.Repositories
             {
                 Log.Error(ex.ToString());
                 return (StatusCodes.Status406NotAcceptable, ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        public async Task<(int statuscode, string message)> CancelDTRCorrection(DTRCorrectionViewModel model)
+        {
+            try
+            {
+                var entity = await _dbContext.DTRCorrection.FirstOrDefaultAsync(x => x.DtrId == model.DtrId && x.IsActive == true);
+                if (entity == null)
+                {
+                    return (StatusCodes.Status406NotAcceptable, "Invalid DTR Adjustment Id");
+                }
+                entity.Status = (int)EnumStatus.Cancelled;
+                entity.IsActive = true;          
+                _dbContext.DTRCorrection.Entry(entity).State = EntityState.Modified;
+                await _dbContext.SaveChangesAsync();
+                return (StatusCodes.Status200OK, "Successfully cancelled");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return (StatusCodes.Status400BadRequest, ex.ToString());
             }
             finally
             {

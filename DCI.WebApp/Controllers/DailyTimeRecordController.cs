@@ -82,6 +82,43 @@ namespace DCI.WebApp.Controllers
             return View(model);
         }
 
+        public async Task<IActionResult> AttendanceLogs([FromBody] DailyTimeRecordViewModel param)
+        {
+            List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+
+                    // param.ScopeTypeEmp = (int)EnumEmployeeScope.PerEmployee;
+                    param.EMPLOYEE_ID = currentUser.EmployeeId;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetBiometricLogsByEmployeeId");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
+                    }
+
+                }
+                return Json(new { success = true, data = model });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
         public async Task<IActionResult> DTR(DailyTimeRecordViewModel model)
         {
             try
@@ -363,6 +400,40 @@ namespace DCI.WebApp.Controllers
                 }
 
 
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        public async Task<IActionResult> CancelDTRCorrection(DTRCorrectionViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    model.CreatedBy = currentUser.UserId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/CancelDTRCorrection");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = responseBody });
+                    }
+                    return Json(new { success = false, message = responseBody });
+                }
             }
             catch (Exception ex)
             {
