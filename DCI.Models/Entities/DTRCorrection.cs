@@ -1,4 +1,5 @@
 ﻿using DCI.Models.Configuration;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System.ComponentModel.DataAnnotations;
 
 namespace DCI.Models.Entities
@@ -21,11 +22,13 @@ namespace DCI.Models.Entities
 
          public int ApproverId { get; set; }
 
-        public string? Filename { get; set; }
+        //public string? Filename { get; set; }
 
-        public string? FileLocation { get; set; }
+        //public string? FileLocation { get; set; }
 
         public int CreatedBy { get; set; }
+        public int? ModifiedBy { get; set; }
+        public DateTime? DateModified { get; set; }
 
         public bool IsActive { get; set; }
 

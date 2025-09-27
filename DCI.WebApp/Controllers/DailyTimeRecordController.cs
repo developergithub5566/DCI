@@ -286,6 +286,40 @@ namespace DCI.WebApp.Controllers
             //  return View(model);
         }
 
+        public async Task<IActionResult> CancelLeave(LeaveRequestHeaderViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    model.ModifiedBy = currentUser.UserId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/CancelLeave");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = responseBody });
+                    }
+                    return Json(new { success = false, message = responseBody });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
         public async Task<IActionResult> LeaveDropdown(int filteryear)
         {
             LeaveViewModel model = new LeaveViewModel();
@@ -418,9 +452,8 @@ namespace DCI.WebApp.Controllers
             {
                 using (var _httpclient = new HttpClient())
                 {
-                    var currentUser = _userSessionHelper.GetCurrentUser();
-                    model.CreatedBy = currentUser.UserId;
-
+                    var currentUser = _userSessionHelper.GetCurrentUser();                   
+                    model.ModifiedBy = currentUser.UserId;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/CancelDTRCorrection");

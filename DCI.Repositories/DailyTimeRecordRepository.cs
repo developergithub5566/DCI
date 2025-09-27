@@ -153,8 +153,6 @@ namespace DCI.Repositories
                              Status = dtr.Status,
                              StatusName = stat.StatusName,
                              Reason = dtr.Reason,
-                             Filename = dtr.Filename,
-                             FileLocation = dtr.FileLocation,
                              CreatedBy = dtr.CreatedBy,
                              IsActive = dtr.IsActive
                          }).ToList();
@@ -170,11 +168,13 @@ namespace DCI.Repositories
         public async Task<DTRCorrectionViewModel> DTRCorrectionByDtrId(int dtrId)
         {
             var query = await (from dtr in _dbContext.DTRCorrection.AsNoTracking()
-                         join stat in _dbContext.Status on dtr.Status equals stat.StatusId
-                         join emp in _dbContext.EmployeeWorkDetails on dtr.EmployeeId equals emp.EmployeeId
+                         join stat in _dbContext.Status.AsNoTracking() on dtr.Status equals stat.StatusId
+                         join emp in _dbContext.EmployeeWorkDetails.AsNoTracking() on dtr.EmployeeId equals emp.EmployeeId
                          //join dept in _dbContext.Department on emp.DepartmentId equals dept.DepartmentId
-                         join depthead in _dbContext.User on dtr.ApproverId equals depthead.UserId
-                         where dtr.DtrId == dtrId
+                         join depthead in _dbContext.User.AsNoTracking() on dtr.ApproverId equals depthead.UserId
+                         join apprvl in _dbContext.ApprovalHistory.AsNoTracking() on dtr.DtrId equals apprvl.TransactionId into ah
+                         from apprvl in ah.DefaultIfEmpty()
+                               where dtr.DtrId == dtrId
                          select new DTRCorrectionViewModel
                          {
                              DtrId = dtr.DtrId,
@@ -184,11 +184,13 @@ namespace DCI.Repositories
                              DtrDateTime = dtr.DtrDateTime,
                              Status = dtr.Status,
                              StatusName = stat.StatusName,
-                             Reason = dtr.Reason,
-                             Filename = dtr.Filename,
-                             FileLocation = dtr.FileLocation,
+                             Reason = dtr.Reason,                             
                              CreatedBy = dtr.CreatedBy,
+                             ModifiedBy = dtr.ModifiedBy,
+                             DateModified = dtr.DateModified,
                              IsActive = dtr.IsActive,
+                             DateApprovedDisapproved = apprvl != null ? apprvl.DateCreated.ToString("yyyy-MM-dd HH:mm") : string.Empty,
+                             ApprovalRemarks = apprvl != null ? apprvl.Remarks : string.Empty,
                              DepartmentHead = depthead.Firstname + " " + depthead.Lastname// + " " + depthead.Suffix
                          }).FirstOrDefaultAsync();
 
@@ -213,8 +215,8 @@ namespace DCI.Repositories
                     entity.ApproverId = param.ApproverId;
                     entity.RawLogsId = 0;
                     entity.Reason = param.Reason;
-                    entity.Filename = param.Filename;
-                    entity.FileLocation = param.FileLocation;
+                    //entity.Filename = param.Filename;
+                    //entity.FileLocation = param.FileLocation;
                     entity.CreatedBy = param.CreatedBy;
                     entity.IsActive = true;
                     await _dbContext.DTRCorrection.AddAsync(entity);
@@ -281,6 +283,8 @@ namespace DCI.Repositories
                     return (StatusCodes.Status406NotAcceptable, "Invalid DTR Adjustment Id");
                 }
                 entity.Status = (int)EnumStatus.Cancelled;
+                entity.ModifiedBy = model.ModifiedBy;
+                entity.DateModified = DateTime.Now;
                 entity.IsActive = true;          
                 _dbContext.DTRCorrection.Entry(entity).State = EntityState.Modified;
                 await _dbContext.SaveChangesAsync();

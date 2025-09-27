@@ -188,8 +188,10 @@ namespace DCI.Repositories
                                 Status = lheader.Status,
                                 StatusName = stat.StatusName,
                                 EmployeeName = emp.Firstname + " " + emp.Lastname,
-                                DateApprovedDisapproved = apprvl != null ? apprvl.DateCreated : null,
+                                DateApprovedDisapproved = apprvl != null ? apprvl.DateCreated.ToString("yyyy-MM-dd HH:mm") : string.Empty,
                                 ApprovalRemarks = apprvl != null ? apprvl.Remarks : string.Empty,
+                                DateModified = lheader.DateModified,
+                                ModifiedBy = lheader.ModifiedBy,
                             };
 
                 model.LeaveRequestHeader = await query.AsNoTracking().FirstOrDefaultAsync();
@@ -227,6 +229,34 @@ namespace DCI.Repositories
             {
                 Log.Error(ex.ToString());
                 return null;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        public async Task<(int statuscode, string message)> CancelLeave(LeaveRequestHeaderViewModel model)
+        {
+            try
+            {
+                var entity = await _dbContext.LeaveRequestHeader.FirstOrDefaultAsync(x => x.LeaveRequestHeaderId == model.LeaveRequestHeaderId && x.IsActive == true);
+                if (entity == null)
+                {
+                    return (StatusCodes.Status406NotAcceptable, "Invalid Leave Id");
+                }
+                entity.Status = (int)EnumStatus.Cancelled;
+                entity.ModifiedBy = model.ModifiedBy;
+                entity.DateModified = DateTime.Now;
+                entity.IsActive = true;
+                _dbContext.LeaveRequestHeader.Entry(entity).State = EntityState.Modified;
+                await _dbContext.SaveChangesAsync();
+                return (StatusCodes.Status200OK, "Successfully cancelled");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return (StatusCodes.Status400BadRequest, ex.ToString());
             }
             finally
             {

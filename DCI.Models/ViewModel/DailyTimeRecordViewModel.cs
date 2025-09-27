@@ -66,7 +66,13 @@ namespace DCI.Models.ViewModel
         public string RequestorEmail { get; set; } = string.Empty;
         public string ApproverEmail { get; set; } = string.Empty;
         public string EmailBody { get; set; } = string.Empty;
-        
+
+        public int? ModifiedBy { get; set; } = 0;
+        public DateTime? DateModified { get; set; } = DateTime.Now;
+
+        public string DateApprovedDisapproved { get; set; } = string.Empty;
+        public string ApprovalRemarks { get; set; } = string.Empty;
+
         public int ScopeTypeEmp { get; set; } = 0;
         public int CurrentUserId { get; set; } = 0;
     }

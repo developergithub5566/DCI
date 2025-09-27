@@ -71,7 +71,7 @@ namespace DCI.API.Controllers
         [Route("SaveLeave")]
         public async Task<IActionResult> SaveLeave([FromBody] LeaveFormViewModel model)
         {
-           // return Ok(await _leaveRepository.SaveLeave(model));
+            // return Ok(await _leaveRepository.SaveLeave(model));
             var result = await _leaveRepository.SaveLeave(model);
             return StatusCode(result.statuscode, result.message);
         }
@@ -94,7 +94,6 @@ namespace DCI.API.Controllers
         [Route("CancelDTRCorrection")]
         public async Task<IActionResult> CancelDTRCorrection([FromBody] DTRCorrectionViewModel model)
         {
-      
             var result = await _dtrRepository.CancelDTRCorrection(model);
             return StatusCode(result.statuscode, result.message);
         }
@@ -103,7 +102,7 @@ namespace DCI.API.Controllers
         [Route("SaveDTRCorrection")]
         public async Task<IActionResult> SaveDTRCorrection([FromBody] DTRCorrectionViewModel model)
         {
-           // return Ok(await _dtrRepository.SaveDTRCorrection(model));
+            // return Ok(await _dtrRepository.SaveDTRCorrection(model));
             var result = await _dtrRepository.SaveDTRCorrection(model);
             return StatusCode(result.statuscode, result.message);
         }
@@ -127,7 +126,7 @@ namespace DCI.API.Controllers
         [Route("SaveUndertime")]
         public async Task<IActionResult> SaveUndertime([FromBody] List<UndertimeDeductionViewModel> model)
         {
-           // return Ok(await _dtrRepository.SaveUndertime(model));
+            // return Ok(await _dtrRepository.SaveUndertime(model));
             var result = await _undertimeRepository.SaveUndertime(model);
             return StatusCode(result.statuscode, result.message);
         }
@@ -174,7 +173,7 @@ namespace DCI.API.Controllers
         {
             return Ok(await _wfhRepository.GetWFHApplicationDetailByWfhHeaderId(model));
         }
-     
+
         [HttpPost]
         [Route("GetWFHLogsByEmployeeId")]
         public async Task<IActionResult> GetWFHLogsByEmployeeId([FromBody] WFHViewModel model)
@@ -237,7 +236,14 @@ namespace DCI.API.Controllers
         public async Task<IActionResult> GetAllLeaveReport([FromBody] LeaveViewModel model)
         {
             return Ok(await _leaveRepository.GetAllLeaveReport());
-        }        
+        }
 
+        [HttpPost]
+        [Route("CancelLeave")]
+        public async Task<IActionResult> CancelLeave([FromBody] LeaveRequestHeaderViewModel model)
+        {
+            var result = await _leaveRepository.CancelLeave(model);
+            return StatusCode(result.statuscode, result.message);
+        }
     }
 }

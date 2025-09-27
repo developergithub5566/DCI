@@ -1,6 +1,6 @@
 ﻿@model DCI.Models.ViewModel.LeaveViewModel
 @using Newtonsoft.Json;
-@* @using DCI.Core.Common; *@
+@using DCI.Core.Common;
 @using DCI.Models.ViewModel;
 
 
@@ -158,15 +158,11 @@
                                             </strong>
                                         </td>
                                         <td><strong>@hdr.NoofDays</strong></td>
-                                        @if (hdr.StatusName == "Approved")
+                                        @if (hdr.Status == (int)EnumStatus.Approved)
                                         {
                                             <td class="text-center"><strong><span class='btnPrimary applicationStatus'>@hdr.StatusName</span></strong></td>
-                                        }
-                                        else if (hdr.StatusName == "Rejected")
-                                        {
-                                            <td class="text-center"><strong><span class='btn-danger applicationStatus'>@hdr.StatusName</span></strong></td>
-                                        }
-                                        else if (hdr.StatusName == "Deducted")
+                                        }                                       
+                                        else if (hdr.Status == (int)EnumStatus.VLDeducted || hdr.Status == (int)EnumStatus.PayrollDeducted || hdr.Status == (int)EnumStatus.Rejected)
                                         {
                                             <td class="text-center"><strong><span class='btn-danger applicationStatus'>@hdr.StatusName</span></strong></td>
                                         }
@@ -174,11 +170,13 @@
                                         {
                                             <td class="text-center"><strong><span class='btn-success applicationStatus'>@hdr.StatusName</span></strong></td>
                                         }
-
                                         <td class="text-center">
                                             <a href="javascript:void(0)" onclick="editForm(@hdr.LeaveRequestHeaderId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
 
-                                          
+                                            @if (hdr.Status == (int)EnumStatus.ForApproval)
+                                            {
+                                                <a href="javascript:void(0)" onclick="cancel(@hdr.LeaveRequestHeaderId)" title="Cancel Request" class="btn btn-secondary"><i class="fas fa-ban"></i></a>
+                                            }                                          
                                         </td>
                                     </tr>
                                 }
@@ -814,6 +812,7 @@
                                                 document.getElementById('ApproverLabel').textContent = '';
                                                               document.getElementById('ApprovalDate').textContent = '';
                                        document.getElementById('ApprovalRemarks').textContent = '';
+                                         document.getElementById('deptHeadName').textContent = '';
 
                                    if(response.data.leaveRequestHeader.status == 3){  //forapproval
                                                 $('#btnCancel').show();
@@ -827,22 +826,22 @@
                                                          document.getElementById('deptHeadName').textContent = response.data.approverHead;
                                                             document.getElementById('ApproverLabel').textContent = 'Approved By:';
                                                              // document.getElementById('ApprovalDate').textContent = 'Approved Date and Time: ' + response.data.leaveRequestHeader.dateApprovedDisapproved;
-                                                                      let iso =  response.data.leaveRequestHeader.dateApprovedDisapproved;
-                                                       let formatted = iso.split(".")[0].replace("T", " ").slice(0, 16);
-                                                       document.getElementById('ApprovalDate').textContent = 'Approved Date and Time: ' +formatted;
+                                                       //                let iso =  response.data.leaveRequestHeader.dateApprovedDisapproved;
+                                                       // let formatted = iso.split(".")[0].replace("T", " ").slice(0, 16);
+                                                       document.getElementById('ApprovalDate').textContent = 'Approved Date and Time: ' + response.data.leaveRequestHeader.dateApprovedDisapproved;
                                     }
-                                         else if(response.data.leaveRequestHeader.status == 5){     //Rejected
+                                         else if(response.data.leaveRequestHeader.status == 5 ){     //Rejected
                                                 $('#btnSubmit').hide();
                                                     $('#btnCancel').hide();
                                                           document.getElementById('deptHeadName').textContent = response.data.approverHead;
                                                             document.getElementById('ApproverLabel').textContent = 'Rejected By:';
                                                             //  document.getElementById('ApprovalDate').textContent = 'Rejected Date and Time: ' + response.data.leaveRequestHeader.dateApprovedDisapproved;
                                             document.getElementById('ApprovalRemarks').textContent = 'Remarks: ' + response.data.leaveRequestHeader.approvalRemarks;
-                                                                 let iso =  response.data.leaveRequestHeader.dateApprovedDisapproved;
-                                                       let formatted = iso.split(".")[0].replace("T", " ").slice(0, 16);
-                                                       document.getElementById('ApprovalDate').textContent = 'Approved Date: ' +formatted;
+                                                       //           let iso =  response.data.leaveRequestHeader.dateApprovedDisapproved;
+                                                       // let formatted = iso.split(".")[0].replace("T", " ").slice(0, 16);
+                                                       document.getElementById('ApprovalDate').textContent = 'Approved Date: ' + response.data.leaveRequestHeader.dateApprovedDisapproved;
                                      }
-                                       else if(response.data.leaveRequestHeader.status == 9){     //Deducted
+                                       else if(response.data.leaveRequestHeader.status == 9){     //Deducted 
                                                 $('#btnSubmit').hide();
                                                     $('#btnCancel').hide();
                                                           document.getElementById('deptHeadName').textContent = 'HR Processed Undertime Deduction';
@@ -850,6 +849,14 @@
 
                                                                    
                                      }
+                                       else if(response.data.leaveRequestHeader.status == 6  && response.data.leaveRequestHeader.dateModified != null){     //canclled
+                                                $('#btnSubmit').hide();
+                                                    $('#btnCancel').hide();
+                                                                      let iso =  response.data.leaveRequestHeader.dateModified;
+                                                       let formatted = iso.split(".")[0].replace("T", " ").slice(0, 16);
+                                                      document.getElementById('ApprovalDate').textContent = 'Cancelled Date: ' + formatted;
+                                     }
+                                      
 
 
                            //  $('#preloadedDates').val(response.data.leaveRequestHeader.selectedDateJson);
@@ -895,6 +902,47 @@
                     js('#createmodal').modal('show');
 
                    }
+
+
+                       function cancel(id){
+                                Swal.fire({
+                                    text: "Are you sure you want to cancel this request?",
+                                    icon: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonText: "Yes, cancel it!"
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        $.ajax({
+                                            type: 'POST',
+                                            url: '@Url.Action("CancelLeave", "DailyTimeRecord")',
+                                            data: { LeaveRequestHeaderId: id },
+                                            success: function (response) {
+                                                if (response.success) {
+                                                    Swal.fire({
+                                                        text: response.message,
+                                                        icon: "success",
+                                                        confirmButtonText: "Ok"
+                                                    }).then((result) => {
+                                                        location.reload();
+                                                    });
+                                                } else {
+                                                    Swal.fire({
+                                                        text: response.message,
+                                                        icon: "error"
+                                                    });
+                                                }
+                                            },
+                                            error: function () {
+                                                Swal.fire({
+                                                    text: "An error occurred. Please try again.",
+                                                    icon: "error"
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                    }
+
 
                //  function save() {
                //          const leaveTypeId = $('#leaveTypeSelect').val();

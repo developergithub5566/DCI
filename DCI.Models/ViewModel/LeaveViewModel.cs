@@ -63,7 +63,7 @@ namespace DCI.Models.ViewModel
         public IList<LeaveType>? LeaveTypeList { get; set; }
         //public List<DateTime>? LeaveDateList { get; set; }
 
-        public DateTime? DateApprovedDisapproved { get; set; }
+        public string DateApprovedDisapproved { get; set; } = string.Empty;
         public string ApprovalRemarks { get; set; } = string.Empty;
     }
 

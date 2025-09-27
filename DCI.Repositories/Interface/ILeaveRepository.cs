@@ -9,5 +9,6 @@ namespace DCI.Repositories.Interface
         Task<LeaveViewModel> RequestLeave(LeaveViewModel param);
         Task<(int statuscode, string message)> SaveLeave(LeaveFormViewModel param);
         Task<IList<LeaveReportViewModel>> GetAllLeaveReport();
+        Task<(int statuscode, string message)> CancelLeave(LeaveRequestHeaderViewModel model);
     }
 }

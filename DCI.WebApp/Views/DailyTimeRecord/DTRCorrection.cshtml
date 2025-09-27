@@ -166,15 +166,12 @@
                                         @("Time Out");                                        
                                     }
                                 </td>
-                                        @if (item.StatusName == "Approved")
+                                    @if (item.Status == (int)EnumStatus.Approved)
                                         {
                                     <td class="text-center"><strong><span class='btnPrimary applicationStatus'>@item.StatusName</span></strong></td>
                                         }
-                                        else if (item.StatusName == "Rejected")
-                                        {
-                                    <td class="text-center"><strong><span class='btn-danger applicationStatus'>@item.StatusName</span></strong></td>
-                                        }
-                                        else if (item.StatusName == "Deducted")
+                               
+                                else if (item.Status == (int)EnumStatus.VLDeducted || item.Status == (int)EnumStatus.PayrollDeducted || item.Status == (int)EnumStatus.Rejected)
                                         {
                                             <td class="text-center"><strong><span class='btn-danger applicationStatus'>@item.StatusName</span></strong></td>
                                         }
@@ -188,7 +185,12 @@
                               
                                 <td class="text-center">
                                     <a href="javascript:void(0)" onclick="view(@item.DtrId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
-                                    <a href="javascript:void(0)" onclick="cancel(@item.DtrId)" title="View" class="btn btn-secondary"><i class="fas fa-ban"></i></a>
+                                    
+                                    @if(item.Status  == (int)EnumStatus.ForApproval)
+                                    {
+                                        <a href="javascript:void(0)" onclick="cancel(@item.DtrId)" title="Cancel Request" class="btn btn-secondary"><i class="fas fa-ban"></i></a>
+                                    }
+                                   
                                 </td>
                             </tr>
                         }
@@ -252,12 +254,7 @@
                                             </select>
                                         </div>
                                     </div>
-                                @*     <div class="col-lg-6">
-                                        <div class="form-group">
-                                            <label class="frmText"><span class="required">*</span> Time:</label>
-                                            <input class="form-control frmField" type="time" name="DtrTime" id="DtrTime">
-                                        </div>
-                                    </div> *@
+                             
 
                                     <div class="col-12">
                                         <div class="form-group">
@@ -265,21 +262,17 @@
                                             <textarea class="form-control frmField" name="Reason" id="Reason" required></textarea>
                                         </div>
                                     </div>
-                             @*        <div class="col-12">
-                                        <div class="form-group mb10">
-                                            <label class="frmText">Attachment:</label>
-                                            <input type="file" class="frmFile " name="AttachmentId" id="AttachmentId">
-                                        </div>
-                                    </div> *@
+                        
                                     <div class="col-12">
                                         <hr>
-                                        <div class="form-group">
-                                            <label class="frmText">For Approval of: </label><br>
-                                            <label class="font-weight-bold mb0 text-danger" id="deptHeadName"></label>
-                                            @* <label class="d-block mt0 text-left text-xs">(Department Head)</label> *@
-                                        </div>
+
+                                    <label class="frmText" id="ApproverLabel" name="ApproverLabel"> </label><br>
+                                    <label class="font-weight-bold mb0 text-danger" id="deptHeadName" name="deptHeadName"></label>
+                                    <label class="d-block mt0 text-left text-xs" id="ApprovalDate" name="ApprovalDate"></label>
+                                    <label class="d-block mt0 text-left text-xs" id="ApprovalRemarks" name="ApprovalRemarks"></label>
+                                 
                                     </div>
-                                @* </form> *@
+                         
                             </div>
 
                             <!-- Modal footer -->
@@ -524,13 +517,41 @@
                                                          $('#dateCovered').val(response.data.dtrDateTime);
                                                           $('#DtrType').val(response.data.dtrType);
                                                           $('#Reason').val(response.data.reason);
-                   
-                                                              document.getElementById('deptHeadName').textContent = response.data.departmentHead;
+                                                          
+                                                            
+                                                     document.getElementById('ApproverLabel').textContent = '';
+                                                    document.getElementById('ApprovalDate').textContent = '';
+                                                   document.getElementById('ApprovalRemarks').textContent = '';
+                                                     document.getElementById('deptHeadName').textContent = '';
+                                                        $('#btnSave').css("visibility", "hidden");
 
-                                                              $('#btnSave').css("visibility", "hidden");
-                                                               
-                                                         $('#createForm').find('input, select, textarea').prop('disabled', true);
-                                                  js('#createmodal').modal('show');
+
+                                                        if(response.data.status == 3){  //forapproval
+                                                     document.getElementById('deptHeadName').textContent = response.data.departmentHead;
+                                                       document.getElementById('ApproverLabel').textContent = 'For Approval of:';
+                                              }
+
+                                             else  if(response.data.status == 4){  //approved                                              
+                                                      
+                                                       document.getElementById('deptHeadName').textContent = response.data.departmentHead;
+                                                      document.getElementById('ApproverLabel').textContent = "Approved By: "; 
+                                                       document.getElementById('ApprovalDate').textContent = 'Approved Date and Time: ' + response.data.dateApprovedDisapproved;
+                                              }
+                                                    else if(response.data.status == 5 ){     //Rejected                                                  
+                                                          document.getElementById('deptHeadName').textContent = response.data.approverHead;
+                                                            document.getElementById('ApproverLabel').textContent = 'Rejected By:';                                                           
+                                                   document.getElementById('ApprovalRemarks').textContent = 'Remarks: ' + response.data.approvalRemarks;                                                  
+                                                       document.getElementById('ApprovalDate').textContent = 'Approved Date: ' + response.data.dateApprovedDisapproved;
+                                               }  else if(response.data.status == 6 && response.data.dateModified != null){     //canclled                                                           
+                                                            let iso =  response.data.dateModified;
+                                                       let formatted = iso.split(".")[0].replace("T", " ").slice(0, 16);
+                                                      document.getElementById('ApprovalDate').textContent = 'Cancelled Date: ' + formatted;
+                                                          
+                                             }
+
+
+                                                             $('#createForm').find('input, select, textarea').prop('disabled', true);
+                                                        js('#createmodal').modal('show');
                                               } else {
                                                   Swal.fire({
                                                       text: response.message,
@@ -552,7 +573,7 @@
 
                     function cancel(id){
                                 Swal.fire({
-                                    text: "Are you sure you want to cancel this application?",
+                                    text: "Are you sure you want to cancel this request?",
                                     icon: "warning",
                                     showCancelButton: true,
                                     confirmButtonText: "Yes, cancel it!"
