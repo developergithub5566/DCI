@@ -148,7 +148,7 @@ namespace DCI.Repositories
             entity.RequestNo = await GenereteRequestNo();
             entity.EmployeeId = model.Header.EmployeeId;
             entity.Status = (int)EnumStatus.ForApproval;
-            entity.ApproverId = 1;
+            entity.ApproverId = model.Header.ApproverId;
             entity.Remarks = model.Header.Remarks;
             entity.DateCreated = DateTime.Now;
             entity.CreatedBy = model.Header.CurrentUserId;
@@ -168,9 +168,38 @@ namespace DCI.Repositories
                 await _dbContext.SaveChangesAsync();
             }
 
+
+
             return (StatusCodes.Status200OK, "Successfully saved");
         }
 
+        public async Task<(int statuscode, string message)> CancelWFHApplication(WFHHeaderViewModel model)
+        {
+            try
+            {
+                var entity = await _dbContext.WfhHeader.FirstOrDefaultAsync(x => x.WfhHeaderId == model.WfhHeaderId && x.IsActive == true);
+                if (entity == null)
+                {
+                    return (StatusCodes.Status406NotAcceptable, "Invalid WFH Id");
+                }
+                entity.Status = (int)EnumStatus.Cancelled;
+                entity.ModifiedBy = model.CurrentUserId;
+                entity.DateModified = DateTime.Now;
+                entity.IsActive = true;
+                _dbContext.WfhHeader.Entry(entity).State = EntityState.Modified;
+                await _dbContext.SaveChangesAsync();
+                return (StatusCodes.Status200OK, "Successfully cancelled");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return (StatusCodes.Status400BadRequest, ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
 
         private async Task<string> GenereteRequestNo()
         {
@@ -183,7 +212,7 @@ namespace DCI.Repositories
                 var startDate = new DateTime(_currentYear, _currentMonth, 1);
                 var endDate = startDate.AddMonths(1);
 
-                var _dtr = await _dbContext.WfhHeader
+                var _dtr = await _dbContext.WfhHeader.AsNoTracking()
                     .Where(x => x.IsActive == true
                         && x.DateCreated >= startDate
                         && x.DateCreated < endDate)

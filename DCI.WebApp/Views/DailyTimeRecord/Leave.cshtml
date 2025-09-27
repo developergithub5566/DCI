@@ -457,8 +457,12 @@
 
                                       flatpickr("#minDate", {
                                      dateFormat: "Y-m-d",
-                                      defaultDate: firstDayOfMonth
-                                  });
+                                        defaultDate: (function () {
+                                    let d = new Date();
+                                    d.setMonth(d.getMonth() - 1);
+                                    return d;
+                                     })()
+                                });
 
                                     flatpickr("#maxDate", {
                                      dateFormat: "Y-m-d",
@@ -546,7 +550,7 @@
                         ],
                          lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
                          pageLength: 10 ,// Default entries per page
-                                 order: [[1, 'desc']]
+                                 order: [[2, 'desc']]
                               });
                                 // Event listener for date inputs
                         $('#minDate, #maxDate').on('change', function () {

@@ -185,7 +185,16 @@ namespace DCI.API.Controllers
         [Route("SaveWFHApplication")]
         public async Task<IActionResult> SaveWFHApplication([FromBody] WfhApplicationViewModel param)
         {
-            return Ok(await _wfhRepository.SaveWFHApplication(param));
+            var result = await _wfhRepository.SaveWFHApplication(param);
+            return StatusCode(result.statuscode, result.message);
+        }
+
+        [HttpPost]
+        [Route("CancelWFHApplication")]
+        public async Task<IActionResult> CancelWFHApplication([FromBody] WFHHeaderViewModel model)
+        {
+            var result = await _wfhRepository.CancelWFHApplication(model);
+            return StatusCode(result.statuscode, result.message);
         }
 
         [HttpPost]

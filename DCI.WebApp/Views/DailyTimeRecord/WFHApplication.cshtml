@@ -144,15 +144,15 @@
                                     @item.DateCreated.ToString("yyyy-MM-dd HH:mm")
                                 </td>
 
-                                @if (item.StatusName == "Approved")
+                                @if (item.StatusId == (int)EnumStatus.Approved)
                                 {
                                     <td class="text-center"><strong><span class='btnPrimary applicationStatus'>@item.StatusName</span></strong></td>
                                 }
-                                else if (item.StatusName == "Rejected")
+                                else if (item.StatusId == (int)EnumStatus.Rejected)
                                 {
                                     <td class="text-center"><strong><span class='btn-danger applicationStatus'>@item.StatusName</span></strong></td>
                                 }
-                                else if (item.StatusName == "Deducted")
+                                else if (item.StatusId == (int)EnumStatus.VLDeducted || item.StatusId == (int)EnumStatus.PayrollDeducted)
                                 {
                                     <td class="text-center"><strong><span class='btn-danger applicationStatus'>@item.StatusName</span></strong></td>
                                 }
@@ -164,8 +164,11 @@
                             
                                 <td class="text-center">
                                     <a href="#" onclick='viewWFHdDetails(@item.WfhHeaderId);' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
-                                  
-@*                                     <a href="#" title="logs" class="btn btn-secondary"><i class="fas fa-history"></i></a> *@
+
+                                    @if (item.StatusId == (int)EnumStatus.ForApproval)
+                                    {
+                                        <a href="javascript:void(0)" onclick="cancel(@item.WfhHeaderId)" title="Cancel Request" class="btn btn-secondary"><i class="fas fa-ban"></i></a>
+                                    }
                                 </td>
                             </tr>
                         }
@@ -186,6 +189,29 @@
                         </div>
                         <form id="wfhInfo">
                             <div class="modal-body">
+                                <table class="viewDetailsTblWFH table table-striped">
+                                    <tbody>
+                                        <tr>
+                                            <input type="hidden" id="WfhHeaderId" name="WfhHeaderId" value="0" />
+                                            <th>Date File:</th>
+                                            <td class="tblDate"><label id="lblDate"></label></td>@*  @DateTime.Now.ToString("MM/dd/yyyy") *@
+                                        </tr>                               
+                                        <tr>
+                                            <th>Status:</th>
+                                            <td class="tblSource">
+                                                <span class="btnSuccess applicationStatus">
+                                                    <label id="lblSource">Draft</label>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Remarks:</th>
+                                            <td class="tblRemarks">
+                                                <textarea id="Remarks" name="Remarks" rows="3" style="width:100%" readonly></textarea>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                                 <table class="table table-bordered text-dark text-xs" >
                                     <thead>
                                         <tr>                                         
@@ -242,7 +268,11 @@
 
                                 flatpickr("#minDate", {
                                    dateFormat: "Y-m-d",
-                                    defaultDate: new Date()
+                                    defaultDate: (function () {
+                                    let d = new Date();
+                                    d.setMonth(d.getMonth() - 1); 
+                                    return d;
+                                     })()
                                 });
 
                                   flatpickr("#maxDate", {
@@ -257,15 +287,13 @@
                                      min = $('#minDate').val();   // e.g. "2025-09-01"
                                      max = $('#maxDate').val();   // e.g. "2025-09-10"
                        let rawDateTime = (data[2] || '').trim(); // adjust index to your date column
-                                    // rawDateTime = "2025-09-09 15:45"
+                                   
 
                                     if (!rawDateTime) return false;
+                                  
+                                    let rowDate = new Date(rawDateTime.replace(' ', 'T'));                                  
 
-                                    // Parse row datetime
-                                    let rowDate = new Date(rawDateTime.replace(' ', 'T'));
-                                    // "2025-09-09 15:45" → "2025-09-09T15:45" → valid ISO date
-
-                                    // Parse min/max (flatpickr gives YYYY-MM-DD)
+                                  
                                     let minDate = min ? new Date(min + "T00:00:00") : null;
                                     let maxDate = max ? new Date(max + "T23:59:59") : null;
 
@@ -329,7 +357,7 @@
                         ],
                          lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
                          pageLength: 10 ,// Default entries per page
-                                // order: [[2, 'desc']]
+                                 order: [[2, 'desc']]
                             });
                 $('#minDate, #maxDate').on('change', function () {
                                          table.draw();
@@ -386,7 +414,44 @@
                                           });
                 }
 
-
+                    function cancel(id){
+                                Swal.fire({
+                                    text: "Are you sure you want to cancel this request?",
+                                    icon: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonText: "Yes, cancel it!"
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        $.ajax({
+                                            type: 'POST',
+                                            url: '@Url.Action("CancelWFHApplication", "DailyTimeRecord")',
+                                            data: { WfhHeaderId: id },
+                                            success: function (response) {
+                                                if (response.success) {
+                                                    Swal.fire({
+                                                        text: response.message,
+                                                        icon: "success",
+                                                        confirmButtonText: "Ok"
+                                                    }).then((result) => {
+                                                        location.reload();
+                                                    });
+                                                } else {
+                                                    Swal.fire({
+                                                        text: response.message,
+                                                        icon: "error"
+                                                    });
+                                                }
+                                            },
+                                            error: function () {
+                                                Swal.fire({
+                                                    text: "An error occurred. Please try again.",
+                                                    icon: "error"
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                    }
                    
 
             </script>

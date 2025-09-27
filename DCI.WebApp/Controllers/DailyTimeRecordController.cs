@@ -774,6 +774,7 @@ namespace DCI.WebApp.Controllers
 
                     param.Header.CurrentUserId = currentUser.UserId;
                     param.Header.EmployeeId = currentUser.EmployeeId;
+                    param.Header.ApproverId = currentUser.ApproverId;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/SaveWFHApplication");
@@ -872,6 +873,39 @@ namespace DCI.WebApp.Controllers
                 Log.CloseAndFlush();
             }
             return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
+        public async Task<IActionResult> CancelWFHApplication(WFHHeaderViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    model.CurrentUserId = currentUser.UserId;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/CancelWFHApplication");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = responseBody });
+                    }
+                    return Json(new { success = false, message = responseBody });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
         public async Task<IActionResult> Overtime(OvertimeViewModel param)

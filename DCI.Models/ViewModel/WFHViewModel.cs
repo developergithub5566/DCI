@@ -38,6 +38,7 @@
         public int CurrentUserId { get; set; } = 0;
         public string StatusName { get; set; } = string.Empty;
         public DateTime DateCreated { get; set; } = DateTime.Now;
+        public int ApproverId { get; set; } = 0;
     }
     public class WfhDetailViewModel
     {
@@ -47,6 +48,6 @@
         public string TimeOut { get; set; }
 
         public int WfhHeaderId { get; set; }
-        public string TotalWorkingHours { get; set; }
+        public string? TotalWorkingHours { get; set; } = string.Empty;
     }    
 }

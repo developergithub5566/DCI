@@ -202,7 +202,7 @@
                                                         WorkingHours : "@item.TOTAL_WORKING_HOURS"
                                                             })' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
 
-                                    <a href="#" onclick="rawlogsForm('@item.DATE.ToString("yyyy-MM-ddTHH:mm:ss")')" title="logs" class="btn btn-secondary"><i class="fas fa-history"></i></a>
+                                    <a href="javascript:void(0)" onclick="rawlogsForm('@item.DATE.ToString("yyyy-MM-ddTHH:mm:ss")')" title="logs" class="btn btn-secondary"><i class="fas fa-history"></i></a>
                                 </td>
                             </tr>
                         }
@@ -338,7 +338,11 @@
 
                               flatpickr("#minDate", {
                                    dateFormat: "Y-m-d",
-                                    defaultDate: new Date()
+                                  defaultDate: (function () {
+                                    let d = new Date();
+                                    d.setMonth(d.getMonth() - 1);
+                                    return d;
+                                     })()
                                 });
 
                                   flatpickr("#maxDate", {
@@ -426,7 +430,7 @@
                                                     ],
                                                     lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
                                                     pageLength: 10,
-                                                    order: [[0, 'desc']]
+                                                    order: [[1, 'desc']]
                                                 });
 
                                                  $('#minDate, #maxDate').on('change', function () {
