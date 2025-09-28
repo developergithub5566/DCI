@@ -87,6 +87,9 @@
                                 <label>Name</label>
                             </th>
                             <th>
+                                <label>Date Filed</label>
+                            </th>
+                            <th>
                                 <label>Total</label>
                             </th>
                             <th>
@@ -95,9 +98,7 @@
                             @*          <th>
                                 <label>CreatedBy</label>
                             </th> *@
-                            <th>
-                                <label>Date Filed</label>
-                            </th>
+                            
 
                             <th>
                                 Action
@@ -107,6 +108,16 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
+                            string statusClass = item.StatusId switch
+                            {
+                                (int)EnumStatus.Approved => "btn-primary",
+                                (int)EnumStatus.ForApproval => "btn-success",
+                                (int)EnumStatus.Rejected => "btn-danger",
+                                (int)EnumStatus.Cancelled => "btn-secondary",
+                                (int)EnumStatus.VLDeducted
+                                or (int)EnumStatus.PayrollDeducted => "btn-warning",
+                                _ => "btn-dark"
+                            };
                             <tr>
 
                                 <td>
@@ -116,17 +127,20 @@
                                     @item.Fullname
                                 </td>
                                 <td>
-                                    @item.TotalString
+                                    @item.DateCreated.ToString("MM/dd/yyyy HH:mm tt")
                                 </td>
                                 <td>
-                                    @item.StatusName
+                                    @item.TotalString
+                                </td>
+                                <td class="text-center">
+                                    <strong>
+                                        <span class="@statusClass applicationStatus">@item.StatusName</span>
+                                    </strong>
                                 </td>
                                 @*      <td>
                                     @item.CreatedBy
                                 </td>   *@                             
-                                    <td>
-                                    @item.DateCreated.ToString("MM/dd/yyyy HH:mm tt")
-                                </td>
+                     
 
                                 <td>
                                     <a asp-controller="Report" asp-action="AddOvertime" asp-route-OTHeaderId="@item.OTHeaderId" class="btn btn-primary">

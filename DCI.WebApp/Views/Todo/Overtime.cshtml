@@ -115,8 +115,18 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
-                            <tr>
+                            string statusClass = item.StatusId switch
+                            {
+                                (int)EnumStatus.Approved => "btn-primary",
+                                (int)EnumStatus.ForApproval => "btn-success",
+                                (int)EnumStatus.Rejected => "btn-danger",
+                                (int)EnumStatus.Cancelled => "btn-secondary",
+                                (int)EnumStatus.VLDeducted
+                                or (int)EnumStatus.PayrollDeducted => "btn-warning",
+                                _ => "btn-dark"
+                            };
 
+                            <tr>
                                 <td>
                                     @item.RequestNo
                                 </td>
@@ -126,8 +136,10 @@
                                 <td>
                                     @item.TotalString
                                 </td>
-                                <td>
-                                    @item.StatusName
+                                <td class="text-center">
+                                    <strong>
+                                        <span class="@statusClass applicationStatus">@item.StatusName</span>
+                                    </strong>
                                 </td>
                                 @*      <td>
                                     @item.CreatedBy

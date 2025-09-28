@@ -40,7 +40,7 @@
     else
     {
         var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
-                    .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Department);
+                    .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Reports);
         canView = module?.View ?? false;
         canAdd = module?.Add ?? false;
         canEdit = module?.Update ?? false;
@@ -315,7 +315,11 @@
                                   // firstDayOfMonth.setDate(1);
                                   flatpickr("#minDate", {
                                    dateFormat: "Y-m-d",
-                                    defaultDate: new Date()
+                                     defaultDate: (function () {
+                                    let d = new Date();
+                                    d.setMonth(d.getMonth() - 1);
+                                    return d;
+                                     })()
                                 });
 
                                   flatpickr("#maxDate", {
@@ -401,7 +405,7 @@
                         ],
                         lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
                         pageLength: 10,
-                        order: [[0, 'desc']]
+                        order: [[2, 'desc']]
                     });
 
 
@@ -432,55 +436,7 @@
                                 document.getElementById('lblWorkingHours').textContent = dtr.WorkingHours;
                                 js('#createmodal').modal('show');
                         }
-
-                           
-
-
-                        // function newForm() {
-                        //         document.getElementById('lblDate').textContent = 'May 15, 2025';
-                        //         document.getElementById('lblEmpNo').textContent = '080343';
-                        //         document.getElementById('lblName').textContent = 'Jc Cabugao';
-                        //         document.getElementById('lblSource').textContent = 'Remote';
-                        //         document.getElementById('lblTimeIn').textContent = '08:27:43 AM';
-                        //         document.getElementById('lblTimeOut').textContent = '--:--:--';
-                        //         document.getElementById('lblClockOut').textContent = '05:27:43 PM';
-                        //         document.getElementById('lblLate').textContent = '00:00:00';
-                        //         document.getElementById('lblUnderTime').textContent = '09:00:00';
-                        //         document.getElementById('lblOT').textContent = '00:00:00';
-                        //         document.getElementById('lblHours').textContent = '00:00:00';
-                        //         document.getElementById('lblWorkingHours').textContent = '00:00:00';
-                        //         js('#createmodal').modal('show');
-                        // }
-
-
-
-
-                          //    $('#tblDTR').DataTable({
-                         //                    dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
-                         // buttons: [
-                         //     {
-                         //         extend: 'excel',
-                         //            text: 'Export to Excel',
-                         //         title: 'Attendance Summary Report',
-                         //         exportOptions: {
-                         //             columns: ':not(:last-child)' // Excludes the last column
-                         //         }
-                         //     },
-                         //     {
-                         //         extend: 'pdf',
-                         //         text: 'Export to PDF',
-                         //         title: 'Attendance Summary Report',
-                         //         exportOptions: {
-                         //             columns: ':not(:last-child)' // Excludes the last column
-                         //         }
-                         //     }
-                         // ],
-                         // lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
-                         // pageLength: 10 ,// Default entries per page
-                         //         order: [[2, 'desc']]
-                         //    });
-
-
+                          
 
                 </script>
             }

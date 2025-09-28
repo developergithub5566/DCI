@@ -132,6 +132,18 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
+                              string statusClass = item.StatusId switch
+                                                    {
+                                                        (int)EnumStatus.Approved => "btn-primary",
+                                                        (int)EnumStatus.ForApproval => "btn-success",
+                                                        (int)EnumStatus.Rejected => "btn-danger",
+                                                        (int)EnumStatus.Cancelled => "btn-secondary",
+                                                        (int)EnumStatus.VLDeducted
+                                                        or (int)EnumStatus.PayrollDeducted => "btn-warning",
+                                                        _ => "btn-dark"
+                                                    };
+
+
                             <tr>
 
                                 <td>
@@ -144,22 +156,11 @@
                                     @item.DateCreated.ToString("yyyy-MM-dd HH:mm")
                                 </td>
 
-                                @if (item.StatusId == (int)EnumStatus.Approved)
-                                {
-                                    <td class="text-center"><strong><span class='btnPrimary applicationStatus'>@item.StatusName</span></strong></td>
-                                }
-                                else if (item.StatusId == (int)EnumStatus.Rejected)
-                                {
-                                    <td class="text-center"><strong><span class='btn-danger applicationStatus'>@item.StatusName</span></strong></td>
-                                }
-                                else if (item.StatusId == (int)EnumStatus.VLDeducted || item.StatusId == (int)EnumStatus.PayrollDeducted)
-                                {
-                                    <td class="text-center"><strong><span class='btn-danger applicationStatus'>@item.StatusName</span></strong></td>
-                                }
-                                else
-                                {
-                                    <td class="text-center"><strong><span class='btn-success applicationStatus'>@item.StatusName</span></strong></td>
-                                }
+                                   <td class="text-center">
+                                                    <strong>
+                                                        <span class="@statusClass applicationStatus">@item.StatusName</span>
+                                                    </strong>
+                                                </td>
                               
                             
                                 <td class="text-center">
@@ -205,7 +206,7 @@
                                             <td class="tblSource">
                                             @*     <span class="btnSuccess applicationStatus">
                                                 </span> *@
-                                                    <label id="lblStatus">Draft</label>
+                                                    <label id="lblStatus"></label>
                                                
                                             </td>
                                         </tr>

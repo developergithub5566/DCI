@@ -42,13 +42,12 @@
     else
     {
         var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
-                    .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.DTRCorrection);
+                    .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Reports);
         canView = module?.View ?? false;
         canAdd = module?.Add ?? false;
         canEdit = module?.Update ?? false;
         canDelete = module?.Delete ?? false;
     }
-
 }
 
 <div class="container-fluid">
@@ -115,9 +114,7 @@
                          
                                 <th>
                                     <label>Employee</label>
-                                </th>
-                    
-
+                                </th>    
                             <th>
                                 <label>DTR Date & Time</label>
                             </th>
@@ -138,6 +135,19 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
+                          
+                                string statusClass = item.Status switch
+                                {
+                                    (int)EnumStatus.Approved                => "btn-primary",
+                                    (int)EnumStatus.ForApproval             => "btn-success",
+                                    (int)EnumStatus.Rejected                => "btn-danger",
+                                    (int)EnumStatus.Cancelled               => "btn-secondary",
+                                    (int)EnumStatus.VLDeducted 
+                                      or (int)EnumStatus.PayrollDeducted    => "btn-warning",
+                                    _                                       => "btn-info"
+                                };
+                           
+
                             <tr>
                                 <td>
                                     @item.RequestNo
@@ -164,22 +174,11 @@
                                         ;
                                     }
                                 </td>
-                                @if (item.StatusName == "Approved")
-                                {
-                                    <td class="text-center"><strong><span class='btnPrimary applicationStatus'>@item.StatusName</span></strong></td>
-                                }
-                                else if (item.StatusName == "Rejected")
-                                {
-                                    <td class="text-center"><strong><span class='btn-danger applicationStatus'>@item.StatusName</span></strong></td>
-                                }
-                                else if (item.StatusName == "Deducted")
-                                {
-                                    <td class="text-center"><strong><span class='btn-danger applicationStatus'>@item.StatusName</span></strong></td>
-                                }
-                                else
-                                {
-                                    <td class="text-center"><strong><span class='btn-success applicationStatus'>@item.StatusName</span></strong></td>
-                                }
+                                <td class="text-center">
+                                    <strong>
+                                        <span class="@statusClass applicationStatus">@item.StatusName</span>
+                                    </strong>
+                                </td>
                                 <td>
                                     @item.DateFiled.ToString("MM/dd/yyyy HH:mm")
                                 </td>
@@ -294,7 +293,11 @@
                                   // firstDayOfMonth.setDate(1);
                                   flatpickr("#minDate", {
                                    dateFormat: "Y-m-d",
-                                    defaultDate: new Date()
+                                     defaultDate: (function () {
+                                    let d = new Date();
+                                    d.setMonth(d.getMonth() - 1);
+                                    return d;
+                                     })()
                                 });
 
                                   flatpickr("#maxDate", {

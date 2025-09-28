@@ -70,7 +70,7 @@ namespace DCI.WebApp.Controllers
 
                 var currentUser = _userSessionHelper.GetCurrentUser();
                 model.CurrentUserId = currentUser.UserId;
-
+                
 
                  var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                 var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Todo/GetAllTodo");

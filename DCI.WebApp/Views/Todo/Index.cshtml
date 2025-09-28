@@ -506,6 +506,33 @@
                         <form id="wfhInfo">
                             <div class="modal-body">
                                 <input type="hidden" id="WfhHeaderId" name="WfhHeaderId">
+                                  <table class="viewDetailsTblWFH table table-striped">
+                                    <tbody>
+                            @*             <input type="hidden" id="WfhHeaderId" name="WfhHeaderId" value="0" /> *@
+                                        <tr>
+                                            <th>Request No:</th>
+                                            <td class="tblRequestNo"><label id="lblRequestNoWFH"></label></td>
+                                        </tr>
+                                        <tr>  
+                                            <th>Date Filed:</th>
+                                            <td class="tblDate"><label id="lblDateWFH"></label></td>
+                                        </tr>                               
+                                        <tr>
+                                            <th>Status:</th>
+                                            <td class="tblSource">                                         
+                                                    <label id="lblStatusWFH"></label>                                               
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Remarks:</th>
+                                            <td class="tblRemarks">                                  
+                                           <label id="RemarksWFH"></label>
+                                            </td>
+                                        </tr>
+                            
+                                    </tbody>
+                                </table>
+               
                                 <table class="table table-bordered text-dark text-xs">
                                     <thead>
                                         <tr>
@@ -580,27 +607,34 @@
                             <div class="modal-body">
 
                                 <table class="viewDetailsTbl table table-striped">
+                                 
                                     <tbody>
-                                        <tr>
-                                            <input type="hidden" id="OTHeaderId" name="OTHeaderId" value="0" />
+                                           <input type="hidden" id="OTHeaderId" name="OTHeaderId" value="0" />
+                                                <tr>
                                             <th>Request No:</th>
-                                            <th class="tblDate">  <label id="lblReqNoOT"></label>  </th>
-                                        </tr>                          
-                                        <tr>
-                                            <th>Name :</th>
-                                            <th class="tblEmNo">  <label id="lblNameOT"></label></th>
+                                            <td class="tblRequestNo"><label id="lblRequestNoOT"></label></td>
+                                        </tr>
+                                        <tr>  
+                                            <th>Date Filed:</th>
+                                            <td class="tblDate"><label id="lblDateOT"></label></td>
                                         </tr>
                                         <tr>
-                                            <th>Date Filed :</th>
-                                            <th class="tblEmNo">  <label id="lblDateFiledOT"></label></th>
+                                            <th>Name:</th>
+                                            <td class="tblSource">
+                                                <label id="lblNameOT"></label>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <th>Status:</th>
-                                            <td class="tblStatus"><span class="btnSuccess applicationStatus"><label id="lblStatusOT"></label></span></td>
+                                            <td class="tblSource">                                       
+                                                    <label id="lblStatusOT"></label>                                               
+                                            </td>
                                         </tr>
                                         <tr>
-                                            <th>Remarks:</th>                                         
-                                            <th class="tblEmNo">  <label id="lblremarksOT"></label></th>
+                                            <th>Remarks:</th>
+                                            <td class="tblRemarks">                       
+                                                <label id="RemarksOT"></label>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -630,6 +664,14 @@
                                     <tbody id="tblOvertimeDetails">
                                     </tbody>
                                 </table>
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label class="frmText" id="ApproverLabel" name="ApproverLabel"> </label><br>
+                                        <label class="font-weight-bold mb0 text-danger" id="deptHeadName" name="deptHeadName"></label>
+                                        <label class="d-block mt0 text-left text-xs" id="ApprovalDate" name="ApprovalDate"></label>
+                                        <label class="d-block mt0 text-left text-xs" id="ApprovalRemarks" name="ApprovalRemarks"></label>
+                                    </div>
+                                </div>
                             </div>
                             <div class="modal-footer">
                                 <a href="#" id="approved" onclick="approvalFormOvertime($('#OTHeaderId').val(),@((int)EnumStatus.Approved))" title="Approve" class="btn btn-info"> Approve</a>
@@ -780,13 +822,11 @@
 
 
 @section scripts {             
-                <script src="~/js/dci-validation.js"></script>
-            
+                <script src="~/js/dci-validation.js"></script>          
 
 
                 <script type="text/javascript">
-                        var js = jQuery.noConflict(true);
-                                         
+                        var js = jQuery.noConflict(true);                                        
 
 
                          $('.spinner-overlay').show();
@@ -964,15 +1004,19 @@
                                               url: '@Url.Action("WFHApplicationDetails", "DailyTimeRecord")',
                                                 data: { WFHHeaderId: headerId },
                                               success: function (response) {
-                                                  if (response.success) {
-
-                                                      console.log(response.data);
+                                                  if (response.success) {                                                                                                         
+                                                       
+                                                         console.log(response.data);
+                                                       document.getElementById('lblRequestNoWFH').textContent = response.data.header.requestNo;
+                                                          document.getElementById('lblStatusWFH').textContent = response.data.header.statusName;
+                                                             document.getElementById('lblDateWFH').textContent = response.data.header.dateCreatedString;
+                                                                  document.getElementById('RemarksWFH').textContent = response.data.header.remarks;   
 
                                                            var tbodytable = $("#tblFileforWFH");
                                                     tbodytable.empty();
 
-                                                    if (response.data.length > 0) {
-                                                        $.each(response.data, function(index, item) {
+                                                    if (response.data.details.length > 0) {
+                                                            $.each(response.data.details, function(index, item) {
                                                             var row = `<tr>
 
                                                                                  <td>${item.date}</td>
@@ -1116,12 +1160,12 @@
                                                       console.log(response.data);
                                                       $("#OTHeaderId").val(response.data.otHeaderId)
                                                         // document.getElementById('OTHeaderId').text =response.data.otHeaderId;
-                                       document.getElementById('lblReqNoOT').textContent =response.data.requestNo;
+                                               document.getElementById('lblRequestNoOT').textContent =response.data.requestNo;
                                   // document.getElementById('lblRecommend').textContent =response.data.recommendedBy;
                                 document.getElementById('lblNameOT').textContent =response.data.fullname;
-                                        document.getElementById('lblDateFiledOT').textContent =  response.data.dateCreatedString;
-                                    document.getElementById('lblStatusOT').textContent =response.data.statusName;
-                              document.getElementById('lblremarksOT').textContent =response.data.remarks;
+                                            document.getElementById('lblDateOT').textContent =  response.data.dateCreatedString;
+                                            document.getElementById('lblStatusOT').textContent =response.data.statusName;
+                                  document.getElementById('RemarksOT').textContent =response.data.remarks;
 
 
                                                    var tbodytable = $("#tblOvertimeDetails");

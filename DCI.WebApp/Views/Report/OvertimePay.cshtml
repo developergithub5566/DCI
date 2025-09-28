@@ -291,9 +291,12 @@
 
                                    flatpickr("#minDate", {
                                    dateFormat: "Y-m-d",
-                                   defaultDate: new Date()
-
-                                });
+                                        defaultDate: (function () {
+                                               let d = new Date();
+                                               d.setMonth(d.getMonth() - 1);
+                                               return d;
+                                                })()
+                                           });
 
                                   flatpickr("#maxDate", {
                                    dateFormat: "Y-m-d",

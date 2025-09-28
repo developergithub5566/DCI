@@ -145,6 +145,17 @@
 
                                 @foreach (var hdr in Model.LeaveRequestHeaderList)
                                 {
+                                    string statusClass = hdr.Status switch
+                                    {
+                                        (int)EnumStatus.Approved => "btn-primary",
+                                        (int)EnumStatus.ForApproval => "btn-success",
+                                        (int)EnumStatus.Rejected => "btn-danger",
+                                        (int)EnumStatus.Cancelled => "btn-secondary",
+                                        (int)EnumStatus.VLDeducted
+                                        or (int)EnumStatus.PayrollDeducted => "btn-warning",
+                                        _ => "btn-dark"
+                                    };
+
                                     <tr>
                                         <td><strong>@hdr.RequestNo</strong></td>                                     
                                         <td>@hdr.LeaveName</td>
@@ -158,18 +169,11 @@
                                             </strong>
                                         </td>
                                         <td><strong>@hdr.NoofDays</strong></td>
-                                        @if (hdr.Status == (int)EnumStatus.Approved)
-                                        {
-                                            <td class="text-center"><strong><span class='btnPrimary applicationStatus'>@hdr.StatusName</span></strong></td>
-                                        }                                       
-                                        else if (hdr.Status == (int)EnumStatus.VLDeducted || hdr.Status == (int)EnumStatus.PayrollDeducted || hdr.Status == (int)EnumStatus.Rejected)
-                                        {
-                                            <td class="text-center"><strong><span class='btn-danger applicationStatus'>@hdr.StatusName</span></strong></td>
-                                        }
-                                        else
-                                        {
-                                            <td class="text-center"><strong><span class='btn-success applicationStatus'>@hdr.StatusName</span></strong></td>
-                                        }
+                                        <td class="text-center">
+                                            <strong>
+                                                <span class="@statusClass applicationStatus">@hdr.StatusName</span>
+                                            </strong>
+                                        </td>
                                         <td class="text-center">
                                             <a href="javascript:void(0)" onclick="editForm(@hdr.LeaveRequestHeaderId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
 

@@ -158,6 +158,17 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
+                                 string statusClass = item.STATUS switch
+                            {
+                                (int)EnumStatus.Approved => "btn-primary",
+                                (int)EnumStatus.ForApproval => "btn-success",
+                                (int)EnumStatus.Rejected => "btn-danger",
+                                (int)EnumStatus.Cancelled => "btn-secondary",
+                                (int)EnumStatus.VLDeducted
+                                or (int)EnumStatus.PayrollDeducted => "btn-warning",
+                                _ => "btn-dark"
+                            };
+
                             <tr>
 
                                 <td>
@@ -179,26 +190,11 @@
                                 <td>
                                     @item.TOTAL_WORKING_HOURS
                                 </td>
-
-
-
-
-                                @if (item.STATUSNAME == "Approved")
-                                {
-                                    <td class="text-center"><strong><span class='btnPrimary applicationStatus'>@item.STATUSNAME</span></strong></td>
-                                }
-                                else if (item.STATUSNAME == "Rejected")
-                                {
-                                    <td class="text-center"><strong><span class='btn-danger applicationStatus'>@item.STATUSNAME</span></strong></td>
-                                }
-                                else if (item.STATUSNAME == "Deducted")
-                                {
-                                    <td class="text-center"><strong><span class='btn-danger applicationStatus'>@item.STATUSNAME</span></strong></td>
-                                }
-                                else
-                                {
-                                    <td class="text-center"><strong><span class='btn-success applicationStatus'>@item.STATUSNAME</span></strong></td>
-                                }
+                                <td class="text-center">
+                                    <strong>
+                                        <span class="@statusClass applicationStatus">@item.STATUSNAME</span>
+                                    </strong>
+                                </td>
                                 <td>
                                     REMOTE                           
                                 </td>
@@ -445,6 +441,17 @@
                                     <tbody>
                                         @foreach (var item in Model.Where(x => x.STATUS == 1))
                                         {
+                                             string statusClass = item.STATUS switch
+                                                    {
+                                                        (int)EnumStatus.Approved => "btn-primary",
+                                                        (int)EnumStatus.ForApproval => "btn-success",
+                                                        (int)EnumStatus.Rejected => "btn-danger",
+                                                        (int)EnumStatus.Cancelled => "btn-secondary",
+                                                        (int)EnumStatus.VLDeducted
+                                                        or (int)EnumStatus.PayrollDeducted => "btn-warning",
+                                                        _ => "btn-dark"
+                                                    };
+
                                             <tr>
                                                 <td>
                                                     <input type="checkbox" class="row-checkbox" />
@@ -466,10 +473,12 @@
                                                 </td>
 
                                                 <td>
-                                                    <span class="btnSuccess applicationStatus">REMOTE</span>
+                                                    REMOTE
                                                 </td>
-                                                <td>
-                                                    @item.STATUSNAME
+                                                <td class="text-center">
+                                                    <strong>
+                                                        <span class="@statusClass applicationStatus">@item.STATUSNAME</span>
+                                                    </strong>
                                                 </td>
 
                                             </tr>

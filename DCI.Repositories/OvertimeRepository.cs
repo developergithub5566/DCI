@@ -149,12 +149,12 @@ namespace DCI.Repositories
 
             var query =
                 from ot in _dbContext.OvertimeHeader.AsNoTracking()
-                join usr in _dbContext.User.AsNoTracking() on ot.CreatedBy equals model.CurrentUserId
-                join emp in _dbContext.Employee.AsNoTracking() on usr.EmployeeId equals emp.EmployeeId
-                join empWork in _dbContext.EmployeeWorkDetails.AsNoTracking() on emp.EmployeeId equals empWork.EmployeeId
-                join dept in _dbContext.Department.AsNoTracking() on empWork.DepartmentId equals dept.DepartmentId
+                //join usr in _dbContext.User.AsNoTracking() on ot.CreatedBy equals model.CurrentUserId
+                join emp in _dbContext.Employee.AsNoTracking() on ot.EmployeeId equals emp.EmployeeId
+               // join empWork in _dbContext.EmployeeWorkDetails.AsNoTracking() on emp.EmployeeId equals empWork.EmployeeId
+               // join dept in _dbContext.Department.AsNoTracking() on empWork.DepartmentId equals dept.DepartmentId
 
-                join usrApprover in _dbContext.User.AsNoTracking() on dept.ApproverId equals usrApprover.UserId into usrApproverGroup
+                join usrApprover in _dbContext.User.AsNoTracking() on ot.ApproverId equals usrApprover.UserId into usrApproverGroup
                 from usrApprover in usrApproverGroup.DefaultIfEmpty()
 
                 join stat in _dbContext.Status.AsNoTracking() on ot.StatusId equals stat.StatusId
@@ -215,7 +215,7 @@ namespace DCI.Repositories
                     OvertimeHeader entity = new OvertimeHeader();
 
                     entity.RequestNo = await GenereteRequestNo();
-                    entity.StatusId = (int)EnumStatus.Pending;
+                    entity.StatusId = (int)EnumStatus.ForApproval;
                     entity.EmployeeId = param.CurrentUserId;
                     entity.Remarks = param.Remarks;
                     entity.ApproverId = param.ApproverId;
