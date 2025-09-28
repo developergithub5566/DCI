@@ -172,7 +172,8 @@ namespace DCI.Repositories
                          join emp in _dbContext.EmployeeWorkDetails.AsNoTracking() on dtr.EmployeeId equals emp.EmployeeId
                          //join dept in _dbContext.Department on emp.DepartmentId equals dept.DepartmentId
                          join depthead in _dbContext.User.AsNoTracking() on dtr.ApproverId equals depthead.UserId
-                         join apprvl in _dbContext.ApprovalHistory.AsNoTracking() on dtr.DtrId equals apprvl.TransactionId into ah
+                         join apprvl in _dbContext.ApprovalHistory.AsNoTracking().Where(x => x.ModulePageId == (int)EnumModulePage.DTRCorrection) 
+                         on dtr.DtrId equals apprvl.TransactionId into ah
                          from apprvl in ah.DefaultIfEmpty()
                                where dtr.DtrId == dtrId
                          select new DTRCorrectionViewModel

@@ -15,7 +15,8 @@ namespace DCI.Repositories.Interface
         Task SentToApprovalOvertime(OvertimeViewModel model);
 
         Task SentToApprovalDTRAdjustment(DTRCorrectionViewModel model);
-        Task SendToRequestorDTRAdjustment(DTRCorrectionViewModel model); 
-     
+        Task SendToRequestorDTRAdjustment(DTRCorrectionViewModel model);
+
+        Task SentToApprovalWFH(WFHHeaderViewModel model);
     }
 }

@@ -280,11 +280,11 @@ namespace DCI.Repositories
             string statusName = string.Empty;
 
 
-            if (model.StatusId == (int)EnumStatus.Pending)
-            {
-                userEntity = await _userRepository.GetUserById(model.RecommendedById);
-                statusName = "for approval";
-            }
+            //if (model.StatusId == (int)EnumStatus.Pending)
+            //{
+            //    userEntity = await _userRepository.GetUserById(model.RecommendedById);
+            //    statusName = "for approval";
+            //}
             if (model.StatusId == (int)EnumStatus.ForApproval)
             {
                 userEntity = await _userRepository.GetUserById(model.ApproverId);
@@ -394,6 +394,53 @@ namespace DCI.Repositories
 
             return model;
         }
+
+        #endregion
+
+        #region WFH
+
+        public async Task SentToApprovalWFH(WFHHeaderViewModel model)
+        {
+            model = await WFHNotificationBodyMessage(model);
+
+            MailMessage mail = new MailMessage();
+            mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
+            mail.Subject = "Action Required: Please check the WFH Request no. " + model.RequestNo;
+            mail.Body = model.EmailBody;
+            mail.IsBodyHtml = true;
+            mail.To.Add(model.ApproverEmail);
+            await SendMessage(mail);
+        }
+
+        async Task<WFHHeaderViewModel> WFHNotificationBodyMessage(WFHHeaderViewModel model)
+        {
+            var userEntity = new User();
+            string statusName = string.Empty;
+            
+            if (model.StatusId == (int)EnumStatus.ForApproval)
+            {
+                userEntity = await _userRepository.GetUserById(model.ApproverId);
+                statusName = "for approval";
+            }
+
+            model.ApproverEmail = userEntity.Email;
+            model.EmailBody = $@"
+            <html>
+            <body>              
+                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
+                
+                      <p>This is an automated message from ESS System.</p>
+                 
+				<p>You have been assigned wfh request {model.RequestNo} {statusName}. Kindly review and proceed accordingly. </p> 
+            
+                <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
+                <p>Best regards,<br />ESS System Administrator</p>
+            </body>
+            </html>";
+
+            return model;
+        }
+
 
         #endregion
     }

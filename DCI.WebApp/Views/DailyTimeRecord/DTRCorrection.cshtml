@@ -530,23 +530,24 @@
                                                         $('#btnSave').css("visibility", "hidden");
 
 
-                                                        if(response.data.status == 3){  //forapproval
+                                                        if(response.data.status == @((int)EnumStatus.ForApproval)){  //forapproval
                                                      document.getElementById('deptHeadName').textContent = response.data.departmentHead;
                                                        document.getElementById('ApproverLabel').textContent = 'For Approval of:';
                                               }
 
-                                             else  if(response.data.status == 4){  //approved                                              
+                                             else  if(response.data.status == @((int)EnumStatus.Approved)){  //approved                                              
                                                       
                                                        document.getElementById('deptHeadName').textContent = response.data.departmentHead;
                                                       document.getElementById('ApproverLabel').textContent = "Approved By: "; 
                                                        document.getElementById('ApprovalDate').textContent = 'Approved Date and Time: ' + response.data.dateApprovedDisapproved;
                                               }
-                                                    else if(response.data.status == 5 ){     //Rejected                                                  
+                                                    else if(response.data.status == @((int)EnumStatus.Rejected) ){     //Rejected
                                                           document.getElementById('deptHeadName').textContent = response.data.approverHead;
                                                             document.getElementById('ApproverLabel').textContent = 'Rejected By:';                                                           
-                                                   document.getElementById('ApprovalRemarks').textContent = 'Remarks: ' + response.data.approvalRemarks;                                                  
-                                                       document.getElementById('ApprovalDate').textContent = 'Approved Date: ' + response.data.dateApprovedDisapproved;
-                                               }  else if(response.data.status == 6 && response.data.dateModified != null){     //canclled                                                           
+                                                   document.getElementById('ApprovalRemarks').textContent = 'Remarks: ' + response.data.approvalRemarks;
+                                                       document.getElementById('ApprovalDate').textContent = 'Rejected Date and Time:: ' + response.data.dateApprovedDisapproved;
+
+                                               }  else if(response.data.status == @((int)EnumStatus.Cancelled) && response.data.dateModified != null){     //canclled
                                                             let iso =  response.data.dateModified;
                                                        let formatted = iso.split(".")[0].replace("T", " ").slice(0, 16);
                                                       document.getElementById('ApprovalDate').textContent = 'Cancelled Date: ' + formatted;

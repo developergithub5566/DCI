@@ -39,6 +39,15 @@
         public string StatusName { get; set; } = string.Empty;
         public DateTime DateCreated { get; set; } = DateTime.Now;
         public int ApproverId { get; set; } = 0;
+        public string DateCreatedString { get; set; } = string.Empty;
+        public string? DateModifiedString { get; set; } = string.Empty;
+        public string Approver { get; set; } = string.Empty;
+        public string DateApprovedDisapproved { get; set; } = string.Empty;
+        public string ApprovalRemarks { get; set; } = string.Empty;
+
+        public string ApproverEmail { get; set; } = string.Empty;
+        public string EmailBody { get; set; } = string.Empty;
+        
     }
     public class WfhDetailViewModel
     {

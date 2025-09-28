@@ -844,7 +844,8 @@ namespace DCI.WebApp.Controllers
 
         public async Task<IActionResult> WFHApplicationDetails(WFHHeaderViewModel param)
         {
-            List<WfhDetailViewModel> model = new List<WfhDetailViewModel>();
+            //List<WfhDetailViewModel> model = new List<WfhDetailViewModel>();
+            WfhApplicationViewModel model = new WfhApplicationViewModel();
             try
             {
                 using (var _httpclient = new HttpClient())
@@ -857,9 +858,8 @@ namespace DCI.WebApp.Controllers
                     var responseBody = await response.Content.ReadAsStringAsync();
                     if (response.IsSuccessStatusCode == true)
                     {
-                        model = JsonConvert.DeserializeObject<List<WfhDetailViewModel>>(responseBody)!;
+                        model = JsonConvert.DeserializeObject<WfhApplicationViewModel>(responseBody)!;
                     }
-
                 }
                 return Json(new { success = true, data = model });
             }
@@ -1079,11 +1079,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
-
-
+                    param.ApproverId = currentUser.ApproverId;
                     param.CurrentUserId = currentUser.UserId;
-
-
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/SaveOvertime");

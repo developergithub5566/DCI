@@ -163,7 +163,7 @@
                               
                             
                                 <td class="text-center">
-                                    <a href="#" onclick='viewWFHdDetails(@item.WfhHeaderId);' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+                                    <a href="javascript:void(0)" onclick='viewWFHdDetails(@item.WfhHeaderId);' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
 
                                     @if (item.StatusId == (int)EnumStatus.ForApproval)
                                     {
@@ -182,7 +182,7 @@
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">WFH</h5>
+                            <h5 class="modal-title" id="exampleModalLabel">WFH Application</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -191,27 +191,54 @@
                             <div class="modal-body">
                                 <table class="viewDetailsTblWFH table table-striped">
                                     <tbody>
+                                        <input type="hidden" id="WfhHeaderId" name="WfhHeaderId" value="0" />
                                         <tr>
-                                            <input type="hidden" id="WfhHeaderId" name="WfhHeaderId" value="0" />
-                                            <th>Date File:</th>
-                                            <td class="tblDate"><label id="lblDate"></label></td>@*  @DateTime.Now.ToString("MM/dd/yyyy") *@
+                                            <th>Request No:</th>
+                                            <td class="tblRequestNo"><label id="lblRequestNo"></label></td>
+                                        </tr>
+                                        <tr>  
+                                            <th>Date Filed:</th>
+                                            <td class="tblDate"><label id="lblDate"></label></td>
                                         </tr>                               
                                         <tr>
                                             <th>Status:</th>
                                             <td class="tblSource">
-                                                <span class="btnSuccess applicationStatus">
-                                                    <label id="lblSource">Draft</label>
-                                                </span>
+                                            @*     <span class="btnSuccess applicationStatus">
+                                                </span> *@
+                                                    <label id="lblStatus">Draft</label>
+                                               
                                             </td>
                                         </tr>
                                         <tr>
                                             <th>Remarks:</th>
                                             <td class="tblRemarks">
-                                                <textarea id="Remarks" name="Remarks" rows="3" style="width:100%" readonly></textarea>
+                                    @*             <textarea id="Remarks" name="Remarks" rows="3" style="width:100%" readonly></textarea> *@
+                                           <label id="Remarks"></label
                                             </td>
                                         </tr>
+                                  @*       <tr>
+                                            <th>Approver:</th>
+                                            <td class="lblApprover"><label id="lblApprover"></label></td>                                         
+                                        </tr>  
+                                         <tr>
+                                            <th>Date:</th>                                      
+                                            <td class="lblApprover"> <label id="lblApproveDateTime">321312321</label></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Remarks:</th>
+                                            <td class="lblApprover"><label id="lblApproverRemarks"></label></td>                            
+                                        </tr> *@
                                     </tbody>
                                 </table>
+                             <div class="col-12">
+                                 <div class="form-group">
+                                    <label class="frmText" id="ApproverLabel" name="ApproverLabel"> </label><br>
+                                    <label class="font-weight-bold mb0 text-danger" id="deptHeadName" name="deptHeadName"></label>
+                                    <label class="d-block mt0 text-left text-xs" id="ApprovalDate" name="ApprovalDate"></label>
+                                    <label class="d-block mt0 text-left text-xs" id="ApprovalRemarks" name="ApprovalRemarks"></label>                            
+                                  </div>
+                             </div>
+
                                 <table class="table table-bordered text-dark text-xs" >
                                     <thead>
                                         <tr>                                         
@@ -375,12 +402,47 @@
                                                   if (response.success) {
 
                                                       console.log(response.data);
+                                                       document.getElementById('lblRequestNo').textContent = response.data.header.requestNo;
+                                                          document.getElementById('lblStatus').textContent = response.data.header.statusName;
+                                                             document.getElementById('lblDate').textContent = response.data.header.dateCreatedString;
+                                                              document.getElementById('Remarks').textContent = response.data.header.remarks
+                                                      
+                                                 document.getElementById('ApproverLabel').textContent = '';
+                                                    document.getElementById('ApprovalDate').textContent = '';
+                                                   document.getElementById('ApprovalRemarks').textContent = '';
+                                                     document.getElementById('deptHeadName').textContent = '';
+                                                     
+                                                if (response.data.header.statusId == @((int)EnumStatus.ForApproval)) { // for approval
+                                                     document.getElementById('deptHeadName').textContent = response.data.header.approver;
+                                                       document.getElementById('ApproverLabel').textContent = 'For Approval of:';
+                                              }
+
+                                             else  if(response.data.header.statusId == @((int)EnumStatus.Approved)) {  //approved                                              
+                                                      
+                                                       document.getElementById('deptHeadName').textContent = response.data.header.approver;
+                                                      document.getElementById('ApproverLabel').textContent = "Approved By: "; 
+                                                       document.getElementById('ApprovalDate').textContent = 'Approved Date and Time: ' + response.data.header.dateApprovedDisapproved;
+                                              }
+                                                    else if(response.data.header.statusId == @((int)EnumStatus.Rejected)){     //Rejected                                                  
+                                                          document.getElementById('deptHeadName').textContent = response.data.header.approver;
+                                                            document.getElementById('ApproverLabel').textContent = 'Rejected By:';                                                           
+                                                   document.getElementById('ApprovalRemarks').textContent = 'Remarks: ' + response.data.headerapprovalRemarks;
+                                                       document.getElementById('ApprovalDate').textContent = 'Rejected Date and Time:: ' + response.data.header.dateApprovedDisapproved;
+
+                                               }  else if(response.data.header.statusId == @((int)EnumStatus.Cancelled)){     //canclled                                                           
+                                               
+                                                      document.getElementById('ApprovalDate').textContent = 'Cancelled Date: ' +  response.data.header.dateModifiedString;
+                                                          
+                                             }                                      
+
+
+
 
                                                            var tbodytable = $("#tblFileforWFH");
                                                     tbodytable.empty();
 
-                                                    if (response.data.length > 0) {
-                                                        $.each(response.data, function(index, item) {
+                                                    if (response.data.details.length > 0) {
+                                                        $.each(response.data.details, function(index, item) {
                                                             var row = `<tr>
 
                                                                                  <td>${item.date}</td>

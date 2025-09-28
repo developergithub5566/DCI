@@ -218,6 +218,7 @@ namespace DCI.Repositories
                     entity.StatusId = (int)EnumStatus.Pending;
                     entity.EmployeeId = param.CurrentUserId;
                     entity.Remarks = param.Remarks;
+                    entity.ApproverId = param.ApproverId;
                     entity.DateCreated = DateTime.Now;
                     entity.CreatedBy = param.CurrentUserId;
                     entity.ModifiedBy = null;

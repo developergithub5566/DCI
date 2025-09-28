@@ -163,15 +163,16 @@ namespace DCI.Repositories
             try
             {
 
-                var approvalhistory = _dbContext.ApprovalHistory.Where(x => x.ModulePageId == (int)EnumModulePage.Leave);
+               // var approvalhistory = _dbContext.ApprovalHistory.Where(x => x.ModulePageId == (int)EnumModulePage.Leave);
 
 
 
-                var query = from lheader in _dbContext.LeaveRequestHeader
-                            join lvtype in _dbContext.LeaveType on lheader.LeaveTypeId equals lvtype.LeaveTypeId
-                            join stat in _dbContext.Status on lheader.Status equals stat.StatusId
-                            join emp in _dbContext.Employee on lheader.EmployeeId equals emp.EmployeeId
-                            join apprvl in approvalhistory on lheader.LeaveRequestHeaderId equals apprvl.TransactionId into ah
+                var query = from lheader in _dbContext.LeaveRequestHeader.AsNoTracking()
+                            join lvtype in _dbContext.LeaveType.AsNoTracking() on lheader.LeaveTypeId equals lvtype.LeaveTypeId
+                            join stat in _dbContext.Status.AsNoTracking() on lheader.Status equals stat.StatusId
+                            join emp in _dbContext.Employee.AsNoTracking() on lheader.EmployeeId equals emp.EmployeeId
+                            join apprvl in _dbContext.ApprovalHistory.AsNoTracking().Where(x => x.ModulePageId == (int)EnumModulePage.Leave)
+                            on lheader.LeaveRequestHeaderId equals apprvl.TransactionId into ah
                             from apprvl in ah.DefaultIfEmpty()
                             where lheader.LeaveRequestHeaderId == param.LeaveRequestHeaderId
                             select new LeaveRequestHeaderViewModel

@@ -1171,7 +1171,7 @@
                                  $('.spinner-overlay').show();
                             $.ajax({
                                 type: 'POST',
-                                url: '@Url.Action("ApprovalWFH", "Todo")',
+                                    url: '@Url.Action("ApprovalOvertime", "Todo")',
                                 data: { TransactionId : headerId , Status: status, Remarks: $('#Remarks_Approval_Overtime').val() },
 
                                 success: function (response) {
@@ -1228,7 +1228,7 @@
 
                                        $.ajax({
                                            type: 'POST',
-                                           url: '@Url.Action("ApprovalWFH", "Todo")',
+                                               url: '@Url.Action("ApprovalOvertime", "Todo")',
                                            data: { TransactionId: $('#HiddenOvertimeId').val() , Status: $('#HiddenActionOvertime').val(), Remarks: $('#Remarks_Approval_Overtime').val() },
                                            success: function (response) {
                                                if (response.success) {

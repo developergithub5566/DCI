@@ -11,6 +11,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection.PortableExecutable;
+using System.Security.Cryptography.X509Certificates;
 
 
 namespace DCI.Repositories
@@ -42,9 +43,9 @@ namespace DCI.Repositories
             {
                 var leavequery = await (
                               from leave in _dbContext.LeaveRequestHeader.AsNoTracking()
-                              join emp in _dbContext.Employee.AsNoTracking() on leave.EmployeeId equals emp.EmployeeId
-                              join stat in _dbContext.Status.AsNoTracking() on leave.Status equals stat.StatusId
-                              where leave.IsActive && leave.Status == (int)EnumStatus.ForApproval
+                               join emp in _dbContext.Employee.AsNoTracking() on leave.EmployeeId equals emp.EmployeeId
+                               join stat in _dbContext.Status.AsNoTracking() on leave.Status equals stat.StatusId
+                               where leave.IsActive == true && leave.Status == (int)EnumStatus.ForApproval && leave.ApproverId == model.CurrentUserId
                               orderby leave.DateFiled descending
                               select new LeaveRequestHeaderViewModel
                               {
@@ -73,14 +74,14 @@ namespace DCI.Repositories
                 model.LeaveCount = leavequery.Count();
 
                 var dtrquery = await (
-                                    from dtr in _dbContext.DTRCorrection.AsNoTracking()
-                                    //join usr in _dbContext.User.AsNoTracking() on dtr.CreatedBy equals usr.UserId
-                                    join emp in _dbContext.Employee.AsNoTracking() on dtr.EmployeeId equals emp.EmployeeId
-                                    join stat in _dbContext.Status.AsNoTracking() on dtr.Status equals stat.StatusId
-                                    where dtr.IsActive
-                                       && dtr.Status == (int)EnumStatus.ForApproval
-                                       && dtr.ApproverId == model.CurrentUserId
-                                    orderby dtr.DateFiled descending
+                                         from dtr in _dbContext.DTRCorrection.AsNoTracking()
+                                         join usr in _dbContext.User.AsNoTracking() on dtr.CreatedBy equals usr.UserId
+                                         join emp in _dbContext.Employee.AsNoTracking() on usr.EmployeeId equals emp.EmployeeId
+                                         join stat in _dbContext.Status.AsNoTracking() on dtr.Status equals stat.StatusId
+                                         where dtr.IsActive
+                                               && dtr.Status == (int)EnumStatus.ForApproval
+                                               && dtr.ApproverId == model.CurrentUserId
+                                         orderby dtr.DateFiled descending
                                     select new DTRCorrectionViewModel
                                     {
                                         DtrId = dtr.DtrId,
@@ -102,8 +103,8 @@ namespace DCI.Repositories
                                 from ot in _dbContext.OvertimeHeader.AsNoTracking()
                                 join usr in _dbContext.User.AsNoTracking() on ot.CreatedBy equals usr.UserId
                                 join emp in _dbContext.Employee.AsNoTracking() on usr.EmployeeId equals emp.EmployeeId
-                                join stat in _dbContext.Status.AsNoTracking() on ot.StatusId equals stat.StatusId
-                                where ot.IsActive && ot.CreatedBy == model.CurrentUserId
+                                join stat in _dbContext.Status.AsNoTracking() on ot.StatusId equals stat.StatusId                              
+                                where ot.IsActive && ot.StatusId == (int)EnumStatus.ForApproval && ot.ApproverId == model.CurrentUserId
                                 orderby ot.DateCreated descending
                                 select new OvertimeViewModel
                                 {
@@ -131,6 +132,7 @@ namespace DCI.Repositories
                                        from hdr in _dbContext.WfhHeader.AsNoTracking()
                                        join emp in _dbContext.Employee.AsNoTracking() on hdr.EmployeeId equals emp.EmployeeId
                                        join stat in _dbContext.Status.AsNoTracking() on hdr.Status equals stat.StatusId
+                                       where hdr.IsActive && hdr.Status == (int)EnumStatus.ForApproval && hdr.ApproverId == model.CurrentUserId
                                        orderby hdr.DateCreated descending
                                        select new WFHHeaderViewModel
                                        {
@@ -165,17 +167,16 @@ namespace DCI.Repositories
         {
             try
             {
-                var context = _dbContext.LeaveRequestHeader.AsQueryable().ToList();
-                var contextDetail = _dbContext.LeaveRequestDetails.AsQueryable().ToList();
-                var empList = _dbContext.Employee.AsQueryable().ToList();
-                var statusList = _dbContext.Status.AsQueryable().ToList();
+                //var context = _dbContext.LeaveRequestHeader.AsNoTracking().ToList();
+                //var contextDetail = _dbContext.LeaveRequestDetails.AsNoTracking().ToList();
+                //var empList = _dbContext.Employee.AsNoTracking().ToList();
+                //var statusList = _dbContext.Status.AsNoTracking().ToList();
 
 
-                var query = (from leave in context
-                                 //  join dtl in _dbContext.LeaveRequestDetails on leave.LeaveRequestHeaderId equals dtl.LeaveRequestHeaderId
-                             join emp in empList on leave.EmployeeId equals emp.EmployeeId
-                             join stat in statusList on leave.Status equals stat.StatusId
-                             where leave.IsActive == true && leave.Status == (int)EnumStatus.ForApproval
+                var query = (from leave in _dbContext.LeaveRequestHeader.AsNoTracking().ToList()                               
+                             join emp in _dbContext.Employee.AsNoTracking().ToList() on leave.EmployeeId equals emp.EmployeeId
+                             join stat in _dbContext.Status.AsNoTracking().ToList() on leave.Status equals stat.StatusId
+                             where leave.IsActive == true && leave.Status == (int)EnumStatus.ForApproval && leave.ApproverId == model.CurrentUserId
                              select new LeaveRequestHeaderViewModel
                              {
                                  LeaveRequestHeaderId = leave.LeaveRequestHeaderId,
@@ -188,7 +189,7 @@ namespace DCI.Repositories
                                  StatusName = stat.StatusName,
                                  Reason = leave.Reason,
                                  NoofDays = leave.NoOfDays,
-                                 LeaveRequestDetailList = (from dtl in _dbContext.LeaveRequestDetails
+                                 LeaveRequestDetailList = (from dtl in _dbContext.LeaveRequestDetails.AsNoTracking()
                                                            where dtl.LeaveRequestHeaderId == leave.LeaveRequestHeaderId
                                                            select new LeaveRequestDetailViewModel
                                                            {
@@ -218,10 +219,10 @@ namespace DCI.Repositories
             try
             {
                 var query = await (
-                              from dtr in _dbContext.DTRCorrection
-                              join usr in _dbContext.User on dtr.CreatedBy equals usr.UserId
-                              join emp in _dbContext.Employee on usr.EmployeeId equals emp.EmployeeId
-                              join stat in _dbContext.Status on dtr.Status equals stat.StatusId
+                              from dtr in _dbContext.DTRCorrection.AsNoTracking()
+                              join usr in _dbContext.User.AsNoTracking() on dtr.CreatedBy equals usr.UserId
+                              join emp in _dbContext.Employee.AsNoTracking() on usr.EmployeeId equals emp.EmployeeId
+                              join stat in _dbContext.Status.AsNoTracking() on dtr.Status equals stat.StatusId
                               where dtr.IsActive
                                     && dtr.Status == (int)EnumStatus.ForApproval
                                     && dtr.ApproverId == model.CurrentUserId
@@ -530,13 +531,12 @@ namespace DCI.Repositories
                 await _dbContext.SaveChangesAsync();
                 //OPTIMIZED CODE CHATGPT END
 
-
-
-
-                // var entitiesToViewModel = await _dtrRepository.DTRCorrectionByDtrId(contextHdr.DtrId);
-
+                WFHHeaderViewModel emailvm = new WFHHeaderViewModel();
+                emailvm.RequestNo = contextHdr.RequestNo;
+                emailvm.StatusId = contextHdr.Status;
+                emailvm.ApproverId = contextHdr.ApproverId;
                 // Send Email Notif
-                //   await _emailRepository.SendToRequestorDTR(entitiesToViewModel);
+                await _emailRepository.SentToApprovalWFH(emailvm);
 
                 string status = param.Status == (int)EnumStatus.Approved ? "approved" : "disapproved";
 
@@ -546,9 +546,9 @@ namespace DCI.Repositories
                 notifvm.ModuleId = (int)EnumModulePage.WFH;
                 notifvm.TransactionId = param.TransactionId;
                 notifvm.AssignId = contextHdr.CreatedBy;
-                notifvm.URL = "/DailyTimeRecord/WFH/?wfhHeader=" + contextHdr.WfhHeaderId;
+                notifvm.URL = "/DailyTimeRecord/WFH";
                 notifvm.MarkRead = false;
-                notifvm.CreatedBy = param.CreatedBy;
+                notifvm.CreatedBy = param.CurrentUserId;
                 notifvm.IsActive = true;
                 await _homeRepository.SaveNotification(notifvm);
 
@@ -701,11 +701,12 @@ namespace DCI.Repositories
         public async Task<IList<OvertimeViewModel>> GetAllTodoOvertime(OvertimeViewModel model)
         {
 
-            var query = from ot in _dbContext.OvertimeHeader
-                        join usr in _dbContext.User on ot.CreatedBy equals usr.UserId
-                        join emp in _dbContext.Employee on usr.EmployeeId equals emp.EmployeeId
-                        join stat in _dbContext.Status on ot.StatusId equals stat.StatusId
-                        where ot.IsActive && ot.CreatedBy == model.CurrentUserId
+            var query = from ot in _dbContext.OvertimeHeader.AsNoTracking()
+                        join usr in _dbContext.User.AsNoTracking() on ot.CreatedBy equals usr.UserId
+                        join emp in _dbContext.Employee.AsNoTracking() on usr.EmployeeId equals emp.EmployeeId
+                        join stat in _dbContext.Status.AsNoTracking() on ot.StatusId equals stat.StatusId
+                        // where ot.IsActive && ot.CreatedBy == model.CurrentUserId
+                        where ot.IsActive &&  ot.StatusId == (int)EnumStatus.ForApproval && ot.ApproverId == model.CurrentUserId
                         select new OvertimeViewModel
                         {
                             OTHeaderId = ot.OTHeaderId,
@@ -724,9 +725,10 @@ namespace DCI.Repositories
 
         public async Task<IList<WFHHeaderViewModel>> GetAllWFH(WFHHeaderViewModel model)
         {
-            var query = await (from hdr in _dbContext.WfhHeader.AsQueryable()
+            var query = await (from hdr in _dbContext.WfhHeader.AsNoTracking()
                                join emp in _dbContext.Employee.AsNoTracking() on hdr.EmployeeId equals emp.EmployeeId
-                               join stat in _dbContext.Status on hdr.Status equals stat.StatusId
+                               join stat in _dbContext.Status.AsNoTracking() on hdr.Status equals stat.StatusId
+                               where hdr.IsActive && hdr.Status == (int)EnumStatus.ForApproval && hdr.ApproverId == model.CurrentUserId
                                select new WFHHeaderViewModel
                                {
                                    WfhHeaderId = hdr.WfhHeaderId,
@@ -746,7 +748,7 @@ namespace DCI.Repositories
             try
             {
                 ApprovalHistory entity = new ApprovalHistory();
-                entity.ModulePageId = (int)EnumModulePage.WFH;
+                entity.ModulePageId = (int)EnumModulePage.Overtime;
                 entity.TransactionId = param.TransactionId;
                 entity.ApproverId = param.ApproverId;
                 entity.Status = param.Status;
@@ -758,29 +760,35 @@ namespace DCI.Repositories
                 await _dbContext.SaveChangesAsync();
 
 
-                //OPTIMIZED CODE CHATGPT END
-
-
-                // var entitiesToViewModel = await _dtrRepository.DTRCorrectionByDtrId(contextHdr.DtrId);
+                var contextOT = await _dbContext.OvertimeHeader.Where(x => x.OTHeaderId == param.TransactionId).FirstOrDefaultAsync();
+                contextOT.StatusId = param.Status;
+                contextOT.ModifiedBy = param.CurrentUserId;
+                contextOT.DateModified = DateTime.Now;
+                _dbContext.OvertimeHeader.Entry(contextOT).State = EntityState.Modified;
+                _dbContext.SaveChanges();
 
                 // Send Email Notif
-                //   await _emailRepository.SendToRequestorDTR(entitiesToViewModel);
+                OvertimeViewModel otvm = new OvertimeViewModel();
+                otvm.RequestNo = contextOT.RequestNo;
+                otvm.StatusId = contextOT.StatusId;
+                otvm.ApproverId = contextOT.ApproverId ?? 0;
+                await _emailRepository.SentToApprovalOvertime(otvm);
 
                 string status = param.Status == (int)EnumStatus.Approved ? "approved" : "disapproved";
 
-                //NotificationViewModel notifvm = new NotificationViewModel();
-                //notifvm.Title = "WFH";
-                //notifvm.Description = String.Format("WFH Request No {0} has been {1}", contextHdr.RequestNo, status);
-                //notifvm.ModuleId = (int)EnumModulePage.WFH;
-                //notifvm.TransactionId = param.TransactionId;
-                //notifvm.AssignId = contextHdr.CreatedBy;
-                //notifvm.URL = "/DailyTimeRecord/WFH/?wfhHeader=" + contextHdr.WfhHeaderId;
-                //notifvm.MarkRead = false;
-                //notifvm.CreatedBy = param.CreatedBy;
-                //notifvm.IsActive = true;
-                //await _homeRepository.SaveNotification(notifvm);
+                NotificationViewModel notifvm = new NotificationViewModel();
+                notifvm.Title = "Overtime";
+                notifvm.Description = String.Format("Overtime Request No {0} has been {1}", contextOT.RequestNo, status);
+                notifvm.ModuleId = (int)EnumModulePage.WFH;
+                notifvm.TransactionId = param.TransactionId;
+                notifvm.AssignId = contextOT.CreatedBy;
+                notifvm.URL = "/DailyTimeRecord/Overtime";
+                notifvm.MarkRead = false;
+                notifvm.CreatedBy = param.CurrentUserId;
+                notifvm.IsActive = true;
+                await _homeRepository.SaveNotification(notifvm);
 
-                return (StatusCodes.Status200OK, String.Format("WFH Request No {0} has been {1}.", "RequestNo", status));
+                return (StatusCodes.Status200OK, String.Format("Overtime Request No {0} has been {1}.", "RequestNo", status));
             }
             catch (Exception ex)
             {

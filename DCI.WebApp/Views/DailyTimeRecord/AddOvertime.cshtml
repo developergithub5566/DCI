@@ -16,24 +16,24 @@
     {
         <script>
             $.ajax({
-                type: 'POST',
-                url: '@Url.Action("Logout", "Account")',
-                success: function (response) {
+            type: 'POST',
+            url: '@Url.Action("Logout", "Account")',
+            success: function (response) {
 
-                    Swal.fire({
-                        text: "Your session has timed out. Please log in again.",
-                        icon: "info",
-                        confirmButtonText: "Ok"
-                    }).then((result) => {
-                        window.location.href = '/Account/Logout';
-                    });
-                },
-                error: function () {
-                    Swal.fire({
-                        text: "An error occurred. Please try again.",
-                        icon: "error"
-                    });
-                }
+            Swal.fire({
+            text: "Your session has timed out. Please log in again.",
+            icon: "info",
+            confirmButtonText: "Ok"
+            }).then((result) => {
+            window.location.href = '/Account/Logout';
+            });
+            },
+            error: function () {
+            Swal.fire({
+            text: "An error occurred. Please try again.",
+            icon: "error"
+            });
+            }
             })
         </script>
     }
@@ -72,7 +72,7 @@
     <div class="col-12 p0">
         <ul class="breadcrumb">
             <li><a href="~/Home/Index">Dashboard</a></li>
-            <li><a href="~/DailyTimeRecord/Overtime">Daily Time Record</a></li>
+            <li><a href="#">Daily Time Record</a></li>
             <li><a href="~/DailyTimeRecord/Overtime">Overtime</a></li>
             <li><a href="#">File Overtime</a></li>
         </ul>
@@ -112,8 +112,16 @@
 
                 <div class="row">
                     <div class="col-md-6">
-                        <label class="frmText"><span class="required">*</span>Remarks</label>
-                        <input type="text" id="Remarks" name="Remarks" class="form-control frmField" value="@Model.Remarks" required autocomplete="off">
+                        <label class="frmText"><span class="required">*</span>Reason</label>
+                        @if(Model.OTHeaderId == 0)
+                        {
+                            <input type="text" id="Remarks" name="Remarks" class="form-control frmField" value="@Model.Remarks" required autocomplete="off">
+                        }
+                        else
+                        {
+                            <input type="text" id="Remarks" name="Remarks" class="form-control frmField" value="@Model.Remarks" readonly autocomplete="off">
+                        }
+
                     </div>
 
                 </div>         
@@ -138,7 +146,7 @@
                             @foreach (var item in Model.otDetails.Select((value, index) => new { value, index }))
                             {
                                 <tr>
-                                  
+
                                     <td>
                                         @item.value.OTTypeName
                                     </td>
@@ -175,7 +183,10 @@
                                         <input type="hidden" name="OvertimeEntries[@item.index].TotalMinutes" value="@item.value.TotalMinutes" />
                                     </td>
                                     <td>
-                                        <button type="button" class="btn btn-sm btn-danger remove-row">Remove</button>
+                                        @if (Model.OTHeaderId == 0)
+                                        {
+                                            <button type="button" class="btn btn-sm btn-danger remove-row">Remove</button>
+                                        }
                                     </td>
                                 </tr>
                             }                            
@@ -285,15 +296,17 @@
                                    var statusName = $('#StatusId').val();
                                  
                                   if(otHeaderId > 0){
-                                        // $("#otinfo").prop("hidden", false);
-                                       
-                                  }else{
-                                        //$("#otinfo").prop("hidden", true);
-                                  }
-                                  if(statusName== "Pending"){
                                          $("#AddOvertime").prop("hidden", true);
                                                $("#Submit").prop("hidden", true);
+                                       
+                                  }else{
+                                        $("#AddOvertime").prop("hidden", false);
+                                               $("#Submit").prop("hidden", false);
                                   }
+                                  // if(statusName== "Pending" || statusName== "Approved" ){
+                                  //        $("#AddOvertime").prop("hidden", true);
+                                  //              $("#Submit").prop("hidden", true);
+                                  // }
                                   
 
 

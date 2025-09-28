@@ -555,14 +555,7 @@
                                 // Event listener for date inputs
                         $('#minDate, #maxDate').on('change', function () {
                             table.draw();
-                        });
-
-
-
-                       
-
-
-
+                        });                                                             
 
 
                              let nodays = 0.0000;
@@ -685,6 +678,9 @@
                                   $('#datepickerLabel').hide();
                                $('#btnCancel').hide();
                                  $('#btnSubmit').show();
+                                   document.getElementById('ApprovalDate').textContent = '';
+                                       document.getElementById('ApprovalRemarks').textContent = '';
+
 
                           $.ajax({
                               type: 'POST',
@@ -711,25 +707,7 @@
 
                           // $('#dateCovered').val(response.data.selectedDateJson);
                             $('#NoOfDays').val(response.data.leaveRequestHeader.noofDays);
-                                 $('#Reason').val(response.data.leaveRequestHeader.reason);
-                            //  $('#preloadedDates').val(response.data.leaveRequestHeader.selectedDateJson);
-
-        //  let preloaded = response.data.selectedDateJson;
-            // let preloaded = JSON.parse(raw);
-                                 // let preloaded = JSON.parse(document.getElementById("preloadedDates").value);
-                               //  let preloaded = document.getElementById("preloadedDates").value;
-
-
-                                    // let fp = flatpickr("#dateCovered", {
-                                    //        mode: "multiple",
-                                    //         dateFormat: "Y-m-d"
-                                    //      });
-
-
-                       // let preloaded = ["2025-06-10", "2025-06-15", "2025-06-20"];
-                                //    fp.setDate(["2025-06-10", "2025-06-15", "2025-06-20"]);
-                                       // console.log(preloaded);
-                                      //  fp.setDate(preloaded);
+                                 $('#Reason').val(response.data.leaveRequestHeader.reason);             
 
                                       js('#createmodal').modal('show');
                                   } else {
@@ -794,12 +772,7 @@
 
                                    var container = $('#dateContainer'); // Make sure you have this container in your HTML
                                       container.empty(); // Clear previous spans
-
-                                             // let dateArray = JSON.parse(response.data.leaveDateList); // turns string into array
-                                             // dateArray.forEach(function (date) {
-                                             //     var span = `<span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>${date}</span>`;
-                                             //     $('#dateContainer').append(span);
-                                             // });
+                                                                                 
                                                   response.data.leaveDateList.forEach(function (date) {
                                                   var span = `<span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>${date}</span>`;
                                                   container.append(span);
@@ -818,34 +791,28 @@
                                        document.getElementById('ApprovalRemarks').textContent = '';
                                          document.getElementById('deptHeadName').textContent = '';
 
-                                   if(response.data.leaveRequestHeader.status == 3){  //forapproval
+                                   if(response.data.leaveRequestHeader.status == @((int)EnumStatus.ForApproval)){  //forapproval
                                                 $('#btnCancel').show();
                                                  $('#btnSubmit').hide();
                                                      document.getElementById('deptHeadName').textContent = response.data.approverHead;
                                                        document.getElementById('ApproverLabel').textContent = 'For Approval of:';
                                               }
-                                else if(response.data.leaveRequestHeader.status == 4){     //approved
+                                else if(response.data.leaveRequestHeader.status == @((int)EnumStatus.Approved)){     //approved
                                                $('#btnSubmit').hide();
                                                    $('#btnCancel').hide();
                                                          document.getElementById('deptHeadName').textContent = response.data.approverHead;
-                                                            document.getElementById('ApproverLabel').textContent = 'Approved By:';
-                                                             // document.getElementById('ApprovalDate').textContent = 'Approved Date and Time: ' + response.data.leaveRequestHeader.dateApprovedDisapproved;
-                                                       //                let iso =  response.data.leaveRequestHeader.dateApprovedDisapproved;
-                                                       // let formatted = iso.split(".")[0].replace("T", " ").slice(0, 16);
+                                                            document.getElementById('ApproverLabel').textContent = 'Approved By:';                                                           
                                                        document.getElementById('ApprovalDate').textContent = 'Approved Date and Time: ' + response.data.leaveRequestHeader.dateApprovedDisapproved;
                                     }
-                                         else if(response.data.leaveRequestHeader.status == 5 ){     //Rejected
+                                         else if(response.data.leaveRequestHeader.status == @((int)EnumStatus.Rejected)){     //Rejected
                                                 $('#btnSubmit').hide();
                                                     $('#btnCancel').hide();
                                                           document.getElementById('deptHeadName').textContent = response.data.approverHead;
-                                                            document.getElementById('ApproverLabel').textContent = 'Rejected By:';
-                                                            //  document.getElementById('ApprovalDate').textContent = 'Rejected Date and Time: ' + response.data.leaveRequestHeader.dateApprovedDisapproved;
+                                                            document.getElementById('ApproverLabel').textContent = 'Rejected By:';                                                           
                                             document.getElementById('ApprovalRemarks').textContent = 'Remarks: ' + response.data.leaveRequestHeader.approvalRemarks;
-                                                       //           let iso =  response.data.leaveRequestHeader.dateApprovedDisapproved;
-                                                       // let formatted = iso.split(".")[0].replace("T", " ").slice(0, 16);
-                                                       document.getElementById('ApprovalDate').textContent = 'Approved Date: ' + response.data.leaveRequestHeader.dateApprovedDisapproved;
+                                                       document.getElementById('ApprovalDate').textContent = 'Rejected Date and Time: ' + response.data.leaveRequestHeader.dateApprovedDisapproved;
                                      }
-                                       else if(response.data.leaveRequestHeader.status == 9){     //Deducted 
+                                       else if(response.data.leaveRequestHeader.status == @((int)EnumStatus.VLDeducted) || response.data.leaveRequestHeader.status == @((int)EnumStatus.PayrollDeducted)){     //Deducted
                                                 $('#btnSubmit').hide();
                                                     $('#btnCancel').hide();
                                                           document.getElementById('deptHeadName').textContent = 'HR Processed Undertime Deduction';
@@ -853,7 +820,7 @@
 
                                                                    
                                      }
-                                       else if(response.data.leaveRequestHeader.status == 6  && response.data.leaveRequestHeader.dateModified != null){     //canclled
+                                       else if(response.data.leaveRequestHeader.status == @((int)EnumStatus.Cancelled)  && response.data.leaveRequestHeader.dateModified != null){     //canclled
                                                 $('#btnSubmit').hide();
                                                     $('#btnCancel').hide();
                                                                       let iso =  response.data.leaveRequestHeader.dateModified;
@@ -866,21 +833,13 @@
                            //  $('#preloadedDates').val(response.data.leaveRequestHeader.selectedDateJson);
 
                           let preloaded = response.data.selectedDateJson;
-                                     // let preloaded = JSON.parse(raw);
-                                // let preloaded = JSON.parse(document.getElementById("preloadedDates").value);
-                              //  let preloaded = document.getElementById("preloadedDates").value;
-
-
-
+                                
 
                                    let fp = flatpickr("#dateCovered", {
                                           mode: "multiple",
                                            dateFormat: "Y-m-d"
                                         });
-
-
-                                   // let preloaded = ["2025-06-10", "2025-06-15", "2025-06-20"];
-                               //    fp.setDate(["2025-06-10", "2025-06-15", "2025-06-20"]);
+                                 
                                        console.log(preloaded);
                                        fp.setDate(preloaded);
                                             $('#createForm').find('input, select, textarea').prop('disabled', true);
@@ -947,72 +906,7 @@
                                 });
                     }
 
-
-               //  function save() {
-               //          const leaveTypeId = $('#leaveTypeSelect').val();
-               //       const selectedDatesJson = $('#SelectedDatesJson').val();
-
-
-
-               //           const noOfDays = $('#NoOfDays').val();
-               //             const reason = $('#Reason').val();
-
-               //               const formData = new FormData();
-               //              formData.append('LeaveTypeId', leaveTypeId);
-               //               formData.append('NoOfDays', noOfDays);
-               //                formData.append('SelectedDateJson', selectedDatesJson);
-
-               //                 formData.append('Reason', reason);
-
-
-               //    Swal.fire({
-               //        text: "Are you sure you want to submit this record?",
-               //        icon: "question",
-               //        showCancelButton: true,
-               //        confirmButtonText: "Ok"
-               //    }).then((result) => {
-               //        if (result.isConfirmed) {
-               //            $('.spinner-overlay').show();
-
-               //            $.ajax({
-               //                type: 'POST',
-               //                url: '@Url.Action("SaveLeave", "DailyTimeRecord")',
-               //                data: formData,
-               //                    processData: false,
-               //                       contentType: false,
-               //                success: function (response) {
-               //                    if (response.success) {
-               //                        $('#createForm')[0].reset();
-               //                        js('#createmodal').modal('hide');
-
-               //                        Swal.fire({
-               //                            text: response.message,
-               //                            icon: "success",
-               //                            confirmButtonText: "Ok"
-               //                        }).then((result) => {
-               //                            location.reload();
-               //                        });
-
-               //                    } else {
-               //                        Swal.fire({
-               //                            text: response.message,
-               //                            icon: "error"
-               //                        });
-               //                    }
-               //                    $('.spinner-overlay').hide();
-               //                },
-               //                error: function () {
-               //                    $('.spinner-overlay').hide();
-               //                    Swal.fire({
-               //                        text: "An error occurred. Please try again.",
-               //                        icon: "error"
-               //                    });
-               //                }
-               //            });
-               //        }
-               //    });
-
-               // }
+                               
 
                function GetLeaveTypeAmount(){
                      let leave =  $('#leaveTypeSelect').val();

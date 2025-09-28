@@ -104,12 +104,11 @@ namespace DCI.Repositories
             return query;
         }
 
-        public async Task<IList<WfhDetailViewModel>> GetWFHApplicationDetailByWfhHeaderId(WFHHeaderViewModel model)
+    
+        public async Task<WfhApplicationViewModel> GetWFHApplicationDetailByWfhHeaderId(WFHHeaderViewModel model)
         {
-            // var context = _dbContext.WfhHeader.AsQueryable();
-
-
-            var query = await (from hdr in _dbContext.WfhDetail.AsQueryable()                           
+            WfhApplicationViewModel wfh = new WfhApplicationViewModel();
+            var dtlsquery = await (from hdr in _dbContext.WfhDetail.AsNoTracking()
                                join att in _dbContext.vw_AttendanceSummary_WFH.AsNoTracking() on hdr.AttendanceId equals att.ID
                                where hdr.WfhHeaderId == model.WfhHeaderId
                                select new WfhDetailViewModel
@@ -118,10 +117,35 @@ namespace DCI.Repositories
                                    Date = att.DATE.ToString(),
                                    TimeIn = att.FIRST_IN,
                                    TimeOut = att.LAST_OUT,
-                                   TotalWorkingHours = att.TOTAL_WORKING_HOURS                                
-
+                                   TotalWorkingHours = att.TOTAL_WORKING_HOURS
                                }).ToListAsync();
-            return query;
+
+            var hdrquery = await (from hdr in _dbContext.WfhHeader.AsNoTracking()
+                                  join emp in _dbContext.Employee.AsNoTracking() on hdr.EmployeeId equals emp.EmployeeId
+                                  join stat in _dbContext.Status.AsNoTracking() on hdr.Status equals stat.StatusId
+                                  join apprvl in _dbContext.ApprovalHistory.AsNoTracking().Where(x => x.ModulePageId == (int)EnumModulePage.WFH) 
+                                  on hdr.WfhHeaderId equals apprvl.TransactionId into ah
+                                  from apprvl in ah.DefaultIfEmpty()
+                                  where hdr.WfhHeaderId == model.WfhHeaderId
+                                   select new WFHHeaderViewModel
+                                   {
+                                       WfhHeaderId = hdr.WfhHeaderId,
+                                       RequestNo = hdr.RequestNo,
+                                       Remarks = hdr.Remarks,
+                                       StatusId = hdr.Status,
+                                       StatusName = stat.StatusName ,
+                                       DateCreatedString = hdr.DateCreated.ToString("yyyy-MM-dd HH:mm"),
+                                       DateModifiedString = hdr.DateModified.HasValue ? hdr.DateModified.Value.ToString("yyyy-MM-dd HH:mm") : string.Empty,
+                                       Approver = emp.Firstname + " " + emp.Lastname,
+                                       DateApprovedDisapproved = apprvl.DateCreated.ToString("yyyy-MM-dd HH:mm"),
+                                       ApprovalRemarks = apprvl != null ? apprvl.Remarks : string.Empty,
+                                   }).FirstOrDefaultAsync();
+
+
+            wfh.Details = dtlsquery;
+            wfh.Header = hdrquery;
+
+            return wfh;
         }
 
         public async Task<IList<WFHViewModel>> GetWFHLogsByEmployeeId(WFHViewModel model)

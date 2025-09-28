@@ -25,5 +25,7 @@ namespace DCI.Models.Entities
         public int? ModifiedBy { get; set; }
 
         public bool IsActive { get; set; }
+
+        public int? ApproverId { get; set; }
     }
 }

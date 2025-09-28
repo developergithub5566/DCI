@@ -219,7 +219,7 @@
                                                                     WorkingHours : "@item.TOTAL_WORKING_HOURS"
                                                                         })' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
 
-                                    <a href="#" onclick="wfhlogsForm('@item.DATE.ToString("yyyy-MM-ddTHH:mm:ss")')" title="logs" class="btn btn-secondary"><i class="fas fa-history"></i></a>
+                                    <a href="javascript:void(0)" onclick="wfhlogsForm('@item.DATE.ToString("yyyy-MM-ddTHH:mm:ss")')" title="logs" class="btn btn-secondary"><i class="fas fa-history"></i></a>
                                 </td>
                             </tr>
                         }
@@ -391,7 +391,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th>Remarks:</th>
+                                            <th>Reason:</th>
                                             <td class="tblRemarks">
                                                 <textarea id="Remarks" name="Remarks" rows="3" style="width:100%" required></textarea>
                                             </td>
