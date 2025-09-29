@@ -432,7 +432,7 @@ namespace DCI.Repositories
              join d in _dbContext.OvertimeDetail.AsNoTracking()
                  on h.OTHeaderId equals d.OTHeaderId
              where h.IsActive && d.IsActive
-                   &&h.EmployeeId == param.EmployeeId
+                   && h.EmployeeId == param.EmployeeId
                   // && d.OTDate >= dateFrom && d.OTDate <= dateTo
              select new
              {
@@ -489,7 +489,8 @@ namespace DCI.Repositories
                                 EmployeeId = emp.EmployeeId,
                                 EmployeeNo = emp.EmployeeNo,
                                 Lastname = emp.Lastname,
-                                Firstname = emp.Firstname
+                                Firstname = emp.Firstname,
+                                IsResigned = dtls.IsResigned
                             }
                         ).ToListAsync();
 
@@ -517,7 +518,7 @@ namespace DCI.Repositories
                 };
             }).ToList();
 
-            model.EmployeeList = employeeList;
+            model.EmployeeList = employeeList.Where(x => x.IsResigned == false).OrderBy(x => x.Lastname).ToList();
             model.OvertimeEmployeeDetails = result;
             return model;
         }

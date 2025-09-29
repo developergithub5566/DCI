@@ -34,7 +34,7 @@
 	<h6 class="m-0 font-weight-bold text-gray-800">Profile</h6>
 
 	<div class="upperRightDivBtn">	
-		<a asp-controller="Home" asp-action="ChangePass" class="btn btn-secondary btn-icon-split">
+		<a asp-controller="Home" asp-action="ChangePass" class="btn btn-primary btn-icon-split">
 			<span class="icon"><i class="fas fa-lock text-xs"></i></span>
 			<span class="text"><small>Change Password</small></span>
 		</a>
@@ -88,7 +88,7 @@
 
 			<div class="form-group">
 				<label class="frmText">Role:</label>
-				<input type="text" class="form-control frmField" id="RoleName" name="RoleName" value="@Model.RoleName" readonly>
+				<input type="text" class="form-control frmField" id="RoleName" name="RoleName" value="@Model.RoleName" readonly>				
 			</div>
 
 			<div class="d-flex align-items-center my-3">
@@ -103,8 +103,9 @@
 
 			<div class="d-flex align-items-center my-3">
 				<hr class="flex-grow-1">
-				<span class="mx-2 fw-bold">Employee Asset(Coming Soon)</span>
+				<span class="mx-2 fw-bold">Assigned Assets <sup class="text-muted small"><strong>Coming Soon</strong></sup> </span>
 				<hr class="flex-grow-1">
+
 			</div>
 		</form>
 		<div class="form-group mt30">
@@ -114,8 +115,6 @@
 
 
 	@section scripts {
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.5.2/bootbox.min.js"></script>
-		<script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
 
 
 		<script type="text/javascript">
@@ -133,41 +132,6 @@
 
 
 			});
-
-			function Save() {
-				event.preventDefault();
-				//var formData = $(this).serialize();
-				const formData = new Object();
-				formData.UserId = $('#UserId').val();
-				formData.RoleId = $('#RoleId').val();
-				formData.Email = $('#Email').val();
-				formData.Firstname = $('#Firstname').val();
-				formData.Middlename = $('#Middlename').val();
-				formData.Lastname = $('#Lastname').val();
-
-
-				bootbox.confirm('Are you sure you want to save this record?', function (result) {
-					if (result) {
-
-						$.ajax({
-							type: 'POST',
-							url: '@Url.Action("SaveUser", "Maintenance")',
-							data: formData,
-							success: function (response) {
-								if (response.success) {
-									bootbox.alert(response.message, function () {
-										location.reload();
-									});
-								} else {
-									bootbox.alert(response.message);
-								}
-							},
-							error: function () {
-								bootbox.alert('An error occurred. Please try again.');
-							}
-						});
-					}
-				});
-			}
+			
 		</script>
 	}

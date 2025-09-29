@@ -255,14 +255,31 @@
                     }
                        @if (module.ModulePageId == (int)EnumModulePage.Overtime)
                     {
-                        <hr class='sidebar-divider'>
+                  @*       <hr class='sidebar-divider'>
                         <a href="/DailyTimeRecord/Overtime" class='mainModule'>
                             <div class='sidebar-heading mainModuleActive'>
                                 <i class='fa-solid fa-plus'></i>
                                 <span>Overtime</span>
                                 <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
                             </div>
-                        </a>
+                        </a> *@
+                               <hr class='sidebar-divider'>
+                        <div role="group">
+                            <a href="#" id="btnGroupDrop1" class="mainModule" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class='sidebar-heading mainModuleActive'>
+                                    <i class='fa-solid fa-plus'></i>
+                                    <span>Overtime</span>
+                                    <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">         
+                               <li><a class="dropdown-item" href="/DailyTimeRecord/AddOvertime?OTHeaderId=0">File Overtime</a></li>   
+                                  <li><a class="dropdown-item" href="/DailyTimeRecord/Overtime/">Overtime Records</a></li>      
+                               
+                                <li><a class="dropdown-item" href="/DailyTimeRecord/OvertimeReport/">Overtime Report</a></li>     
+                            </ul>
+                        </div>
+
                     }
                               @if (module.ModulePageId == (int)EnumModulePage.WFH)
                     {                  
@@ -278,7 +295,7 @@
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">         
                               
-                                                  <li><a class="dropdown-item" href="/DailyTimeRecord/WFH/">WFH Records</a></li>      
+                                  <li><a class="dropdown-item" href="/DailyTimeRecord/WFH/">WFH Records</a></li>      
                                
                                 <li><a class="dropdown-item" href="/DailyTimeRecord/WFHApplication/">WFH Application</a></li>     
                             </ul>

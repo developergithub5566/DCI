@@ -304,8 +304,6 @@ namespace DCI.Repositories
                         _dbContext.LeaveInfo.Entry(contextLeaveInfo).State = EntityState.Modified;
                         _dbContext.SaveChanges();
 
-
-
                         foreach (var raw in contextDtl)
                         {
                             //Update DTR attendance summary status to VL DEDUCTED                    

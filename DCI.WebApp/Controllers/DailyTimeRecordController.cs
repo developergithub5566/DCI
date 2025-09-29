@@ -553,6 +553,7 @@ namespace DCI.WebApp.Controllers
             }
             return View(model);
         }
+
         public async Task<IActionResult> UndertimeById(DailyTimeRecordViewModel param)
         {
             List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();
@@ -951,7 +952,7 @@ namespace DCI.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
-        public async Task<IActionResult> OvertimePay(OvertimePayReport param)
+        public async Task<IActionResult> OvertimeReport(OvertimePayReport param)
         {          
             OvertimePayReport model = new OvertimePayReport();
             try
@@ -971,7 +972,6 @@ namespace DCI.WebApp.Controllers
                     {
                         model = JsonConvert.DeserializeObject<OvertimePayReport>(responseBody)!;
                     }
-
                 }
                 ViewBag.Fullname = currentUser?.Fullname;
                 return View(model);
@@ -1070,7 +1070,6 @@ namespace DCI.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
-
         public async Task<IActionResult> SaveOvertime([FromBody] OvertimeViewModel param)
         {
             OvertimeViewModel model = new OvertimeViewModel();
@@ -1107,7 +1106,6 @@ namespace DCI.WebApp.Controllers
             }
             //  return Json(new { success = false, message = "An error occurred. Please try again." });
         }
-
 
         public async Task<IActionResult> CategorizeOvertime([FromBody] OvertimeViewModel param)
         {

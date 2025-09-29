@@ -703,7 +703,7 @@ namespace DCI.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
-        public async Task<IActionResult> OvertimePay(OvertimePayReport param)
+        public async Task<IActionResult> OvertimeReport(OvertimePayReport param)
         {
             // List<OvertimePayReport> model = new List<OvertimePayReport>();
             OvertimePayReport model = new OvertimePayReport();
@@ -713,11 +713,7 @@ namespace DCI.WebApp.Controllers
 
                 using (var _httpclient = new HttpClient())
                 {
-                   
-
-                    //  param.ScopeTypeEmp = (int)EnumEmployeeScope.ALL;
-                    // param.CurrentUserId = currentUser.UserId;
-                    param.EmployeeId = currentUser.EmployeeId;
+                   // param.EmployeeId = currentUser.EmployeeId;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetOvertimeSummaryAsync");
@@ -732,13 +728,16 @@ namespace DCI.WebApp.Controllers
                            new SelectListItem
                            {
                                Value = x.EmployeeId.ToString(),
-                               Text = x.Lastname  + " " + x.Firstname
+                               Text = x.Lastname + " " + x.Firstname
                            }).ToList();
 
+                        var name = model.EmployeeList?.FirstOrDefault(x => x.EmployeeId == param.EmployeeId);
+
+                        ViewBag.Fullname = name != null ? $"{name.Firstname} {name.Lastname}" : string.Empty;
                     }
 
                 }
-                ViewBag.Fullname = currentUser?.Fullname;
+               
                 return View(model);
             }
             catch (Exception ex)

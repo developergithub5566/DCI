@@ -101,11 +101,9 @@
                             <label for="maxDate" generated="true" class="error"></label>
                         </div>
                     </div>
-                    <div class="form-group col-sm-6 col-md-4 col-lg-3 col-xl-2 mb0">
-                        <label class="frmText">Employee: </label>
-                        @Html.DropDownListFor(model => model.EmployeeList, Model.OptionsEmployee, "SELECT EMPLOYEE", new { @class = "bg-gray-100 font-weight-bold form-control frmField text-center" })
-                    </div>
+                
                 </form>
+                        
             </div>
             <div class="table-responsive mt20">
                 <table class="table table-bordered" id="tblDTR">
@@ -123,7 +121,7 @@
                             <th>
                                 <label>@DCI.Core.Common.Constants.OverTime_Regular</label>
                             </th>
-                             <th>
+                            <th>
                                 <label>@DCI.Core.Common.Constants.OverTime_NightDifferential</label>
                             </th>
                             <th>
@@ -175,10 +173,10 @@
                         <tr>
                             <th></th>
                             <th></th>
-                            <th style="text-align:right">TOTAL</th> 
+                            <th style="text-align:right">TOTAL</th>
                             <th></th>
                             <th></th>
-                            <th></th>                            
+                            <th></th>
                             <th></th>
                             <th></th>
                         </tr>
@@ -273,7 +271,7 @@
 
 @section scripts {
 
-    
+
 
                 <script type="text/javascript">
                             var js = jQuery.noConflict(true);
@@ -313,7 +311,7 @@
                         let date = (data[0] || '').trim(); // use correct column index! (2 = 3rd col)
 
                         if (!date) return false;
-                        
+
                         if (min && date < min) return false;
                         if (max && date > max) return false;
 
@@ -371,7 +369,7 @@
                                                                     }
                                                                   );
 
-                                                                           
+
                                                                                  const tableObj = doc.content.find(c => c.table);
                                                                                     if (!tableObj) return; // nothing to do if no table found
 
@@ -383,9 +381,9 @@
                                                                                             cell.fontSize = 8;
                                                                                             cell.bold = false;
                                                                                             cell.alignment = 'center';
-                                                                                          
+
                                                                                              if(cell.text == "0" ){
-                                                                                                let val = parseFloat(cell.text);                                                                                     
+                                                                                                let val = parseFloat(cell.text);
                                                                                                 cell.text = val.toFixed(4);
                                                                                              }
 
@@ -410,7 +408,7 @@
 
                                                                                     // const totalB = api.column(4, { page: 'all' }).data()
                                                                                     //   .reduce((a, b) => intVal(a) + intVal(b), 0);
-                                                                                   
+
 
                                                                                       //       const totalD = api.column(6, { page: 'all' }).data()
                                                                                       // .reduce((a, b) => intVal(a) + intVal(b), 0);
@@ -425,8 +423,8 @@
                                                                                     //   ...fillerCells,
                                                                                     //   { text: totalA.toFixed(2), alignment: 'right', bold: true },
                                                                                     //    { text: totalB.toFixed(2), alignment: 'right', bold: true },
-                                                                                      
-                                                                                      
+
+
                                                                                     // ];
 
                                                                                    // body.push(totalRow);
@@ -470,7 +468,7 @@
                                 : typeof i === 'number' ? i : 0;
                         };
 
-       
+
 
                         // Page totals (visible rows only)
                         let pageTotalA = api
@@ -498,7 +496,7 @@
                             .data()
                             .reduce((a, b) => intVal(a) + intVal(b), 0);
 
-                           
+
                         // Update footer cells
                         $(api.column(3).footer()).html(pageTotalA.toFixed(4));
                         $(api.column(4).footer()).html(pageTotalB.toFixed(4));
@@ -544,47 +542,6 @@
                                                     }
                                                 });
                             });
-                        
-
-                    // function calculateDuration() {
-                    //       if (fromTime && toTime) {
-                    //         // Set both times on the same day
-                    //         const baseDate = new Date();
-                    //         const from = new Date(baseDate);
-                    //         from.setHours(fromTime.getHours(), fromTime.getMinutes(), 0, 0);
-
-                    //         const to = new Date(baseDate);
-                    //         to.setHours(toTime.getHours(), toTime.getMinutes(), 0, 0);
-
-                    //         // Handle crossing midnight
-                    //         if (to < from) {
-                    //           to.setDate(to.getDate() + 1);
-                    //         }
-
-                    //         const diffMs = to - from;
-                    //         const diffMins = Math.floor(diffMs / 60000);
-                    //         const hours = Math.floor(diffMins / 60);
-                    //         const minutes = diffMins % 60;
-
-                    //         document.getElementById("totalTime").innerText =
-                    //           `Total: ${hours} hour(s) and ${minutes} minute(s)`;
-                    //       }
-                    //     }
-
-                    //         function newForm(dtr) {
-                    //            // console.log(dtr)
-
-                    //               const timefrom = document.querySelector("#OTTimeFrom")._flatpickr;
-                    //                                  timefrom.clear();
-                    //               const timeto = document.querySelector("#OTTimeTo")._flatpickr;
-                    //                                                  timeto.clear();
-
-
-
-
-                    //                 js('#createmodal').modal('show');
-                    //         }
-
 
 
 
