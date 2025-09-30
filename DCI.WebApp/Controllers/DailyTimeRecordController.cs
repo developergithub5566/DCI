@@ -1160,9 +1160,6 @@ namespace DCI.WebApp.Controllers
                             lastout = TimeSpan.Parse(dtrmodel.LAST_OUT) > TimeSpan.Parse(dtrmodel.LAST_OUT_WFH) ? TimeSpan.Parse(dtrmodel.LAST_OUT) : TimeSpan.Parse(dtrmodel.LAST_OUT_WFH);
                         }
 
-                        else if (dtrmodel.IsWFHFileRecord && dtrmodel.IsBiometricRecord && !dtrmodel.IsOBFileRecord)
-                        {
-                        }
 
                             /* FILTER */
                             bool isHoliday = dtrmodel.IsHoliday;
@@ -1200,8 +1197,14 @@ namespace DCI.WebApp.Controllers
                         }
 
 
+                        if (!param.IsOfficialBuss)
+                        {
+
+                        }
+
+
                         //REGULAR or SPECIAL HOLIDAY and REST DAY
-                         if (isHoliday == true && isRestDay == true)
+                        if (isHoliday == true && isRestDay == true)
                         {
                             if (totalWorkingHours >= eightHours)
                             {
