@@ -45,8 +45,7 @@
         canAdd = module?.Add ?? false;
         canEdit = module?.Update ?? false;
         canDelete = module?.Delete ?? false;
-    }
-
+    }       
 }
 
 <div class="container-fluid">
@@ -142,8 +141,10 @@
                         </tr>
                     </thead>
                     <tbody>
+              
                         @foreach (var item in Model)
                         {
+                   
                             <tr>
 
                               @*   <td>
@@ -172,10 +173,14 @@
                                     {
                                         <span class="btnSuccess applicationStatus">@item.SOURCE</span>
                                     }
-                                    else
+                                    else if(item.SOURCE == "REMOTE")
                                     {
                                         <span class="btnPrimary applicationStatus">@item.SOURCE</span>
-                                    }                                   
+                                    }
+                                    else 
+                                    {
+                                        <span class="btn-secondary applicationStatus">@item.SOURCE</span>
+                                    }
                                 </td>
                                 @*       <td class="text-center">
                                     <a href="#" onclick="newForm({

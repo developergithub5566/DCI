@@ -40,7 +40,7 @@ namespace DCI.Repositories
             // var wfhlogs = _dbContext.vw_AttendanceSummary.AsQueryable();
 
 
-            var biometriclogs = await (from dtr in _dbContext.vw_AttendanceSummary.AsQueryable()
+            var biometriclogs = await (from dtr in _dbContext.vw_AttendanceSummary.AsQueryable()                                     
                                        orderby dtr.DATE descending, dtr.NAME descending
                                        select new DailyTimeRecordViewModel
                                        {
@@ -80,6 +80,26 @@ namespace DCI.Repositories
                                      SOURCE = "REMOTE"
                                  }).ToListAsync();
 
+            var holiday = await (from hol in _dbContext.Holiday.AsQueryable()
+                                 where hol.IsActive == true                           
+                                 select new DailyTimeRecordViewModel
+                                 {
+                                     ID = 0,
+                                     EMPLOYEE_NO = string.Empty,
+                                     NAME = hol.HolidayName, 
+                                     DATE = hol.HolidayDate.Date,
+                                     FIRST_IN = string.Empty,
+                                     LAST_OUT = string.Empty,
+                                     LATE = string.Empty,
+                                     CLOCK_OUT = string.Empty,
+                                     UNDER_TIME = string.Empty,
+                                     OVERTIME = string.Empty,
+                                     TOTAL_HOURS = string.Empty,
+                                     TOTAL_WORKING_HOURS = string.Empty,
+                                     SOURCE = "HOLIDAY"
+                                 }).ToListAsync();
+
+
             var attendance = biometriclogs.Concat(wfhlogs).ToList();
 
             if ((int)EnumEmployeeScope.PerEmployee == model.ScopeTypeEmp)
@@ -90,7 +110,7 @@ namespace DCI.Repositories
                     attendance = attendance.Where(x => x.EMPLOYEE_NO == emp.EmployeeNo).ToList();
             }
 
-            return attendance;
+            return attendance.Concat(holiday).ToList();
         }
 
         public async Task<IList<DailyTimeRecordViewModel>> GetAllDTRByEmpNo(string empNo)

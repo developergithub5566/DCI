@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection.PortableExecutable;
 using System.Text;
@@ -34,13 +35,11 @@ namespace DCI.Repositories
 
         public async Task<DailyTimeRecordViewModel> GetAllAttendanceByDate(OvertimeViewModel model)
         {
-            //var date = model.OTDate;
+            var context = _dbContext.vw_AttendanceSummary.AsNoTracking().Where(x => x.DATE == model.OTDate);
+            var user = _dbContext.User.AsNoTracking().Where(x => x.UserId == model.CurrentUserId).FirstOrDefault();
+            var employee = _dbContext.Employee.AsNoTracking().Where(x => x.EmployeeId == user.EmployeeId).FirstOrDefault();
 
-            var context = _dbContext.vw_AttendanceSummary.Where(x => x.DATE == model.OTDate);
-            var user = _dbContext.User.Where(x => x.UserId == model.CurrentUserId).FirstOrDefault();
-            var employee = _dbContext.Employee.Where(x => x.EmployeeId == user.EmployeeId).FirstOrDefault();
-
-            var query = (from dtr in context                      
+            var query = (from dtr in context
                          where dtr.DATE == model.OTDate && dtr.EMPLOYEE_NO == employee.EmployeeNo
                          select new DailyTimeRecordViewModel
                          {
@@ -59,22 +58,31 @@ namespace DCI.Repositories
                              DATESTRING = dtr.DATE.ToString("MM/dd/yyyy")
                          }).FirstOrDefault() ?? new DailyTimeRecordViewModel();
 
-            query.IsHoliday = _dbContext.Holiday.Any(x => x.HolidayDate == model.OTDate);
-            //var IsHolidayRegularSpecial = await _dbContext.Holiday.Where(x => x.HolidayDate == model.OTDate).FirstOrDefaultAsync();
-            //query.IsHolidayRegularSpecial = IsHolidayRegularSpecial != null ? IsHolidayRegularSpecial.HolidayType : 0;
+            query.IsHoliday = _dbContext.Holiday.AsNoTracking().Any(x => x.HolidayDate == model.OTDate);
 
-            if(model.IsOfficialBuss)
+
+            query.IsBiometricRecord = query.ID > 0 ? true : false;
+
+            if (model.IsOfficialBuss)
             {
-                var x = (from hdr in _dbContext.LeaveRequestHeader
-                         join dtl in _dbContext.LeaveRequestDetails on hdr.LeaveRequestHeaderId equals dtl.LeaveRequestHeaderId
-                         where hdr.IsActive && dtl.LeaveDate.Date == model.OTDate.Date && hdr.LeaveTypeId == (int)EnumLeaveType.OB
+                var x = (from hdr in _dbContext.LeaveRequestHeader.AsNoTracking()
+                         join dtl in _dbContext.LeaveRequestDetails.AsNoTracking() on hdr.LeaveRequestHeaderId equals dtl.LeaveRequestHeaderId
+                         where hdr.IsActive && dtl.LeaveDate.Date == model.OTDate.Date && hdr.LeaveTypeId == (int)EnumLeaveType.OB && hdr.ApproverId == (int)EnumStatus.Approved
                          select new
                          {
                              Exist = hdr.LeaveRequestHeaderId
                          });
 
-                query.IsNoOBFileRecord = x.Count() == 0 ? true : false;
-              }
+                query.IsOBFileRecord = x.Count() == 0 ? false : true;
+            }
+
+            var _wfh = _dbContext.vw_AttendanceSummary_WFH.AsNoTracking().Where(x => x.DATE == model.OTDate).FirstOrDefault();
+            if(_wfh != null)
+            {
+                query.IsWFHFileRecord = true;
+                query.FIRST_IN_WFH = _wfh.FIRST_IN;
+                query.LAST_OUT_WFH = _wfh.LAST_OUT ;
+            }
 
             return query;
         }
@@ -105,7 +113,7 @@ namespace DCI.Repositories
                 //var usr = _dbContext.User.Where(x => x.UserId == model.CurrentUserId).FirstOrDefault();
                 //var emp = _dbContext.Employee.Where(x => x.EmployeeId == usr.EmployeeId).FirstOrDefault();
                 //if (emp != null)
-                    query = query.Where(x => x.CreatedBy == model.CurrentUserId);
+                query = query.Where(x => x.CreatedBy == model.CurrentUserId);
             }
 
             return await query.ToListAsync();
@@ -149,16 +157,16 @@ namespace DCI.Repositories
 
             var query =
                 from ot in _dbContext.OvertimeHeader.AsNoTracking()
-                //join usr in _dbContext.User.AsNoTracking() on ot.CreatedBy equals model.CurrentUserId
+                    //join usr in _dbContext.User.AsNoTracking() on ot.CreatedBy equals model.CurrentUserId
                 join emp in _dbContext.Employee.AsNoTracking() on ot.EmployeeId equals emp.EmployeeId
-               // join empWork in _dbContext.EmployeeWorkDetails.AsNoTracking() on emp.EmployeeId equals empWork.EmployeeId
-               // join dept in _dbContext.Department.AsNoTracking() on empWork.DepartmentId equals dept.DepartmentId
+                // join empWork in _dbContext.EmployeeWorkDetails.AsNoTracking() on emp.EmployeeId equals empWork.EmployeeId
+                // join dept in _dbContext.Department.AsNoTracking() on empWork.DepartmentId equals dept.DepartmentId
 
                 join usrApprover in _dbContext.User.AsNoTracking() on ot.ApproverId equals usrApprover.UserId into usrApproverGroup
                 from usrApprover in usrApproverGroup.DefaultIfEmpty()
 
                 join stat in _dbContext.Status.AsNoTracking() on ot.StatusId equals stat.StatusId
-                where ot.IsActive && ot.OTHeaderId == model.OTHeaderId 
+                where ot.IsActive && ot.OTHeaderId == model.OTHeaderId
                 select new OvertimeViewModel
                 {
                     OTHeaderId = ot.OTHeaderId,
@@ -181,10 +189,10 @@ namespace DCI.Repositories
                         .Select(x => new OvertimeDetailViewModel
                         {
                             OTTypeName = x.OTType == 1 ? Constants.OverTime_Regular
-                                       : x.OTType == 2 ? Constants.OverTime_NightDifferential 
-                                       : x.OTType == 3 ? Constants.OverTime_SpecialHoliday 
+                                       : x.OTType == 2 ? Constants.OverTime_NightDifferential
+                                       : x.OTType == 3 ? Constants.OverTime_SpecialHoliday
                                        : x.OTType == 4 ? Constants.OverTime_After8hrs
-                                       : x.OTType == 5 ? Constants.OverTime_HolidayOnRestDay 
+                                       : x.OTType == 5 ? Constants.OverTime_HolidayOnRestDay
                                        : "",
                             OTHeaderId = x.OTHeaderId,
                             OTDetailId = x.OTDetailId,
@@ -244,20 +252,20 @@ namespace DCI.Repositories
                         await _dbContext.SaveChangesAsync();
                     }
 
-                    var result =                           
-                            from b in _dbContext.User.AsNoTracking()   
+                    var result =
+                            from b in _dbContext.User.AsNoTracking()
                             join c in _dbContext.EmployeeWorkDetails.AsNoTracking()
                                 on b.EmployeeId equals c.EmployeeId into cGroup
                             from c in cGroup.DefaultIfEmpty()
 
                             join d in _dbContext.Department.AsNoTracking()
                                 on c.DepartmentId equals d.DepartmentId into dGroup
-                            from d in dGroup.DefaultIfEmpty()                            
+                            from d in dGroup.DefaultIfEmpty()
 
                             where b.UserId == param.CurrentUserId
                             select new
                             {
-                                RecommendedById = d.ApproverId                               
+                                RecommendedById = d.ApproverId
                             };
 
                     var hrHead = _dbContext.Department.AsNoTracking().Where(x => x.DepartmentCode == "HR").FirstOrDefault();
@@ -365,16 +373,16 @@ namespace DCI.Repositories
 
         public async Task<OvertimeEntryDto> CheckOvertimeDate(OvertimeEntryDto model)
         {
-            var data = (from ot in _dbContext.vw_AttendanceSummary                        
+            var data = (from ot in _dbContext.vw_AttendanceSummary
                         where ot.DATE.Date == model.OTDate.Date
                         select new OvertimeEntryDto
                         {
-                            OTDate   = ot.DATE,
+                            OTDate = ot.DATE,
                             OTTimeFrom = ot.FIRST_IN,
                             OTTimeTo = ot.LAST_OUT
                         }).FirstOrDefault();
             return data;
-        }            
+        }
 
         private async Task<string> GenereteRequestNo()
         {
@@ -433,7 +441,7 @@ namespace DCI.Repositories
                  on h.OTHeaderId equals d.OTHeaderId
              where h.IsActive && d.IsActive
                    && h.EmployeeId == param.EmployeeId
-                  // && d.OTDate >= dateFrom && d.OTDate <= dateTo
+             // && d.OTDate >= dateFrom && d.OTDate <= dateTo
              select new
              {
                  h.EmployeeId,
@@ -506,15 +514,15 @@ namespace DCI.Repositories
                     RequestNo = x.RequestNo,
                     OTDateString = x.Date.ToString("yyyy-MM-dd"),
                     OTTimeFrom = x.OTTimeFrom.ToString("HH:mm"),
-                    OTTimeTo = x.OTTimeTo.ToString("HH:mm"), 
+                    OTTimeTo = x.OTTimeTo.ToString("HH:mm"),
                     Regular = TimeHelper.ConvertMinutesToValue(x.Regular),
                     NightDifferential = TimeHelper.ConvertMinutesToValue(x.NightDifferential),
                     SpecialHoliday = TimeHelper.ConvertMinutesToValue(x.SpecialHoliday),
-                    After8hrs =   TimeHelper.ConvertMinutesToValue(x.After8hrs),
-                    HolidayOnRestDay =  TimeHelper.ConvertMinutesToValue(x.HolidayOnRestDay),
+                    After8hrs = TimeHelper.ConvertMinutesToValue(x.After8hrs),
+                    HolidayOnRestDay = TimeHelper.ConvertMinutesToValue(x.HolidayOnRestDay),
                     TotalMinutes = x.TotalMinutes,
                     TotalHours = hhmm,
-                  
+
                 };
             }).ToList();
 

@@ -1138,15 +1138,34 @@ namespace DCI.WebApp.Controllers
                             lastout = TimeSpan.Parse(param.OTTimeTo);
                             clockout = TimeSpan.Parse("16:30");
                         }
-                        else if (dtrmodel != null && dtrmodel.ID > 0)
+                        else if (dtrmodel.IsBiometricRecord)
                         {
                             firstin = TimeSpan.Parse(dtrmodel.FIRST_IN);
                             lastout = TimeSpan.Parse(dtrmodel.LAST_OUT);
                             clockout = TimeSpan.Parse(dtrmodel.CLOCK_OUT);
                         }
 
-                        /* FILTER */
-                        bool isHoliday = dtrmodel.IsHoliday;
+                        //WFH only
+                        if (dtrmodel.IsWFHFileRecord && !dtrmodel.IsBiometricRecord && !dtrmodel.IsOBFileRecord)
+                        {
+                            firstin = TimeSpan.Parse(dtrmodel.FIRST_IN_WFH);
+                            lastout = TimeSpan.Parse(dtrmodel.LAST_OUT_WFH);
+
+                        }
+
+                        //WFH + biometrics (Get earlier time and late time between WFH and bio)
+                        else if (dtrmodel.IsWFHFileRecord && dtrmodel.IsBiometricRecord && !dtrmodel.IsOBFileRecord)
+                        {
+                            firstin = TimeSpan.Parse(dtrmodel.FIRST_IN) < TimeSpan.Parse(dtrmodel.FIRST_IN_WFH) ? TimeSpan.Parse(dtrmodel.FIRST_IN) : TimeSpan.Parse(dtrmodel.FIRST_IN_WFH);
+                            lastout = TimeSpan.Parse(dtrmodel.LAST_OUT) > TimeSpan.Parse(dtrmodel.LAST_OUT_WFH) ? TimeSpan.Parse(dtrmodel.LAST_OUT) : TimeSpan.Parse(dtrmodel.LAST_OUT_WFH);
+                        }
+
+                        else if (dtrmodel.IsWFHFileRecord && dtrmodel.IsBiometricRecord && !dtrmodel.IsOBFileRecord)
+                        {
+                        }
+
+                            /* FILTER */
+                            bool isHoliday = dtrmodel.IsHoliday;
                         //int IsHolidayRegularSpecial = dtrmodel.IsHolidayRegularSpecial;
                         bool isRestDay = param.OTDate.DayOfWeek == DayOfWeek.Saturday || param.OTDate.DayOfWeek == DayOfWeek.Sunday;
 
@@ -1165,7 +1184,7 @@ namespace DCI.WebApp.Controllers
                         TimeSpan totalWorkingHours = lastout - firstin;
 
 
-                        if (param.IsOfficialBuss && dtrmodel.IsNoOBFileRecord)
+                        if (param.IsOfficialBuss && dtrmodel.IsOBFileRecord)
                         {
                             return Json(new { success = false, message = Constants.Msg_NoOfficialBusinessRecord });
                         }

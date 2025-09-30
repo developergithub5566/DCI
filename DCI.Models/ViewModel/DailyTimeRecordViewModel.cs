@@ -40,7 +40,12 @@ namespace DCI.Models.ViewModel
         public string RequestNo { get; set; } = string.Empty;
         public decimal VLBalance { get; set; } = 0;
 
-        public bool IsNoOBFileRecord { get; set; } = false;
+        public bool IsBiometricRecord { get; set; } = false;
+        public bool IsOBFileRecord { get; set; } = false;
+        public bool IsWFHFileRecord { get; set; } = false;
+
+        public string FIRST_IN_WFH { get; set; } = string.Empty;
+        public string LAST_OUT_WFH { get; set; } = string.Empty;
     }
     public class DTRCorrectionViewModel
     {
