@@ -46,6 +46,8 @@ namespace DCI.Models.ViewModel
 
         public string FIRST_IN_WFH { get; set; } = string.Empty;
         public string LAST_OUT_WFH { get; set; } = string.Empty;
+        public string CLOCK_OUT_WFH { get; set; } = string.Empty;
+        public string TOTAL_WORKING_HOURS_WFH { get; set; } = string.Empty;
     }
     public class DTRCorrectionViewModel
     {

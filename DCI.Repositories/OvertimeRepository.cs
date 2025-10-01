@@ -35,56 +35,70 @@ namespace DCI.Repositories
 
         public async Task<DailyTimeRecordViewModel> GetAllAttendanceByDate(OvertimeViewModel model)
         {
-            var context = _dbContext.vw_AttendanceSummary.AsNoTracking().Where(x => x.DATE == model.OTDate);
-            var user = _dbContext.User.AsNoTracking().Where(x => x.UserId == model.CurrentUserId).FirstOrDefault();
-            var employee = _dbContext.Employee.AsNoTracking().Where(x => x.EmployeeId == user.EmployeeId).FirstOrDefault();
-
-            var query = (from dtr in context
-                         where dtr.DATE == model.OTDate && dtr.EMPLOYEE_NO == employee.EmployeeNo
-                         select new DailyTimeRecordViewModel
-                         {
-                             ID = dtr.ID,
-                             EMPLOYEE_NO = dtr.EMPLOYEE_NO,
-                             NAME = dtr.NAME,
-                             DATE = dtr.DATE,
-                             FIRST_IN = dtr.FIRST_IN,
-                             LAST_OUT = dtr.LAST_OUT,
-                             LATE = dtr.LATE,
-                             CLOCK_OUT = dtr.CLOCK_OUT,
-                             UNDER_TIME = dtr.UNDER_TIME,
-                             OVERTIME = dtr.OVERTIME,
-                             TOTAL_HOURS = dtr.TOTAL_HOURS,
-                             TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS,
-                             DATESTRING = dtr.DATE.ToString("MM/dd/yyyy")
-                         }).FirstOrDefault() ?? new DailyTimeRecordViewModel();
-
-            query.IsHoliday = _dbContext.Holiday.AsNoTracking().Any(x => x.HolidayDate == model.OTDate);
-
-
-            query.IsBiometricRecord = query.ID > 0 ? true : false;
-
-            if (model.IsOfficialBuss)
+            try
             {
-                var x = (from hdr in _dbContext.LeaveRequestHeader.AsNoTracking()
-                         join dtl in _dbContext.LeaveRequestDetails.AsNoTracking() on hdr.LeaveRequestHeaderId equals dtl.LeaveRequestHeaderId
-                         where hdr.IsActive && dtl.LeaveDate.Date == model.OTDate.Date && hdr.LeaveTypeId == (int)EnumLeaveType.OB && hdr.ApproverId == (int)EnumStatus.Approved
-                         select new
-                         {
-                             Exist = hdr.LeaveRequestHeaderId
-                         });
+                var context = _dbContext.vw_AttendanceSummary.AsNoTracking().Where(x => x.DATE.Date == model.OTDate.Date);
+                var user = _dbContext.User.AsNoTracking().Where(x => x.UserId == model.CurrentUserId).FirstOrDefault();
+                var employee = _dbContext.Employee.AsNoTracking().Where(x => x.EmployeeId == user.EmployeeId).FirstOrDefault();
 
-                query.IsOBFileRecord = x.Count() == 0 ? false : true;
+                var query = (from dtr in context
+                             where dtr.DATE == model.OTDate && dtr.EMPLOYEE_NO == employee.EmployeeNo
+                             select new DailyTimeRecordViewModel
+                             {
+                                 ID = dtr.ID,
+                                 EMPLOYEE_NO = dtr.EMPLOYEE_NO,
+                                 NAME = dtr.NAME,
+                                 DATE = dtr.DATE,
+                                 FIRST_IN = dtr.FIRST_IN,
+                                 LAST_OUT = dtr.LAST_OUT,
+                                 LATE = dtr.LATE,
+                                 CLOCK_OUT = dtr.CLOCK_OUT,
+                                 UNDER_TIME = dtr.UNDER_TIME,
+                                 OVERTIME = dtr.OVERTIME,
+                                 TOTAL_HOURS = dtr.TOTAL_HOURS,
+                                 TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS,
+                                 DATESTRING = dtr.DATE.ToString("MM/dd/yyyy")
+                             }).FirstOrDefault() ?? new DailyTimeRecordViewModel();
+
+                query.IsHoliday = _dbContext.Holiday.AsNoTracking().Any(x => x.HolidayDate.Date == model.OTDate.Date);
+
+
+                query.IsBiometricRecord = query.ID > 0 ? true : false;
+
+                if (model.IsOfficialBuss)
+                {
+                    var x = (from hdr in _dbContext.LeaveRequestHeader.AsNoTracking()
+                             join dtl in _dbContext.LeaveRequestDetails.AsNoTracking() on hdr.LeaveRequestHeaderId equals dtl.LeaveRequestHeaderId
+                             where hdr.IsActive && dtl.LeaveDate.Date == model.OTDate.Date && hdr.LeaveTypeId == (int)EnumLeaveType.OB && hdr.ApproverId == (int)EnumStatus.Approved
+                             select new
+                             {
+                                 Exist = hdr.LeaveRequestHeaderId
+                             });
+
+                    query.IsOBFileRecord = x.Count() == 0 ? false : true;
+                }
+
+                var _wfh = _dbContext.vw_AttendanceSummary_WFH.AsNoTracking().FirstOrDefault(x => x.DATE.Date == model.OTDate.Date && model.StatusId == (int)EnumStatus.Approved);
+                if (_wfh != null)
+                {
+                    query.IsWFHFileRecord = true;
+                    query.FIRST_IN_WFH = _wfh.FIRST_IN;
+                    query.LAST_OUT_WFH = _wfh.LAST_OUT;
+                    query.CLOCK_OUT_WFH = _wfh.CLOCK_OUT;
+                    query.TOTAL_WORKING_HOURS_WFH = _wfh.TOTAL_WORKING_HOURS;
+                }
+
+                return query;
             }
-
-            var _wfh = _dbContext.vw_AttendanceSummary_WFH.AsNoTracking().Where(x => x.DATE == model.OTDate).FirstOrDefault();
-            if(_wfh != null)
+            catch (Exception ex)
             {
-                query.IsWFHFileRecord = true;
-                query.FIRST_IN_WFH = _wfh.FIRST_IN;
-                query.LAST_OUT_WFH = _wfh.LAST_OUT ;
+                Log.Error(ex.ToString());
+                return new DailyTimeRecordViewModel();
             }
-
-            return query;
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
         public async Task<IList<OvertimeViewModel>> Overtime(OvertimeViewModel model)
