@@ -236,22 +236,49 @@
 
                                     <div id="timeparam">
                                         <label class="frmText"><span class="required">*</span> Time From: </label>
-                                        <div class="input-group">
-                                            <input type="text" name="OTTimeFrom" id="OTTimeFrom" class="form-control frmField">
+                                        <div class="input-group clockpicker" data-autoclose="true">
+                                            <input type="text" name="OTTimeFrom" id="OTTimeFrom" class="form-control frmField" autocomplete="off" readonly placeholder="24-Hour Format">
                                             <div class="input-group-prepend prependBtn">
                                                 <i class="fa fa-calendar"></i>
                                             </div>
                                         </div>
+                              @*           <div class="input-group clockpicker" data-autoclose="true">
+                                            <input type="text" name="OTTimeFrom" id="OTTimeFrom" class="form-control frmField" value="" readonly>
+                                            <div class="input-group-prepend prependBtn">
+                                                <i class="fa fa-calendar"></i>
+                                            </div>
+                                        </div> *@
                                         <label for="OTTimeFrom" generated="true" class="error"></label>
                                         <label class="frmText"><span class="required">*</span> Time To: </label>
-                                        <div class="input-group">
-                                            <input type="text" name="OTTimeTo" id="OTTimeTo" class="form-control frmField" autocomplete="off">
+                                        <div class="input-group clockpicker" data-autoclose="true">
+                                            <input type="text" name="OTTimeTo" id="OTTimeTo" class="form-control frmField" autocomplete="off" readonly placeholder="24-Hour Format">
                                             <div class="input-group-prepend prependBtn">
                                                 <i class="fa fa-calendar"></i>
                                             </div>
                                         </div>
+                                   @*      <div class="input-group clockpicker" data-autoclose="true">
+                                            <input type="text" name="OTTimeTo" id="OTTimeTo" class="form-control frmField" value="" readonly>
+                                            <div class="input-group-prepend prependBtn">
+                                                <i class="fa fa-calendar"></i>
+                                            </div>
+                                        </div> *@
                                         <label for="OTTimeTo" generated="true" class="error"></label>
-                                    </div>    
+                                    </div>
+
+
+                               @*      <div class="input-group clockpicker" data-autoclose="true">
+                                        <input type="text" class="form-control" value="09:30">
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-time"></span>
+                                        </span>
+                                    </div>
+
+                                    <div class="input-group clockpicker" data-autoclose="true">
+                                        <input type="text" class="form-control" value="09:30">
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-time"></span>
+                                        </span>
+                                    </div> *@
                                 </div>                       
 
                             </div>
@@ -262,11 +289,14 @@
                         </form>
                     </div>
                 </div>
-            </div>     
-   
+            </div>
+         
 
-@section scripts {      
-           
+@section scripts {
+                <link href="~/js/clockpicker/src/clockpicker.css" rel="stylesheet" />
+                <script src="~/js/clockpicker/src/clockpicker.js"></script>
+
+
                 <script type="text/javascript">
                             var js = jQuery.noConflict(true);
                                                let fromTime = null;
@@ -296,8 +326,8 @@
                                   //        $("#AddOvertime").prop("hidden", true);
                                   //              $("#Submit").prop("hidden", true);
                                   // }
-                                  
 
+       
 
                                 //  document.getElementById("timeparam").style.display = 'none';
 
@@ -315,32 +345,50 @@
                                                  onChange: function(selectedDates, dateStr, instance) {
                                                       }
                                                 });
+                                                                    // js('.xx').clockpicker();
+                                                                           // js('.OTTimeFrom').clockpicker();
+                                                                           //   js('.OTTimeTo').clockpicker();
+                                                                           js('.clockpicker').clockpicker();
 
+                                                //    flatpickr("#OTTimeFrom", {
+                                                //              enableTime: true,
+                                                //              noCalendar: true,
+                                                //               dateFormat: "H:i",
+                                                //               onChange: function(selectedDates) {
+                                                //               fromTime = selectedDates[0];
+                                                //               //calculateDuration();
+                                                //             }
+                                                //         });
 
-
-                                                   flatpickr("#OTTimeFrom", {
-                                                             enableTime: true,
-                                                             noCalendar: true,
-                                                              dateFormat: "H:i",
-                                                              onChange: function(selectedDates) {
-                                                              fromTime = selectedDates[0];
-                                                              //calculateDuration();
-                                                            }
-                                                        });
-
-                                                       flatpickr("#OTTimeTo", {
-                                                                 enableTime: true,
-                                                         noCalendar: true,
-                                                        dateFormat: "H:i",
-                                                         onChange: function(selectedDates) {
-                                                      toTime = selectedDates[0];
-                                                     // calculateDuration();
-                                                    }
-                                                });
-
+                                                //        flatpickr("#OTTimeTo", {
+                                                //                  enableTime: true,
+                                                //          noCalendar: true,
+                                                //         dateFormat: "H:i",
+                                                //          onChange: function(selectedDates) {
+                                                //       toTime = selectedDates[0];
+                                                //      // calculateDuration();
+                                                //     }
+                                                // });
                             });
 
 
+                                  function newForm(dtr) {
+                               // console.log(dtr)
+
+                                  // const timefrom = document.querySelector("#OTTimeFrom")._flatpickr;
+                                  //                    timefrom.clear();
+                                  // const timeto = document.querySelector("#OTTimeTo")._flatpickr;
+                                  //                    timeto.clear();
+                                               js('.clockpicker').clockpicker();
+                                                 $('#OTTimeFrom').val("");  
+                                                 $('#OTTimeTo').val("");
+                                               
+                                                                     // js('.xx').clockpicker();
+                                            // js('.OTTimeFrom').clockpicker();
+                                            //                                  js('.OTTimeTo').clockpicker();
+
+                                    js('#createmodal').modal('show');
+                            }
                          
                              function checkOvertimeDate() {
                                event.preventDefault();
@@ -523,17 +571,7 @@
                     //       }
                     //     }
 
-                            function newForm(dtr) {
-                               // console.log(dtr)
-
-                                  const timefrom = document.querySelector("#OTTimeFrom")._flatpickr;
-                                                     timefrom.clear();
-                                  const timeto = document.querySelector("#OTTimeTo")._flatpickr;
-                                                                     timeto.clear();
-
-
-                                    js('#createmodal').modal('show');
-                            }
+                      
                 </script>
 
                 <script>

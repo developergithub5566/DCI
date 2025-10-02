@@ -17,15 +17,17 @@ namespace DCI.API.Controllers
         IOvertimeRepository _overtimeRepository;
         IWfhRepository _wfhRepository;
         IUndertimeRepository _undertimeRepository;
+        ILateRepository _lateRepository;
 
         public DailyTimeRecordController(IDailyTimeRecordRepository dtrRepository, ILeaveRepository leaveRepository,
-            IOvertimeRepository overtimeRepository, IWfhRepository wfhRepository, IUndertimeRepository undertimeRepository)
+            IOvertimeRepository overtimeRepository, IWfhRepository wfhRepository, IUndertimeRepository undertimeRepository, ILateRepository lateRepository)
         {
             _dtrRepository = dtrRepository;
             _leaveRepository = leaveRepository;
             _overtimeRepository = overtimeRepository;
             _wfhRepository = wfhRepository;
             _undertimeRepository = undertimeRepository;
+            _lateRepository = lateRepository;
         }
 
         [HttpPost]
@@ -254,5 +256,31 @@ namespace DCI.API.Controllers
             var result = await _leaveRepository.CancelLeave(model);
             return StatusCode(result.statuscode, result.message);
         }
+
+
+        [HttpPost]
+        [Route("GetAllLate")]
+        public async Task<IActionResult> GetAllLate(DailyTimeRecordViewModel model)
+        {
+            var result = await _lateRepository.GetAllLate(model);
+            return Ok(result);
+        }
+
+
+        [HttpPost]
+        [Route("GetLateById")]
+        public async Task<IActionResult> GetLateById([FromBody] DailyTimeRecordViewModel model)
+        {
+            return Ok(await _lateRepository.GetLateById(model));
+        }
+
+        [HttpPost]
+        [Route("SaveLate")]
+        public async Task<IActionResult> SaveLate([FromBody] List<LateDeductionViewModel> model)
+        {          
+            var result = await _lateRepository.SaveLate(model);
+            return StatusCode(result.statuscode, result.message);
+        }
+
     }
 }

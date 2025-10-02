@@ -51,7 +51,8 @@ namespace DCI.Core.Common
         [Description("Undertime")]
         Undertime = 22,
         [Description("DTR Adjustment")]
-        DTRCorrection = 23
+        DTRCorrection = 23,
+        Late = 24
     }
 
     public enum EnumRole
@@ -176,7 +177,7 @@ namespace DCI.Core.Common
     {
         Regular = 1,
         Special = 2,
-        Suspension = 3, //paano kapag late pumasok
+        Suspension = 3, 
     }
 
     public enum EnumDeductionType
@@ -191,6 +192,8 @@ namespace DCI.Core.Common
     public enum EnumSource
     {
         BIOMETRICS = 1,
-        REMOTE = 2
+        REMOTE = 2,
+        HOLIDAY = 3,
+        SUSPENSION = 4
     }
 }

@@ -56,7 +56,7 @@ namespace DCI.Repositories
                                            OVERTIME = dtr.OVERTIME,
                                            TOTAL_HOURS = dtr.TOTAL_HOURS,
                                            TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS,
-                                           SOURCE = "BIOMETRICS"
+                                           SOURCE =  "BIOMETRICS"
                                        }).ToListAsync();
 
 
@@ -96,7 +96,7 @@ namespace DCI.Repositories
                                      OVERTIME = string.Empty,
                                      TOTAL_HOURS = string.Empty,
                                      TOTAL_WORKING_HOURS = string.Empty,
-                                     SOURCE = "HOLIDAY"
+                                     SOURCE = hol.HolidayType == 3 ? "SUSPENSION" : "HOLIDAY"
                                  }).ToListAsync();
 
 

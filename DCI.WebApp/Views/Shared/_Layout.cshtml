@@ -312,6 +312,18 @@
                             </div>
                         </a>
                     }
+
+                     @if (module.ModulePageId == (int)EnumModulePage.Late)
+                    {
+                        <hr class='sidebar-divider'>
+                        <a href="/DailyTimeRecord/Late" class='mainModule'>
+                            <div class='sidebar-heading mainModuleActive'>
+                                <i class='fa-solid fa fa-share'></i>
+                                <span>Late</span>
+                                <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
+                            </div>
+                        </a>
+                    }
                      
 
                 }

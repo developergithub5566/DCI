@@ -708,7 +708,6 @@ namespace DCI.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
-
         public async Task<IActionResult> WFHTimeIn(WFHViewModel param)
         {
             //  List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();
@@ -763,7 +762,6 @@ namespace DCI.WebApp.Controllers
             }
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
-
 
         public async Task<IActionResult> SaveWFHApplication([FromBody] WfhApplicationViewModel param)
         {
@@ -1461,5 +1459,120 @@ namespace DCI.WebApp.Controllers
             }
             //  return Json(new { success = false, message = "An error occurred. Please try again." });
         }
+
+        public async Task<IActionResult> Late(DailyTimeRecordViewModel param)
+        {
+            List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();            
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    param.CurrentUserId = currentUser.UserId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllLate");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
+                    }
+                }
+
+                return View(model);
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return View(model);
+        }
+
+        public async Task<IActionResult> LateById(DailyTimeRecordViewModel param)
+        {
+            List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    // var currentUser = _userSessionHelper.GetCurrentUser();
+                    //  model.CreatedBy = 2;//currentUser.UserId;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetLateById");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+
+                    string emp_name = string.Empty;
+                    string emp_no = string.Empty;
+                    string emp_info = string.Empty;
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
+                        emp_name = model.Count > 0 ? model.FirstOrDefault().NAME : string.Empty;
+                        emp_no = model.Count > 0 ? model.FirstOrDefault().EMPLOYEE_NO : string.Empty;
+
+                    }
+                    return Json(new { success = true, data = model, emp = String.Format("{0} - {1}", emp_no, emp_name) });
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+       
+        public async Task<IActionResult> SaveLate([FromBody] List<LateDeductionViewModel> model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    //model.CreatedBy = currentUser.UserId;
+                    // model.EmployeeId = currentUser.EmployeeId;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/SaveLate");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = responseBody });
+                    }
+                    return Json(new { success = false, message = responseBody });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
+
     }
 }

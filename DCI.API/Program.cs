@@ -53,6 +53,7 @@ builder.Services.AddScoped<IWfhRepository, WfhRepository>();
 builder.Services.AddScoped<IHolidayRepository, HolidayRepository>();
 builder.Services.AddScoped<IUndertimeRepository, UndertimeRepository>();
 builder.Services.AddScoped<IPositionRepository, PositionRepository>();
+builder.Services.AddScoped<ILateRepository, LateRepository>();
 
 builder.Services.Configure<SMTPModel>(builder.Configuration.GetSection("SmtpSettings"));
 builder.Services.AddSingleton<AuthenticationModel>();

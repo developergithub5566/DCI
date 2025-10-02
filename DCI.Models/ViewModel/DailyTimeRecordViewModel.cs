@@ -27,6 +27,9 @@ namespace DCI.Models.ViewModel
         public string TOTAL_UNDERTIME { get; set; } = string.Empty;
         public string TOTAL_UNDERTIMEHOURS { get; set; } = string.Empty;
 
+        public string TOTAL_LATE { get; set; } = string.Empty;
+        public string TOTAL_LATEHOURS { get; set; } = string.Empty;
+
         public string SOURCE { get; set; } = string.Empty;
         public DateTime DateFrom { get; set; } = DateTime.Now;
         public DateTime DateTo { get; set; } = DateTime.Now;
@@ -128,8 +131,47 @@ namespace DCI.Models.ViewModel
         public string TOTAL_WORKING_HOURS { get; set; } = string.Empty;
         public string LATE { get; set; } = string.Empty;
         public string CLOCK_OUT { get; set; } = string.Empty;
-        public string UNDER_TIME { get; set; } = string.Empty;
-   
+        public string UNDER_TIME { get; set; } = string.Empty;   
+    }
+
+    public class LateDeductionViewModel
+    {
+        public string EmpNo { get; set; } = string.Empty;
+        public DateTime DateFrom { get; set; }
+        public DateTime DateTo { get; set; }
+        public decimal? TotalUndertime { get; set; } = 0;
+    }
+
+    public class LateHeaderViewModel
+    {
+        public int LateHeaderId { get; set; } = 0;
+        public string RequestNo { get; set; } = string.Empty;
+        public DateTime DateFrom { get; set; }
+        public DateTime DateTo { get; set; }
+        public int CreatedBy { get; set; } = 0;
+        public DateTime DateCreated { get; set; }
+        public string CreatedName { get; set; } = string.Empty;
+        public bool IsActive { get; set; } = true;
+    }
+    public class LateDetailViewModel
+    {
+        public int LateDetailId { get; set; } = 0;
+        public int LateHeaderId { get; set; } = 0;
+        public int AttendanceId { get; set; } = 0;
+        public int DeductionType { get; set; } = 0;
+        public string DeductionTypeName { get; set; } = string.Empty;
+        public int CreatedBy { get; set; } = 0;
+        public bool IsActive { get; set; } = true;
+
+        public string EMPLOYEE_NO { get; set; } = string.Empty;
+        public string NAME { get; set; } = string.Empty;
+        public DateTime DATE { get; set; } = DateTime.Now;
+        public string FIRST_IN { get; set; } = string.Empty;
+        public string LAST_OUT { get; set; } = string.Empty;
+        public string TOTAL_WORKING_HOURS { get; set; } = string.Empty;
+        public string LATE { get; set; } = string.Empty;
+        public string CLOCK_OUT { get; set; } = string.Empty;
+        public string LATE_TIME { get; set; } = string.Empty;
     }
 }
 
