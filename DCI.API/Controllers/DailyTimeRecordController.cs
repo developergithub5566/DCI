@@ -282,5 +282,21 @@ namespace DCI.API.Controllers
             return StatusCode(result.statuscode, result.message);
         }
 
+
+        [HttpPost]
+        [Route("GetLateDeduction")]
+        public async Task<IActionResult> GetLateDeduction([FromBody] DailyTimeRecordViewModel model)
+        {
+            return Ok(await _lateRepository.GetLateDeduction(model));
+        }
+
+
+        [HttpPost]
+        [Route("GetLateDeductionByHeaderId")]
+        public async Task<IActionResult> GetLateDeductionByHeaderId([FromBody] DailyTimeRecordViewModel model)
+        {
+            return Ok(await _lateRepository.GetLateDeductionByHeaderId(model));
+        }
+
     }
 }

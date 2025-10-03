@@ -29,7 +29,8 @@ namespace DCI.Repositories
 
         public async Task<IList<DailyTimeRecordViewModel>> GetAllLate(DailyTimeRecordViewModel model)
         {
-            var context = _dbContext.vw_AttendanceSummary.AsQueryable().Where(x => x.STATUS != (int)EnumStatus.PayrollDeducted);
+            // var context = _dbContext.vw_AttendanceSummary.AsNoTracking().Where(x => x.STATUS != (int)EnumStatus.PayrollDeducted && x.STATUS != (int)EnumStatus.VLDeducted);
+            var context = _dbContext.vw_AttendanceSummary.AsNoTracking().Where(x => x.STATUS == (int)EnumStatus.Raw);
             int _currentYear = DateTime.Now.Year;
 
             var dateTo = model.DateTo.Date.AddDays(1).AddTicks(-1);
@@ -302,7 +303,6 @@ namespace DCI.Repositories
                                                          .ExecuteUpdateAsync(s => s
                                                          .SetProperty(r => r.STATUS, r => (int)EnumStatus.VLDeducted));
 
-
                             foreach (var attdnc in attendanceList)
                             {
                                 otd.LateHeaderId = oth.LateHeaderId;
@@ -330,8 +330,6 @@ namespace DCI.Repositories
                                 await _dbContext.SaveChangesAsync();
                             }
                         }
-
-
                     }
                 }
 

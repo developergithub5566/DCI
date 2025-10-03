@@ -1,4 +1,4 @@
-﻿@model IEnumerable<DCI.Models.ViewModel.UndertimeDetailViewModel>
+﻿@model IEnumerable<DCI.Models.ViewModel.LateDetailViewModel>
 @using Newtonsoft.Json;
 @using DCI.Core.Common;
 @using DCI.Models.ViewModel;
@@ -42,7 +42,7 @@
     else
     {
         var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
-                        .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Undertime);
+                        .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Reports);
         canView = module?.View ?? false;
         canAdd = module?.Add ?? false;
         canEdit = module?.Update ?? false;
@@ -81,14 +81,14 @@
         <ul class="breadcrumb">
             <li><a href="~/Home/Index">Dashboard</a></li>
            <li><a href="~/Report/Index">Report</a></li>
-               <li><a href="~/Report/Undertime">Undertime Summary Report</a></li>
+               <li><a href="~/Report/Late">Late Summary Report</a></li>
               <li>@ViewBag.RequestNo</li>
         </ul>
     </div>
 
     <div class="card shadow mb-4">
         <div class="card-header">
-            <label class="mb0">Undertime - @ViewBag.RequestNo</label>
+            <label class="mb0">Late - @ViewBag.RequestNo</label>
         </div>
         <div class="card-body">
             <div class="table-responsive mt20">
@@ -106,7 +106,7 @@
                             <th>First In</th>
                             <th>Last Out</th>
                             <th>Total Working Hours</th>
-                            <th>Under Time</th>
+                            <th>Late</th>
                         </tr>
                     </thead>
                    
@@ -127,7 +127,7 @@
                                         <td>@record.FIRST_IN</td>
                                         <td>@record.LAST_OUT</td>
                                         <td>@record.TOTAL_WORKING_HOURS</td>
-                                        <td>@record.UNDER_TIME.ToString()</td>
+                                        <td>@record.LATE.ToString()</td>
                                     </tr>
                                 }
 
@@ -135,7 +135,7 @@
                              var totalMinutes = g.Sum(r => 
                                 {
                                     TimeSpan ts;
-                                    if (TimeSpan.TryParse(r.UNDER_TIME, out ts))
+                                    if (TimeSpan.TryParse(r.LATE, out ts))
                                     {
                                         return ts.Hours * 60 + ts.Minutes; // exclude seconds
                                     }
@@ -149,7 +149,7 @@
                                 
                             
                                 <tr class="table-secondary fw-bold">
-                                    <td colspan="7" class="text-end">Total Undertime (minutes) for  @g.Key.EMPLOYEE_NO </td>
+                                    <td colspan="7" class="text-end">Total Late (minutes) for  @g.Key.EMPLOYEE_NO </td>
                                     <td>@totalTime.ToString(@"hh\:mm")</td>
                                 </tr>
 
@@ -167,38 +167,6 @@
                             </tr>
                         }
                     </tbody>
-@* 
-                    <tbody>
-                        @foreach (var grp in Model.GroupBy(x => new { x.EMPLOYEE_NO, x.NAME }))
-                        {
-                            foreach (var r in grp)
-                            {
-                                <tr>
-                                    <td>@r.EMPLOYEE_NO</td>
-                                    <td>@r.NAME</td>
-                                    <td>@r.DATE.ToString("yyyy-MM-dd")</td>
-                                    <td>@r.FIRST_IN</td>
-                                    <td>@r.LAST_OUT</td>
-                                    <td>@r.TOTAL_WORKING_HOURS</td>
-                                    <td>@r.UNDER_TIME</td>
-                                </tr>
-                            }
-
-                            var totalMinutes = grp.Sum(r => TimeSpan.TryParse(r.UNDER_TIME, out var ts) ? (int)ts.TotalMinutes : 0);
-
-                            <!-- Summary row: exactly 7 TDs -->
-                            <tr class="group-total table-secondary fw-bold">
-                                <td>**Total for @grp.Key.EMPLOYEE_NO**</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td>@totalMinutes</td>
-                            </tr>
-                        }
-                    </tbody> *@
-
                 </table>
             </div>
             </<div>
@@ -206,21 +174,7 @@
         </div>
         
 @section scripts {
-
-            <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
-            
-            @*  Export Button*@
-            <script src="https://cdn.datatables.net/buttons/3.2.1/js/dataTables.buttons.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-            <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.html5.min.js"></script>
-            <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.print.min.js"></script>
-            <script src="https://cdn.datatables.net/searchpanes/2.3.3/js/dataTables.searchPanes.js"></script>
-            <script src="https://cdn.datatables.net/searchpanes/2.3.3/js/searchPanes.dataTables.js"></script>
-
-            <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
-            <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.1/css/buttons.dataTables.css">
+       
 
             <script type="text/javascript">
                 var js = jQuery.noConflict(true);
@@ -233,41 +187,6 @@
 
 
                 $(document).ready(function () {
-
-                        // setTimeout(() => {
-                        //     $('.spinner-overlay').hide();
-                        // }, 200);
-
-
-                     // js('#tblUndertime').DataTable({
-                     //                  dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
-                     //     buttons: [
-                     //         {
-                     //            extend: 'print',
-                     //                customScripts: [
-                     //                    'https://unpkg.com/pagedjs/dist/paged.polyfill.js'
-                     //                ]
-                     //         }
-                     //     ],
-                     //     lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
-                     //     pageLength: 10 ,// Default entries per page
-                     //            // order: [[2, 'desc']]
-                     //        });
-
-                //                   const dt = $('#tblUndertime').DataTable({
-                //   dom: '<"d-flex justify-content-between align-items-center mb-2"Bf>rtip',
-                //   buttons: [
-                //     {
-                //       extend: 'excelHtml5',
-                //       text: 'Excel'
-                //       // If you want to EXCLUDE summary rows from export, uncomment:
-                //       // , exportOptions: { rows: (idx, data, node) => !$(node).hasClass('group-total') }
-                //     }
-                //   ],
-                //   ordering: false,          // keep grouped order stable
-                //   autoWidth: false,
-                //   responsive: true
-                // });
 
 
                 

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<DCI.Models.ViewModel.UndertimeHeaderViewModel>
+﻿@model IEnumerable<DCI.Models.ViewModel.LateHeaderViewModel>
 @using Newtonsoft.Json;
 @using DCI.Core.Common;
 @using DCI.Models.ViewModel;
@@ -59,7 +59,7 @@
     else
     {
         var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
-                        .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Undertime);
+                        .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Reports);
         canView = module?.View ?? false;
         canAdd = module?.Add ?? false;
         canEdit = module?.Update ?? false;
@@ -79,7 +79,7 @@
 
     <div class="d-sm-flex align-items-center justify-content-between mb-3">
         <h6 class="m-0 font-weight-bold text-gray-800">Reports</h6>
-@* 
+        @* 
         <div class="upperRightDivBtn">
 
             <select id="statusDocType" name="statusDocType" class="form-select" onchange="loadData()">
@@ -99,7 +99,7 @@
         <ul class="breadcrumb">
             <li><a href="~/Home/Index">Dashboard</a></li>
             <li><a href="~/Report/Index">Reports</a></li>
-            <li>Undertime Summary Report</li>
+            <li>Late Summary Report</li>
         </ul>
     </div>
 
@@ -160,10 +160,9 @@
                                     @item.CreatedName
                                 </td>
                                 <td class="text-center">
-                                    @* <a href="#" onclick='view(@item.UndertimeHeaderId);' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a> *@
-                                    @* <a href="#" onclick='view(@item.UndertimeHeaderId);' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a> *@
-                                    <a asp-controller="Report" asp-action="UndertimeByEmpNo" asp-route-UndertimeHeaderId="@item.UndertimeHeaderId"
-                                       asp-route-RequestNo="@item.RequestNo"  title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+
+                                    <a asp-controller="Report" asp-action="LateByEmpNo" asp-route-LateHeaderId="@item.LateHeaderId"
+                                       asp-route-RequestNo="@item.RequestNo" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
                                 </td>
                             </tr>
                         }
@@ -197,7 +196,7 @@
                                             <th>First In</th>
                                             <th>Last Out</th>
                                             <th>Total Working Hours</th>
-                                            <th>Under Time</th>                                        
+                                            <th>Under Time</th>
                                         </tr>
                                     </thead>
                                     <tbody id="underTable">
@@ -215,24 +214,11 @@
 
         </div>
 
-        
+
 
 @section scripts {
 
-            <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
-            
-            @*  Export Button*@
-            <script src="https://cdn.datatables.net/buttons/3.2.1/js/dataTables.buttons.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-            <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.html5.min.js"></script>
-            <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.print.min.js"></script>
-            <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
-            <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.1/css/buttons.dataTables.css">
-
-@*             <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
-            <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.1/css/buttons.dataTables.css"> *@
+ 
 
             <script type="text/javascript">
                 var js = jQuery.noConflict(true);
@@ -282,10 +268,10 @@
 
 
                 //  function view(underHeaderId){
-             
+
                 //              $.ajax({
                 //                     type: 'POST',
-                //                     url: '@Url.Action("UndertimeDeductionByHeaderId", "Report")',
+                //                     url: '@Url.Action("LateDeductionByHeaderId", "Report")',
                 //                     data: JSON.stringify({ UndertimeHeaderId: underHeaderId }),
                 //                     contentType: 'application/json',
                 //                     success: function (response) {
@@ -326,7 +312,7 @@
                 //                       <td>${item.lasT_OUT}</td>
                 //                       <td>${item.totaL_WORKING_HOURS}</td>
                 //                       <td>${item.undeR_TIME}</td>
-                                                                       
+
                 //                    </tr>`;
                 //         tbodytable.append(row);
                 //     });
@@ -353,7 +339,7 @@
 
                     //      if ($.fn.DataTable.isDataTable('#underTable')) {
                     //                  js('#underTable').DataTable().destroy();
-                                    
+
                     //      }
 
                     //  js('#underTable').DataTable({
@@ -383,7 +369,7 @@
 
 
 
-                                    
+
                 //                     } else {
                 //                         tbodytable.html(`<tr><td colspan="7" class="text-center">No record found.</td></tr>`);
                 //                     }
@@ -391,7 +377,7 @@
                 //             }
                 // });
 
-                                                 
+
                 //     js('#undertimeModal').modal('show');
                 //  }
 

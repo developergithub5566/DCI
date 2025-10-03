@@ -350,6 +350,7 @@ namespace DCI.WebApp.Controllers
             }
             return View(model);
         }
+
         public async Task<IActionResult> WFH(DailyTimeRecordViewModel param)
         {
             List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();
@@ -814,6 +815,85 @@ namespace DCI.WebApp.Controllers
                 }
 
                 return View(model);
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return View(model);
+        }
+
+        public async Task<IActionResult> Late(DailyTimeRecordViewModel param)
+        {
+            List<LateHeaderViewModel> model = new List<LateHeaderViewModel>();
+
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    param.CurrentUserId = 1;//currentUser.UserId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetLateDeduction");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<List<LateHeaderViewModel>>(responseBody)!;
+                    }
+                }
+
+                return View(model);
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return View(model);
+        }
+
+
+        public async Task<IActionResult> LateByEmpNo(LateHeaderViewModel param) 
+        {
+            List<LateDetailViewModel> model = new List<LateDetailViewModel>();
+
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    // param.CurrentUserId = 1;//currentUser.UserId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetLateDeductionByHeaderId");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<List<LateDetailViewModel>>(responseBody)!;
+                    }
+                    // return Json(new { success = true, message = "", data = model });
+                    ViewBag.RequestNo = param.RequestNo ?? string.Empty;
+
+                    return View(model);
+                }
+
+                return Json(new { success = false, message = "", data = model });
 
             }
             catch (Exception ex)

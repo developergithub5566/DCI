@@ -131,6 +131,7 @@ namespace DCI.Core.Common
 
     public enum EnumStatus
     {
+        Raw = 0,
         Draft = 1,
         Pending = 2,
         ForApproval = 3,
@@ -140,8 +141,7 @@ namespace DCI.Core.Common
         Deleted = 7,
         Active = 8,
         PayrollDeducted = 9,
-        VLDeducted = 10,
-        NotDeducted = 11
+        VLDeducted = 10       
     }
 
     public enum EnumLeaveType
