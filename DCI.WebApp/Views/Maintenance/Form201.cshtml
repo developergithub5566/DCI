@@ -85,7 +85,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group mb0 text-center">
 
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" asp-for="Firstname" id="Firstname" name="Firstname">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" asp-for="Firstname" id="Firstname" name="Firstname" required>
                                     <label class="bottomLabelText" asp-for="Firstname">First Name</label>
                                 </div>
                             </div>
@@ -99,7 +99,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
 
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Lastname" name="Lastname" value="@(string.IsNullOrWhiteSpace(Model.Lastname) ? "-" : Model.Lastname)">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Lastname" name="Lastname" value="@(string.IsNullOrWhiteSpace(Model.Lastname) ? "-" : Model.Lastname)" required>
                                     <label class="bottomLabelText">Last Name</label>
                                 </div>
                             </div>
@@ -248,7 +248,7 @@
                             <div class="col-lg-6">
                                 <div class="form-group mb10 text-center">
 
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Email" name="Email" placeholder="email@dci.ph" value="@(string.IsNullOrWhiteSpace(Model.Email) ? "" : Model.Email)">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Email" name="Email" placeholder="email@dci.ph" value="@(string.IsNullOrWhiteSpace(Model.Email) ? "" : Model.Email)" required>
                                     <label class="bottomLabelText">Company Email</label>
                                 </div>
                             </div>
@@ -276,7 +276,7 @@
                             <div class="col-lg-12">
                                 <div class="form-group mb10 text-center">
 
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="PresentAddress" name="PresentAddress" value="@(string.IsNullOrWhiteSpace(Model.PresentAddress) ? "-" : Model.PresentAddress)">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="PresentAddress" name="PresentAddress" value="@(string.IsNullOrWhiteSpace(Model.PresentAddress) ? "-" : Model.PresentAddress)" required>
                                     <label class="bottomLabelText">Present Address</label>
                                 </div>
                             </div>
@@ -303,7 +303,7 @@
                             <div class="col-lg-3">
                                 <div class="form-group mb10 text-center">
 
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="EmployeeNo" name="EmployeeNo" value="@(string.IsNullOrWhiteSpace(Model.EmployeeNo) ? "-" : Model.EmployeeNo)">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="EmployeeNo" name="EmployeeNo" value="@(string.IsNullOrWhiteSpace(Model.EmployeeNo) ? "-" : Model.EmployeeNo)" required>
                                     <label class="bottomLabelText">Employee No</label>
                                 </div>
                             </div>
@@ -319,7 +319,7 @@
                             <div class="col-lg-5">
                                 <div class="form-group mb10 text-center">
                                     @*      <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.DepartmentName) ? "-" : Model.DepartmentName)</label> *@
-                                    @Html.DropDownListFor(model => model.DepartmentId, Model.OptionsDepartment, "SELECT DEPARTMENT", new { @class = "bg-gray-100 font-weight-bold form-control frmField text-center" })
+                                    @Html.DropDownListFor(model => model.DepartmentId, Model.OptionsDepartment, "SELECT DEPARTMENT", new { @class = "bg-gray-100 font-weight-bold form-control frmField text-center", required = "required" })
                                     <label class="bottomLabelText">Department</label>
                                 </div>
                             </div>
@@ -328,20 +328,20 @@
                                     @*        <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.EmployeeStatusName) ? "-" : Model.EmployeeStatusName)</label> *@
                                     @*   <select id="empStatusSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" required>                                  
                                 </select> *@
-                                    @Html.DropDownListFor(model => model.EmployeeStatusId, Model.OptionsEmployeeStatus, "SELECT STATUS", new { @class = "bg-gray-100 font-weight-bold form-control frmField text-center", @onchange = "splchange()" })
+                                    @Html.DropDownListFor(model => model.EmployeeStatusId, Model.OptionsEmployeeStatus, "SELECT STATUS", new { @class = "bg-gray-100 font-weight-bold form-control frmField text-center", @onchange = "splchange()", required = "required" })
                                     <label class="bottomLabelText">Employment Status</label>
                                 </div>
                             </div>
                             <div class="col-lg-3">
                                 <div class="form-group mb10 text-center">
                                     @*  <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.DateHired.ToString()) ? "-" : Model.DateHired?.ToString("MMMM dd, yyyy"))</label> *@
-                                    <input type="text" name="DateHired" id="DateHired" class="bg-gray-100 font-weight-bold form-control frmField text-center" autocomplete="off" value="@Model.DateHired?.ToString("yyyy-MM-dd")">
+                                    <input type="text" name="DateHired" id="DateHired" class="bg-gray-100 font-weight-bold form-control frmField text-center" autocomplete="off" value="@Model.DateHired?.ToString("yyyy-MM-dd")" required>
                                     <label class="bottomLabelText">Date Hired</label>
                                 </div>
                             </div>
                             <div class="col-lg-3">
                                 <div class="form-group mb10 text-center">
-                                    @*  <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.DateHired.ToString()) ? "-" : Model.DateHired?.ToString("MMMM dd, yyyy"))</label> *@
+                                    @*  <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.DateRegularized.ToString()) ? "-" : Model.DateRegularized?.ToString("MMMM dd, yyyy"))</label> *@
                                     <input type="text" name="DateRegularized" id="DateRegularized" class="bg-gray-100 font-weight-bold form-control frmField text-center" autocomplete="off" value="@Model.DateRegularized?.ToString("yyyy-MM-dd")">
                                     <label class="bottomLabelText">Date Regularized</label>
                                 </div>
@@ -428,19 +428,19 @@
                             <div class="col-lg-2">
                                 <div class="form-group mb10 text-center">
                                     <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="VLCredit" name="VLCredit" onkeypress="return isNumericDecimalKey(event, this)" oninput="checkingNumber(this)" title="VL Monthly Credit">
-                                    <label class="bottomLabelText">Vacation Leave Credit</label>
+                                    <label class="bottomLabelText">Vacation Leave Credit <i class="fa-solid fa-circle-info" title="Monthly Leave Credit"></i></label>
                                 </div>
                             </div>
                             <div class="col-lg-2">
                                 <div class="form-group mb10 text-center">
                                     <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="SLCredit" name="SLCredit" onkeypress="return isNumericDecimalKey(event, this)" oninput="checkingNumber(this)" title="SL Monthly Credit">
-                                    <label class="bottomLabelText">Sick Leave Credit</label>
+                                    <label class="bottomLabelText">Sick Leave Credit <i class="fa-solid fa-circle-info" title="Monthly Leave Credit"></i></label>
                                 </div>
                             </div>
                             <div class="col-lg-2">
                                 <div class="form-group mb10 text-center">
-                                    <label class="topLabelText" title="SPL Yearly Credit" id="splyearyly">3.0000</label>
-                                    <label class="bottomLabelText">Special Leave Credit</label>
+                                    <label class="topLabelText" title="SPL Yearly Credit" id="splyearyly">0.0000</label>
+                                    <label class="bottomLabelText">Special Leave Credit <i class="fa-solid fa-circle-info" title="Annual Special Leave Credit"></i></label>
                                 </div>
                             </div>
                         </div>

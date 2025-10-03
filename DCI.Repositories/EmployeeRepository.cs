@@ -322,8 +322,7 @@ namespace DCI.Repositories
                 lv.CreatedBy = model.CurrentUserId;
                 lv.IsActive = true;
                 await _dbContext.LeaveInfo.AddAsync(lv);
-                await _dbContext.SaveChangesAsync();
-              
+                await _dbContext.SaveChangesAsync();              
             }
             // kung hindi same lang nung last record, issave nya. 
             else if (IsNewEmployee == false && leaveinfo?.VLCredit != model.VLCredit && leaveinfo?.SLCredit != model.SLCredit)
@@ -343,6 +342,8 @@ namespace DCI.Repositories
                 await _dbContext.LeaveInfo.AddAsync(lv);
                 await _dbContext.SaveChangesAsync();
             }
+
+
            
         }
 

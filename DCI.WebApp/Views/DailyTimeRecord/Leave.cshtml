@@ -463,7 +463,8 @@
                                      dateFormat: "Y-m-d",
                                         defaultDate: (function () {
                                     let d = new Date();
-                                    d.setMonth(d.getMonth() - 1);
+                                   // d.setMonth(d.getMonth() - 1);
+                                     d.setMonth(d.getMonth() - 12);
                                     return d;
                                      })()
                                 });
