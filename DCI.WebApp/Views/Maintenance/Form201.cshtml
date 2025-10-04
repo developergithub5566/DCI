@@ -134,7 +134,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
                                     @* <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Sex" name="Sex" value="@(string.IsNullOrWhiteSpace(Model.Sex) ? "-" : Model.Sex)"> *@
-                                    <select id="SexSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" asp-for="Sex" required>
+                                    <select id="SexSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" asp-for="Sex">
                                         <option value="">SELECT SEX</option>
                                         <option value="1">MALE</option>
                                         <option value="2">FEMALE</option>
@@ -145,7 +145,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
                                     @* <input type="hidden" id="Civil" name="Sex" value="0" class="bg-gray-100 font-weight-bold form-control frmField text-center"> *@
-                                    <select id="CivilSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" asp-for="CivilStatus" required>
+                                    <select id="CivilSelect" class="bg-gray-100 font-weight-bold form-control frmField text-center" asp-for="CivilStatus">
                                         <option value="">SELECT CIVIL STATUS</option>
                                         <option value="1">SINGLE</option>
                                         <option value="2">MARRIED</option>
@@ -303,7 +303,7 @@
                             <div class="col-lg-3">
                                 <div class="form-group mb10 text-center">
 
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="EmployeeNo" name="EmployeeNo" value="@(string.IsNullOrWhiteSpace(Model.EmployeeNo) ? "-" : Model.EmployeeNo)" required>
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="EmployeeNo" name="EmployeeNo" value="@(string.IsNullOrWhiteSpace(Model.EmployeeNo) ? "" : Model.EmployeeNo)" required>
                                     <label class="bottomLabelText">Employee No</label>
                                 </div>
                             </div>
@@ -427,13 +427,13 @@
 
                             <div class="col-lg-2">
                                 <div class="form-group mb10 text-center">
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="VLCredit" name="VLCredit" onkeypress="return isNumericDecimalKey(event, this)" oninput="checkingNumber(this)" title="VL Monthly Credit">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="VLCredit" name="VLCredit" onkeypress="return isNumericDecimalKey(event, this)" oninput="checkingNumber(this)" title="VL Monthly Credit" value="@(string.IsNullOrWhiteSpace(Model.VLCredit.ToString()) ? "" : Model.VLCredit)">
                                     <label class="bottomLabelText">Vacation Leave Credit <i class="fa-solid fa-circle-info" title="Monthly Leave Credit"></i></label>
                                 </div>
                             </div>
                             <div class="col-lg-2">
                                 <div class="form-group mb10 text-center">
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="SLCredit" name="SLCredit" onkeypress="return isNumericDecimalKey(event, this)" oninput="checkingNumber(this)" title="SL Monthly Credit">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="SLCredit" name="SLCredit" onkeypress="return isNumericDecimalKey(event, this)" oninput="checkingNumber(this)" title="SL Monthly Credit" value="@(string.IsNullOrWhiteSpace(Model.SLCredit.ToString()) ? "" : Model.SLCredit)">
                                     <label class="bottomLabelText">Sick Leave Credit <i class="fa-solid fa-circle-info" title="Monthly Leave Credit"></i></label>
                                 </div>
                             </div>
@@ -478,9 +478,9 @@
 
 @section scripts {
 
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+@*     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"> *@
     <script src="@Url.Content("~/js/dci-validation.js")"></script>
 
 

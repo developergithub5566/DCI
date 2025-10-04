@@ -79,23 +79,26 @@ namespace DCI.Repositories
             {
                 //var xamedsa = _dbContext.EmployeeWorkDetails.Where(x => x.EmployeeId == empId).FirstOrDefault();
 
-               var result =  await (from emp in _dbContext.Employee
-                                    join dtl in _dbContext.EmployeeWorkDetails on emp.EmployeeId equals dtl.EmployeeId into dtlGroup
+               var result =  await (from emp in _dbContext.Employee.AsNoTracking()
+                                    join dtl in _dbContext.EmployeeWorkDetails.AsNoTracking() on emp.EmployeeId equals dtl.EmployeeId into dtlGroup
                                     from dtl in dtlGroup.DefaultIfEmpty()
 
-                                    join dpt in _dbContext.Department on dtl.DepartmentId equals dpt.DepartmentId into dptGroup
+                                    join dpt in _dbContext.Department.AsNoTracking() on dtl.DepartmentId equals dpt.DepartmentId into dptGroup
                                      from dpt in dptGroup.DefaultIfEmpty()
 
-                                     join post in _dbContext.Position on dtl.Position equals post.PositionId into postGroup
+                                     join post in _dbContext.Position.AsNoTracking() on dtl.Position equals post.PositionId into postGroup
                                      from post in postGroup.DefaultIfEmpty()
 
-                                    join loc in _dbContext.WorkLocation on dtl.WorkLocation equals loc.WorkLocationId into locGroup
+                                    join loc in _dbContext.WorkLocation.AsNoTracking() on dtl.WorkLocation equals loc.WorkLocationId into locGroup
                                     from loc in locGroup.DefaultIfEmpty()
 
-                                    join empstat in _dbContext.EmployeeStatus on dtl.EmployeeStatusId equals empstat.EmployeeStatusId into empstatGroup
+                                    join empstat in _dbContext.EmployeeStatus.AsNoTracking() on dtl.EmployeeStatusId equals empstat.EmployeeStatusId into empstatGroup
                                      from empstat in empstatGroup.DefaultIfEmpty()
 
-                                     where emp.EmployeeId == empId
+                                    join leaveinfo in _dbContext.LeaveInfo.AsNoTracking() on emp.EmployeeId equals leaveinfo.EmployeeId into leaveinfoGroup
+                                    from leaveinfo in leaveinfoGroup.DefaultIfEmpty()
+
+                                    where emp.EmployeeId == empId
                                             select new Form201ViewModel
                                             {
                                                 EmployeeId = emp.EmployeeId,
@@ -137,6 +140,8 @@ namespace DCI.Repositories
                                                 EmployeeStatusId = empstat.EmployeeStatusId,
                                                 EmployeeStatusName = empstat.Description,
                                                 PayrollType = dtl.PayrollType,
+                                                VLCredit  = leaveinfo.VLCredit,
+                                                SLCredit = leaveinfo.SLCredit,
                                                 DateCreated = emp.DateCreated,
                                                 CreatedBy = emp.CreatedBy,
                                                 DateModified = emp.DateModified,
@@ -145,10 +150,10 @@ namespace DCI.Repositories
                                             }).FirstOrDefaultAsync() ?? new Form201ViewModel();
 
 
-                result.EmployeeStatusList = _dbContext.EmployeeStatus.Where(x => x.IsActive).ToList();
-                result.DepartmentList = _dbContext.Department.Where(x => x.IsActive).ToList();
-                result.PositionList = _dbContext.Position.Where(x => x.IsActive).ToList();
-                result.WorkLocationList = _dbContext.WorkLocation.Where(x => x.IsActive).ToList();
+                result.EmployeeStatusList = _dbContext.EmployeeStatus.AsNoTracking().Where(x => x.IsActive).ToList();
+                result.DepartmentList = _dbContext.Department.AsNoTracking().Where(x => x.IsActive).ToList();
+                result.PositionList = _dbContext.Position.AsNoTracking().Where(x => x.IsActive).ToList();
+                result.WorkLocationList = _dbContext.WorkLocation.AsNoTracking().Where(x => x.IsActive).ToList();
                 return result;
             }
             catch (Exception ex)
@@ -219,8 +224,9 @@ namespace DCI.Repositories
                     await _dbContext.EmployeeWorkDetails.AddAsync(dtl);
                     await _dbContext.SaveChangesAsync();
 
-                   await UpdateLeaveInfo(model, true);
-
+                    model.EmployeeId = emp.EmployeeId;
+                    await UpdateLeaveInfo(model, true);
+                  
                     return (StatusCodes.Status200OK, "Registration successful");
                 }
                 else
@@ -279,12 +285,16 @@ namespace DCI.Repositories
                     await _dbContext.SaveChangesAsync();
 
                     var usr = await _dbContext.User.FirstOrDefaultAsync(x => x.EmployeeId == model.EmployeeId);
-                    usr.Firstname = model.Firstname;
-                    usr.Middlename = model.Middlename;
-                    usr.Lastname = model.Lastname;
-                    usr.ContactNo = model.MobileNoPersonal ?? model.MobileNoOffice;
-                    _dbContext.User.Entry(usr).State = EntityState.Modified;
-                    await _dbContext.SaveChangesAsync();
+                    if(usr != null)
+                    {
+                        usr.Firstname = model.Firstname;
+                        usr.Middlename = model.Middlename;
+                        usr.Lastname = model.Lastname;
+                        usr.ContactNo = model.MobileNoPersonal ?? model.MobileNoOffice;
+                        _dbContext.User.Entry(usr).State = EntityState.Modified;
+                        await _dbContext.SaveChangesAsync();
+                    }
+                  
 
                     await UpdateLeaveInfo(model, false);
 
@@ -306,16 +316,33 @@ namespace DCI.Repositories
         {
             int _year = DateTime.Now.Year;
 
-            var leaveinfo = await _dbContext.LeaveInfo.OrderByDescending(x => x.EmployeeId == model.EmployeeId).FirstOrDefaultAsync();
+            var leaveinfo = await _dbContext.LeaveInfo.Where(x => x.EmployeeId == model.EmployeeId && x.IsActive).OrderByDescending(x => x.DateCreated).FirstOrDefaultAsync();
 
             if(leaveinfo == null && IsNewEmployee)
             {
+                var dayStart = model.DateHired.Value.Date.Day;
+           
+                decimal multiplier = 0;
+
+                if (dayStart <= 7)
+                    multiplier = 1.00m;
+                else if (dayStart <= 15)
+                    multiplier = 0.75m;
+                else if (dayStart <= 23)
+                    multiplier = 0.50m;
+                else if (dayStart <= 31)
+                    multiplier = 0.25m;
+
+                decimal firstCreditMonthVL = model.VLCredit * multiplier;
+                decimal firstCreditMonthSL = model.SLCredit * multiplier;
+
+
                 LeaveInfo lv = new LeaveInfo();
                 lv.EmployeeId = model.EmployeeId;
                 lv.VLYear = 0;
                 lv.SLYear = 0;
-                lv.VLBalance = 0;
-                lv.SLBalance = 0;
+                lv.VLBalance = firstCreditMonthVL;
+                lv.SLBalance = firstCreditMonthSL;
                 lv.VLCredit = model.VLCredit;
                 lv.SLCredit = model.SLCredit;
                 lv.DateCreated = DateTime.Now;

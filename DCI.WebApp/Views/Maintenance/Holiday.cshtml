@@ -175,14 +175,16 @@
                                     <label for="HolidayName" class="col-form-label required">Holiday Name:</label>
                                     <input type="text" class="form-control" id="HolidayName" name="HolidayName" maxlength="100" onkeypress="return alphaNumericOnly(event);" required>
                                 </div>
-
+                                <div class="form-group">
+                                
+                                    <label for="HolidayType" class="col-form-label required">Holiday Type:</label>
                                 <select id="selectholiday" class="form-select" required">
                                     <option value="0" disabled>Select</option>
                                     <option value="1">Regular Holiday</option>
                                     <option value="2">Special Holiday</option>
                                     <option value="3">Suspension</option>
                                 </select>
-
+                                </div>
                                 <div class="form-group">
                                     <label for="Description" class="col-form-label">Description:</label>
                                     <textarea class="form-control" id="Description" name="Description" maxlength="255"></textarea>

@@ -71,6 +71,6 @@ namespace DCI.Models.ViewModel
 
         public int CurrentUserId { get; set; } = 0;
         public decimal VLCredit { get; set; }
-        public decimal SLCredit { get; set; }
+        public decimal SLCredit { get; set; }      
     }
 }
