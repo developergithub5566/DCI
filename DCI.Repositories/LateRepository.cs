@@ -245,11 +245,11 @@ namespace DCI.Repositories
         }
 
 
-        public async Task<(int statuscode, string message)> SaveLate(List<LateDeductionViewModel> model)
+        public async Task<(int statuscode, string message)> SaveLate(LateHeaderDeductionViewModel model)
         {
             try
             {
-                foreach (var ut in model)
+                foreach (var ut in model.LateDeductionList)
                 {
                     if (ut.EmpNo != null && ut.TotalUndertime > 0)
                     {
@@ -267,7 +267,7 @@ namespace DCI.Repositories
                         oth.DateFrom = ut.DateFrom;
                         oth.DateTo = ut.DateTo;
                         oth.DateCreated = DateTime.Now;
-                        oth.CreatedBy = 1;
+                        oth.CreatedBy = model.CurrentUserId;
                         oth.IsActive = true;
                         await _dbContext.LateHeader.AddAsync(oth);
                         await _dbContext.SaveChangesAsync();

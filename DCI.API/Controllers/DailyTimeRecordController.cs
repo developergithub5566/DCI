@@ -126,7 +126,7 @@ namespace DCI.API.Controllers
 
         [HttpPost]
         [Route("SaveUndertime")]
-        public async Task<IActionResult> SaveUndertime([FromBody] List<UndertimeDeductionViewModel> model)
+        public async Task<IActionResult> SaveUndertime([FromBody] UndertimeHeaderDeductionViewModel model)
         {
             // return Ok(await _dtrRepository.SaveUndertime(model));
             var result = await _undertimeRepository.SaveUndertime(model);
@@ -276,7 +276,7 @@ namespace DCI.API.Controllers
 
         [HttpPost]
         [Route("SaveLate")]
-        public async Task<IActionResult> SaveLate([FromBody] List<LateDeductionViewModel> model)
+        public async Task<IActionResult> SaveLate([FromBody] LateHeaderDeductionViewModel model)
         {          
             var result = await _lateRepository.SaveLate(model);
             return StatusCode(result.statuscode, result.message);

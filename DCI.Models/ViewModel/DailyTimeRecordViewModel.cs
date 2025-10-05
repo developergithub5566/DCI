@@ -102,6 +102,12 @@ namespace DCI.Models.ViewModel
         public decimal? TotalUndertime { get; set; } = 0;
     }
 
+    public class UndertimeHeaderDeductionViewModel
+    {
+        public int CurrentUserId { get; set; } = 0;
+        public List<UndertimeDeductionViewModel> UndertimeDeductionList { get; set; } = new List<UndertimeDeductionViewModel>();
+    }
+
     public class UndertimeHeaderViewModel
     {
         public int UndertimeHeaderId { get; set; } = 0;
@@ -111,7 +117,7 @@ namespace DCI.Models.ViewModel
         public int CreatedBy { get; set; } = 0;
         public DateTime DateCreated { get; set; }
         public string CreatedName { get; set; } = string.Empty;
-        public bool IsActive { get; set; } = true;
+        public bool IsActive { get; set; } = true;     
     }
     public class UndertimeDetailViewModel
     {
@@ -140,6 +146,12 @@ namespace DCI.Models.ViewModel
         public DateTime DateFrom { get; set; }
         public DateTime DateTo { get; set; }
         public decimal? TotalUndertime { get; set; } = 0;
+    }
+
+    public class LateHeaderDeductionViewModel
+    {
+        public int CurrentUserId { get; set; } = 0;
+        public List<LateDeductionViewModel> LateDeductionList { get; set; } = new List<LateDeductionViewModel>();
     }
 
     public class LateHeaderViewModel

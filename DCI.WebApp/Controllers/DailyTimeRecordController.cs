@@ -600,13 +600,15 @@ namespace DCI.WebApp.Controllers
         {
             try
             {
+                UndertimeHeaderDeductionViewModel headermodel = new UndertimeHeaderDeductionViewModel();
                 using (var _httpclient = new HttpClient())
                 {
-                    var currentUser = _userSessionHelper.GetCurrentUser();
-                    //model.CreatedBy = currentUser.UserId;
-                    // model.EmployeeId = currentUser.EmployeeId;
+                    var currentUser = _userSessionHelper.GetCurrentUser();                 
+                    headermodel.CurrentUserId = currentUser.UserId;
+                    headermodel.UndertimeDeductionList = model;
+                
 
-                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(headermodel), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/SaveUndertime");
                     request.Content = stringContent;
                     var response = await _httpclient.SendAsync(request);
@@ -1542,13 +1544,15 @@ namespace DCI.WebApp.Controllers
         {
             try
             {
+                LateHeaderDeductionViewModel headermodel = new LateHeaderDeductionViewModel();
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
-                    //model.CreatedBy = currentUser.UserId;
-                    // model.EmployeeId = currentUser.EmployeeId;
+                    headermodel.CurrentUserId = currentUser.UserId;
+                    headermodel.LateDeductionList = model;
 
-                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(headermodel), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/SaveLate");
                     request.Content = stringContent;
                     var response = await _httpclient.SendAsync(request);
