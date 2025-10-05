@@ -1,4 +1,5 @@
-﻿using DCI.Models.Entities;
+﻿using DCI.Models.Configuration;
+using DCI.Models.Entities;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DCI.Models.ViewModel
@@ -136,6 +137,27 @@ namespace DCI.Models.ViewModel
         public int PendingApplication { get; set; } = 0;
         public int VLFiled { get; set; } = 0;
         public int SLFiled { get; set; } = 0;
+    }
+
+
+    public class LeaveCreditViewModel
+    {
+        public int LeaveCreditId { get; set; }
+
+        public int EmployeeId { get; set; } = 0;
+
+        public int LeaveTypeId { get; set; } = 0;
+
+        public decimal? VLBegBal { get; set; } = 0;
+
+        public decimal? VLCredit { get; set; } = 0;
+        public decimal? SLBegBal { get; set; } = 0;
+
+        public decimal? SLCredit { get; set; } = 0;
+
+        public DateTime DateCreated { get; set; } = DateTime.Now;
+
+        public bool IsActive { get; set; } = true;
     }
 
 }

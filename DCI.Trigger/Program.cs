@@ -46,8 +46,14 @@ public class Program
 
         app.UseHangfireDashboard();
 
-        RecurringJob.AddOrUpdate<OutboxProcessor>("outbox-job",
-            processor => processor.ProcessPendingMessages(), Cron.Minutely);
+        //RecurringJob.AddOrUpdate<OutboxProcessor>("outbox-job",
+        //    processor => processor.ProcessPendingMessages(), Cron.Minutely);
+
+        //RecurringJob.AddOrUpdate<LeaveProcessor>("leave-credit-job",
+        // processor => processor.MonthlyLeaveCredit(), "0 0 1 * *"); // Runs on the 1st day of every month
+
+        RecurringJob.AddOrUpdate<LeaveProcessor>("leave-credit-job",
+ processor => processor.MonthlyLeaveCredit(), Cron.Minutely); 
 
         app.MapGet("/", () => "SQL Outbox + Hangfire is running");
 

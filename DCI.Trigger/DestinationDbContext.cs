@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DCI.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace DCI.Trigger
 {
@@ -7,5 +8,11 @@ namespace DCI.Trigger
         public DestinationDbContext(DbContextOptions<DestinationDbContext> options) : base(options) { }
 
         public DbSet<TblRawLog> TblRawLogs { get; set; }
+
+        public DbSet<LeaveCredits> LeaveCredits { get; set; }
+        public DbSet<LeaveInfo> LeaveInfo { get; set; }
+        public DbSet<Employee> Employee { get; set; }
+        public DbSet<EmployeeWorkDetails> EmployeeWorkDetails { get; set; }
+
     }
 }
