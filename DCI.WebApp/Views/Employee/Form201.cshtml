@@ -4,6 +4,37 @@
 @using DCI.Models.ViewModel;
 
 
+@{
+    var modulePageAccess = Context.Session.GetString("ModulePageAccess"); 
+
+    if (modulePageAccess == null)
+    {
+        <script>
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Logout", "Account")',
+                success: function (response) {
+
+                    Swal.fire({
+                        text: "Your session has timed out. Please log in again.",
+                        icon: "info",
+                        confirmButtonText: "Ok"
+                    }).then((result) => {
+                        window.location.href = '/Account/Logout';
+                    });
+                },
+                error: function () {
+                    Swal.fire({
+                        text: "An error occurred. Please try again.",
+                        icon: "error"
+                    });
+                }
+            })
+        </script>
+    } 
+}
+
+
 
 <div class="container-fluid">
     @*    <div class="spinner-overlay">
@@ -358,7 +389,7 @@
 
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex bg-light flex-row align-items-center justify-content-between">
-                    <h6 class="m-0  small font-weight-bold text-dark"><i class="fa fa-graduation-cap" aria-hidden="true"></i> &nbsp; Educational Background(Coming Soon)</h6>
+                    <h6 class="m-0  small font-weight-bold text-dark"><i class="fa fa-graduation-cap" aria-hidden="true"></i> &nbsp; Educational Background<sup>(Coming Soon)</sup></h6>
                 </div>
 
                 <!-- Card Body -->

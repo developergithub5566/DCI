@@ -17,7 +17,7 @@
         <script>
             $.ajax({
                 type: 'POST',
-                url: '@Url.Action("Logout", "Account")',
+                url: '@Url.Action("Logout", "Account")',    
                 success: function (response) {
 
                     Swal.fire({
@@ -125,11 +125,11 @@
                                 </td> *@
                                 @if(item.Status == 8)
                                 {
-                                    <td class="text-center"><a href="#" class="btnActivate" onclick="changeStatus(@item.AnnouncementId, 8)"><i class="fas fa-toggle-on"></i></a></td>
+                                    <td class="text-center"><a href="#" class="btnActivate" onclick="changeStatus(@item.AnnouncementId, 1)"><i class="fas fa-toggle-on"></i></a></td>
                                 }
                                 else
                                 {
-                                    <td class="text-center"><a href="#" class="btnDeactivate" onclick="changeStatus(@item.AnnouncementId, 9)"><i class="fas fa-toggle-off"></i></a></td>
+                                    <td class="text-center"><a href="#" class="btnDeactivate" onclick="changeStatus(@item.AnnouncementId, 8)"><i class="fas fa-toggle-off"></i></a></td>
                                 }                             
 
                                 <td>
@@ -449,9 +449,9 @@
                         }
 
                         function changeStatus(id,status){
-                            var strActivate = "Activate";
+                            var strActivate = "Deactivate";
                             if(status == 8){
-                                 strActivate = "Deactivate";
+                                 strActivate = "Activate";
                             }
 
 
@@ -464,8 +464,8 @@
                                 if (result.isConfirmed) {
                                     $.ajax({
                                         type: 'POST',
-                                        url: '@Url.Action("SaveAnnouncement", "Maintenance")',
-                                        data: { DepartmentId: id },
+                                        url: '@Url.Action("ChangeStatusAnnouncement", "Maintenance")',
+                                        data: { AnnouncementId: id , Status : status},
                                         success: function (response) {
                                             if (response.success) {
                                                 Swal.fire({

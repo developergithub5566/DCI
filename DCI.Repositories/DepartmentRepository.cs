@@ -90,7 +90,12 @@ namespace DCI.Repositories
 			return await _dbContext.Department.AnyAsync(x => x.DepartmentId == DepartmentId && x.IsActive == true);
 		}
 
-		public async Task<(int statuscode, string message)> Save(DepartmentViewModel model)
+        public async Task<bool> IsExistsDepartmentCode(string deptCode)
+        {
+            return await _dbContext.Department.AnyAsync(x => x.DepartmentCode == deptCode && x.IsActive == true);
+        }
+
+        public async Task<(int statuscode, string message)> Save(DepartmentViewModel model)
 		{
 			try
 			{

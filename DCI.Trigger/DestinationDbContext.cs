@@ -13,6 +13,7 @@ namespace DCI.Trigger
         public DbSet<LeaveInfo> LeaveInfo { get; set; }
         public DbSet<Employee> Employee { get; set; }
         public DbSet<EmployeeWorkDetails> EmployeeWorkDetails { get; set; }
-
+        public DbSet<Notification> Notification { get; set; }
+        public DbSet<User> User { get; set; }
     }
 }

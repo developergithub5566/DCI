@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Serilog;
 
 namespace DCI.Trigger
 {
@@ -50,7 +51,7 @@ namespace DCI.Trigger
             }
             catch (Exception ex)
             {
-                ex.Message.ToString();
+                Log.Error(ex.ToString());
             }
         }
     }

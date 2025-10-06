@@ -232,6 +232,10 @@ namespace DCI.API.Controllers
         [Route("SaveDepartment")]
         public async Task<IActionResult> SaveDepartment([FromBody] DepartmentViewModel model)
         {
+            if (await _departmentRepository.IsExistsDepartmentCode(model.DepartmentCode))
+            {
+                return NotFound("Department code already exists");
+            }
             var result = await _departmentRepository.Save(model);
             return StatusCode(result.statuscode, result.message);
         }
@@ -360,6 +364,15 @@ namespace DCI.API.Controllers
             var result = await _announcementRepository.Save(model);
             return StatusCode(result.statuscode, result.message);
         }
+
+        [HttpPost]
+        [Route("ChangeStatusAnnouncement")]
+        public async Task<IActionResult> ChangeStatusAnnouncement([FromBody] AnnouncementViewModel model)
+        {
+            var result = await _announcementRepository.ChangeStatusAnnouncement(model);
+            return StatusCode(result.statuscode, result.message);
+        }
+
         [HttpPost]
         [Route("DeleteAnnouncement")]
         public async Task<IActionResult> DeleteAnnouncement([FromBody] AnnouncementViewModel model)
@@ -467,6 +480,11 @@ namespace DCI.API.Controllers
         [Route("SavePosition")]
         public async Task<IActionResult> SavePosition([FromBody] PositionViewModel model)
         {
+            if (await _positionRepository.IsExistsPositionCode(model.PositionCode))
+            {
+                return NotFound("Position code already exists");
+            }
+
             var result = await _positionRepository.Save(model);
             return StatusCode(result.statuscode, result.message);
         }

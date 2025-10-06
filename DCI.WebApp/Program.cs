@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using DCI.Models.Configuration;
 using Serilog;
@@ -97,6 +97,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 //app.UseSession();
+app.UseMiddleware<EnsureUserSessionMiddleware>();  // 👈 here
 
 app.UseAuthentication(); // jc for testing oct7
 app.UseRouting();

@@ -145,6 +145,7 @@ namespace DCI.Models.ViewModel
         public int LeaveCreditId { get; set; }
 
         public int EmployeeId { get; set; } = 0;
+        public int UserId { get; set; } = 0;
 
         public int LeaveTypeId { get; set; } = 0;
 

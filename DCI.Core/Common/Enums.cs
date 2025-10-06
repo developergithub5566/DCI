@@ -52,7 +52,8 @@ namespace DCI.Core.Common
         Undertime = 22,
         [Description("DTR Adjustment")]
         DTRCorrection = 23,
-        Late = 24
+        Late = 24,
+        TriggerLeaveCreditProcess = 25
     }
 
     public enum EnumRole

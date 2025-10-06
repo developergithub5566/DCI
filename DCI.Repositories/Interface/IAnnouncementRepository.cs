@@ -8,5 +8,6 @@ namespace DCI.Repositories.Interface
         Task<IList<AnnouncementViewModel>> GetAllAnnouncement();
         Task<(int statuscode, string message)> Delete(AnnouncementViewModel model);
         Task<(int statuscode, string message)> Save(AnnouncementViewModel model);
+        Task<(int statuscode, string message)> ChangeStatusAnnouncement(AnnouncementViewModel model);
     }
 }

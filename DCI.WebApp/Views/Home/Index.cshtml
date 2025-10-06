@@ -53,7 +53,7 @@
     <!-- Begin Page Content -->
     <div class="container-fluid">
         <!-- Content Row -->
-        @* 	<div class="row">
+@* 	<div class="row">
 				<div class="col-12">
 					<div class="announcementDiv shadow">
 						<div class="row">
@@ -204,60 +204,90 @@
                                     .cake:hover {
                                         transform: scale(1.3) rotate(10deg);
                                     }
+
+
+                                .sad-emoji {
+                                    font-size: 4rem;
+                                    cursor: pointer;
+                                    display: inline-block;
+                                    transition: transform 0.3s ease;
+                                }
+
+                                    .sad-emoji::after {
+                                        content: "😔"; /* default emoji */
+                                        transition: all 0.3s ease;
+                                        display: inline-block;
+                                    }
+
+                                    .sad-emoji:hover::after {
+                                        content: "😢"; /* crying emoji when hovered */
+                                        transform: scale(1.2);
+                                    }
                             </style>
                             <div class="col-sm-8">
                                 <div class="small text-muted">This Month</div>
                                 <div class="h5 font-weight-bold text-gray-900 mb-2">Birthday Celebrators</div>
                                 <ul class="bdayList">
-                                    @foreach (var bday in Model.BirthdayList.OrderBy(b => b.Birthday.HasValue &&                                                                       
-                                                                        b.Birthday.Value.Day == DateTime.Now.Day))
+                                    @if (Model.BirthdayList == null || !Model.BirthdayList.Any())
                                     {
-                                        var isToday = bday.Birthday.HasValue &&
-                                        bday.Birthday.Value.Month == DateTime.Now.Month &&
-                                        bday.Birthday.Value.Day == DateTime.Now.Day;
+                                        <div class="text-center text-muted mt-3">
+                                           
+                                            <div>No celebrants for this month</div>
+                                            <span class="sad-emoji"></span>
+                                        </div>
+                                    }
+                                    else
+                                    {
 
-                                        <li class="@(isToday ? "bday-today" : "")">
-                                            <label class="date">@bday.Birthdate</label>
-                                            <label class="name">@bday.EmployeeName</label>
-                                            @if (isToday)
-                                            {
-                                                <span title="click me" class="cake" onclick="throwConfetti()">🎂</span>
-                                            }
-                                        </li>
+                                        @foreach (var bday in Model.BirthdayList.OrderBy(b => b.Birthday.HasValue &&
+                                                                            b.Birthday.Value.Day == DateTime.Now.Day))
+                                        {
+                                            var isToday = bday.Birthday.HasValue &&
+                                            bday.Birthday.Value.Month == DateTime.Now.Month &&
+                                            bday.Birthday.Value.Day == DateTime.Now.Day;
+
+                                            <li class="@(isToday ? "bday-today" : "")">
+                                                <label class="date">@bday.Birthdate</label>
+                                                <label class="name">@bday.EmployeeName</label>
+                                                @if (isToday)
+                                                {
+                                                    <span title="click me" class="cake" onclick="throwConfetti()">🎂</span>
+                                                }
+                                            </li>
+                                        }
                                     }
                                 </ul>
-
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+
             </div>
-        </div>   
-
-
-    </div>
-</div>
+        </div>
 
 
 
 @section scripts {
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
-    <script type="text/javascript">
+            <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+            <script type="text/javascript">
 
-        $('.spinner-overlay').show();
+                $('.spinner-overlay').show();
 
-        setTimeout(() => {
-             $('.spinner-overlay').hide();
-        }, 200);
-
-
+                setTimeout(() => {
+                     $('.spinner-overlay').hide();
+                }, 200);
 
 
-        function throwConfetti() {           
-                confetti({
-            particleCount: 120,
-            spread: 90,
-            origin: { y: 0.7 }
-              });
-        }
 
-    </script>
+
+                function throwConfetti() {
+                        confetti({
+                    particleCount: 120,
+                    spread: 90,
+                    origin: { y: 0.7 }
+                      });
+                }
+
+            </script>
 }

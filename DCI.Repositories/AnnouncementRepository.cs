@@ -149,6 +149,32 @@ namespace DCI.Repositories
                 Log.CloseAndFlush();
             }
         }
+        
+             public async Task<(int statuscode, string message)> ChangeStatusAnnouncement(AnnouncementViewModel model)
+        {
+            try
+            {
+                var entity = await _dbContext.Announcement.FirstOrDefaultAsync(x => x.AnnouncementId == model.AnnouncementId);     
+              
+                entity.Status = model.Status;            
+                entity.DateModified = DateTime.Now;
+                entity.ModifiedBy = model.ModifiedBy;
+                entity.IsActive = true;
+                _dbContext.Announcement.Entry(entity).State = EntityState.Modified;
+                await _dbContext.SaveChangesAsync();
+                return (StatusCodes.Status200OK, "Successfully updated");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return (StatusCodes.Status400BadRequest, ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
 
         public async Task<(int statuscode, string message)> Delete(AnnouncementViewModel model)
         {

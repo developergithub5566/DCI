@@ -8,5 +8,6 @@ namespace DCI.Repositories.Interface
         Task<PositionViewModel> GetPositionById(int postId);
         Task<(int statuscode, string message)> Delete(PositionViewModel model);
         Task<(int statuscode, string message)> Save(PositionViewModel model);
+        Task<bool> IsExistsPositionCode(string postCode);
     }
 }

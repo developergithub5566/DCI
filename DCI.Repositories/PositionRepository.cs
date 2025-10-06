@@ -84,6 +84,12 @@ namespace DCI.Repositories
             return await _dbContext.Position.AnyAsync(x => x.PositionId == positionId && x.IsActive == true);
         }
 
+
+        public async Task<bool> IsExistsPositionCode(string postCode)
+        {
+            return await _dbContext.Position.AnyAsync(x => x.PositionCode == postCode && x.IsActive == true);
+        }
+
         public async Task<(int statuscode, string message)> Save(PositionViewModel model)
         {
             try

@@ -314,14 +314,23 @@ namespace DCI.Repositories
                     }
                     else // probitionary and contractual/projectbased
                     {
-                        foreach (var raw in contextDtl)
+                        bool isRegular = empDetails.DateHired != null && contextDtl.Any(x => x.LeaveDate >= empDetails.DateHired.Value.AddMonths(6));
+
+                        if(isRegular)
                         {
-                            //Update DTR attendance summary status to Payroll DEDUCTED                    
-                            await _dbContext.tbl_raw_logs.Where(x => x.EMPLOYEE_ID == emp.EmployeeNo && x.DATE_TIME.Date == raw.LeaveDate.Date)
-                                                         .ExecuteUpdateAsync(s => s
-                                                         .SetProperty(r => r.STATUS, r => (int)EnumStatus.PayrollDeducted));
+
                         }
-                        contextHdr.DeductionType = (int)EnumDeductionType.Payroll;
+                        else
+                        {
+                            foreach (var raw in contextDtl)
+                            {
+                                //Update DTR attendance summary status to Payroll DEDUCTED                    
+                                await _dbContext.tbl_raw_logs.Where(x => x.EMPLOYEE_ID == emp.EmployeeNo && x.DATE_TIME.Date == raw.LeaveDate.Date)
+                                                             .ExecuteUpdateAsync(s => s
+                                                             .SetProperty(r => r.STATUS, r => (int)EnumStatus.PayrollDeducted));
+                            }
+                            contextHdr.DeductionType = (int)EnumDeductionType.Payroll;
+                        }                      
                     }
                 }
 

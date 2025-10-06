@@ -11,5 +11,7 @@ namespace DCI.Repositories.Interface
 		Task<DepartmentViewModel> GetDepartmentById(int DepartmentId);
 		Task<IList<DepartmentViewModel>> GetAllDepartment();
 		Task<bool> IsExistsDepartment(int DepartmentId);
-	}
+		Task<bool> IsExistsDepartmentCode(string deptCode);
+
+    }
 }
