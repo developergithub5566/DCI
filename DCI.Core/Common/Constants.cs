@@ -12,11 +12,12 @@
         public const string Msg_ErrorMessage = "An error occurred. Please try again.";
         public const string Msg_NoBiometricsFound = "No biometric records found.";
 
-        public const string Email_Subject_SetPassword = "DCI App - Set Password";
-		public const string Email_Subject_ResetPassword = "DCI App - Reset Password";
-		public const string Email_Subject_UploadFile = "DCI App - Please Upload Your Document No";
-
-		public const string Approval_Approved = "Approved";
+        public const string Email_Subject_SetPassword = "DCI ESS - Set Password";
+		public const string Email_Subject_ResetPassword = "DCI ESS - Reset Password";
+		public const string Email_Subject_UploadFile = "DCI ESS - Please Upload Your Document No";
+        public const string Email_Subject_BiometricAttendance = "DCI ESS - Biometric Attendance Logged";
+        
+        public const string Approval_Approved = "Approved";
 		public const string Approval_Disapproved = "Disapproved";
 		public const string Approval_Reviewed = "Reviewed";
 

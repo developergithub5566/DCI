@@ -1,6 +1,7 @@
 ﻿using DCI.Models.Configuration;
 using DCI.Models.Entities;
 using DCI.Models.ViewModel;
+using System.Threading.Tasks;
 
 
 namespace DCI.Repositories.Interface
@@ -35,5 +36,8 @@ namespace DCI.Repositories.Interface
         Task<User> GetUserByEmployeeId(int empId);
 
         Task<UserManager> GetUserManagerByEmail(string email);
+       
+        
+        // Task<User> GetUserByEmployeeNo(string empNo);
     }
 }

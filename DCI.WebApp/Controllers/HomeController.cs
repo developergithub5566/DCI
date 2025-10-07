@@ -148,6 +148,33 @@ namespace DCI.WebApp.Controllers
         }
 
 
+        public async Task<IActionResult> SaveEmailNotificationForBiometrics(UserViewModel model)
+        {
+           
+            using (var _httpclient = new HttpClient())
+            {
+              
+                var currentUser = _userSessionHelper.GetCurrentUser();
+                if (currentUser == null)
+                {
+                    return RedirectToAction("Logout", "Account");
+                }
+                model.UserId = currentUser.UserId;
+
+                var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Home/SaveEmailNotificationForBiometrics");
+
+                request.Content = stringContent;
+                var response = await _httpclient.SendAsync(request);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    return Json(new { success = true, message = "Save" });
+                }
+            }
+            return Json(new { success = false, message = "Error" });
+        }
+
 
     }
 }

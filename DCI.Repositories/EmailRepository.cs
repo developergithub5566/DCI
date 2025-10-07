@@ -26,7 +26,8 @@ namespace DCI.Repositories
         private IUserAccessRepository _userAccessRepository;
         private readonly IOptions<APIConfigModel> _apiconfig;
 
-        public EmailRepository(DCIdbContext context, IOptions<SMTPModel> smtpSettings, IUserRepository userRepository, IUserAccessRepository userAccessRepository, IOptions<APIConfigModel> apiconfig)
+        public EmailRepository(DCIdbContext context, IOptions<SMTPModel> smtpSettings, IUserRepository userRepository,
+            IUserAccessRepository userAccessRepository, IOptions<APIConfigModel> apiconfig)
         {
             this._dbContext = context;
             _smtpSettings = smtpSettings.Value;
@@ -443,5 +444,7 @@ namespace DCI.Repositories
 
 
         #endregion
+
+       
     }
 }

@@ -736,6 +736,7 @@ namespace DCI.WebApp.Controllers
                     var currentUser = _userSessionHelper.GetCurrentUser();
 
                     param.EMPLOYEE_ID = currentUser.EmployeeId;
+                    param.Password = string.Empty;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/SaveWFHTimeIn");
@@ -783,9 +784,9 @@ namespace DCI.WebApp.Controllers
                     var response = await _httpclient.SendAsync(request);
                     var responseBody = await response.Content.ReadAsStringAsync();
 
-                    string emp_name = string.Empty;
-                    string emp_no = string.Empty;
-                    string emp_info = string.Empty;
+                    //string emp_name = string.Empty;
+                    //string emp_no = string.Empty;
+                    //string emp_info = string.Empty;
                     if (response.IsSuccessStatusCode)
                     {
                         return Json(new { success = true, message = responseBody });

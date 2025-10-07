@@ -3,6 +3,7 @@ using DCI.Data;
 using DCI.Models.Entities;
 using DCI.Models.ViewModel;
 using DCI.Repositories.Interface;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -164,6 +165,30 @@ namespace DCI.Repositories
                         await cmd.ExecuteNonQueryAsync();
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+        public async Task SaveEmailNotificationForBiometrics(UserViewModel model)
+        {
+            try
+            {
+                var entities = await _dbContext.User.FirstOrDefaultAsync(x => x.UserId == model.UserId);
+
+                entities.EmailBiometricsNotification = model.EmailBiometricsNotification;                   
+                entities.DateModified = DateTime.Now;
+                entities.ModifiedBy = model.UserId;
+                entities.IsActive = true;
+
+                _dbContext.User.Entry(entities).State = EntityState.Modified;
+                await _dbContext.SaveChangesAsync();
+               
             }
             catch (Exception ex)
             {

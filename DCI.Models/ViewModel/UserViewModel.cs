@@ -19,5 +19,7 @@
 		public int? ModifiedBy { get; set; } = null;
 		public bool IsActive { get; set; } = true;	
 		public int? IsAddEdit { get; set; } = 0;
+        public bool EmailBiometricsNotification { get; set; } = false;
+        public string EmployeeNo { get; set; } = string.Empty;
     }
 }

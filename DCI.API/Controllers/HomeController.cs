@@ -40,5 +40,16 @@ namespace DCI.API.Controllers
             return Ok();
         }
 
+        [HttpPost]
+        [Route("SaveEmailNotificationForBiometrics")]
+        public async Task<IActionResult> SaveEmailNotificationForBiometrics([FromBody] UserViewModel model)
+        {
+            await _homeRepository.SaveEmailNotificationForBiometrics(model);
+
+            return Ok();
+           
+        }
+
     }
 }
+

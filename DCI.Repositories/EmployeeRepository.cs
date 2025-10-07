@@ -22,132 +22,197 @@ namespace DCI.Repositories
             _dbContext.Dispose();
         }
 
-        public async Task<IList<Form201ViewModel>> GetAllEmployee()
+        //public async Task<IList<Form201ViewModel>> GetAllEmployee()
+        //{
+        // return await (from emp in _dbContext.Employee.AsNoTracking()
+        //                  join dtl in _dbContext.EmployeeWorkDetails on emp.EmployeeId equals dtl.EmployeeId into dtlGroup
+        //                  from dtl in dtlGroup.DefaultIfEmpty()
+
+        //                  join dpt in _dbContext.Department.AsNoTracking() on dtl.DepartmentId equals dpt.DepartmentId into dptGroup
+        //                  from dpt in dptGroup.DefaultIfEmpty()
+
+        //                  join post in _dbContext.Position.AsNoTracking() on dtl.Position equals post.PositionId into postGroup
+        //                  from post in postGroup.DefaultIfEmpty()
+
+        //                  join empstat in _dbContext.EmployeeStatus.AsNoTracking() on dtl.EmployeeStatusId equals empstat.EmployeeStatusId into empstatGroup
+        //                  from empstat in empstatGroup.DefaultIfEmpty()   
+
+        //                  where emp.IsActive == true
+
+        //                  orderby dtl.EmployeeStatusId descending, emp.Lastname  descending , emp.Firstname descending
+        //                   select new Form201ViewModel
+        //                      {
+        //                          EmployeeId = emp.EmployeeId,
+        //                          EmployeeNo = emp.EmployeeNo,
+        //                          Email = emp.Email,
+        //                          Firstname = emp.Firstname,
+        //                          Middlename = emp.Middlename,
+        //                          Lastname = emp.Lastname,
+        //                          Sex = emp.Sex,
+        //                          Prefix = emp.Prefix,
+        //                          Suffix = emp.Suffix,
+        //                          Nickname = emp.Nickname,
+        //                          DateBirth = emp.DateBirth,
+        //                          MobileNoPersonal = emp.MobileNoPersonal,
+        //                          LandlineNo = emp.LandlineNo,
+        //                          PresentAddress = emp.PresentAddress,
+        //                          PermanentAddress = emp.PermanentAddress,
+        //                          EmailPersonal = emp.EmailPersonal,
+        //                          DateCreated = emp.DateCreated,
+        //                          CreatedBy = emp.CreatedBy,
+        //                          DateModified = emp.DateModified,
+        //                          ModifiedBy = emp.ModifiedBy,
+        //                          IsActive = emp.IsActive,
+
+        //                          PositionName = post.PositionName,
+        //                          DepartmentName = dpt.DepartmentName,
+        //                          EmployeeStatusName = empstat.EmployeeStatusName,
+        //                          DateHired = dtl.DateHired,
+
+        //                      }).ToListAsync();
+
+        //}
+
+        public async Task<IList<Form201ViewModel>> GetAllEmployee(CancellationToken ct = default)
         {
-         return await (from emp in _dbContext.Employee
-                          join dtl in _dbContext.EmployeeWorkDetails on emp.EmployeeId equals dtl.EmployeeId into dtlGroup
-                          from dtl in dtlGroup.DefaultIfEmpty()
+            var query =
+                from emp in _dbContext.Employee.AsNoTracking()
+                join dtl in _dbContext.EmployeeWorkDetails.AsNoTracking()
+                    on emp.EmployeeId equals dtl.EmployeeId into empdtl
+                from dtl in empdtl.DefaultIfEmpty()
 
-                          join dpt in _dbContext.Department on dtl.DepartmentId equals dpt.DepartmentId into dptGroup
-                          from dpt in dptGroup.DefaultIfEmpty()
+                join dpt in _dbContext.Department.AsNoTracking()
+                    on dtl.DepartmentId equals dpt.DepartmentId into dept
+                from dpt in dept.DefaultIfEmpty()
 
-                          join post in _dbContext.Position on dtl.Position equals post.PositionId into postGroup
-                          from post in postGroup.DefaultIfEmpty()
+                join post in _dbContext.Position.AsNoTracking()
+                    on dtl.Position equals post.PositionId into pos
+                from post in pos.DefaultIfEmpty()
 
-                          join empstat in _dbContext.EmployeeStatus on dtl.EmployeeStatusId equals empstat.EmployeeStatusId into empstatGroup
-                          from empstat in empstatGroup.DefaultIfEmpty()   
+                join empstat in _dbContext.EmployeeStatus.AsNoTracking()
+                    on dtl.EmployeeStatusId equals empstat.EmployeeStatusId into empst
+                from empstat in empst.DefaultIfEmpty()
 
-                          where emp.IsActive == true
-                   
-                          orderby dtl.EmployeeStatusId descending, emp.Lastname  descending , emp.Firstname descending
-                           select new Form201ViewModel
-                              {
-                                  EmployeeId = emp.EmployeeId,
-                                  EmployeeNo = emp.EmployeeNo,
-                                  Email = emp.Email,
-                                  Firstname = emp.Firstname,
-                                  Middlename = emp.Middlename,
-                                  Lastname = emp.Lastname,
-                                  Sex = emp.Sex,
-                                  Prefix = emp.Prefix,
-                                  Suffix = emp.Suffix,
-                                  Nickname = emp.Nickname,
-                                  DateBirth = emp.DateBirth,
-                                  MobileNoPersonal = emp.MobileNoPersonal,
-                                  LandlineNo = emp.LandlineNo,
-                                  PresentAddress = emp.PresentAddress,
-                                  PermanentAddress = emp.PermanentAddress,
-                                  EmailPersonal = emp.EmailPersonal,
-                                  DateCreated = emp.DateCreated,
-                                  CreatedBy = emp.CreatedBy,
-                                  DateModified = emp.DateModified,
-                                  ModifiedBy = emp.ModifiedBy,
-                                  IsActive = emp.IsActive,
+                where emp.IsActive
+                orderby dtl.EmployeeStatusId descending,
+                        emp.Lastname descending,
+                        emp.Firstname descending
+                select new Form201ViewModel
+                {
+                    EmployeeId = emp.EmployeeId,
+                    EmployeeNo = emp.EmployeeNo,
+                    Email = emp.Email,
+                    Firstname = emp.Firstname,
+                    Middlename = emp.Middlename,
+                    Lastname = emp.Lastname,
+                    Sex = emp.Sex,
+                    Prefix = emp.Prefix,
+                    Suffix = emp.Suffix,
+                    Nickname = emp.Nickname,
+                    DateBirth = emp.DateBirth,
+                    MobileNoPersonal = emp.MobileNoPersonal,
+                    LandlineNo = emp.LandlineNo,
+                    PresentAddress = emp.PresentAddress,
+                    PermanentAddress = emp.PermanentAddress,
+                    EmailPersonal = emp.EmailPersonal,
+                    DateCreated = emp.DateCreated,
+                    CreatedBy = emp.CreatedBy,
+                    DateModified = emp.DateModified,
+                    ModifiedBy = emp.ModifiedBy,
+                    IsActive = emp.IsActive,
 
-                                  PositionName = post.PositionName,
-                                  DepartmentName = dpt.DepartmentName,
-                                  EmployeeStatusName = empstat.EmployeeStatusName,
-                                  DateHired = dtl.DateHired,
+                    PositionName = post.PositionName,
+                    DepartmentName = dpt.DepartmentName,
+                    EmployeeStatusName = empstat.EmployeeStatusName,
+                    DateHired = dtl.DateHired
+                };
 
-                              }).ToListAsync();
-
+            return await query.ToListAsync(ct);
         }
+
 
         public async Task<Form201ViewModel?> GetEmployeeById(int empId)
         {
             try
-            {
-                //var xamedsa = _dbContext.EmployeeWorkDetails.Where(x => x.EmployeeId == empId).FirstOrDefault();
+            {              
 
-               var result =  await (from emp in _dbContext.Employee.AsNoTracking()
+                var result = await (from emp in _dbContext.Employee.AsNoTracking()
                                     join dtl in _dbContext.EmployeeWorkDetails.AsNoTracking() on emp.EmployeeId equals dtl.EmployeeId into dtlGroup
                                     from dtl in dtlGroup.DefaultIfEmpty()
 
                                     join dpt in _dbContext.Department.AsNoTracking() on dtl.DepartmentId equals dpt.DepartmentId into dptGroup
-                                     from dpt in dptGroup.DefaultIfEmpty()
+                                    from dpt in dptGroup.DefaultIfEmpty()
 
-                                     join post in _dbContext.Position.AsNoTracking() on dtl.Position equals post.PositionId into postGroup
-                                     from post in postGroup.DefaultIfEmpty()
+                                    join post in _dbContext.Position.AsNoTracking() on dtl.Position equals post.PositionId into postGroup
+                                    from post in postGroup.DefaultIfEmpty()
 
                                     join loc in _dbContext.WorkLocation.AsNoTracking() on dtl.WorkLocation equals loc.WorkLocationId into locGroup
                                     from loc in locGroup.DefaultIfEmpty()
 
                                     join empstat in _dbContext.EmployeeStatus.AsNoTracking() on dtl.EmployeeStatusId equals empstat.EmployeeStatusId into empstatGroup
-                                     from empstat in empstatGroup.DefaultIfEmpty()
+                                    from empstat in empstatGroup.DefaultIfEmpty()
+
+                                        //join leaveinfo in _dbContext.LeaveInfo.AsNoTracking() on emp.EmployeeId equals leaveinfo.EmployeeId into leaveinfoGroup
+                                        //from leaveinfo in leaveinfoGroup.DefaultIfEmpty()
 
                                     join leaveinfo in _dbContext.LeaveInfo.AsNoTracking() on emp.EmployeeId equals leaveinfo.EmployeeId into leaveinfoGroup
-                                    from leaveinfo in leaveinfoGroup.DefaultIfEmpty()
+                                    from leaveinfo in leaveinfoGroup
+                                        .OrderByDescending(x => x.DateCreated)
+                                        .Take(1) // get the latest if there are multiple
+                                        .DefaultIfEmpty()
+
 
                                     where emp.EmployeeId == empId
-                                            select new Form201ViewModel
-                                            {
-                                                EmployeeId = emp.EmployeeId,
-                                                EmployeeNo = emp.EmployeeNo,
-                                                Firstname = emp.Firstname,
-                                                Middlename = emp.Middlename,
-                                                Lastname = emp.Lastname,
-                                                Sex = emp.Sex,
-                                                Prefix = emp.Prefix,
-                                                Suffix = emp.Suffix,
-                                                Nickname = emp.Nickname,
-                                                DateBirth = emp.DateBirth,
-                                                MobileNoPersonal = emp.MobileNoPersonal,
-                                                CivilStatus = emp.CivilStatus,
-                                                LandlineNo = emp.LandlineNo,
-                                                PresentAddress = emp.PresentAddress,
-                                                PermanentAddress = emp.PermanentAddress,
-                                                EmailPersonal = emp.EmailPersonal,
-                                                ContactPerson = emp.ContactPerson,
-                                                ContactPersonNo = emp.ContactPersonNo,
-                                                Email = emp.Email,
-                                                SSSNo = dtl.SSSNo,
-                                                Tin = dtl.Tin,
-                                                Pagibig = dtl.Pagibig,
-                                                Philhealth = dtl.Philhealth,
-                                                NationalId = dtl.NationalId,
-                                                MobileNoOffice = dtl.MobileNoOffice,
-                                                DepartmentId = dtl.DepartmentId,
-                                                DepartmentName = dpt.Description,
-                                                JobFunction = dtl.JobFunction,
-                                                DateHired = dtl.DateHired,
-                                                DateRegularized = dtl.DateRegularized,
-                                                PositionId = post.PositionId,
-                                                PositionName = post.Description,
-                                                ResignedDate = dtl.ResignedDate,
-                                                BandLevel = dtl.BandLevel,
-                                                WorkLocation = loc.WorkLocationId,
-                                                WorkLocationName = loc.Location,
-                                                EmployeeStatusId = empstat.EmployeeStatusId,
-                                                EmployeeStatusName = empstat.Description,
-                                                PayrollType = dtl.PayrollType,
-                                                VLCredit  = leaveinfo.VLCredit,
-                                                SLCredit = leaveinfo.SLCredit,
-                                                DateCreated = emp.DateCreated,
-                                                CreatedBy = emp.CreatedBy,
-                                                DateModified = emp.DateModified,
-                                                ModifiedBy = emp.ModifiedBy,
-                                                IsActive = emp.IsActive
-                                            }).FirstOrDefaultAsync() ?? new Form201ViewModel();
+                                    select new Form201ViewModel
+                                    {
+                                        EmployeeId = emp.EmployeeId,
+                                        EmployeeNo = emp.EmployeeNo,
+                                        Firstname = emp.Firstname,
+                                        Middlename = emp.Middlename,
+                                        Lastname = emp.Lastname,
+                                        Sex = emp.Sex,
+                                        Prefix = emp.Prefix,
+                                        Suffix = emp.Suffix,
+                                        Nickname = emp.Nickname,
+                                        DateBirth = emp.DateBirth,
+                                        MobileNoPersonal = emp.MobileNoPersonal,
+                                        CivilStatus = emp.CivilStatus,
+                                        LandlineNo = emp.LandlineNo,
+                                        PresentAddress = emp.PresentAddress,
+                                        PermanentAddress = emp.PermanentAddress,
+                                        EmailPersonal = emp.EmailPersonal,
+                                        ContactPerson = emp.ContactPerson,
+                                        ContactPersonNo = emp.ContactPersonNo,
+                                        Email = emp.Email,
+                                        SSSNo = dtl.SSSNo,
+                                        Tin = dtl.Tin,
+                                        Pagibig = dtl.Pagibig,
+                                        Philhealth = dtl.Philhealth,
+                                        NationalId = dtl.NationalId,
+                                        MobileNoOffice = dtl.MobileNoOffice,
+                                        DepartmentId = dtl.DepartmentId,
+                                        DepartmentName = dpt.Description,
+                                        JobFunction = dtl.JobFunction,
+                                        DateHired = dtl.DateHired,
+                                        DateRegularized = dtl.DateRegularized,
+                                        PositionId = post.PositionId,
+                                        PositionName = post.Description,
+                                        ResignedDate = dtl.ResignedDate,
+
+                                        BandLevel = dtl.BandLevel,
+                                        WorkLocation = loc.WorkLocationId,
+                                        WorkLocationName = loc.Location,
+                                        EmployeeStatusId = empstat.EmployeeStatusId,
+                                        EmployeeStatusName = empstat.Description,
+                                        PayrollType = dtl.PayrollType,
+                                        VLCredit = leaveinfo != null ? leaveinfo.VLCredit : 0m,
+                                        SLCredit = leaveinfo != null ? leaveinfo.SLCredit : 0m,
+                                        DateCreated = emp.DateCreated,
+                                        CreatedBy = emp.CreatedBy,
+                                        DateModified = emp.DateModified,
+                                        ModifiedBy = emp.ModifiedBy,
+                                        IsActive = emp.IsActive
+                                    }).FirstOrDefaultAsync() ?? new Form201ViewModel();
 
 
                 result.EmployeeStatusList = _dbContext.EmployeeStatus.AsNoTracking().Where(x => x.IsActive).ToList();

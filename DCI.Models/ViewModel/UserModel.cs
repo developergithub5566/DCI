@@ -26,6 +26,7 @@ namespace DCI.Models.ViewModel
         public IList<UserViewModel>? UserViewList { get; set; }
         public IList<Department>? DepartmentList { get; set; }
         public List<SelectListItem>? OptionsDepartment { get; set; }
+        public bool EmailBiometricsNotification { get; set; }
     }
 
     public class EmployeeDropdownModel

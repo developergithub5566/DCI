@@ -8,5 +8,6 @@ namespace DCI.Repositories.Interface
         Task<IList<NotificationViewModel>> GetAllNotification(NotificationViewModel model);
         Task SaveNotification(NotificationViewModel model);
         Task MarkAsRead(NotificationViewModel model);
+        Task SaveEmailNotificationForBiometrics(UserViewModel model);
     }
 }

@@ -1,6 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DCI.Models.ViewModel;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Serilog;
+using DCI.Trigger;
+using Microsoft.AspNetCore.Identity.UI.Services;
+
+
 
 namespace DCI.Trigger
 {
@@ -8,12 +13,13 @@ namespace DCI.Trigger
     {
         private readonly AppDbContext _sourceDb;
         private readonly DestinationDbContext _destDb;
+        IEmailRepository _emailRepository;
 
-
-        public OutboxProcessor(AppDbContext sourceDb, DestinationDbContext destDb)
+        public OutboxProcessor(AppDbContext sourceDb, DestinationDbContext destDb  ,IEmailRepository emailRepository) 
         {
             _sourceDb = sourceDb;
             _destDb = destDb;
+            _emailRepository = emailRepository;
         }
 
         public async Task ProcessPendingMessages()
@@ -36,6 +42,22 @@ namespace DCI.Trigger
 
                         message.Status = "Processed";
                         message.LastError = null;
+
+                       
+                        if(log.EMPLOYEE_ID != null)
+                        {
+                            var emp = _destDb.Employee.FirstOrDefault(x => x.EmployeeNo == log.EMPLOYEE_ID);
+                            var user = _destDb.User.FirstOrDefault(x => x.EmployeeId == emp.EmployeeId );
+                            if (user != null && user.Email != null && user.EmailBiometricsNotification == true)
+                            {
+                                BiometricViewModel viewModel = new BiometricViewModel();
+                                viewModel.Fullname = log.FULL_NAME;
+                                viewModel.Email = user.Email;
+                                viewModel.DateTimeInOut = log.DATE_TIME;
+                                await _emailRepository.SendEmailBiometricsNotification (viewModel);
+                            }                          
+                        }
+              
                     }
                     catch (Exception ex)
                     {

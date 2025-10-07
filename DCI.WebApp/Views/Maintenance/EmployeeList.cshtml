@@ -432,8 +432,8 @@
                                 if (result.isConfirmed) {
                                     $.ajax({
                                         type: 'POST',
-                                        url: '@Url.Action("DeleteDepartment", "Maintenance")',
-                                        data: { DepartmentId: id },
+                                        url: '@Url.Action("DeleteEmployee", "Maintenance")',
+                                        data: { EmployeeId: id },
                                         success: function (response) {
                                             if (response.success) {
                                                 Swal.fire({

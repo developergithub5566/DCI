@@ -61,23 +61,34 @@ namespace DCI.Repositories
         public async Task<(int statuscode, string message)> SaveWFHTimeIn(WFHViewModel model)
         {
 
-            var empdtl = await _dbContext.Employee.Where(x => x.EmployeeId == model.EMPLOYEE_ID).FirstOrDefaultAsync();
+            try
+            {
+                var empdtl = await _dbContext.Employee.Where(x => x.EmployeeId == model.EMPLOYEE_ID).FirstOrDefaultAsync();
+                model.EMPLOYEE_NO = empdtl.EmployeeNo ?? string.Empty;
+                model.FULL_NAME = empdtl.Firstname + " " + empdtl.Lastname;
+                model.CREATED_BY = Constants.SYSAD;
 
-            model.EMPLOYEE_NO = empdtl.EmployeeNo ?? string.Empty;
-            model.FULL_NAME = empdtl.Firstname + " " + empdtl.Lastname;
-            model.CREATED_BY = "SYSAD";
+                tbl_wfh_logs entity = new tbl_wfh_logs();
+                entity.EMPLOYEE_ID = model.EMPLOYEE_NO;
+                entity.FULL_NAME = model.FULL_NAME;
+                entity.DATE_TIME = DateTime.Now;
+                entity.CREATED_DATE = DateTime.Now;
+                entity.CREATED_BY = model.CREATED_BY;
+                entity.STATUS = (int)EnumStatus.Draft;
+                await _dbContext.tbl_wfh_logs.AddAsync(entity);
+                await _dbContext.SaveChangesAsync();
 
-            tbl_wfh_logs entity = new tbl_wfh_logs();
-            entity.EMPLOYEE_ID = model.EMPLOYEE_NO;
-            entity.FULL_NAME = model.FULL_NAME;
-            entity.DATE_TIME = DateTime.Now;
-            entity.CREATED_DATE = DateTime.Now;
-            entity.CREATED_BY = model.CREATED_BY;
-            entity.STATUS = (int)EnumStatus.Draft;
-            await _dbContext.tbl_wfh_logs.AddAsync(entity);
-            await _dbContext.SaveChangesAsync();
-
-            return (StatusCodes.Status200OK, "Successfully saved");
+                return (StatusCodes.Status200OK, "WFH time-in recorded successfully.");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return (StatusCodes.Status404NotFound, ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }        
         }
 
 
@@ -192,9 +203,9 @@ namespace DCI.Repositories
                 await _dbContext.SaveChangesAsync();
             }
 
+            return (StatusCodes.Status200OK, string.Format("WFH application request {0} has been submitted for approval.", entity.RequestNo));
 
-
-            return (StatusCodes.Status200OK, "Successfully saved");
+            // return (StatusCodes.Status200OK, "Successfully saved");
         }
 
         public async Task<(int statuscode, string message)> CancelWFHApplication(WFHHeaderViewModel model)

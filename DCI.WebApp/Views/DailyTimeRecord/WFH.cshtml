@@ -215,7 +215,7 @@
                                                                     WorkingHours : "@item.TOTAL_WORKING_HOURS"
                                                                         })' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
 
-                                    <a href="javascript:void(0)" onclick="wfhlogsForm('@item.DATE.ToString("yyyy-MM-ddTHH:mm:ss")')" title="logs" class="btn btn-secondary"><i class="fas fa-history"></i></a>
+                                    <a href="javascript:void(0)" onclick="wfhlogsForm('@item.DATE.ToString("yyyy-MM-ddTHH:mm:ss")')" title="remote logs" class="btn btn-secondary"><i class="fas fa-history"></i></a>
                                 </td>
                             </tr>
                         }
@@ -355,7 +355,7 @@
             </div>
 
 
-            <div class="modal fade" id="filewfhmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+            <div class="modal fade" id="filewfhmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -429,13 +429,13 @@
                                                 <label>Total Working Hours</label>
                                             </th>
 
-                                            <th>
-                                                <label>Source</label>
-                                            </th>
+                                           
                                             <th>
                                                 <label>Status</label>
                                             </th>
-
+                                          @*   <th>
+                                                <label>Source</label>
+                                            </th> *@
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -472,14 +472,15 @@
                                                     @item.TOTAL_WORKING_HOURS
                                                 </td>
 
-                                                <td>
-                                                    REMOTE
-                                                </td>
+                                               
                                                 <td class="text-center">
                                                     <strong>
                                                         <span class="@statusClass applicationStatus">@item.STATUSNAME</span>
                                                     </strong>
                                                 </td>
+                                           @*      <td>
+                                                    REMOTE
+                                                </td> *@
 
                                             </tr>
                                         }
@@ -807,53 +808,95 @@
                     if (k < 10) { return "0" + k; } else { return k; } }
 
 
-                function submitTimeClock(){
-                                var formData = $(this).serialize();
-                    var pass = $('#Password').val();//document.getElementById("Password");
+                                    function submitTimeClock(e) {
+                                                  
 
-                         // var clock = $('#clock').val();
-                       // alert(clock)
+                                                    var formData = $(this).serialize();
 
-                                          $.ajax({
-                                              type: 'POST',
+                                                    $('.spinner-overlay').show();
 
-                                              url: '@Url.Action("WFHTimeIn", "DailyTimeRecord")',
-                                                // data: { Password: pass,  __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
-                                                              data: { Password: pass},
-                                              success: function (response) {
-                                                  //alert(response.success)
-                                                  if (response.success) {
-                                                                               $('#createForm')[0].reset();
-                                                                   js('#createmodal').modal('hide');
+                                                    $.ajax({
+                                                        type: 'POST',
+                                                        url: '@Url.Action("WFHTimeIn", "DailyTimeRecord")',
+                                                        data: formData,
+                                                        success: function (response) {
+                                                           
 
-                                                                   Swal.fire({
-                                                                       text: response.message,
-                                                                       icon: "success",
-                                                                       confirmButtonText: "Ok"
-                                                                   }).then((result) => {
-                                                                       //location.reload();
-                                                                         //setTimeout(() => location.reload(), 800);
-                                                                   });
-                                                  } else {
+                                                            if (response.success) {
+                                                              
+                                                                Swal.fire({
+                                                                    title: "Success",
+                                                                    text: response.message,
+                                                                    icon: "success",
+                                                                    confirmButtonText: "OK",                                                                          
+                                                                    allowOutsideClick: false
+                                                                }).then(() => {
+                                                                     $('.spinner-overlay').hide();
+                                                                    setTimeout(() => location.reload(), 1000);
+                                                                });
 
 
-                                                      Swal.fire({
-                                                          text: response.message,
-                                                          icon: "error"
-                                                      });
-                                                  }
-                                                  $('.spinner-overlay').hide();
-                                              },
-                                              error: function () {
-                                                  $('.spinner-overlay').hide();
-                                                  Swal.fire({
-                                                      text: "An error occurred. Please try again.",
-                                                      icon: "error"
-                                                  });
-                                              }
-                                          });
+                                                            } else {
+                                                                Swal.fire({
+                                                                    text: response.message,
+                                                                    icon: "error"
+                                                                });
+                                                            }
+                                                        },
+                                                        error: function () {
+                                                            $('.spinner-overlay').hide();
+                                                            Swal.fire({
+                                                                text: "An error occurred. Please try again.",
+                                                                icon: "error"
+                                                            });
+                                                        }
+                                                    });
+                                  }
 
-                }
+
+
+                // function submitTimeClock(e){
+                        
+                //                 var formData = $(this).serialize();                
+
+                //                           $.ajax({
+                //                               type: 'POST',
+
+                //                               url: '@Url.Action("WFHTimeIn", "DailyTimeRecord")',                                          
+                                                        
+                //                               success: function (response) {                                                
+                //                                   if (response.success) {
+
+                //                                                      Swal.fire({
+                //                                                               text: "Are you sure you want to submit this record?",
+                //                                                               icon: "question",
+                //                                                               showCancelButton: true,
+                //                                                               confirmButtonText: "Ok"
+                //                                                           }).then((result) => {
+                //                                                               if (result.isConfirmed) {
+                //                                                                   alert("ok")
+
+
+                //                                                             }
+                //                                                         }); //swal alert
+                //                                     } else {
+                //                                       Swal.fire({
+                //                                           text: response.message,
+                //                                           icon: "error"
+                //                                       });
+                //                                   }
+                //                                   $('.spinner-overlay').hide();
+                //                               },
+                //                               error: function () {
+                //                                   $('.spinner-overlay').hide();
+                //                                   Swal.fire({
+                //                                       text: "An error occurred. Please try again.",
+                //                                       icon: "error"
+                //                                   });
+                //                               }
+                //                           });
+
+                // }
 
 
                    function filewfhmodal() {

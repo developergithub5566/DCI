@@ -18,5 +18,7 @@ namespace DCI.Repositories.Interface
         Task SendToRequestorDTRAdjustment(DTRCorrectionViewModel model);
 
         Task SentToApprovalWFH(WFHHeaderViewModel model);
+
+        //Task SendEmailBiometricsNotification(BiometricViewModel model);
     }
 }

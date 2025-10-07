@@ -207,7 +207,7 @@
                                                         WorkingHours : "@item.TOTAL_WORKING_HOURS"
                                                             })' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
 
-                                    <a href="javascript:void(0)" onclick="rawlogsForm('@item.DATE.ToString("yyyy-MM-ddTHH:mm:ss")')" title="logs" class="btn btn-secondary"><i class="fas fa-history"></i></a>
+                                    <a href="javascript:void(0)" onclick="rawlogsForm('@item.DATE.ToString("yyyy-MM-ddTHH:mm:ss")')" title="biometric logs" class="btn btn-secondary"><i class="fas fa-history"></i></a>
                                 </td>
                             </tr>
                         }
@@ -291,7 +291,7 @@
                 </div>
             </div>
 
-            <div class="modal fade" id="rawlogsmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+            <div class="modal fade" id="rawlogsmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" >
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">

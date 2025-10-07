@@ -1,13 +1,13 @@
 ﻿// Check All checkboxes
 
-//let checkAllBox_Document = document.getElementById('chkAllDocument');
-//checkAllBox_Document.addEventListener('change', function () {
-//	let checkboxes = document.querySelectorAll('.chk_auditTrail');
-//	checkboxes.forEach((checkbox) => {
-//		checkbox.checked = checkAllBox_Document.checked;
-//		checkbox.disabled = !checkAllBox_Document.checked;
-//	});
-//});
+let checkAllBox_EmployeeMaster = document.getElementById('chkAllEmployeeMaster');
+checkAllBox_EmployeeMaster.addEventListener('change', function () {
+	let checkboxes = document.querySelectorAll('.chk_EmployeeMaster');
+	checkboxes.forEach((checkbox) => {
+		checkbox.checked = checkAllBox_EmployeeMaster.checked;
+		checkbox.disabled = !checkAllBox_EmployeeMaster.checked;
+	});
+});
 
 let checkAllBox_UserManagement = document.getElementById('chkAllUserManagement');
 checkAllBox_UserManagement.addEventListener('change', function () {
@@ -27,31 +27,32 @@ checkAllBox_Department.addEventListener('change', function () {
 	});
 });
 
-//let checkAllBox_Section = document.getElementById('chkAllSection');
-//checkAllBox_Section.addEventListener('change', function () {
-//	let checkboxes = document.querySelectorAll('.chk_section');
-//	checkboxes.forEach((checkbox) => {
-//		checkbox.checked = checkAllBox_Section.checked;
-//		checkbox.disabled = !checkAllBox_Section.checked;
-//	});
-//});
+let checkAllBox_Holiday = document.getElementById('chkAllHoliday');
+checkAllBox_Holiday.addEventListener('change', function () {
+	let checkboxes = document.querySelectorAll('.chk_holiday');
+	checkboxes.forEach((checkbox) => {
+		checkbox.checked = checkAllBox_Holiday.checked;
+		checkbox.disabled = !checkAllBox_Holiday.checked;
+	});
+});
 
-//let checkAllBox_Documenttype = document.getElementById('chkAllDocumenttype');
-//checkAllBox_Documenttype.addEventListener('change', function () {
-//	let checkboxes = document.querySelectorAll('.chk_documenttype');
-//	checkboxes.forEach((checkbox) => {
-//		checkbox.checked = checkAllBox_Documenttype.checked;
-//		checkbox.disabled = !checkAllBox_Documenttype.checked;
-//	});
-//});
+let checkAllBox_Announcement = document.getElementById('chkAllAnnouncement');
+checkAllBox_Announcement.addEventListener('change', function () {
+	let checkboxes = document.querySelectorAll('.chk_announcement');
+	checkboxes.forEach((checkbox) => {
+		checkbox.checked = checkAllBox_Announcement.checked;
+		checkbox.disabled = !checkAllBox_Announcement.checked;
+	});
+});
 
-//let checkAllBox_Announcement = document.getElementById('chkAllAnnouncement');
-//checkAllBox_Announcement.addEventListener('change', function () {
-//	let checkboxes = document.querySelectorAll('.chk_announcement');
-//	checkboxes.forEach((checkbox) => {
-//		checkbox.checked = checkAllBox_Announcement.checked;
-//	});
-//});
+let checkAllBox_Position = document.getElementById('chkAllPosition');
+checkAllBox_Position.addEventListener('change', function () {
+	let checkboxes = document.querySelectorAll('.chk_position');
+	checkboxes.forEach((checkbox) => {
+		checkbox.checked = checkAllBox_Position.checked;
+		checkbox.disabled = !checkAllBox_Position.checked;
+	});
+});
 
 let checkAllBox_AuditTrail = document.getElementById('chkAllAuditTrail');
 checkAllBox_AuditTrail.addEventListener('change', function () {

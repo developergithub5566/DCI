@@ -158,7 +158,9 @@ namespace DCI.API.Controllers
         [Route("SaveWFHTimeIn")]
         public async Task<IActionResult> SaveWFHTimeIn([FromBody] WFHViewModel model)
         {
-            return Ok(await _wfhRepository.SaveWFHTimeIn(model));
+            // return Ok(await _wfhRepository.SaveWFHTimeIn(model));
+            var result = await _wfhRepository.SaveWFHTimeIn(model);
+            return StatusCode(result.statuscode, result.message);
         }
 
         [HttpPost]

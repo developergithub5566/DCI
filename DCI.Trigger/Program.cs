@@ -1,4 +1,5 @@
-﻿using DCI.Trigger;
+﻿using DCI.Models.Configuration;
+using DCI.Trigger;
 using Hangfire;
 using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Builder;
@@ -11,7 +12,7 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        var builder = WebApplication.CreateBuilder(args);
+        var builder = WebApplication.CreateBuilder(args);   
 
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerA")));
@@ -42,7 +43,8 @@ public class Program
         builder.Services.AddHangfireServer();
 
         builder.Services.AddTransient<OutboxProcessor>();
-
+        builder.Services.Configure<SMTPModel>(builder.Configuration.GetSection("SmtpSettings"));
+        builder.Services.AddScoped<IEmailRepository, EmailRepository>();
         Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).CreateLogger();
 
         var app = builder.Build();

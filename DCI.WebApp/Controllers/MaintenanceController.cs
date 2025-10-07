@@ -1447,33 +1447,65 @@ namespace DCI.WebApp.Controllers
                     if (response.IsSuccessStatusCode)
                     {
                         vm = JsonConvert.DeserializeObject<Form201ViewModel>(responseBody)!;
-                        vm.OptionsEmployeeStatus = vm.EmployeeStatusList.Select(x =>
-                                 new SelectListItem
-                                 {
-                                     Value = x.EmployeeStatusId.ToString(),
-                                     Text = x.EmployeeStatusName
-                                 }).ToList();
 
-                        vm.OptionsPosition = vm.PositionList.Select(x =>
+                        if (vm?.EmployeeStatusList != null && vm.EmployeeStatusList.Any())
+                        {
+                            vm.OptionsEmployeeStatus = vm.EmployeeStatusList.Select(x => new SelectListItem
+                            {
+                                Value = x.EmployeeStatusId.ToString(),
+                                Text = x.EmployeeStatusName
+                            }).ToList();
+                        }
+                        else
+                        {
+                            vm ??= new Form201ViewModel();
+                            vm.OptionsEmployeeStatus = new List<SelectListItem>();
+                        }
+
+                        if (vm?.PositionList != null && vm.PositionList.Any())
+                        {
+                            vm.OptionsPosition = vm.PositionList.Select(x =>
                                new SelectListItem
                                {
                                    Value = x.PositionId.ToString(),
                                    Text = x.PositionName
                                }).ToList();
+                        }
+                        else
+                        {
+                            vm ??= new Form201ViewModel();
+                            vm.OptionsPosition = new List<SelectListItem>();
+                        }
 
-                        vm.OptionsDepartment = vm.DepartmentList.Select(x =>
+                        if (vm?.DepartmentList != null && vm.DepartmentList.Any())
+                        {
+                            vm.OptionsDepartment = vm.DepartmentList.Select(x =>
+                                   new SelectListItem
+                                   {
+                                       Value = x.DepartmentId.ToString(),
+                                       Text = x.DepartmentName
+                                   }).ToList();
+                        }
+                        else
+                        {
+                            vm ??= new Form201ViewModel();
+                            vm.OptionsDepartment = new List<SelectListItem>();
+                        }
+
+                        if (vm?.WorkLocationList != null && vm.WorkLocationList.Any())
+                        {
+                            vm.OptionsWorkLocation = vm.WorkLocationList.Select(x =>
                                new SelectListItem
                                {
-                                   Value = x.DepartmentId.ToString(),
-                                   Text = x.DepartmentName
+                                   Value = x.WorkLocationId.ToString(),
+                                   Text = x.Location
                                }).ToList();
-
-                        vm.OptionsWorkLocation = vm.WorkLocationList.Select(x =>
-                           new SelectListItem
-                           {
-                               Value = x.WorkLocationId.ToString(),
-                               Text = x.Location
-                           }).ToList();
+                        }
+                        else
+                        {
+                            vm ??= new Form201ViewModel();
+                            vm.OptionsWorkLocation = new List<SelectListItem>();
+                        }
 
                     }
 
@@ -1490,6 +1522,43 @@ namespace DCI.WebApp.Controllers
                 Log.CloseAndFlush();
             }
             return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
+
+
+        public async Task<IActionResult> DeleteEmployee(Form201ViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    model.ModifiedBy = currentUser.UserId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Employee/DeleteEmployee");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = responseBody });
+                    }
+                    return Json(new { success = false, message = responseBody });
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
         #endregion
 
