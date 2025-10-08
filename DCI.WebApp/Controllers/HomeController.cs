@@ -38,6 +38,9 @@ namespace DCI.WebApp.Controllers
             using (var _httpclient = new HttpClient())
             {
                 var currentUser = _userSessionHelper.GetCurrentUser();
+                if (currentUser == null)
+                    return RedirectToAction("Logout", "Account");
+              
                 model.CurrentUserId = currentUser.UserId;
           
 
@@ -83,9 +86,8 @@ namespace DCI.WebApp.Controllers
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
                     if (currentUser == null)
-                    {
                         return RedirectToAction("Logout", "Account");
-                    }
+
                     model.UserId = currentUser.UserId;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -128,9 +130,8 @@ namespace DCI.WebApp.Controllers
                 NotificationViewModel _filterRoleModel = new NotificationViewModel();
                 var currentUser = _userSessionHelper.GetCurrentUser();
                 if (currentUser == null)
-                {
                     return RedirectToAction("Logout", "Account");
-                }
+
                 _filterRoleModel.AssignId = currentUser.UserId;
 
                 var stringContent = new StringContent(JsonConvert.SerializeObject(_filterRoleModel), Encoding.UTF8, "application/json");
@@ -156,9 +157,9 @@ namespace DCI.WebApp.Controllers
               
                 var currentUser = _userSessionHelper.GetCurrentUser();
                 if (currentUser == null)
-                {
                     return RedirectToAction("Logout", "Account");
-                }
+
+
                 model.UserId = currentUser.UserId;
 
                 var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");

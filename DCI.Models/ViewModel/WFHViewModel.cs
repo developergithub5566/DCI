@@ -37,6 +37,7 @@
         public string Remarks { get; set; } = string.Empty;
         public int CurrentUserId { get; set; } = 0;
         public string StatusName { get; set; } = string.Empty;
+        public int CreatedBy { get; set; } = 0;
         public DateTime DateCreated { get; set; } = DateTime.Now;
         public int ApproverId { get; set; } = 0;
         public string DateCreatedString { get; set; } = string.Empty;
@@ -47,8 +48,9 @@
 
         public string ApproverEmail { get; set; } = string.Empty;
         public string EmailBody { get; set; } = string.Empty;
-        
+        public string RequestorEmail { get; set; } = string.Empty;    
     }
+
     public class WfhDetailViewModel
     {
         public int Id { get; set; }

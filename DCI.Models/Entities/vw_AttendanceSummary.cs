@@ -6,7 +6,7 @@ namespace DCI.Models.Entities
     {
         public long ID { get; set; } = 0;
         public string EMPLOYEE_NO { get; set; } = string.Empty;
-        public string NAME { get; set; } = string.Empty;
+      //  public string NAME { get; set; } = string.Empty;
         public DateTime DATE { get; set; }
         public string FIRST_IN { get; set; } = string.Empty;
         public string LAST_OUT { get; set; } = string.Empty;

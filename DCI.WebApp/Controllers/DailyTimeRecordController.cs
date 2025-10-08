@@ -44,6 +44,9 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+
                     param.ScopeTypeEmp = id;
 
                     param.CurrentUserId = currentUser.UserId;
@@ -57,14 +60,7 @@ namespace DCI.WebApp.Controllers
                     if (response.IsSuccessStatusCode == true)
                     {
                         model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
-                    }
-                    //ViewBag.BreadCrumbLabelA = "DTR Management";
-                    //ViewBag.BreadCrumbLabelB = "Attendance Summary";
-                    //if ((int)EnumEmployeeScope.PerEmployee == param.ScopeTypeEmp)
-                    //{
-                    //    ViewBag.BreadCrumbLabelA = "Daily Time Record";
-                    //    ViewBag.BreadCrumbLabelB = "Attendance";
-                    //}
+                    }                   
                     ViewBag.Fullname = currentUser?.Fullname;
                 }
 
@@ -90,8 +86,10 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
 
-                    // param.ScopeTypeEmp = (int)EnumEmployeeScope.PerEmployee;
+                  
                     param.EMPLOYEE_ID = currentUser.EmployeeId;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
@@ -156,6 +154,9 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+
                     model.CurrentUserId = currentUser.UserId;
                     model.EmployeeId = currentUser.EmployeeId;
 
@@ -197,6 +198,9 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+
                     //  model.CurrentUserId = currentUser.UserId;
                     model.EmployeeId = currentUser.EmployeeId;
                     model.ApproverId = currentUser.ApproverId;
@@ -238,6 +242,10 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+
+
                     model.CurrentUserId = currentUser.UserId;
                     model.EmployeeId = currentUser.EmployeeId;
                     model.ApproverId = currentUser.ApproverId;
@@ -261,12 +269,7 @@ namespace DCI.WebApp.Controllers
                                         Text = x.Description
                                     }).ToList();
                         model.ApproverHead = currentUser?.ApproverHead;
-
-                        //model.SelectedDateJson = JsonConvert.SerializeObject(model.LeaveDateList);
-                        // var dateList = new List<string> { "2025-06-09","2025-06-10" };
-                        // // var jsonDates = JsonConvert.SerializeObject(dateList);
-                        //  model.SelectedDateJson = jsonDates;
-                        //string json = JsonConvert.SerializeObject(model.LeaveDateList);
+                     
                     }
                     return Json(new { success = true, data = model });
                 }
@@ -283,7 +286,6 @@ namespace DCI.WebApp.Controllers
             {
                 Log.CloseAndFlush();
             }
-            //  return View(model);
         }
 
         public async Task<IActionResult> CancelLeave(LeaveRequestHeaderViewModel model)
@@ -293,6 +295,9 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+
                     model.ModifiedBy = currentUser.UserId;
 
 
@@ -328,6 +333,9 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+
                     model.CurrentUserId = currentUser.UserId;
                     model.EmployeeId = currentUser.EmployeeId;
                     model.FilterYear = filteryear;
@@ -368,6 +376,8 @@ namespace DCI.WebApp.Controllers
                 {
                     DTRCorrectionViewModel model = new DTRCorrectionViewModel();
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
 
                     model.CreatedBy = currentUser.UserId;
                     model.ScopeTypeEmp = DtrId;
@@ -413,11 +423,7 @@ namespace DCI.WebApp.Controllers
             {
                 using (var _httpclient = new HttpClient())
                 {
-
-                    // var currentUser = _userSessionHelper.GetCurrentUser();
-
-                    //  model.CreatedBy = 2;//currentUser.UserId;
-
+             
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/DTRCorrectionById");
@@ -432,7 +438,6 @@ namespace DCI.WebApp.Controllers
                     }
                     return Json(new { success = true, data = model });
                 }
-
 
             }
             catch (Exception ex)
@@ -452,7 +457,10 @@ namespace DCI.WebApp.Controllers
             {
                 using (var _httpclient = new HttpClient())
                 {
-                    var currentUser = _userSessionHelper.GetCurrentUser();                   
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+
                     model.ModifiedBy = currentUser.UserId;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -486,6 +494,9 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+
                     model.CreatedBy = currentUser.UserId;
                     model.EmployeeId = currentUser.EmployeeId;
                     model.ApproverId = currentUser.ApproverId;
@@ -524,6 +535,9 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+
 
 
                     param.CurrentUserId = currentUser.UserId;
@@ -603,7 +617,10 @@ namespace DCI.WebApp.Controllers
                 UndertimeHeaderDeductionViewModel headermodel = new UndertimeHeaderDeductionViewModel();
                 using (var _httpclient = new HttpClient())
                 {
-                    var currentUser = _userSessionHelper.GetCurrentUser();                 
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+
                     headermodel.CurrentUserId = currentUser.UserId;
                     headermodel.UndertimeDeductionList = model;
                 
@@ -640,7 +657,9 @@ namespace DCI.WebApp.Controllers
             {
                 using (var _httpclient = new HttpClient())
                 {
-                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    var currentUser = _userSessionHelper.GetCurrentUser();                   
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
 
                     param.ScopeTypeEmp = (int)EnumEmployeeScope.PerEmployee;
                     param.EMPLOYEE_ID = currentUser.EmployeeId;
@@ -680,7 +699,9 @@ namespace DCI.WebApp.Controllers
             {
                 using (var _httpclient = new HttpClient())
                 {
-                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    var currentUser = _userSessionHelper.GetCurrentUser();        
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
 
                     // param.ScopeTypeEmp = (int)EnumEmployeeScope.PerEmployee;
                     param.EMPLOYEE_ID = currentUser.EmployeeId;
@@ -734,6 +755,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
 
                     param.EMPLOYEE_ID = currentUser.EmployeeId;
                     param.Password = string.Empty;
@@ -773,6 +796,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
 
                     param.Header.CurrentUserId = currentUser.UserId;
                     param.Header.EmployeeId = currentUser.EmployeeId;
@@ -784,9 +809,7 @@ namespace DCI.WebApp.Controllers
                     var response = await _httpclient.SendAsync(request);
                     var responseBody = await response.Content.ReadAsStringAsync();
 
-                    //string emp_name = string.Empty;
-                    //string emp_no = string.Empty;
-                    //string emp_info = string.Empty;
+                   
                     if (response.IsSuccessStatusCode)
                     {
                         return Json(new { success = true, message = responseBody });
@@ -814,9 +837,9 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
-
-                    //  param.ScopeTypeEmp = (int)EnumEmployeeScope.PerEmployee;
-                    //param.EMPLOYEE_ID = currentUser.EmployeeId;
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+            
 
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
@@ -884,6 +907,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
                     model.CurrentUserId = currentUser.UserId;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -918,6 +943,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
 
                     param.ScopeTypeEmp = (int)EnumEmployeeScope.PerEmployee;
                     param.CurrentUserId = currentUser.UserId;
@@ -959,6 +986,8 @@ namespace DCI.WebApp.Controllers
             try
             {
                 var currentUser = _userSessionHelper.GetCurrentUser();
+                if (currentUser == null)
+                    return RedirectToAction("Logout", "Account");
 
                 using (var _httpclient = new HttpClient())
                 {          
@@ -997,7 +1026,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
-
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
 
                     param.CurrentUserId = currentUser.UserId;
 
@@ -1040,7 +1070,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
-
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
 
                     param.CurrentUserId = currentUser.UserId;
 
@@ -1079,6 +1110,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
                     param.ApproverId = currentUser.ApproverId;
                     param.CurrentUserId = currentUser.UserId;
 
@@ -1118,6 +1151,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
                     param.CurrentUserId = currentUser.UserId;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
@@ -1471,6 +1506,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
                     param.CurrentUserId = currentUser.UserId;
 
 
@@ -1549,6 +1586,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
                     headermodel.CurrentUserId = currentUser.UserId;
                     headermodel.LateDeductionList = model;
 

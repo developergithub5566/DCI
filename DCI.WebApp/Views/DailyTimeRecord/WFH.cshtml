@@ -672,7 +672,7 @@
                                                                $('#savewfhapp').submit(function (e) {
                                                                         e.preventDefault();
 
-                                                                       // $('.spinner-overlay').hide();
+                                                                       
                                                                        
                                                                    
                                                                                 let header = {
@@ -721,6 +721,8 @@
                                                                                         }).then((result) => {
                                                                                             if (result.isConfirmed) {
 
+                                                                                          $('.spinner-overlay').show();
+                                                                                                           
                                                                                 $.ajax({
                                                                                     type: 'POST',
                                                                                     url: '@Url.Action("SaveWFHApplication", "DailyTimeRecord")',
@@ -733,6 +735,7 @@
                                                                                                 icon: "success",
                                                                                                 confirmButtonText: "Ok"
                                                                                             }).then(() => {
+                                                                                                 $('.spinner-overlay').hide();
                                                                                                 location.reload();
                                                                                             });
                                                                                         } else {

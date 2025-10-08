@@ -47,7 +47,6 @@ namespace DCI.WebApp.Controllers
 
 				if (_httpContextAccessor.HttpContext.Request.Cookies.Count > 0)
 				{
-
 					foreach (var cookie in _httpContextAccessor.HttpContext.Request.Cookies.Keys)
 					{
 						_httpContextAccessor.HttpContext.Response.Cookies.Delete(cookie);

@@ -30,7 +30,19 @@ namespace DCI.Repositories
         public async Task<IList<DailyTimeRecordViewModel>> GetAllUndertime(DailyTimeRecordViewModel model)
         {
             //var context = _dbContext.vw_AttendanceSummary.AsQueryable().Where(x => x.STATUS != (int)EnumStatus.PayrollDeducted);
-            var context = _dbContext.vw_AttendanceSummary.AsQueryable().Where(x => x.STATUS == (int)EnumStatus.Raw);
+            //var context = _dbContext.vw_AttendanceSummary.AsQueryable().Where(x => x.STATUS == (int)EnumStatus.Raw);
+            var context = (from dtr in _dbContext.vw_AttendanceSummary.AsNoTracking()
+                           join emp in _dbContext.Employee.AsNoTracking() on dtr.EMPLOYEE_NO equals emp.EmployeeNo
+                           where dtr.STATUS == (int)EnumStatus.Raw
+                           select new
+                           {
+                               EMPLOYEE_NO = dtr.EMPLOYEE_NO,
+                               DATE = dtr.DATE,
+                               NAME = emp.Firstname + " " + emp.Lastname,
+                               UNDER_TIME = dtr.UNDER_TIME,
+                           }).ToList();
+
+
             int _currentYear = DateTime.Now.Year;
 
             var dateTo = model.DateTo.Date.AddDays(1).AddTicks(-1);
@@ -83,8 +95,21 @@ namespace DCI.Repositories
                         .Select(x => TimeSpan.TryParse(x.UNDER_TIME, out var t) ? t : TimeSpan.Zero)
                         .Aggregate(TimeSpan.Zero, (sum, next) => sum + next);
 
+                    //var totalMinutes = g.Sum(x =>
+                    //     TimeSpan.TryParse(x.UNDER_TIME, out var t) ? t.TotalMinutes : 0);
                     var totalMinutes = g.Sum(x =>
-                         TimeSpan.TryParse(x.UNDER_TIME, out var t) ? t.TotalMinutes : 0);
+                    {
+                        if (string.IsNullOrWhiteSpace(x.UNDER_TIME))
+                            return 0.0;
+
+                        var parts = x.UNDER_TIME.Split(':');
+                        var cleanLate = parts.Length >= 2 ? $"{parts[0]}:{parts[1]}" : x.UNDER_TIME;
+
+                        return TimeSpan.TryParse(cleanLate, out var t)
+                            ? t.TotalMinutes
+                            : 0.0;
+                    });
+
 
                     return new DailyTimeRecordViewModel
                     {
@@ -231,7 +256,8 @@ namespace DCI.Repositories
                     select new
                     {
                         Row = a,
-                        EmployeeId = e.EmployeeId
+                        EmployeeId = e.EmployeeId,
+                        NAME = e.Firstname + " " + e.Lastname,
                     }
                 ).ToListAsync();
 
@@ -300,7 +326,7 @@ namespace DCI.Repositories
                     {
                         ID = x.Row.ID,
                         EMPLOYEE_NO = x.Row.EMPLOYEE_NO,
-                        NAME = x.Row.NAME,
+                        NAME = x.NAME,
                         DATE = x.Row.DATE,
                         FIRST_IN = x.Row.FIRST_IN,
                         LAST_OUT = x.Row.LAST_OUT,
@@ -374,13 +400,10 @@ namespace DCI.Repositories
                         lvFormmodel.EmployeeId = emp.EmployeeId;
                         lvFormmodel.NoOfDays = ut.TotalUndertime ?? 0;
                         await SaveLeaveForUndertime(lvFormmodel);
-
-
-                        //var attendanceList = await _dbContext.vw_AttendanceSummary.Where(x => x.EMPLOYEE_NO == ut.EmpNo && x.DATE >= ut.DateFrom.Date && x.DATE <= dateTo.Date
-                        //&& (x.STATUS != (int)EnumStatus.NotDeducted || x.STATUS != (int)EnumStatus.PayrollDeducted || x.STATUS != (int)EnumStatus.VLDeducted)).ToListAsync();
+                  
 
                         var attendanceList = await _dbContext.vw_AttendanceSummary.Where(x => x.EMPLOYEE_NO == ut.EmpNo && x.DATE >= ut.DateFrom.Date && x.DATE <= dateTo.Date
-                                                                                                                                                      && x.STATUS == 0).ToListAsync();
+                                                                                                                                                      && x.STATUS == (int)EnumStatus.Raw).ToListAsync();
 
                         // kung may remaining leave pa
                         if (leafinfo?.VLBalance >= ut.TotalUndertime && workdtls.EmployeeStatusId == (int)EnumEmploymentType.Regular)
@@ -428,7 +451,20 @@ namespace DCI.Repositories
                         }
 
 
+                        //Send Notification to Executor/HR 
+                        NotificationViewModel notifvm = new NotificationViewModel();
+                        notifvm.Title = "Undertime Deduction";
+                        notifvm.Description = System.String.Format("Undertime deduction process {0} has been executed successfully.", oth.RequestNo);
+                        notifvm.ModuleId = (int)EnumModulePage.Undertime;
+                        notifvm.TransactionId = oth.UndertimeHeaderId;
+                        notifvm.AssignId = model.CurrentUserId;
+                        notifvm.URL = "/Report/Undertime";
+                        notifvm.MarkRead = false;
+                        notifvm.CreatedBy = model.CurrentUserId;
+                        notifvm.IsActive = true;
+                        await _homeRepository.SaveNotification(notifvm);
                     }
+                 
                 }
 
                 return (StatusCodes.Status200OK, Constants.Undertime_Deduction);
@@ -453,7 +489,7 @@ namespace DCI.Repositories
 
                 LeaveRequestHeader entity = new LeaveRequestHeader();
                 entity.EmployeeId = param.EmployeeId;
-                entity.RequestNo = await GenereteRequestNoForUndertime();
+                entity.RequestNo = await GenereteRequestNoForLeave();
                 entity.DateFiled = DateTime.Now;
                 entity.LeaveTypeId = (int)EnumLeaveType.UT;
                 entity.Status = (int)EnumStatus.VLDeducted;
@@ -475,24 +511,17 @@ namespace DCI.Repositories
                 await _dbContext.SaveChangesAsync();
 
 
-                //var workdtls = _dbContext.EmployeeWorkDetails.Where(x => x.EmployeeId == param.EmployeeId).FirstOrDefault();
-                //var dept = _dbContext.Department.Where(x => x.DepartmentId == workdtls.DepartmentId).FirstOrDefault();
-                //model.ApproverId = dept.ApproverId;
-                //model.LeaveRequestHeader.Status = entity.Status;
-                //model.LeaveRequestHeader.RequestNo = entity.RequestNo;
-                //await _emailRepository.SendToApproval(model);
-
-
+                var usr = _dbContext.User.AsNoTracking().Where(x => x.EmployeeId == param.EmployeeId).FirstOrDefault();
 
                 NotificationViewModel notifvm = new NotificationViewModel();
                 notifvm.Title = "Undertime";
                 notifvm.Description = System.String.Format("System-Generated Undertime Deduction.", entity.RequestNo);
                 notifvm.ModuleId = (int)EnumModulePage.Undertime;
                 notifvm.TransactionId = entity.LeaveRequestHeaderId;
-                notifvm.AssignId = param.ApproverId;
-                notifvm.URL = "/DailyTimeRecord/Undertime";
+                notifvm.AssignId = usr != null ? usr.UserId : 0;
+                notifvm.URL = "/DailyTimeRecord/Leave";
                 notifvm.MarkRead = false;
-                notifvm.CreatedBy = param.EmployeeId;
+                notifvm.CreatedBy = param.CurrentUserId;
                 notifvm.IsActive = true;
                 await _homeRepository.SaveNotification(notifvm);
 
@@ -509,7 +538,7 @@ namespace DCI.Repositories
             }
         }
 
-        private async Task<string> GenereteRequestNoForUndertime()
+        private async Task<string> GenereteRequestNoForLeave()
         {
 
             try
@@ -517,7 +546,7 @@ namespace DCI.Repositories
                 int _currentYear = DateTime.Now.Year;
                 int _currentMonth = DateTime.Now.Month;
                 var _leaveContext = await _dbContext.LeaveRequestHeader
-                                                .Where(x => x.IsActive == true && x.DateFiled.Date.Year == _currentYear && x.DateFiled.Date.Month == _currentMonth)
+                                                .Where(x => x.IsActive == true && x.DateFiled.Date.Year == _currentYear)
                                                 .AsQueryable()
                                                 .ToListAsync();
 
@@ -525,7 +554,7 @@ namespace DCI.Repositories
                 int totalrecords = _leaveContext.Count() + 1;
                 string finalSetRecords = GetFormattedRecordForUndertime(totalrecords);
                 string yearMonth = DateTime.Now.ToString("yyyyMM");
-                string req = "UT";
+                string req = Constants.ModuleCode_Leave;
 
                 return $"{req}-{yearMonth}-{finalSetRecords}";
             }
@@ -555,17 +584,17 @@ namespace DCI.Repositories
             try
             {
                 int _currentYear = DateTime.Now.Year;
-                int _currentMonth = DateTime.Now.Month;
+               // int _currentMonth = DateTime.Now.Month;
                 var _leaveContext = await _dbContext.UndertimeHeader
-                                                .Where(x => x.IsActive == true)
-                                                .AsQueryable()
+                                                .Where(x => x.IsActive == true && x.DateCreated.Date.Year == _currentYear)
+                                                .AsNoTracking()
                                                 .ToListAsync();
 
 
                 int totalrecords = _leaveContext.Count() + 1;
                 string finalSetRecords = GetFormattedRecordForUndertime(totalrecords);
                 string yearMonth = DateTime.Now.ToString("yyyyMM");
-                string req = "UTD";
+                string req = Constants.ModuleCode_Undertime_Deduction;
 
                 return $"{req}-{yearMonth}-{finalSetRecords}";
             }
@@ -609,9 +638,9 @@ namespace DCI.Repositories
         public async Task<IList<UndertimeDetailViewModel>> GetUndertimeDeductionByHeaderId(DailyTimeRecordViewModel model)
         {
             var rows = await (
-                from ot in _dbContext.UndertimeDetail
-                join attdnce in _dbContext.vw_AttendanceSummary on ot.AttendanceId equals attdnce.ID
-                //   join emp in _dbContext.Employee on usr.EmployeeId equals emp.EmployeeId
+                from ot in _dbContext.UndertimeDetail.AsNoTracking()
+                join attdnce in _dbContext.vw_AttendanceSummary.AsNoTracking() on ot.AttendanceId equals attdnce.ID
+                join emp in _dbContext.Employee on attdnce.EMPLOYEE_NO equals emp.EmployeeNo
                 where ot.IsActive
                 //orderby ot.DateCreated descending
                 select new UndertimeDetailViewModel
@@ -619,7 +648,7 @@ namespace DCI.Repositories
                     UndertimeDetailId = ot.UndertimeDetailId,
                     UndertimeHeaderId = ot.UndertimeHeaderId,
                     EMPLOYEE_NO = attdnce.EMPLOYEE_NO,
-                    NAME = attdnce.NAME,
+                    NAME = emp.Firstname + " " + emp.Lastname,
                     AttendanceId = ot.AttendanceId,
                     DATE = attdnce.DATE,
                     FIRST_IN = attdnce.FIRST_IN,
@@ -627,10 +656,9 @@ namespace DCI.Repositories
                     UNDER_TIME = attdnce.UNDER_TIME,
                     TOTAL_WORKING_HOURS = attdnce.TOTAL_WORKING_HOURS,
                     DeductionType = ot.DeductionType,
-                    DeductionTypeName = ot.DeductionType == 1 ? "Payroll" : (ot.DeductionType == 2 ? "Vacation Leave" : "Sick Leave"),
+                    DeductionTypeName = ot.DeductionType == (int)EnumDeductionType.Payroll ? "Payroll" : (ot.DeductionType == (int)EnumDeductionType.VacationLeave ? "Vacation Leave" : "Sick Leave"),
                    // DeductionTypeName = EnumHelper.GetEnumDescriptionByTypeValue(EnumDeductionType ,(int)EnumDeductionType.VacationLeave))
-                })
-                .AsNoTracking()
+                })               
                 .ToListAsync();
 
 

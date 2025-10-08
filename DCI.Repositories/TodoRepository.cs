@@ -412,7 +412,7 @@ namespace DCI.Repositories
                 raw_logs.DATE_TIME = contextHdr.DtrDateTime;
                 raw_logs.CREATED_DATE = DateTime.Now;
                 raw_logs.CREATED_BY = Constants.SYSAD;
-                raw_logs.STATUS = 0;
+                raw_logs.STATUS = (int)EnumStatus.Raw;
                 await _dbContext.tbl_raw_logs.AddAsync(raw_logs);
                 await _dbContext.SaveChangesAsync();
 
@@ -542,8 +542,9 @@ namespace DCI.Repositories
                 emailvm.RequestNo = contextHdr.RequestNo;
                 emailvm.StatusId = contextHdr.Status;
                 emailvm.ApproverId = contextHdr.ApproverId;
+                emailvm.CreatedBy = contextHdr.CreatedBy;
                 // Send Email Notif
-                await _emailRepository.SentToApprovalWFH(emailvm);
+                await _emailRepository.SendToRequestorWFH(emailvm);
 
                 string status = param.Status == (int)EnumStatus.Approved ? "approved" : "disapproved";
 
@@ -553,7 +554,7 @@ namespace DCI.Repositories
                 notifvm.ModuleId = (int)EnumModulePage.WFH;
                 notifvm.TransactionId = param.TransactionId;
                 notifvm.AssignId = contextHdr.CreatedBy;
-                notifvm.URL = "/DailyTimeRecord/WFH";
+                notifvm.URL = "/DailyTimeRecord/WFHApplication";
                 notifvm.MarkRead = false;
                 notifvm.CreatedBy = param.CurrentUserId;
                 notifvm.IsActive = true;

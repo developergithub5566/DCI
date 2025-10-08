@@ -12,9 +12,14 @@ namespace DCI.Repositories
     public class WfhRepository : IWfhRepository, IDisposable
     {
         private DCIdbContext _dbContext;
-        public WfhRepository(DCIdbContext dbContext)
+        private readonly IHomeRepository _homeRepository;
+        private IEmailRepository _emailRepository;
+
+        public WfhRepository(DCIdbContext dbContext, IHomeRepository homeRepository, IEmailRepository emailRepository)
         {
             _dbContext = dbContext;
+            _homeRepository = homeRepository;
+            _emailRepository = emailRepository;
         }
         public void Dispose()
         {
@@ -23,17 +28,16 @@ namespace DCI.Repositories
 
         public async Task<IList<DailyTimeRecordViewModel>> GetAllWFH(DailyTimeRecordViewModel model)
         {
-            var context = _dbContext.vw_AttendanceSummary_WFH.AsQueryable();
-
-
-            var query = await (from dtr in context
+            //var context = _dbContext.vw_AttendanceSummary_WFH.AsQueryable();
+            var query = await (from dtr in _dbContext.vw_AttendanceSummary_WFH.AsNoTracking()
+                               join emp in _dbContext.Employee on dtr.EMPLOYEE_NO equals emp.EmployeeNo
                                join stat in _dbContext.Status on dtr.STATUS equals stat.StatusId
-                               orderby dtr.DATE descending, dtr.NAME descending
+                               orderby dtr.DATE descending//, dtr.NAME descending
                                select new DailyTimeRecordViewModel
                                {
                                    ID = dtr.ID,
                                    EMPLOYEE_NO = dtr.EMPLOYEE_NO,
-                                   NAME = dtr.NAME,
+                                   NAME = emp.Firstname + " " + emp.Lastname,
                                    DATE = dtr.DATE,
                                    FIRST_IN = dtr.FIRST_IN,
                                    LAST_OUT = dtr.LAST_OUT,
@@ -50,7 +54,7 @@ namespace DCI.Repositories
             if ((int)EnumEmployeeScope.PerEmployee == model.ScopeTypeEmp)
             {
                 //var usr = _dbContext.User.Where(x => x.UserId == model.CurrentUserId).FirstOrDefault();
-                var emp = _dbContext.Employee.Where(x => x.EmployeeId == model.EMPLOYEE_ID).FirstOrDefault();
+                var emp = _dbContext.Employee.AsNoTracking().Where(x => x.EmployeeId == model.EMPLOYEE_ID).FirstOrDefault();
                 if (emp != null)
                     query = query.Where(x => x.EMPLOYEE_NO == emp.EmployeeNo).ToList();
             }
@@ -203,9 +207,40 @@ namespace DCI.Repositories
                 await _dbContext.SaveChangesAsync();
             }
 
-            return (StatusCodes.Status200OK, string.Format("WFH application request {0} has been submitted for approval.", entity.RequestNo));
+            //Send Email Notification to Approver
+            WFHHeaderViewModel email = new WFHHeaderViewModel();
+            email.ApproverId = model.Header.ApproverId;
+            email.StatusId = entity.Status;
+            email.RequestNo = entity.RequestNo;
+            await _emailRepository.SentToApprovalWFH(email);
 
-            // return (StatusCodes.Status200OK, "Successfully saved");
+            //Send Application Notification to Approver
+            NotificationViewModel notifvmToApprover = new NotificationViewModel();
+            notifvmToApprover.Title = "WFH";
+            notifvmToApprover.Description = System.String.Format("You have been assigned WFH request {0} for approval.", entity.RequestNo);
+            notifvmToApprover.ModuleId = (int)EnumModulePage.WFH;
+            notifvmToApprover.TransactionId = entity.WfhHeaderId;
+            notifvmToApprover.AssignId = model.Header.ApproverId;
+            notifvmToApprover.URL = "/Todo/Index/";
+            notifvmToApprover.MarkRead = false;
+            notifvmToApprover.CreatedBy = entity.CreatedBy;
+            notifvmToApprover.IsActive = true;
+            await _homeRepository.SaveNotification(notifvmToApprover);
+
+            //Send Application Notification to Requestor
+            NotificationViewModel notifvmToRequestor = new NotificationViewModel();
+            notifvmToRequestor.Title = "WFH";
+            notifvmToRequestor.Description = System.String.Format("Your WFH request {0} has been submitted for approval.", entity.RequestNo);
+            notifvmToRequestor.ModuleId = (int)EnumModulePage.WFH;
+            notifvmToRequestor.TransactionId = entity.WfhHeaderId;
+            notifvmToRequestor.AssignId = entity.CreatedBy;          
+            notifvmToRequestor.URL = "/DailyTimeRecord/WFH";
+            notifvmToRequestor.MarkRead = false;
+            notifvmToRequestor.CreatedBy = entity.CreatedBy;
+            notifvmToRequestor.IsActive = true;
+            await _homeRepository.SaveNotification(notifvmToRequestor);
+
+            return (StatusCodes.Status200OK, string.Format("WFH application request {0} has been submitted for approval.", entity.RequestNo));          
         }
 
         public async Task<(int statuscode, string message)> CancelWFHApplication(WFHHeaderViewModel model)
@@ -223,7 +258,22 @@ namespace DCI.Repositories
                 entity.IsActive = true;
                 _dbContext.WfhHeader.Entry(entity).State = EntityState.Modified;
                 await _dbContext.SaveChangesAsync();
-                return (StatusCodes.Status200OK, "Successfully cancelled");
+
+                //Send Application Notification to Approver
+                NotificationViewModel notifvmToApprover = new NotificationViewModel();
+                notifvmToApprover.Title = "WFH";
+                notifvmToApprover.Description = System.String.Format("WFH request {0} has been cancelled by the requestor.", entity.RequestNo);
+                notifvmToApprover.ModuleId = (int)EnumModulePage.WFH;
+                notifvmToApprover.TransactionId = entity.WfhHeaderId;
+                notifvmToApprover.AssignId = entity.ApproverId;
+                notifvmToApprover.URL = "/Todo/Index/";
+                notifvmToApprover.MarkRead = false;
+                notifvmToApprover.CreatedBy = entity.CreatedBy;
+                notifvmToApprover.IsActive = true;
+                await _homeRepository.SaveNotification(notifvmToApprover);
+
+                return (StatusCodes.Status200OK, System.String.Format("WFH request {0} has been cancelled.", entity.RequestNo));
+                
             }
             catch (Exception ex)
             {
@@ -244,20 +294,19 @@ namespace DCI.Repositories
                 int _currentYear = DateTime.Now.Year;
                 int _currentMonth = DateTime.Now.Month;
 
-                var startDate = new DateTime(_currentYear, _currentMonth, 1);
-                var endDate = startDate.AddMonths(1);
+                //var startDate = new DateTime(_currentYear, _currentMonth, 1);
+                //var endDate = startDate.AddMonths(1);                             
 
                 var _dtr = await _dbContext.WfhHeader.AsNoTracking()
-                    .Where(x => x.IsActive == true
-                        && x.DateCreated >= startDate
-                        && x.DateCreated < endDate)
+                    .Where(x => x.IsActive == true && x.DateCreated.Date.Year == _currentYear)
+                    .AsNoTracking()
                     .ToListAsync();
 
 
                 int totalrecords = _dtr.Count() + 1;
                 string finalSetRecords = GetFormattedRecord(totalrecords);
                 string yearMonth = DateTime.Now.ToString("yyyyMM");
-                string req = "WFH";
+                string req = Constants.ModuleCode_WFH;
 
                 return $"{req}-{yearMonth}-{finalSetRecords}";
             }

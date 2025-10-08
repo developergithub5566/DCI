@@ -69,6 +69,8 @@ namespace DCI.WebApp.Controllers
                 
 
                 var currentUser = _userSessionHelper.GetCurrentUser();
+                if (currentUser == null)
+                    return RedirectToAction("Logout", "Account");
                 model.CurrentUserId = currentUser.UserId;
                 
 
@@ -98,7 +100,9 @@ namespace DCI.WebApp.Controllers
                 LeaveViewModel _filterRoleModel = new LeaveViewModel();
 
                 var currentUser = _userSessionHelper.GetCurrentUser();
-                //_filterRoleModel = currentUser.RoleId;
+                if (currentUser == null)
+                    return RedirectToAction("Logout", "Account");
+
                 _filterRoleModel.CurrentUserId = currentUser.UserId;
 
                 var stringContent = new StringContent(JsonConvert.SerializeObject(_filterRoleModel), Encoding.UTF8, "application/json");
@@ -125,6 +129,9 @@ namespace DCI.WebApp.Controllers
                 DTRCorrectionViewModel _filterRoleModel = new DTRCorrectionViewModel();
 
                 var currentUser = _userSessionHelper.GetCurrentUser();
+                if (currentUser == null)
+                    return RedirectToAction("Logout", "Account");
+
                 _filterRoleModel.CurrentUserId = currentUser.UserId;
 
                 var stringContent = new StringContent(JsonConvert.SerializeObject(_filterRoleModel), Encoding.UTF8, "application/json");
@@ -148,6 +155,9 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+
                     model.CreatedBy = currentUser.UserId;
                     model.ApproverId = currentUser.UserId;
 
@@ -182,6 +192,9 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+
                     model.CreatedBy = currentUser.UserId;
                     model.ApproverId = currentUser.UserId;
 
@@ -218,7 +231,9 @@ namespace DCI.WebApp.Controllers
                 LeaveViewModel _filterModel = new LeaveViewModel();
 
                 var currentUser = _userSessionHelper.GetCurrentUser();
-                //_filterRoleModel = currentUser.RoleId;
+                if (currentUser == null)
+                    return RedirectToAction("Logout", "Account");
+
                 _filterModel.CurrentUserId = currentUser.UserId;
 
                 var stringContent = new StringContent(JsonConvert.SerializeObject(_filterModel), Encoding.UTF8, "application/json");
@@ -243,6 +258,10 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+
+
                     model.CreatedBy = currentUser.UserId;
                     model.ApproverId = currentUser.UserId;
 
@@ -277,6 +296,9 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+
                     model.CreatedBy = currentUser.UserId;
                     model.ApproverId = currentUser.UserId;
 
@@ -314,9 +336,10 @@ namespace DCI.WebApp.Controllers
                 OvertimeViewModel _filterRoleModel = new OvertimeViewModel();
 
                 var currentUser = _userSessionHelper.GetCurrentUser();
-                //_filterRoleModel.CurrentUserId = currentUser.RoleId;
-                _filterRoleModel.CurrentUserId = currentUser.UserId;
+                if (currentUser == null)
+                    return RedirectToAction("Logout", "Account");
 
+                _filterRoleModel.CurrentUserId = currentUser.UserId;
                 var stringContent = new StringContent(JsonConvert.SerializeObject(_filterRoleModel), Encoding.UTF8, "application/json");
                 var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Todo/GetAllTodoOvertime");
 
@@ -346,9 +369,11 @@ namespace DCI.WebApp.Controllers
                 WFHHeaderViewModel _filterRoleModel = new WFHHeaderViewModel();
 
                 var currentUser = _userSessionHelper.GetCurrentUser();
+                if (currentUser == null)
+                    return RedirectToAction("Logout", "Account");
+
                 _filterRoleModel.EmployeeId = currentUser.EmployeeId;
                 _filterRoleModel.CurrentUserId = currentUser.UserId;
-
                 var stringContent = new StringContent(JsonConvert.SerializeObject(_filterRoleModel), Encoding.UTF8, "application/json");
                 var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Todo/GetAllWFH");
 

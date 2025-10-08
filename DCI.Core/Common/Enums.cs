@@ -142,7 +142,8 @@ namespace DCI.Core.Common
         Deleted = 7,
         Active = 8,
         PayrollDeducted = 9,
-        VLDeducted = 10       
+        VLDeducted = 10,
+        DTRAdjustment = 11
     }
 
     public enum EnumLeaveType

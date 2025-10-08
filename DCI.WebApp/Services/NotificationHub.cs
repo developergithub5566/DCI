@@ -40,6 +40,9 @@ namespace DCI.WebApp.Services
             {
                 NotificationViewModel _filterRoleModel = new NotificationViewModel();
                 var currentUser = _userSessionHelper.GetCurrentUser();
+                if (currentUser == null)
+                    new List<NotificationViewModel>();
+
                 _filterRoleModel.AssignId = currentUser.UserId;
                 var stringContent = new StringContent(JsonConvert.SerializeObject(_filterRoleModel), Encoding.UTF8, "application/json");
                 var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Home/GetAllNotification");

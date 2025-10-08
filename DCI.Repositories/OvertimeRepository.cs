@@ -37,17 +37,18 @@ namespace DCI.Repositories
         {
             try
             {
-                var context = _dbContext.vw_AttendanceSummary.AsNoTracking().Where(x => x.DATE.Date == model.OTDate.Date);
+               // var context = _dbContext.vw_AttendanceSummary.AsNoTracking().Where(x => x.DATE.Date == model.OTDate.Date);
                 var user = _dbContext.User.AsNoTracking().Where(x => x.UserId == model.CurrentUserId).FirstOrDefault();
                 var employee = _dbContext.Employee.AsNoTracking().Where(x => x.EmployeeId == user.EmployeeId).FirstOrDefault();
 
-                var query = (from dtr in context
+                var query = (from dtr in _dbContext.vw_AttendanceSummary.AsNoTracking().Where(x => x.DATE.Date == model.OTDate.Date)
+                             join emp in _dbContext.Employee.AsNoTracking() on dtr.EMPLOYEE_NO equals emp.EmployeeNo
                              where dtr.DATE == model.OTDate && dtr.EMPLOYEE_NO == employee.EmployeeNo
                              select new DailyTimeRecordViewModel
                              {
                                  ID = dtr.ID,
                                  EMPLOYEE_NO = dtr.EMPLOYEE_NO,
-                                 NAME = dtr.NAME,
+                                 NAME =emp.Firstname + " " + emp.Lastname,
                                  DATE = dtr.DATE,
                                  FIRST_IN = dtr.FIRST_IN,
                                  LAST_OUT = dtr.LAST_OUT,

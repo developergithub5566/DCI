@@ -36,17 +36,14 @@ namespace DCI.Repositories
 
         public async Task<IList<DailyTimeRecordViewModel>> GetAllDTR(DailyTimeRecordViewModel model)
         {
-            // var biometriclogs = _dbContext.vw_AttendanceSummary.AsQueryable();
-            // var wfhlogs = _dbContext.vw_AttendanceSummary.AsQueryable();
-
-
-            var biometriclogs = await (from dtr in _dbContext.vw_AttendanceSummary.AsQueryable()                                     
-                                       orderby dtr.DATE descending, dtr.NAME descending
+            var biometriclogs = await (from dtr in _dbContext.vw_AttendanceSummary.AsNoTracking()
+                                       join emp in _dbContext.Employee.AsNoTracking() on dtr.EMPLOYEE_NO equals emp.EmployeeNo
+                                       orderby dtr.DATE descending
                                        select new DailyTimeRecordViewModel
                                        {
                                            ID = dtr.ID,
                                            EMPLOYEE_NO = dtr.EMPLOYEE_NO,
-                                           NAME = dtr.NAME,
+                                           NAME = emp.Firstname + " " + emp.Lastname,
                                            DATE = dtr.DATE,
                                            FIRST_IN = dtr.FIRST_IN,
                                            LAST_OUT = dtr.LAST_OUT,
@@ -56,18 +53,19 @@ namespace DCI.Repositories
                                            OVERTIME = dtr.OVERTIME,
                                            TOTAL_HOURS = dtr.TOTAL_HOURS,
                                            TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS,
-                                           SOURCE =  "BIOMETRICS"
+                                           SOURCE = Constants.Source_Biometrics
                                        }).ToListAsync();
 
 
-            var wfhlogs = await (from dtr in _dbContext.vw_AttendanceSummary_WFH.AsQueryable()
+            var wfhlogs = await (from dtr in _dbContext.vw_AttendanceSummary_WFH.AsNoTracking()
+                                 join emp in _dbContext.Employee.AsNoTracking() on dtr.EMPLOYEE_NO equals emp.EmployeeNo
                                  where dtr.STATUS == (int)EnumStatus.Approved
-                                 orderby dtr.DATE descending, dtr.NAME descending
+                                 orderby dtr.DATE descending
                                  select new DailyTimeRecordViewModel
                                  {
                                      ID = dtr.ID,
                                      EMPLOYEE_NO = dtr.EMPLOYEE_NO,
-                                     NAME = dtr.NAME,
+                                     NAME = emp.Firstname + " " + emp.Lastname,
                                      DATE = dtr.DATE,
                                      FIRST_IN = dtr.FIRST_IN,
                                      LAST_OUT = dtr.LAST_OUT,
@@ -77,16 +75,16 @@ namespace DCI.Repositories
                                      OVERTIME = dtr.OVERTIME,
                                      TOTAL_HOURS = dtr.TOTAL_HOURS,
                                      TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS,
-                                     SOURCE = "REMOTE"
+                                     SOURCE = Constants.Source_Remote
                                  }).ToListAsync();
 
-            var holiday = await (from hol in _dbContext.Holiday.AsQueryable()
-                                 where hol.IsActive == true                           
+            var holiday = await (from hol in _dbContext.Holiday.AsNoTracking()
+                                 where hol.IsActive == true
                                  select new DailyTimeRecordViewModel
                                  {
                                      ID = 0,
                                      EMPLOYEE_NO = string.Empty,
-                                     NAME = hol.HolidayName, 
+                                     NAME = hol.HolidayName,
                                      DATE = hol.HolidayDate.Date,
                                      FIRST_IN = string.Empty,
                                      LAST_OUT = string.Empty,
@@ -96,7 +94,7 @@ namespace DCI.Repositories
                                      OVERTIME = string.Empty,
                                      TOTAL_HOURS = string.Empty,
                                      TOTAL_WORKING_HOURS = string.Empty,
-                                     SOURCE = hol.HolidayType == 3 ? "SUSPENSION" : "HOLIDAY"
+                                     SOURCE = hol.HolidayType == (int)EnumHoliday.Suspension ? Constants.Source_Suspension : Constants.Source_Holiday
                                  }).ToListAsync();
 
 
@@ -115,26 +113,27 @@ namespace DCI.Repositories
 
         public async Task<IList<DailyTimeRecordViewModel>> GetAllDTRByEmpNo(string empNo)
         {
-            var context = _dbContext.vw_AttendanceSummary.AsQueryable();
+            //var context = _dbContext.vw_AttendanceSummary.AsQueryable();
 
 
-            var query = (from dtr in context
-                         where dtr.EMPLOYEE_NO == empNo
-                         select new DailyTimeRecordViewModel
-                         {
-                             ID = dtr.ID,
-                             EMPLOYEE_NO = dtr.EMPLOYEE_NO,
-                             NAME = dtr.NAME,
-                             DATE = dtr.DATE,
-                             FIRST_IN = dtr.FIRST_IN,
-                             LAST_OUT = dtr.LAST_OUT,
-                             LATE = dtr.LATE,
-                             CLOCK_OUT = dtr.CLOCK_OUT,
-                             UNDER_TIME = dtr.UNDER_TIME,
-                             OVERTIME = dtr.OVERTIME,
-                             TOTAL_HOURS = dtr.TOTAL_HOURS,
-                             TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS
-                         }).ToList();
+            var query = await (from dtr in _dbContext.vw_AttendanceSummary.AsNoTracking()
+                               join emp in _dbContext.Employee.AsNoTracking() on dtr.EMPLOYEE_NO equals emp.EmployeeNo
+                               where dtr.EMPLOYEE_NO == empNo
+                               select new DailyTimeRecordViewModel
+                               {
+                                   ID = dtr.ID,
+                                   EMPLOYEE_NO = dtr.EMPLOYEE_NO,
+                                   NAME = emp.Firstname + " " + emp.Lastname,
+                                   DATE = dtr.DATE,
+                                   FIRST_IN = dtr.FIRST_IN,
+                                   LAST_OUT = dtr.LAST_OUT,
+                                   LATE = dtr.LATE,
+                                   CLOCK_OUT = dtr.CLOCK_OUT,
+                                   UNDER_TIME = dtr.UNDER_TIME,
+                                   OVERTIME = dtr.OVERTIME,
+                                   TOTAL_HOURS = dtr.TOTAL_HOURS,
+                                   TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS
+                               }).ToListAsync();
 
 
             return query;
@@ -142,7 +141,7 @@ namespace DCI.Repositories
 
         public async Task<IList<DailyTimeRecordViewModel>> GetBiometricLogsByEmployeeId(DailyTimeRecordViewModel model)
         {
-            var _emp = await _dbContext.Employee.AsQueryable().Where(x => x.EmployeeId == model.EMPLOYEE_ID).FirstOrDefaultAsync();
+            var _emp = await _dbContext.Employee.AsNoTracking().Where(x => x.EmployeeId == model.EMPLOYEE_ID).FirstOrDefaultAsync();
             var empNO = _emp.EmployeeNo ?? string.Empty;
 
             var query = await (from logs in _dbContext.tbl_raw_logs.AsQueryable()
@@ -151,16 +150,17 @@ namespace DCI.Repositories
                                {
                                    DATESTRING = logs.DATE_TIME.ToString("yyyy-MM-dd"),
                                    EMPLOYEE_NO = logs.EMPLOYEE_ID,
-                                   FIRST_IN = logs.DATE_TIME.ToString("HH:mm:ss")
+                                   FIRST_IN = logs.DATE_TIME.ToString("HH:mm:ss"),
+                                   //  SOURCE = logs.STATUS == 11 ? "DTR Adjustment" : "BIOMETRICS"
                                }).ToListAsync();
             return query;
         }
 
         public async Task<IList<DTRCorrectionViewModel>> GetAllDTRCorrection(DTRCorrectionViewModel model)
         {
-            var query = (from dtr in _dbContext.DTRCorrection.AsQueryable()
-                         join emp in _dbContext.Employee on dtr.EmployeeId equals emp.EmployeeId
-                         join stat in _dbContext.Status on dtr.Status equals stat.StatusId
+            var query = (from dtr in _dbContext.DTRCorrection.AsNoTracking()
+                         join emp in _dbContext.Employee.AsNoTracking() on dtr.EmployeeId equals emp.EmployeeId
+                         join stat in _dbContext.Status.AsNoTracking() on dtr.Status equals stat.StatusId
                          where dtr.CreatedBy == model.CreatedBy
                          select new DTRCorrectionViewModel
                          {
@@ -182,45 +182,49 @@ namespace DCI.Repositories
             {
                 query = query.Where(x => x.CreatedBy == model.CreatedBy).ToList();
             }
+            else
+            {
+                query = query.Where(x => x.Status == (int)EnumStatus.Approved || x.Status == (int)EnumStatus.Rejected).ToList();
+            }
             return query;
         }
 
         public async Task<DTRCorrectionViewModel> DTRCorrectionByDtrId(int dtrId)
         {
             var query = await (from dtr in _dbContext.DTRCorrection.AsNoTracking()
-                         join stat in _dbContext.Status.AsNoTracking() on dtr.Status equals stat.StatusId
-                         join emp in _dbContext.EmployeeWorkDetails.AsNoTracking() on dtr.EmployeeId equals emp.EmployeeId
-                         //join dept in _dbContext.Department on emp.DepartmentId equals dept.DepartmentId
-                         join depthead in _dbContext.User.AsNoTracking() on dtr.ApproverId equals depthead.UserId
-                         join apprvl in _dbContext.ApprovalHistory.AsNoTracking().Where(x => x.ModulePageId == (int)EnumModulePage.DTRCorrection) 
-                         on dtr.DtrId equals apprvl.TransactionId into ah
-                         from apprvl in ah.DefaultIfEmpty()
+                               join stat in _dbContext.Status.AsNoTracking() on dtr.Status equals stat.StatusId
+                               join emp in _dbContext.EmployeeWorkDetails.AsNoTracking() on dtr.EmployeeId equals emp.EmployeeId
+                               //join dept in _dbContext.Department on emp.DepartmentId equals dept.DepartmentId
+                               join depthead in _dbContext.User.AsNoTracking() on dtr.ApproverId equals depthead.UserId
+                               join apprvl in _dbContext.ApprovalHistory.AsNoTracking().Where(x => x.ModulePageId == (int)EnumModulePage.DTRCorrection)
+                               on dtr.DtrId equals apprvl.TransactionId into ah
+                               from apprvl in ah.DefaultIfEmpty()
                                where dtr.DtrId == dtrId
-                         select new DTRCorrectionViewModel
-                         {
-                             DtrId = dtr.DtrId,
-                             RequestNo = dtr.RequestNo,
-                             DateFiled = dtr.DateFiled,
-                             DtrType = dtr.DtrType,
-                             DtrDateTime = dtr.DtrDateTime,
-                             Status = dtr.Status,
-                             StatusName = stat.StatusName,
-                             Reason = dtr.Reason,                             
-                             CreatedBy = dtr.CreatedBy,
-                             ModifiedBy = dtr.ModifiedBy,
-                             DateModified = dtr.DateModified,
-                             IsActive = dtr.IsActive,
-                             DateApprovedDisapproved = apprvl != null ? apprvl.DateCreated.ToString("yyyy-MM-dd HH:mm") : string.Empty,
-                             ApprovalRemarks = apprvl != null ? apprvl.Remarks : string.Empty,
-                             DepartmentHead = depthead.Firstname + " " + depthead.Lastname// + " " + depthead.Suffix
-                         }).FirstOrDefaultAsync();
+                               select new DTRCorrectionViewModel
+                               {
+                                   DtrId = dtr.DtrId,
+                                   RequestNo = dtr.RequestNo,
+                                   DateFiled = dtr.DateFiled,
+                                   DtrType = dtr.DtrType,
+                                   DtrDateTime = dtr.DtrDateTime,
+                                   Status = dtr.Status,
+                                   StatusName = stat.StatusName,
+                                   Reason = dtr.Reason,
+                                   CreatedBy = dtr.CreatedBy,
+                                   ModifiedBy = dtr.ModifiedBy,
+                                   DateModified = dtr.DateModified,
+                                   IsActive = dtr.IsActive,
+                                   DateApprovedDisapproved = apprvl != null ? apprvl.DateCreated.ToString("yyyy-MM-dd HH:mm") : string.Empty,
+                                   ApprovalRemarks = apprvl != null ? apprvl.Remarks : string.Empty,
+                                   DepartmentHead = depthead.Firstname + " " + depthead.Lastname// + " " + depthead.Suffix
+                               }).FirstOrDefaultAsync();
 
             return query;
         }
 
 
         public async Task<(int statuscode, string message)> SaveDTRCorrection(DTRCorrectionViewModel param)
-        { 
+        {
             try
             {
                 if (param.DtrId == 0)
@@ -258,8 +262,8 @@ namespace DCI.Repositories
                     notifvmToApprover.TransactionId = entity.DtrId;
                     notifvmToApprover.AssignId = param.ApproverId;
                     // notifvmToApprover.URL = "/Todo/Index/?leaveId=" + model.DtrId;
-                    notifvmToApprover.URL = "/Todo/DTR";
-                     notifvmToApprover.MarkRead = false;
+                    notifvmToApprover.URL = "/Todo/Index/";
+                    notifvmToApprover.MarkRead = false;
                     notifvmToApprover.CreatedBy = param.CreatedBy;
                     notifvmToApprover.IsActive = true;
                     await _homeRepository.SaveNotification(notifvmToApprover);
@@ -272,7 +276,7 @@ namespace DCI.Repositories
                     notifvmToRequestor.TransactionId = entity.DtrId;
                     notifvmToRequestor.AssignId = param.CreatedBy;
                     //  notifvmToSelf.URL = "/Todo/Index/?leaveId=" + model.DtrId;
-                    notifvmToRequestor.URL = "/Home/Notification";
+                    notifvmToRequestor.URL = "/DailyTimeRecord/DTRCorrection?DtrId=1";
                     notifvmToRequestor.MarkRead = false;
                     notifvmToRequestor.CreatedBy = param.CreatedBy;
                     notifvmToRequestor.IsActive = true;
@@ -306,10 +310,25 @@ namespace DCI.Repositories
                 entity.Status = (int)EnumStatus.Cancelled;
                 entity.ModifiedBy = model.ModifiedBy;
                 entity.DateModified = DateTime.Now;
-                entity.IsActive = true;          
+                entity.IsActive = true;
                 _dbContext.DTRCorrection.Entry(entity).State = EntityState.Modified;
                 await _dbContext.SaveChangesAsync();
-                return (StatusCodes.Status200OK, "Successfully cancelled");
+
+                //Send Application Notification to Approver
+                NotificationViewModel notifvmToApprover = new NotificationViewModel();
+                notifvmToApprover.Title = "DTR Adjustment";
+                notifvmToApprover.Description = System.String.Format("DTR adjustment request {0} has been cancelled by the requestor.", entity.RequestNo);
+                notifvmToApprover.ModuleId = (int)EnumModulePage.DTRCorrection;
+                notifvmToApprover.TransactionId = entity.DtrId;
+                notifvmToApprover.AssignId = entity.ApproverId;
+                notifvmToApprover.URL = "/Todo/Index/";
+                notifvmToApprover.MarkRead = false;
+                notifvmToApprover.CreatedBy = entity.CreatedBy;
+                notifvmToApprover.IsActive = true;
+                await _homeRepository.SaveNotification(notifvmToApprover);
+
+                return (StatusCodes.Status200OK, System.String.Format("DTR adjustment request {0} has been cancelled.", entity.RequestNo));
+                // return (StatusCodes.Status200OK, "Successfully cancelled");
             }
             catch (Exception ex)
             {
@@ -328,17 +347,17 @@ namespace DCI.Repositories
             try
             {
                 int _currentYear = DateTime.Now.Year;
-                int _currentMonth = DateTime.Now.Month;
+                // int _currentMonth = DateTime.Now.Month;
                 var _dtr = await _dbContext.DTRCorrection
-                                                .Where(x => x.IsActive == true && x.DateFiled.Date.Year == _currentYear && x.DateFiled.Date.Month == _currentMonth)
-                                                .AsQueryable()
+                                                .Where(x => x.IsActive == true && x.DateFiled.Date.Year == _currentYear)
+                                                .AsNoTracking()
                                                 .ToListAsync();
 
 
                 int totalrecords = _dtr.Count() + 1;
                 string finalSetRecords = GetFormattedRecord(totalrecords);
                 string yearMonth = DateTime.Now.ToString("yyyyMM");
-                string req = "DTR";
+                string req = Constants.ModuleCode_DTR;
 
                 return $"{req}-{yearMonth}-{finalSetRecords}";
             }
@@ -361,29 +380,6 @@ namespace DCI.Repositories
             string formattedB = setB.ToString("D4");
             return $"{formattedA}";
         }
-        
- 
-        //public async Task<IList<WFHViewModel>> GetAllWFH(WFHViewModel model)
-        //{
-        //    var query = (from dtr in _dbContext.tbl_wfh_logs
-        //                 select new WFHViewModel
-        //                 {
-        //                     ID = dtr.ID,
-        //                     EMPLOYEE_NO = dtr.EMPLOYEE_ID,
-        //                     FULL_NAME = dtr.FULL_NAME,
-        //                     DATE_TIME = dtr.DATE_TIME
-
-        //                 }).ToList();
-        //    if ((int)EnumEmployeeScope.PerEmployee == model.ScopeTypeEmp)
-        //    {
-        //        //var usr = _dbContext.User.Where(x => x.UserId == model.CurrentUserId).FirstOrDefault();
-        //        var emp = _dbContext.Employee.Where(x => x.EmployeeId == model.EMPLOYEE_ID).FirstOrDefault();
-        //        if (emp != null)
-        //            query = query.Where(x => x.EMPLOYEE_NO == emp.EmployeeNo).ToList();
-        //    }
-        //    return query;
-        //}
-
 
     }
 }

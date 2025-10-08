@@ -77,10 +77,11 @@ namespace DCI.Trigger
 
                     <p>Your biometric attendance has been recorded as follows:</p>
 
-                     <p>Date: {model.DateTimeInOut.ToShortDateString()}</p>
-				     <p>Time: {model.DateTimeInOut.ToShortTimeString()}</p>
+                     <p>Date: {model.DateTimeInOut.ToLongDateString()}</p>
+				     <p>Time: {model.DateTimeInOut.ToString("HH:mm:ss tt")}</p>
                      <p>Source: BIOMETRICS </p>
-            
+                
+                    <br/>
                     <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
                     <p>Best regards,<br />ESS System Administrator</p>
                 </body>

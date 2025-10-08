@@ -349,7 +349,7 @@ namespace DCI.Repositories
                 
                 <p>This is an automated message from ESS System.</p>
                  
-				<p>You have been assigned DTR Correction request {model.RequestNo} {statusName}. Kindly review and proceed accordingly. </p> 
+				<p>You have been assigned DTR Adjustment request {model.RequestNo} {statusName}. Kindly review and proceed accordingly. </p> 
             
                 <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
                 <p>Best regards,<br />ESS System Administrator</p>
@@ -443,8 +443,45 @@ namespace DCI.Repositories
         }
 
 
+
+        public async Task SendToRequestorWFH(WFHHeaderViewModel model)
+        {
+            model.StatusName = model.StatusId == (int)EnumStatus.Approved ? Constants.Approval_Approved : Constants.Approval_Disapproved;
+
+            model = await RequestorNotificationBodyMessageWFH(model);
+
+            MailMessage mail = new MailMessage();
+            mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
+            mail.Subject = "DCI ESS App - Your Work from home " + model.RequestNo + " has been " + model.StatusName.ToLower();
+            mail.Body = model.EmailBody;
+            mail.IsBodyHtml = true;
+            mail.To.Add(model.RequestorEmail);
+            await SendMessage(mail);
+        }
+
+        async Task<WFHHeaderViewModel> RequestorNotificationBodyMessageWFH(WFHHeaderViewModel model)
+        {
+            var userEntity = await _userRepository.GetUserById(model.CreatedBy);
+            model.RequestorEmail = userEntity.Email;
+
+            model.EmailBody = $@"
+            <html>
+            <body>              
+                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
+                
+                <p>This is an automated message from ESS System.</p>
+                 <p>Your Work from home request {model.RequestNo} has been {model.StatusName.ToLower()}.</p>   
+              
+                  <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
+                  <p>Best regards,<br />ESS System Administrator</p>
+            </body>
+            </html>";
+
+            return model;
+        }
+
         #endregion
 
-       
+
     }
 }

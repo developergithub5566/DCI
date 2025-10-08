@@ -114,9 +114,9 @@
                            @*  <th>
                                 <label>Employee No.</label>
                             </th>*@
-                            <th>
+                           @*  <th>
                                 <label>Name</label>
-                            </th> 
+                            </th>  *@
                             <th>
                                 <label>Date</label>
                             </th>
@@ -131,6 +131,9 @@
                             </th>
                             <th>
                                 <label>Undertime</label>
+                            </th>
+                            <th>
+                                <label>Working Hours</label>
                             </th>
                             <th>
                                 <label>Source</label> 
@@ -150,9 +153,9 @@
                               @*   <td>
                                     @item.EMPLOYEE_NO
                                 </td>*@
-                                <td>
+                               @*  <td>
                                     @item.NAME
-                                </td> 
+                                </td>  *@
                                 <td>
                                     @item.DATE.ToString("yyyy-MM-dd")
                                 </td>
@@ -167,6 +170,9 @@
                                 </td>
                                 <td>
                                     @item.UNDER_TIME
+                                </td>
+                                <td>
+                                    @item.TOTAL_WORKING_HOURS
                                 </td>
                                 <td class="text-center">
                                     @if(item.SOURCE == "BIOMETRICS")
@@ -311,6 +317,9 @@
                                             <th>
                                                 <label>Time In</label>
                                             </th>
+                                      @*       <th>
+                                                <label>Source</label>
+                                            </th> *@
                                         </tr>
                                     </thead>
                                     <tbody id="tblRawLogs">
@@ -435,7 +444,7 @@
                                                     ],
                                                     lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
                                                     pageLength: 10,
-                                                    order: [[1, 'desc']]
+                                                    order: [[0, 'desc']]
                                                 });
 
                                                  $('#minDate, #maxDate').on('change', function () {
@@ -486,7 +495,7 @@
                                                                                 var row = `<tr>
                                                                                                      <td>${item.datestring}</td>
                                                                                                      <td>${item.firsT_IN}</td>
-
+                                                                                                        
                                                                                             </tr>`;
                                                                                 tbodytable.append(row);
                                                                             });
