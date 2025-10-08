@@ -9,6 +9,7 @@ namespace DCI.Repositories.Interface
         //Task<(int statuscode, string message)> SaveLate(List<LateDeductionViewModel> model); LateHeaderDeductionViewModel
         Task<(int statuscode, string message)> SaveLate(LateHeaderDeductionViewModel model);
         Task<IList<LateHeaderViewModel>> GetLateDeduction(DailyTimeRecordViewModel model);
-        Task<IList<LateDetailViewModel>> GetLateDeductionByHeaderId(DailyTimeRecordViewModel model);
+        // Task<IList<LateDetailViewModel>> GetLateDeductionByHeaderId(DailyTimeRecordViewModel model);
+        Task<IList<LateDetailViewModel>> GetLateDeductionByHeaderId(LateHeaderViewModel model);
     }
 }

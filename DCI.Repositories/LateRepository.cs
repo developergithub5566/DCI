@@ -278,102 +278,109 @@ namespace DCI.Repositories
         {
             try
             {
-                foreach (var ut in model.LateDeductionList)
+                if (model.LateDeductionList.Count() > 0)
                 {
-                    if (ut.EmpNo != null && ut.TotalUndertime > 0)
+
+                    //create audit logs for undertime execution 
+                    LateHeader oth = new LateHeader();
+                    oth.RequestNo = await GenereteRequestNoForLateDeduction();
+                    oth.DateFrom = model.DateFrom.Date;
+                    oth.DateTo = model.DateTo.Date;
+                    oth.DateCreated = DateTime.Now;
+                    oth.CreatedBy = model.CurrentUserId;
+                    oth.IsActive = true;
+                    await _dbContext.LateHeader.AddAsync(oth);
+                    await _dbContext.SaveChangesAsync();
+
+
+
+                    foreach (var ut in model.LateDeductionList)
                     {
-                        var dateTo = ut.DateTo.Date.AddDays(1).AddTicks(-1);
-                        var emp = _dbContext.Employee.Where(x => x.EmployeeNo == ut.EmpNo).FirstOrDefault();
-                        var workdtls = _dbContext.EmployeeWorkDetails.Where(x => x.EmployeeId == emp.EmployeeId).FirstOrDefault();
-                        //var leafinfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == emp.EmployeeId).FirstOrDefault();
-                        var leafinfo = _dbContext.LeaveInfo.Where(li => li.IsActive && li.EmployeeId == emp.EmployeeId && li.DateCreated.Year == DateTime.Now.Year).OrderByDescending(li => li.DateCreated).FirstOrDefault();
-
-
-
-                        //create audit logs for undertime execution 
-                        LateHeader oth = new LateHeader();
-                        oth.RequestNo = await GenereteRequestNoForLateDeduction();
-                        oth.DateFrom = ut.DateFrom;
-                        oth.DateTo = ut.DateTo;
-                        oth.DateCreated = DateTime.Now;
-                        oth.CreatedBy = model.CurrentUserId;
-                        oth.IsActive = true;
-                        await _dbContext.LateHeader.AddAsync(oth);
-                        await _dbContext.SaveChangesAsync();
-
-                        LateDetail otd = new LateDetail();
-
-                        //Insert Leave application : leavetype Undertime , Status automatic approved and Insert Notification 
-                        LeaveFormViewModel lvFormmodel = new LeaveFormViewModel();
-                        lvFormmodel.EmployeeId = emp.EmployeeId;
-                        lvFormmodel.NoOfDays = ut.TotalUndertime ?? 0;
-                        await SaveLeaveForLate(lvFormmodel);
-
-
-
-                        var attendanceList = await _dbContext.vw_AttendanceSummary.Where(x => x.EMPLOYEE_NO == ut.EmpNo && x.DATE >= ut.DateFrom.Date && x.DATE <= dateTo.Date
-                                                                                                                                                      && x.STATUS == (int)EnumStatus.Raw).ToListAsync();
-
-                        // kung may remaining leave pa
-                        if (leafinfo?.VLBalance >= ut.TotalUndertime && workdtls.EmployeeStatusId == (int)EnumEmploymentType.Regular)
+                        if (ut.EmpNo != null && ut.TotalUndertime > 0)
                         {
-                            leafinfo.VLBalance = leafinfo.VLBalance - ut.TotalUndertime ?? 0;
-                            // leafinfo.DateModified = DateTime.Now;
-                            // leafinfo.ModifiedBy = model.ModifiedBy;
-                            leafinfo.IsActive = true;
-                            _dbContext.LeaveInfo.Entry(leafinfo).State = EntityState.Modified;
-                            await _dbContext.SaveChangesAsync();
+                            var dateTo = ut.DateTo.Date.AddDays(1).AddTicks(-1);
+                            var emp = _dbContext.Employee.Where(x => x.EmployeeNo == ut.EmpNo).FirstOrDefault();
+                            var workdtls = _dbContext.EmployeeWorkDetails.Where(x => x.EmployeeId == emp.EmployeeId).FirstOrDefault();
+                            //var leafinfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == emp.EmployeeId).FirstOrDefault();
+                            var leafinfo = _dbContext.LeaveInfo.Where(li => li.IsActive && li.EmployeeId == emp.EmployeeId && li.DateCreated.Year == DateTime.Now.Year).OrderByDescending(li => li.DateCreated).FirstOrDefault();
+
+                                                    
+
+                    
+                            //Insert Leave application : leavetype Undertime , Status automatic approved and Insert Notification 
+                            LeaveFormViewModel lvFormmodel = new LeaveFormViewModel();
+                            lvFormmodel.EmployeeId = emp.EmployeeId;
+                            lvFormmodel.NoOfDays = ut.TotalUndertime ?? 0;
+                            lvFormmodel.DateFromTo = model.DateFrom.ToShortDateString() + " to " + model.DateTo.ToShortDateString();
+                            await SaveLeaveForLate(lvFormmodel);
 
 
-                            //Update DTR attendance summary status to DEDUCTED                    
-                            await _dbContext.tbl_raw_logs.Where(x => x.EMPLOYEE_ID == ut.EmpNo && x.DATE_TIME >= ut.DateFrom && x.DATE_TIME <= dateTo)
-                                                         .ExecuteUpdateAsync(s => s
-                                                         .SetProperty(r => r.STATUS, r => (int)EnumStatus.VLDeducted));
 
-                            foreach (var attdnc in attendanceList)
+                            var attendanceList = await _dbContext.vw_AttendanceSummary.Where(x => x.EMPLOYEE_NO == ut.EmpNo && x.DATE >= ut.DateFrom.Date && x.DATE <= dateTo.Date
+                                                                                                                                                          && x.STATUS == (int)EnumStatus.Raw).ToListAsync();
+
+                            // kung may remaining leave pa
+                            if (leafinfo?.VLBalance >= ut.TotalUndertime && workdtls.EmployeeStatusId == (int)EnumEmploymentType.Regular)
                             {
-                                otd.LateHeaderId = oth.LateHeaderId;
-                                otd.AttendanceId = (int)attdnc.ID;
-                                otd.DeductionType = (int)EnumDeductionType.VacationLeave;
-                                otd.IsActive = true;
-                                await _dbContext.LateDetail.AddAsync(otd);
+                                leafinfo.VLBalance = leafinfo.VLBalance - ut.TotalUndertime ?? 0;                               
+                                leafinfo.IsActive = true;
+                                _dbContext.LeaveInfo.Entry(leafinfo).State = EntityState.Modified;
                                 await _dbContext.SaveChangesAsync();
-                            }
-                        } // kapag wala ng leave
-                        else
-                        {
-                            //Update DTR attendance summary status to Payroll DEDUCTED                    
-                            await _dbContext.tbl_raw_logs.Where(x => x.EMPLOYEE_ID == ut.EmpNo && x.DATE_TIME >= ut.DateFrom && x.DATE_TIME <= dateTo)
-                                                         .ExecuteUpdateAsync(s => s
-                                                         .SetProperty(r => r.STATUS, r => (int)EnumStatus.PayrollDeducted));
 
-                            foreach (var attdnc in attendanceList)
+
+                                //Update DTR attendance summary status to DEDUCTED                    
+                                await _dbContext.tbl_raw_logs.Where(x => x.EMPLOYEE_ID == ut.EmpNo && x.DATE_TIME >= ut.DateFrom && x.DATE_TIME <= dateTo)
+                                                             .ExecuteUpdateAsync(s => s
+                                                             .SetProperty(r => r.STATUS, r => (int)EnumStatus.VLDeducted));
+
+                                foreach (var attdnc in attendanceList)
+                                {
+                                    LateDetail otd = new LateDetail();
+                                    otd.LateHeaderId = oth.LateHeaderId;
+                                    otd.AttendanceId = (int)attdnc.ID;
+                                    otd.DeductionType = (int)EnumDeductionType.VacationLeave;
+                                    otd.IsActive = true;
+                                    await _dbContext.LateDetail.AddAsync(otd);
+                                    await _dbContext.SaveChangesAsync();
+                                }
+                            } // kapag wala ng leave
+                            else
                             {
-                                otd.LateHeaderId = oth.LateHeaderId;
-                                otd.AttendanceId = (int)attdnc.ID;
-                                otd.DeductionType = (int)EnumDeductionType.Payroll;
-                                otd.IsActive = true;
-                                await _dbContext.LateDetail.AddAsync(otd);
-                                await _dbContext.SaveChangesAsync();
-                            }
+                                //Update DTR attendance summary status to Payroll DEDUCTED                    
+                                await _dbContext.tbl_raw_logs.Where(x => x.EMPLOYEE_ID == ut.EmpNo && x.DATE_TIME >= ut.DateFrom && x.DATE_TIME <= dateTo)
+                                                             .ExecuteUpdateAsync(s => s
+                                                             .SetProperty(r => r.STATUS, r => (int)EnumStatus.PayrollDeducted));
+
+                                foreach (var attdnc in attendanceList)
+                                {
+                                    LateDetail otd = new LateDetail();
+                                    otd.LateHeaderId = oth.LateHeaderId;
+                                    otd.AttendanceId = (int)attdnc.ID;
+                                    otd.DeductionType = (int)EnumDeductionType.Payroll;
+                                    otd.IsActive = true;
+                                    await _dbContext.LateDetail.AddAsync(otd);
+                                    await _dbContext.SaveChangesAsync();
+                                }
+                            }                          
                         }
-
-                        //Send Notification to Executor/HR 
-                        //NotificationViewModel notifvm = new NotificationViewModel();
-                        //notifvm.Title = "Late Deduction";
-                        //notifvm.Description = System.String.Format("Late deduction process {0} has been executed successfully.", oth.RequestNo);
-                        //notifvm.ModuleId = (int)EnumModulePage.Late;
-                        //notifvm.TransactionId = oth.LateHeaderId;
-                        //notifvm.AssignId = model.CurrentUserId;
-                        //notifvm.URL = "/Report/Late";
-                        //notifvm.MarkRead = false;
-                        //notifvm.CreatedBy = model.CurrentUserId;
-                        //notifvm.IsActive = true;
-                        //await _homeRepository.SaveNotification(notifvm);
                     }
-                }
 
-                return (StatusCodes.Status200OK, Constants.Undertime_Deduction);
+                    //Send Notification to Executor/HR 
+                    NotificationViewModel notifvm = new NotificationViewModel();
+                    notifvm.Title = "Late Deduction";
+                    notifvm.Description = System.String.Format("Late deduction process {0} has been executed successfully.", oth.RequestNo);
+                    notifvm.ModuleId = (int)EnumModulePage.Late;
+                    notifvm.TransactionId = oth.LateHeaderId;
+                    notifvm.AssignId = model.CurrentUserId;
+                    notifvm.URL = "/Report/Late";
+                    notifvm.MarkRead = false;
+                    notifvm.CreatedBy = model.CurrentUserId;
+                    notifvm.IsActive = true;
+                    await _homeRepository.SaveNotification(notifvm);
+
+                    return (StatusCodes.Status200OK, Constants.Msg_Deduction);
+                }
+                return (StatusCodes.Status200OK, Constants.Msg_NoRecordFound);
             }
             catch (Exception ex)
             {
@@ -399,7 +406,7 @@ namespace DCI.Repositories
                 entity.DateFiled = DateTime.Now;
                 entity.LeaveTypeId = (int)EnumLeaveType.UT;
                 entity.Status = (int)EnumStatus.VLDeducted;
-                entity.Reason = "System-Generated Late Deduction.";
+                entity.Reason = "System-Generated Late Deduction for the period " + param.DateFromTo;
                 entity.NoOfDays = param.NoOfDays;
                 entity.ModifiedBy = null;
                 entity.DateModified = null;
@@ -537,13 +544,13 @@ namespace DCI.Repositories
         }
 
 
-        public async Task<IList<LateDetailViewModel>> GetLateDeductionByHeaderId(DailyTimeRecordViewModel model)
+        public async Task<IList<LateDetailViewModel>> GetLateDeductionByHeaderId(LateHeaderViewModel model)
         {
             var rows = await (
                 from ot in _dbContext.LateDetail.AsNoTracking()
                 join attdnce in _dbContext.vw_AttendanceSummary.AsNoTracking() on ot.AttendanceId equals attdnce.ID
                 join emp in _dbContext.Employee.AsNoTracking() on attdnce.EMPLOYEE_NO equals emp.EmployeeNo
-                where ot.IsActive
+                where ot.IsActive && ot.LateHeaderId == model.LateHeaderId
                 //orderby ot.DateCreated descending
                 select new LateDetailViewModel
                 {

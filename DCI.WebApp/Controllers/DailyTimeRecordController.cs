@@ -623,7 +623,8 @@ namespace DCI.WebApp.Controllers
 
                     headermodel.CurrentUserId = currentUser.UserId;
                     headermodel.UndertimeDeductionList = model;
-                
+                    headermodel.DateFrom = model.Count() > 0 ? model.FirstOrDefault().DateFrom : DateTime.Now;
+                    headermodel.DateTo = model.Count() > 0 ? model.FirstOrDefault().DateTo : DateTime.Now;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(headermodel), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/SaveUndertime");
@@ -1590,7 +1591,8 @@ namespace DCI.WebApp.Controllers
                         return RedirectToAction("Logout", "Account");
                     headermodel.CurrentUserId = currentUser.UserId;
                     headermodel.LateDeductionList = model;
-
+                    headermodel.DateFrom = model.Count() > 0 ? model.FirstOrDefault().DateFrom : DateTime.Now;
+                    headermodel.DateTo = model.Count() > 0 ? model.FirstOrDefault().DateTo : DateTime.Now;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(headermodel), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/SaveLate");

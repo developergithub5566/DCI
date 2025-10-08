@@ -368,106 +368,110 @@ namespace DCI.Repositories
 
             try
             {
- 
-
-                foreach (var ut in model.UndertimeDeductionList)
+                if (model.UndertimeDeductionList.Count() > 0)
                 {
-                    if (ut.EmpNo != null && ut.TotalUndertime > 0)
+                    //create audit logs for undertime execution 
+                    UndertimeHeader oth = new UndertimeHeader();
+                    oth.RequestNo = await GenereteRequestNoForUndertimeDeduction();
+                    oth.DateFrom = model.DateFrom;
+                    oth.DateTo = model.DateTo;
+                    oth.DateCreated = DateTime.Now;
+                    oth.CreatedBy = model.CurrentUserId;
+                    oth.IsActive = true;
+                    await _dbContext.UndertimeHeader.AddAsync(oth);
+                    await _dbContext.SaveChangesAsync();
+
+                    foreach (var ut in model.UndertimeDeductionList)
                     {
-                        var dateTo = ut.DateTo.Date.AddDays(1).AddTicks(-1);
-                        var emp = _dbContext.Employee.Where(x => x.EmployeeNo == ut.EmpNo).FirstOrDefault();
-                        var workdtls = _dbContext.EmployeeWorkDetails.Where(x => x.EmployeeId == emp.EmployeeId).FirstOrDefault();
-                        //var leafinfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == emp.EmployeeId).FirstOrDefault();
-                        var leafinfo = _dbContext.LeaveInfo.Where(li => li.IsActive && li.EmployeeId == emp.EmployeeId && li.DateCreated.Year == DateTime.Now.Year).OrderByDescending(li => li.DateCreated).FirstOrDefault();
-
-
-
-                        //create audit logs for undertime execution 
-                        UndertimeHeader oth = new UndertimeHeader();
-                        oth.RequestNo = await GenereteRequestNoForUndertimeDeduction();
-                        oth.DateFrom = ut.DateFrom;
-                        oth.DateTo = ut.DateTo;
-                        oth.DateCreated = DateTime.Now;
-                        oth.CreatedBy = model.CurrentUserId;
-                        oth.IsActive = true;
-                        await _dbContext.UndertimeHeader.AddAsync(oth);
-                        await _dbContext.SaveChangesAsync();
-
-                        UndertimeDetail otd = new UndertimeDetail();
-
-                        //Insert Leave application : leavetype Undertime , Status automatic approved and Insert Notification 
-                        LeaveFormViewModel lvFormmodel = new LeaveFormViewModel();
-                        lvFormmodel.EmployeeId = emp.EmployeeId;
-                        lvFormmodel.NoOfDays = ut.TotalUndertime ?? 0;
-                        await SaveLeaveForUndertime(lvFormmodel);
-                  
-
-                        var attendanceList = await _dbContext.vw_AttendanceSummary.Where(x => x.EMPLOYEE_NO == ut.EmpNo && x.DATE >= ut.DateFrom.Date && x.DATE <= dateTo.Date
-                                                                                                                                                      && x.STATUS == (int)EnumStatus.Raw).ToListAsync();
-
-                        // kung may remaining leave pa
-                        if (leafinfo?.VLBalance >= ut.TotalUndertime && workdtls.EmployeeStatusId == (int)EnumEmploymentType.Regular)
+                        if (ut.EmpNo != null && ut.TotalUndertime > 0)
                         {
-                            leafinfo.VLBalance = leafinfo.VLBalance - ut.TotalUndertime ?? 0;
-                            // leafinfo.DateModified = DateTime.Now;
-                            // leafinfo.ModifiedBy = model.ModifiedBy;
-                            leafinfo.IsActive = true;
-                            _dbContext.LeaveInfo.Entry(leafinfo).State = EntityState.Modified;
-                            await _dbContext.SaveChangesAsync();
+                            var dateTo = ut.DateTo.Date.AddDays(1).AddTicks(-1);
+                            var emp = _dbContext.Employee.Where(x => x.EmployeeNo == ut.EmpNo).FirstOrDefault();
+                            var workdtls = _dbContext.EmployeeWorkDetails.Where(x => x.EmployeeId == emp.EmployeeId).FirstOrDefault();
+                            //var leafinfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == emp.EmployeeId).FirstOrDefault();
+                            var leafinfo = _dbContext.LeaveInfo.Where(li => li.IsActive && li.EmployeeId == emp.EmployeeId && li.DateCreated.Year == DateTime.Now.Year).OrderByDescending(li => li.DateCreated).FirstOrDefault();
+
+                                                     
+
+                           
+
+                            //Insert Leave application : leavetype Undertime , Status automatic approved and Insert Notification 
+                            LeaveFormViewModel lvFormmodel = new LeaveFormViewModel();
+                            lvFormmodel.EmployeeId = emp.EmployeeId;
+                            lvFormmodel.NoOfDays = ut.TotalUndertime ?? 0;
+                            lvFormmodel.DateFromTo = model.DateFrom.ToShortDateString() + " to " + model.DateTo.ToShortDateString();
+                            await SaveLeaveForUndertime(lvFormmodel);
 
 
-                            //Update DTR attendance summary status to DEDUCTED                    
-                            await _dbContext.tbl_raw_logs.Where(x => x.EMPLOYEE_ID == ut.EmpNo && x.DATE_TIME >= ut.DateFrom && x.DATE_TIME <= dateTo)
-                                                         .ExecuteUpdateAsync(s => s
-                                                         .SetProperty(r => r.STATUS, r => (int)EnumStatus.VLDeducted));
+                            var attendanceList = await _dbContext.vw_AttendanceSummary.Where(x => x.EMPLOYEE_NO == ut.EmpNo && x.DATE >= ut.DateFrom.Date && x.DATE <= dateTo.Date
+                                                                                                                                                          && x.STATUS == (int)EnumStatus.Raw).ToListAsync();
 
-
-                            foreach (var attdnc in attendanceList)
+                            // kung may remaining leave pa
+                            if (leafinfo?.VLBalance >= ut.TotalUndertime && workdtls.EmployeeStatusId == (int)EnumEmploymentType.Regular)
                             {
-                                otd.UndertimeHeaderId = oth.UndertimeHeaderId;
-                                otd.AttendanceId = (int)attdnc.ID;
-                                otd.DeductionType = (int)EnumDeductionType.VacationLeave;
-                                otd.IsActive = true;
-                                await _dbContext.UndertimeDetail.AddAsync(otd);
+                                leafinfo.VLBalance = leafinfo.VLBalance - ut.TotalUndertime ?? 0;
+                                // leafinfo.DateModified = DateTime.Now;
+                                // leafinfo.ModifiedBy = model.ModifiedBy;
+                                leafinfo.IsActive = true;
+                                _dbContext.LeaveInfo.Entry(leafinfo).State = EntityState.Modified;
                                 await _dbContext.SaveChangesAsync();
-                            }
-                        } // kapag wala ng leave
-                        else 
-                        {
-                            //Update DTR attendance summary status to Payroll DEDUCTED                    
-                            await _dbContext.tbl_raw_logs.Where(x => x.EMPLOYEE_ID == ut.EmpNo && x.DATE_TIME >= ut.DateFrom && x.DATE_TIME <= dateTo)
-                                                         .ExecuteUpdateAsync(s => s
-                                                         .SetProperty(r => r.STATUS, r => (int)EnumStatus.PayrollDeducted));
 
-                            foreach (var attdnc in attendanceList)
+
+                                //Update DTR attendance summary status to DEDUCTED                    
+                                await _dbContext.tbl_raw_logs.Where(x => x.EMPLOYEE_ID == ut.EmpNo && x.DATE_TIME >= ut.DateFrom && x.DATE_TIME <= dateTo)
+                                                             .ExecuteUpdateAsync(s => s
+                                                             .SetProperty(r => r.STATUS, r => (int)EnumStatus.VLDeducted));
+
+
+                                foreach (var attdnc in attendanceList)
+                                {
+                                    UndertimeDetail otd = new UndertimeDetail();
+                                    otd.UndertimeHeaderId = oth.UndertimeHeaderId;
+                                    otd.AttendanceId = (int)attdnc.ID;
+                                    otd.DeductionType = (int)EnumDeductionType.VacationLeave;
+                                    otd.IsActive = true;
+                                    await _dbContext.UndertimeDetail.AddAsync(otd);
+                                    await _dbContext.SaveChangesAsync();
+                                }
+                            } // kapag wala ng leave
+                            else
                             {
-                                otd.UndertimeHeaderId = oth.UndertimeHeaderId;
-                                otd.AttendanceId = (int)attdnc.ID;
-                                otd.DeductionType = (int)EnumDeductionType.Payroll;
-                                otd.IsActive = true;
-                                await _dbContext.UndertimeDetail.AddAsync(otd);
-                                await _dbContext.SaveChangesAsync();
-                            }
+                                //Update DTR attendance summary status to Payroll DEDUCTED                    
+                                await _dbContext.tbl_raw_logs.Where(x => x.EMPLOYEE_ID == ut.EmpNo && x.DATE_TIME >= ut.DateFrom && x.DATE_TIME <= dateTo)
+                                                             .ExecuteUpdateAsync(s => s
+                                                             .SetProperty(r => r.STATUS, r => (int)EnumStatus.PayrollDeducted));
+
+                                foreach (var attdnc in attendanceList)
+                                {
+                                    UndertimeDetail otd = new UndertimeDetail();
+                                    otd.UndertimeHeaderId = oth.UndertimeHeaderId;
+                                    otd.AttendanceId = (int)attdnc.ID;
+                                    otd.DeductionType = (int)EnumDeductionType.Payroll;
+                                    otd.IsActive = true;
+                                    await _dbContext.UndertimeDetail.AddAsync(otd);
+                                    await _dbContext.SaveChangesAsync();
+                                }
+                            }                          
                         }
-
-
-                        //Send Notification to Executor/HR 
-                        NotificationViewModel notifvm = new NotificationViewModel();
-                        notifvm.Title = "Undertime Deduction";
-                        notifvm.Description = System.String.Format("Undertime deduction process {0} has been executed successfully.", oth.RequestNo);
-                        notifvm.ModuleId = (int)EnumModulePage.Undertime;
-                        notifvm.TransactionId = oth.UndertimeHeaderId;
-                        notifvm.AssignId = model.CurrentUserId;
-                        notifvm.URL = "/Report/Undertime";
-                        notifvm.MarkRead = false;
-                        notifvm.CreatedBy = model.CurrentUserId;
-                        notifvm.IsActive = true;
-                        await _homeRepository.SaveNotification(notifvm);
                     }
-                 
+
+                    //Send Notification to Executor/HR 
+                    NotificationViewModel notifvm = new NotificationViewModel();
+                    notifvm.Title = "Undertime Deduction";
+                    notifvm.Description = System.String.Format("Undertime deduction process {0} has been executed successfully.", oth.RequestNo);
+                    notifvm.ModuleId = (int)EnumModulePage.Undertime;
+                    notifvm.TransactionId = oth.UndertimeHeaderId;
+                    notifvm.AssignId = model.CurrentUserId;
+                    notifvm.URL = "/Report/Undertime";
+                    notifvm.MarkRead = false;
+                    notifvm.CreatedBy = model.CurrentUserId;
+                    notifvm.IsActive = true;
+                    await _homeRepository.SaveNotification(notifvm);
+
+                    return (StatusCodes.Status200OK, Constants.Msg_Deduction);
                 }
 
-                return (StatusCodes.Status200OK, Constants.Undertime_Deduction);
+                return (StatusCodes.Status200OK, Constants.Msg_NoRecordFound);
             }
             catch (Exception ex)
             {
@@ -493,7 +497,7 @@ namespace DCI.Repositories
                 entity.DateFiled = DateTime.Now;
                 entity.LeaveTypeId = (int)EnumLeaveType.UT;
                 entity.Status = (int)EnumStatus.VLDeducted;
-                entity.Reason = "System-Generated Undertime Deduction.";
+                entity.Reason = "System-Generated Undertime Deduction for the period " + param.DateFromTo;
                 entity.NoOfDays = param.NoOfDays;
                 entity.ModifiedBy = null;
                 entity.DateModified = null;
@@ -634,14 +638,14 @@ namespace DCI.Repositories
             return rows;
         }
 
-
-        public async Task<IList<UndertimeDetailViewModel>> GetUndertimeDeductionByHeaderId(DailyTimeRecordViewModel model)
+        
+        public async Task<IList<UndertimeDetailViewModel>> GetUndertimeDeductionByHeaderId(UndertimeHeaderViewModel model)
         {
             var rows = await (
                 from ot in _dbContext.UndertimeDetail.AsNoTracking()
                 join attdnce in _dbContext.vw_AttendanceSummary.AsNoTracking() on ot.AttendanceId equals attdnce.ID
-                join emp in _dbContext.Employee on attdnce.EMPLOYEE_NO equals emp.EmployeeNo
-                where ot.IsActive
+                join emp in _dbContext.Employee.AsNoTracking() on attdnce.EMPLOYEE_NO equals emp.EmployeeNo
+                where ot.IsActive && ot.UndertimeHeaderId == model.UndertimeHeaderId
                 //orderby ot.DateCreated descending
                 select new UndertimeDetailViewModel
                 {

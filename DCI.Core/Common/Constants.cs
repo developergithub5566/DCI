@@ -17,8 +17,11 @@
         public const string ModuleCode_Undertime_Deduction = "UTD";
         public const string ModuleCode_WFH = "WFH";
 
+        public const string Msg_NoRecordFound = "No Record Found.";
         public const string Msg_ErrorMessage = "An error occurred. Please try again.";
         public const string Msg_NoBiometricsFound = "No biometric records found.";
+        public const string Msg_Deduction = "Deductions successfully applied to all selected employees.";
+
 
         public const string Email_Subject_SetPassword = "DCI ESS - Set Password";
 		public const string Email_Subject_ResetPassword = "DCI ESS - Reset Password";
@@ -46,7 +49,7 @@
 
         public const string Msg_NoOfficialBusinessRecord  = "No Official Business record was found for the selected date. Please file and secure approval for Official Business before submitting an overtime request.";
 
-        public const string Undertime_Deduction = "Deductions successfully applied to all selected employees.";
-        
+    
+
     }
 }

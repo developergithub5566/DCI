@@ -111,6 +111,7 @@ namespace DCI.Models.ViewModel
         public string Period { get; set; } = string.Empty;
         public string Reason { get; set; } = string.Empty;
         public string RequestNo { get; set; } = string.Empty;
+        public string DateFromTo { get; set; } = string.Empty;
         public string SelectedDateJson { get; set; } = string.Empty;
         public List<DateTime> SelectedDateList { get; set; } = new();
         public int ApproverId { get; set; } = 0;

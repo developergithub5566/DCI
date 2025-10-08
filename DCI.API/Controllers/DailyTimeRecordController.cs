@@ -142,7 +142,7 @@ namespace DCI.API.Controllers
 
         [HttpPost]
         [Route("GetUndertimeDeductionByHeaderId")]
-        public async Task<IActionResult> GetUndertimeDeductionByHeaderId([FromBody] DailyTimeRecordViewModel model)
+        public async Task<IActionResult> GetUndertimeDeductionByHeaderId([FromBody] UndertimeHeaderViewModel model)
         {
             return Ok(await _undertimeRepository.GetUndertimeDeductionByHeaderId(model));
         }
@@ -295,7 +295,7 @@ namespace DCI.API.Controllers
 
         [HttpPost]
         [Route("GetLateDeductionByHeaderId")]
-        public async Task<IActionResult> GetLateDeductionByHeaderId([FromBody] DailyTimeRecordViewModel model)
+        public async Task<IActionResult> GetLateDeductionByHeaderId([FromBody] LateHeaderViewModel model)
         {
             return Ok(await _lateRepository.GetLateDeductionByHeaderId(model));
         }

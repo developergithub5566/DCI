@@ -105,6 +105,8 @@ namespace DCI.Models.ViewModel
     public class UndertimeHeaderDeductionViewModel
     {
         public int CurrentUserId { get; set; } = 0;
+        public DateTime DateFrom { get; set; }
+        public DateTime DateTo { get; set; }
         public List<UndertimeDeductionViewModel> UndertimeDeductionList { get; set; } = new List<UndertimeDeductionViewModel>();
     }
 
@@ -151,6 +153,8 @@ namespace DCI.Models.ViewModel
     public class LateHeaderDeductionViewModel
     {
         public int CurrentUserId { get; set; } = 0;
+        public DateTime DateFrom { get; set; }
+        public DateTime DateTo { get; set; }
         public List<LateDeductionViewModel> LateDeductionList { get; set; } = new List<LateDeductionViewModel>();
     }
 
