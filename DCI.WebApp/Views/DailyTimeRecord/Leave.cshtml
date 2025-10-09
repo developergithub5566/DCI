@@ -11,6 +11,11 @@
 
 <!-- Begin Page Content -->
 <div class="container-fluid">
+    <div class="spinner-overlay">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
     <div class="d-sm-flex align-items-center justify-content-between mb-3">
         <h6 class="m-0 font-weight-bold text-gray-800">Leave Application & Balances</h6>
         <div class="upperRightDivBtn">
@@ -331,7 +336,7 @@
                             <div class="form-group">
                                 <label class="frmText"><span class="required">*</span> Type</label>
                                 <select id="leaveTypeSelect" class="form-select" required onchange="GetLeaveTypeAmount()" required>
-                                    <option value="">select type</option>
+                                    <option value="0" disabled>select type</option>
                                 </select>
 
                             </div>
@@ -401,12 +406,12 @@
                         </button>
                     </div>
                     <div id="btnCancel">
-                        <button class="btn btnDanger btn-icon-split d-block" type="button" onclick="cancel()">
+              @*           <button class="btn btnDanger btn-icon-split d-block" type="button" onclick="cancel()">
                             <span class="icon text-white">
                                 <i class="fa-regular fa-file-lines text-xs"></i>
                             </span>
                             <span class="text text-white"><small>Cancel Request</small></span>
-                        </button>
+                        </button> *@
                     </div>
                     <button class="btn btnSecondary btn-icon-split d-block" data-dismiss="modal">
                         <span class="icon text-white">
@@ -455,7 +460,10 @@
                          let fp;
 
                         $(document).ready(function () {
-                            
+                          //  GetLeaveTypeAmount();
+
+
+
                             let firstDayOfMonth = new Date();
                             firstDayOfMonth.setDate(1);
 
@@ -565,43 +573,32 @@
 
                              let nodays = 0.0000;
 
-                                  
+                                                               
                                                             fp =    flatpickr("#dateCovered", {
                                                                            mode: "multiple",                                                                         
                                                                            enableTime: false,
-                                                                           dateFormat: "Y-m-d",
+                                                                           dateFormat: "Y-m-d",     
                                                                            onChange: function(selectedDates, dateStr, instance) {
-                                                                             // Update number of selected days
+                                                                          
                                                                              let nodays = selectedDates.length;
-                                                                            // alert("nodays" + nodays); 
-                                                                                    let amount =     $('#SelectedLeaveTypeAmount').val();
-                                                                                    //   let iMultiple =     $('#isMultiple').val();
-                                                                                            //   alert("amount" + amount);
-                                                                            //   console.log(nodays);
+                                                                            
+                                                                                    let amount =     $('#SelectedLeaveTypeAmount').val();                                                                           
 
                                                                           let total = amount * nodays;
                                                                      
                                                                          let formattedDays = total.toFixed(4);
                                                                              $('#NoOfDays').val(formattedDays);
 
-
-                                                                             // if($('#isMultiple').val() == 1){
-                                                                             //         fp.set("mode", "multiple");
-                                                                             // }else{
-                                                                             //     console.log("false daw")
-                                                                             //         fp.set("mode", "single");
-                                                                             // }
-                                                                                     
-
                                                                              let selectedDateStrings = selectedDates.map(date =>
                                                                                instance.formatDate(date, "Y-m-d")
-                                                                             );
-
-                                                                                  
+                                                                             );                                                                                  
 
                                                                              $('#SelectedDatesJson').val(JSON.stringify(selectedDateStrings));
                                                                            }
                                                                          });
+
+                                                                                 GetLeaveTypeAmount();
+                                                                         $('#leaveTypeSelect').on('change', GetLeaveTypeAmount);
 
 
                   $('#createForm').submit(function (event) {
@@ -639,8 +636,9 @@
                                      contentType: false,
                               success: function (response) {
                                   if (response.success) {
-                                      $('#createForm')[0].reset();
-                                      js('#createmodal').modal('hide');
+                                      // $('#createForm')[0].reset();
+                                      // js('#createmodal').modal('hide');
+                                         $('.spinner-overlay').show();
 
                                       Swal.fire({
                                           text: response.message,
@@ -698,7 +696,7 @@
 
                                  var $select = $('#leaveTypeSelect');
                                   $select.empty();
-                                  $select.append('<option value="">Select type</option>');
+                                  $select.append('<option value="0" disabled>Select leave type</option>');
 
                                   $.each(response.data.optionsLeaveType, function (index, item) {
                                  if (item.value == response.data.leaveRequestHeader.leaveTypeId) {
@@ -763,7 +761,7 @@
 
                                  var $select = $('#leaveTypeSelect');
                                      $select.empty();
-                                     $select.append('<option value="">Select type</option>');
+                                     $select.append('<option value="0" disabled>Select type</option>');
 
                                      $.each(response.data.optionsLeaveType, function (index, item) {
                                  if (item.value == response.data.leaveRequestHeader.leaveTypeId) {
@@ -915,74 +913,41 @@
 
                function GetLeaveTypeAmount(){
                      let leave =  $('#leaveTypeSelect').val();
-                      console.log("getleave" + leave);
+                    //  console.log("getleave" + leave);
                      let  _amount = 0.0000;
-                    
+                      let mode = 'multiple';
 
-                    if(leave ==1){
+                   //  const my_fp = document.querySelector("#dateCovered")._flatpickr;
+
+                     if(leave == null){
+                                  _amount = 0.5000;
+                       $('#SelectedLeaveTypeAmount').val(_amount);
+                           $('#isMultiple').val(0);
+                             mode = 'single';
+                           
+                     }
+                   else if(leave == 1){ //half day
 
                        _amount = 0.5000;
                        $('#SelectedLeaveTypeAmount').val(_amount);
                            $('#isMultiple').val(0);
-                       
+                              mode = 'single';
+                             
                     }else{
                         _amount = 1.0000;
                        $('#SelectedLeaveTypeAmount').val(_amount);
                        $('#isMultiple').val(1);
-                    }
+                              fp.set('mode', 'multiple');
+                          mode = 'multiple';
+                    }             
 
-                     //console.log("x", $('#isMultiple').val())
-
-                        const my_fp = document.querySelector("#dateCovered")._flatpickr;
-                        my_fp.clear();
-
-                       // initFlatpickr(isMultiple)
+                        if(fp){
+                            fp.set('mode', mode);
+                            fp.clear();
+                        }                        
                  }
 
-               //         var fp;
-               //          function initFlatpickr(condition) {
-               //              if (fp) {
-               //                  fp.destroy(); // clean up existing instance
-               //              }
-
-               //              fp = flatpickr("#dateCovered", {
-               //                  mode: condition ? "multiple" : "single",
-               //                  dateFormat: "Y-m-d"
-               //              });
-               //          }
-
-                       
-
-                    // function GetLeaveTypeAmount() {
-                    //     let leave = $('#leaveTypeSelect').val();
-                    //     let _amount = 0.0000;
-                    //     let isMultiple = true;
-
-                    //     if (leave == 1) {
-                    //         isMultiple = false;
-                    //         _amount = 0.5000;                               
-                    //     } else {
-                    //         _amount = 1.0000;
-                    //     }
-
-                       
-
-                    //     // Destroy old flatpickr if it exists
-                    //     if (fp) {
-                    //         fp.destroy();
-                    //     }
-
-                    //     // Re-initialize with correct mode
-                    //     fp = flatpickr("#dateCovered", {
-                    //         mode: isMultiple ? "multiple" : "single",
-                    //         dateFormat: "Y-m-d"
-                    //     });
-
-
-                    
-                    //      $('#SelectedLeaveTypeAmount').val(_amount);
-                    //          fp.clear();
-                    //        }
+              
                         
 
                        function isNumericDecimalKey(evt, el) {
@@ -1007,9 +972,7 @@
                             // Block everything else (e, E, -, +, spaces, etc.)
                             evt.preventDefault();
                             return false;
-                        }
-
-      
+                        }                       
 
 
          function getLeaveByYear() {
@@ -1086,7 +1049,7 @@
                                       icon: "error"
                                   });
                               }
-                          });
+                          });                        
         }
     </script>
 }

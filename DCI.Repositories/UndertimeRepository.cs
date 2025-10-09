@@ -497,7 +497,7 @@ namespace DCI.Repositories
                 entity.DateFiled = DateTime.Now;
                 entity.LeaveTypeId = (int)EnumLeaveType.UT;
                 entity.Status = (int)EnumStatus.VLDeducted;
-                entity.Reason = "System-Generated Undertime Deduction for the period " + param.DateFromTo;
+                entity.Reason = System.String.Format("System-Generated Undertime Deduction for the period {0}." , param.DateFromTo);
                 entity.NoOfDays = param.NoOfDays;
                 entity.ModifiedBy = null;
                 entity.DateModified = null;
@@ -519,7 +519,7 @@ namespace DCI.Repositories
 
                 NotificationViewModel notifvm = new NotificationViewModel();
                 notifvm.Title = "Undertime";
-                notifvm.Description = System.String.Format("System-Generated Undertime Deduction.", entity.RequestNo);
+                notifvm.Description = System.String.Format("System-Generated Undertime Deduction has been processed.", entity.RequestNo);
                 notifvm.ModuleId = (int)EnumModulePage.Undertime;
                 notifvm.TransactionId = entity.LeaveRequestHeaderId;
                 notifvm.AssignId = usr != null ? usr.UserId : 0;

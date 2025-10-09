@@ -151,6 +151,17 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
+                              string statusClass = item.STATUS switch
+                                                    {
+                                                        (int)EnumStatus.Approved => "btn-primary",
+                                                        (int)EnumStatus.ForApproval => "btn-success",
+                                                        (int)EnumStatus.Rejected => "btn-danger",
+                                                        (int)EnumStatus.Cancelled => "btn-secondary",
+                                                        (int)EnumStatus.VLDeducted
+                                                        or (int)EnumStatus.PayrollDeducted => "btn-warning",
+                                                        _ => "btn-dark"
+                                                    };
+
                                 <tr>
 
                                     <td>
@@ -173,13 +184,16 @@
                                     <td>
                                     @item.TOTAL_WORKING_HOURS
                                     </td>
-
+                                <td class="text-center">
+                                    <strong>
+                                        <span class="@statusClass applicationStatus">@item.STATUSNAME</span>
+                                    </strong>
+                                </td>
                                     <td>
-                                        <span class="btnSuccess applicationStatus">REMOTE</span>
+                                        @* <span class="btnSuccess applicationStatus">REMOTE</span> *@
+                                    REMOTE
                                     </td>
-                                    <td>
-                                    @item.STATUSNAME
-                                    </td>
+                                
                                     <td class="text-center">
                                         <a href="#" onclick='newForm({
                                                                 date:"@item.DATE.ToString("MM/dd/yyyy")",

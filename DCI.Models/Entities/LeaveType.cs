@@ -5,6 +5,7 @@ namespace DCI.Models.Entities
     public class LeaveType : IAuditable
     {
         public int LeaveTypeId { get; set; }
+        public string? Code { get; set; }
         public string? Description { get; set; }
         public decimal? Amount { get; set; }
         public DateTime DateCreated { get; set; }

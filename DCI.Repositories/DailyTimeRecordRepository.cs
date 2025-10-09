@@ -86,19 +86,40 @@ namespace DCI.Repositories
                                      EMPLOYEE_NO = string.Empty,
                                      NAME = hol.HolidayName,
                                      DATE = hol.HolidayDate.Date,
-                                     FIRST_IN = string.Empty,
-                                     LAST_OUT = string.Empty,
-                                     LATE = string.Empty,
-                                     CLOCK_OUT = string.Empty,
-                                     UNDER_TIME = string.Empty,
-                                     OVERTIME = string.Empty,
-                                     TOTAL_HOURS = string.Empty,
-                                     TOTAL_WORKING_HOURS = string.Empty,
+                                     FIRST_IN = "00:00:00",
+                                     LAST_OUT = "00:00:00",
+                                     LATE = "00:00:00",
+                                     CLOCK_OUT = "00:00:00",
+                                     UNDER_TIME = "00:00:00",
+                                     OVERTIME = "00:00:00",
+                                     TOTAL_HOURS = "00:00:00",
+                                     TOTAL_WORKING_HOURS = "00:00:00",
                                      SOURCE = hol.HolidayType == (int)EnumHoliday.Suspension ? Constants.Source_Suspension : Constants.Source_Holiday
                                  }).ToListAsync();
 
+            var officialBusiness = await (from dtl in _dbContext.LeaveRequestDetails.AsNoTracking()
+                                          join ob in _dbContext.LeaveRequestHeader.AsNoTracking() on dtl.LeaveRequestHeaderId equals ob.LeaveRequestHeaderId
+                                          join emp in _dbContext.Employee.AsNoTracking() on ob.EmployeeId equals emp.EmployeeId
+                                          where ob.IsActive == true && ob.LeaveTypeId == (int)EnumLeaveType.OB && ob.Status == (int)EnumStatus.Approved
+                                 select new DailyTimeRecordViewModel
+                                 {
+                                     ID = 0,
+                                     EMPLOYEE_NO = emp.EmployeeNo,
+                                     NAME = emp.Firstname + " " + emp.Lastname,
+                                     DATE = dtl.LeaveDate.Date,
+                                     FIRST_IN = "00:00:00",
+                                     LAST_OUT = "00:00:00",
+                                     LATE = "00:00:00",
+                                     CLOCK_OUT = "00:00:00",
+                                     UNDER_TIME = "00:00:00",
+                                     OVERTIME = "00:00:00",
+                                     TOTAL_HOURS = "00:00:00",
+                                     TOTAL_WORKING_HOURS = "00:00:00",
+                                     SOURCE = Constants.Source_OfficialBusiness
+                                 }).ToListAsync();
 
-            var attendance = biometriclogs.Concat(wfhlogs).ToList();
+
+            var attendance = biometriclogs.Concat(wfhlogs).Concat(officialBusiness).ToList();
 
             if ((int)EnumEmployeeScope.PerEmployee == model.ScopeTypeEmp)
             {
@@ -107,7 +128,7 @@ namespace DCI.Repositories
                 if (emp != null)
                     attendance = attendance.Where(x => x.EMPLOYEE_NO == emp.EmployeeNo).ToList();
             }
-
+    
             return attendance.Concat(holiday).ToList();
         }
 

@@ -110,7 +110,10 @@
                                 <th>
                                     <label>Date Filed</label>
                                 </th>
-                               
+
+                                <th>
+                                    <label>Leave Type</label>
+                                </th>
                                 <th>
                                     <label>Date Covered</label>
                                 </th>
@@ -141,7 +144,9 @@
                                         <td>
                                             @item.DateFiled.ToString("yyyy-MM-dd HH:mm")
                                         </td>
-                                       
+                                        <td>
+                                            @item.LeaveName
+                                        </td>
                                         <td>
                                             <strong>
                                                 @foreach (var dtl in item.LeaveRequestDetailList)
@@ -418,7 +423,7 @@
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel"><label id="lblReq"></label></h5>
+                            <h5 class="modal-title" id="exampleModalLabel">Leave</label></h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -427,7 +432,11 @@
                             <div class="modal-body">
                                 <table class="viewDetailsTbl table table-striped">
                                     <tbody>
-                                        
+                                       
+                                        <tr>
+                                            <th>Request No:</th>
+                                            <th class="tblRequest">  <label id="lblReq"></label>  </th>
+                                        </tr>
                                         <tr>
                                             <th>Date Filed:</th>
                                             <th class="tblDate">  <label id="lblDateFiled"></label>  </th>
@@ -440,6 +449,10 @@
                                         <tr>
                                             <th>DTR Covered:</th>
                                             <td><div id="dateContainer"></div></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Leave Type:</th>
+                                            <th class="tblLeaveType"><label id="lblLeaveType"></label></th>
                                         </tr>
                                         <tr>
                                             <th>No. of Days:</th>
@@ -862,7 +875,8 @@
                                     document.getElementById('lblNoDays').textContent = response.data.leaveRequestHeader.noofDays;
                                     document.getElementById('lblStatus').textContent = response.data.leaveRequestHeader.statusName;
                                     document.getElementById('lblReason').textContent = response.data.leaveRequestHeader.reason;
-
+                                    document.getElementById('lblLeaveType').textContent = response.data.leaveRequestHeader.leaveName;
+                                        
                                     var container = $('#dateContainer');
                                     container.empty();
 

@@ -243,11 +243,10 @@
                            
                                 <div class="col-12">
                                     <hr>
-                                    <div class="form-group">
-                                        <label class="frmText">For Approval of: </label><br>
-                                        <label class="font-weight-bold mb0 text-danger" id="deptHeadName"></label>
-                                        @* <label class="d-block mt0 text-left text-xs">(Department Head)</label> *@
-                                    </div>
+                                    <label class="frmText" id="ApproverLabel" name="ApproverLabel"> </label><br>
+                                    <label class="font-weight-bold mb0 text-danger" id="deptHeadName" name="deptHeadName"></label>
+                                    <label class="d-block mt0 text-left text-xs" id="ApprovalDate" name="ApprovalDate"></label>
+                                    <label class="d-block mt0 text-left text-xs" id="ApprovalRemarks" name="ApprovalRemarks"></label>
                                 </div>
                  
                             </div>
@@ -400,8 +399,36 @@
                                                           $('#DtrType').val(response.data.dtrType);
                                                           $('#Reason').val(response.data.reason);
 
-                                                              document.getElementById('deptHeadName').textContent = response.data.departmentHead;
+                                                                document.getElementById('ApproverLabel').textContent = '';
+                                                    document.getElementById('ApprovalDate').textContent = '';
+                                                   document.getElementById('ApprovalRemarks').textContent = '';
+                                                     document.getElementById('deptHeadName').textContent = '';
+                                                        $('#btnSave').css("visibility", "hidden");
 
+
+                                                        if(response.data.status == @((int)EnumStatus.ForApproval)){  //forapproval
+                                                     document.getElementById('deptHeadName').textContent = response.data.departmentHead;
+                                                       document.getElementById('ApproverLabel').textContent = 'For Approval of:';
+                                              }
+
+                                             else  if(response.data.status == @((int)EnumStatus.Approved)){  //approved
+
+                                                       document.getElementById('deptHeadName').textContent = response.data.departmentHead;
+                                                      document.getElementById('ApproverLabel').textContent = "Approved By: ";
+                                                       document.getElementById('ApprovalDate').textContent = 'Approved Date and Time: ' + response.data.dateApprovedDisapproved;
+                                              }
+                                                    else if(response.data.status == @((int)EnumStatus.Rejected) ){     //Rejected
+                                                          document.getElementById('deptHeadName').textContent = response.data.departmentHead;
+                                                            document.getElementById('ApproverLabel').textContent = 'Rejected By:';
+                                                   document.getElementById('ApprovalRemarks').textContent = 'Remarks: ' + response.data.approvalRemarks;
+                                                       document.getElementById('ApprovalDate').textContent = 'Rejected Date and Time:: ' + response.data.dateApprovedDisapproved;
+
+                                               }  else if(response.data.status == @((int)EnumStatus.Cancelled) && response.data.dateModified != null){     //canclled
+                                                            let iso =  response.data.dateModified;
+                                                       let formatted = iso.split(".")[0].replace("T", " ").slice(0, 16);
+                                                      document.getElementById('ApprovalDate').textContent = 'Cancelled Date: ' + formatted;
+
+                                             }
                                                               $('#btnSave').css("visibility", "hidden");
 
                                                          $('#createForm').find('input, select, textarea').prop('disabled', true);

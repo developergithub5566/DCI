@@ -43,9 +43,10 @@ namespace DCI.Repositories
             {
                 var leavequery = await (
                               from leave in _dbContext.LeaveRequestHeader.AsNoTracking()
-                               join emp in _dbContext.Employee.AsNoTracking() on leave.EmployeeId equals emp.EmployeeId
-                               join stat in _dbContext.Status.AsNoTracking() on leave.Status equals stat.StatusId
-                               where leave.IsActive == true && leave.Status == (int)EnumStatus.ForApproval && leave.ApproverId == model.CurrentUserId
+                              join emp in _dbContext.Employee.AsNoTracking() on leave.EmployeeId equals emp.EmployeeId
+                              join leavetype in _dbContext.LeaveType.AsNoTracking() on leave.LeaveTypeId equals leavetype.LeaveTypeId
+                              join stat in _dbContext.Status.AsNoTracking() on leave.Status equals stat.StatusId
+                              where leave.IsActive == true && leave.Status == (int)EnumStatus.ForApproval && leave.ApproverId == model.CurrentUserId
                               orderby leave.DateFiled descending
                               select new LeaveRequestHeaderViewModel
                               {
@@ -57,6 +58,7 @@ namespace DCI.Repositories
                                   DateFiledString = leave.DateFiled.ToShortDateString(),
                                   Status = leave.Status,
                                   StatusName = stat.StatusName,
+                                  LeaveName = leavetype.Description,
                                   Reason = leave.Reason,
                                   NoofDays = leave.NoOfDays,
                                   LeaveRequestDetailList = (from dtl in _dbContext.LeaveRequestDetails
@@ -82,18 +84,18 @@ namespace DCI.Repositories
                                                && dtr.Status == (int)EnumStatus.ForApproval
                                                && dtr.ApproverId == model.CurrentUserId
                                          orderby dtr.DateFiled descending
-                                    select new DTRCorrectionViewModel
-                                    {
-                                        DtrId = dtr.DtrId,
-                                        RequestNo = dtr.RequestNo,
-                                        DateFiled = dtr.DateFiled,
-                                        DtrDateTime = dtr.DtrDateTime,
-                                        DtrType = dtr.DtrType,
-                                        EmployeeName = emp.Firstname + " " + emp.Lastname,
-                                        Status = dtr.Status,
-                                        StatusName = stat.StatusName,
-                                        Reason = dtr.Reason
-                                    }
+                                         select new DTRCorrectionViewModel
+                                         {
+                                             DtrId = dtr.DtrId,
+                                             RequestNo = dtr.RequestNo,
+                                             DateFiled = dtr.DateFiled,
+                                             DtrDateTime = dtr.DtrDateTime,
+                                             DtrType = dtr.DtrType,
+                                             EmployeeName = emp.Firstname + " " + emp.Lastname,
+                                             Status = dtr.Status,
+                                             StatusName = stat.StatusName,
+                                             Reason = dtr.Reason
+                                         }
                                 ).ToListAsync();
 
                 model.dtrList = dtrquery.ToList();
@@ -103,7 +105,7 @@ namespace DCI.Repositories
                                 from ot in _dbContext.OvertimeHeader.AsNoTracking()
                                 join usr in _dbContext.User.AsNoTracking() on ot.CreatedBy equals usr.UserId
                                 join emp in _dbContext.Employee.AsNoTracking() on usr.EmployeeId equals emp.EmployeeId
-                                join stat in _dbContext.Status.AsNoTracking() on ot.StatusId equals stat.StatusId                              
+                                join stat in _dbContext.Status.AsNoTracking() on ot.StatusId equals stat.StatusId
                                 where ot.IsActive && ot.StatusId == (int)EnumStatus.ForApproval && ot.ApproverId == model.CurrentUserId
                                 orderby ot.DateCreated descending
                                 select new OvertimeViewModel
@@ -173,7 +175,7 @@ namespace DCI.Repositories
                 //var statusList = _dbContext.Status.AsNoTracking().ToList();
 
 
-                var query = (from leave in _dbContext.LeaveRequestHeader.AsNoTracking().ToList()                               
+                var query = (from leave in _dbContext.LeaveRequestHeader.AsNoTracking().ToList()
                              join emp in _dbContext.Employee.AsNoTracking().ToList() on leave.EmployeeId equals emp.EmployeeId
                              join stat in _dbContext.Status.AsNoTracking().ToList() on leave.Status equals stat.StatusId
                              where leave.IsActive == true && leave.Status == (int)EnumStatus.ForApproval && leave.ApproverId == model.CurrentUserId
@@ -284,18 +286,49 @@ namespace DCI.Repositories
                 {
                     if (empDetails?.EmployeeStatusId == (int)EnumEmploymentType.Regular)
                     {
-                        var contextLeaveInfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == contextHdr.EmployeeId && x.DateCreated.Date.Year == _currentYear).OrderByDescending(x => x.DateCreated).FirstOrDefault();
+                        var contextLeaveInfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == contextHdr.EmployeeId && x.DateCreated.Date.Year == _currentYear).OrderByDescending(x => x.DateCreated).FirstOrDefault();                                          
 
-                        if (contextHdr.LeaveTypeId == (int)EnumLeaveType.VL)
+
+                        if (contextHdr.LeaveTypeId == (int)EnumLeaveType.HD)
                         {
-                            contextLeaveInfo.VLBalance = contextLeaveInfo.VLBalance - contextHdr.NoOfDays;
-                            contextHdr.DeductionType = (int)EnumDeductionType.Payroll;
+                            if (contextLeaveInfo.VLBalance >= contextHdr.NoOfDays)
+                            {
+                                contextLeaveInfo.VLBalance = contextLeaveInfo.VLBalance -  contextHdr.NoOfDays;
+                                contextHdr.DeductionType = (int)EnumDeductionType.VacationLeave;
+                            }
+                            else
+                            {
+                                contextLeaveInfo.VLBalance = 0;
+                                contextHdr.DeductionType = (int)EnumDeductionType.Payroll;
+                            }               
+                      
                         }
-                        else if (contextHdr.LeaveTypeId == (int)EnumLeaveType.SL)
+                        else if (contextHdr.LeaveTypeId == (int)EnumLeaveType.VL || contextHdr.LeaveTypeId == (int)EnumLeaveType.VLMon)
                         {
-                            contextLeaveInfo.SLBalance = contextLeaveInfo.SLBalance - contextHdr.NoOfDays;
-                            contextHdr.DeductionType = (int)EnumDeductionType.SickLeave;
+                            if (contextLeaveInfo.VLBalance >= contextHdr.NoOfDays)
+                            {
+                                contextLeaveInfo.VLBalance = contextLeaveInfo.VLBalance - contextHdr.NoOfDays;
+                                contextHdr.DeductionType = (int)EnumDeductionType.VacationLeave;
+                            }
+                            else
+                            {
+                                contextLeaveInfo.VLBalance = 0;
+                                contextHdr.DeductionType = (int)EnumDeductionType.Payroll;
+                            }
                         }
+                        else if (contextHdr.LeaveTypeId == (int)EnumLeaveType.SL || contextHdr.LeaveTypeId == (int)EnumLeaveType.SLMon)
+                        {                         
+                            if (contextLeaveInfo.SLBalance >= contextHdr.NoOfDays)
+                            {
+                                contextLeaveInfo.SLBalance = contextLeaveInfo.SLBalance - contextHdr.NoOfDays;
+                                contextHdr.DeductionType = (int)EnumDeductionType.SickLeave;
+                            }
+                            else
+                            {
+                                contextLeaveInfo.SLBalance = 0;
+                                contextHdr.DeductionType = (int)EnumDeductionType.Payroll;
+                            }
+                        }                       
                         else if (contextHdr.LeaveTypeId == (int)EnumLeaveType.SPL)
                         {
                             contextLeaveInfo.SPLBalance = contextLeaveInfo.SPLBalance - contextHdr.NoOfDays;
@@ -314,14 +347,14 @@ namespace DCI.Repositories
                     }
                     else // probitionary and contractual/projectbased
                     {
-                        bool isRegular = empDetails.DateHired != null && contextDtl.Any(x => x.LeaveDate >= empDetails.DateHired.Value.AddMonths(6));
+                        //bool isRegular = empDetails.DateHired != null && contextDtl.Any(x => x.LeaveDate >= empDetails.DateHired.Value.AddMonths(6));
 
-                        if(isRegular)
-                        {
+                        //if (isRegular)
+                        //{
 
-                        }
-                        else
-                        {
+                        //}
+                        //else
+                        //{
                             foreach (var raw in contextDtl)
                             {
                                 //Update DTR attendance summary status to Payroll DEDUCTED                    
@@ -330,7 +363,7 @@ namespace DCI.Repositories
                                                              .SetProperty(r => r.STATUS, r => (int)EnumStatus.PayrollDeducted));
                             }
                             contextHdr.DeductionType = (int)EnumDeductionType.Payroll;
-                        }                      
+                       // }
                     }
                 }
 
@@ -355,7 +388,7 @@ namespace DCI.Repositories
 
                 NotificationViewModel notifvm = new NotificationViewModel();
                 notifvm.Title = "Leave";
-                notifvm.Description = String.Format("Leave request {0} has been {1}", contextHdr.RequestNo, status);
+                notifvm.Description = String.Format("Leave request {0} has been {1}.", contextHdr.RequestNo, status);
                 notifvm.ModuleId = (int)EnumModulePage.Leave;
                 notifvm.TransactionId = param.TransactionId;
                 notifvm.AssignId = user.UserId;
@@ -399,11 +432,11 @@ namespace DCI.Repositories
                 string _middleInitial = string.IsNullOrWhiteSpace(_user.Middlename) ? string.Empty : _user.Middlename.Substring(0, 1).ToUpper();
 
                 var contextHdr = _dbContext.DTRCorrection.AsNoTracking().Where(x => x.DtrId == param.TransactionId).FirstOrDefault();
-             
 
-                    var totalCount = await _dbContext.tbl_raw_logs
-                                                        .AsNoTracking()
-                                                        .CountAsync();
+
+                var totalCount = await _dbContext.tbl_raw_logs
+                                                    .AsNoTracking()
+                                                    .CountAsync();
 
                 tbl_raw_logs raw_logs = new tbl_raw_logs();
                 raw_logs.ID = totalCount + 1;
@@ -416,13 +449,13 @@ namespace DCI.Repositories
                 await _dbContext.tbl_raw_logs.AddAsync(raw_logs);
                 await _dbContext.SaveChangesAsync();
 
-                
+
                 contextHdr.Status = param.Status;
                 contextHdr.RawLogsId = raw_logs.ID;
                 _dbContext.DTRCorrection.Entry(contextHdr).State = EntityState.Modified;
-                _dbContext.SaveChanges();                         
+                _dbContext.SaveChanges();
 
-                var entitiesToViewModel = await _dtrRepository.DTRCorrectionByDtrId(contextHdr.DtrId);  
+                var entitiesToViewModel = await _dtrRepository.DTRCorrectionByDtrId(contextHdr.DtrId);
 
                 //Send Email Notification to Requestor
                 await _emailRepository.SendToRequestorDTRAdjustment(entitiesToViewModel);
@@ -714,7 +747,7 @@ namespace DCI.Repositories
                         join emp in _dbContext.Employee.AsNoTracking() on usr.EmployeeId equals emp.EmployeeId
                         join stat in _dbContext.Status.AsNoTracking() on ot.StatusId equals stat.StatusId
                         // where ot.IsActive && ot.CreatedBy == model.CurrentUserId
-                        where ot.IsActive &&  ot.StatusId == (int)EnumStatus.ForApproval && ot.ApproverId == model.CurrentUserId
+                        where ot.IsActive && ot.StatusId == (int)EnumStatus.ForApproval && ot.ApproverId == model.CurrentUserId
                         select new OvertimeViewModel
                         {
                             OTHeaderId = ot.OTHeaderId,

@@ -161,12 +161,7 @@ namespace DCI.Repositories
         {
             LeaveViewModel model = new LeaveViewModel();
             try
-            {
-
-               // var approvalhistory = _dbContext.ApprovalHistory.Where(x => x.ModulePageId == (int)EnumModulePage.Leave);
-
-
-
+            {   
                 var query = from lheader in _dbContext.LeaveRequestHeader.AsNoTracking()
                             join lvtype in _dbContext.LeaveType.AsNoTracking() on lheader.LeaveTypeId equals lvtype.LeaveTypeId
                             join stat in _dbContext.Status.AsNoTracking() on lheader.Status equals stat.StatusId
@@ -174,7 +169,7 @@ namespace DCI.Repositories
                             join apprvl in _dbContext.ApprovalHistory.AsNoTracking().Where(x => x.ModulePageId == (int)EnumModulePage.Leave)
                             on lheader.LeaveRequestHeaderId equals apprvl.TransactionId into ah
                             from apprvl in ah.DefaultIfEmpty()
-                            where lheader.LeaveRequestHeaderId == param.LeaveRequestHeaderId
+                            where lheader.LeaveRequestHeaderId == param.LeaveRequestHeaderId //&& apprvl.IsActive 
                             select new LeaveRequestHeaderViewModel
                             {
                                 LeaveRequestHeaderId = lheader.LeaveRequestHeaderId,
@@ -221,7 +216,7 @@ namespace DCI.Repositories
                     // model.LeaveRequestHeader.LeaveRequestDetailList = _dbContext.LeaveRequestDetails.Where(x => x.LeaveRequestHeaderId == param.LeaveRequestHeaderId).ToList();
                 }
 
-                var leavetypeList = _dbContext.LeaveType.Where(x => x.IsActive == true).AsQueryable().ToList();
+                var leavetypeList = _dbContext.LeaveType.Where(x => x.IsActive == true).AsNoTracking().ToList();
                 model.LeaveRequestHeader.LeaveTypeList = leavetypeList.Count() > 0 ? leavetypeList : null;
 
                 return model;
@@ -252,7 +247,25 @@ namespace DCI.Repositories
                 entity.IsActive = true;
                 _dbContext.LeaveRequestHeader.Entry(entity).State = EntityState.Modified;
                 await _dbContext.SaveChangesAsync();
-                return (StatusCodes.Status200OK, "Successfully cancelled");
+
+                var usr = _dbContext.User.AsNoTracking().Where(x => x.EmployeeId == entity.EmployeeId).FirstOrDefault();
+
+                //Send Application Notification to Approver
+                NotificationViewModel notifvmToApprover = new NotificationViewModel();
+                notifvmToApprover.Title = "Leave";
+                notifvmToApprover.Description = System.String.Format("Leave request {0} has been cancelled by the requestor.", entity.RequestNo);
+                notifvmToApprover.ModuleId = (int)EnumModulePage.Leave;
+                notifvmToApprover.TransactionId = entity.LeaveRequestHeaderId;
+                notifvmToApprover.AssignId = entity.ApproverId;
+                notifvmToApprover.URL = "/Todo/Index/";
+                notifvmToApprover.MarkRead = false;
+                notifvmToApprover.CreatedBy = usr != null ? usr.UserId : 0;
+                notifvmToApprover.IsActive = true;
+                await _homeRepository.SaveNotification(notifvmToApprover);
+
+                return (StatusCodes.Status200OK, System.String.Format("Leave request {0} has been cancelled.", entity.RequestNo));
+
+               // return (StatusCodes.Status200OK, "Successfully cancelled");
             }
             catch (Exception ex)
             {
@@ -340,9 +353,8 @@ namespace DCI.Repositories
                     notifvm.Description = String.Format("You have been assigned leave request {0} for approval", entity.RequestNo);
                     notifvm.ModuleId = (int)EnumModulePage.Leave;
                     notifvm.TransactionId = entity.LeaveRequestHeaderId;
-                    notifvm.AssignId = param.ApproverId;
-                    //notifvm.URL = "/Todo/Index/?leaveId=" + entity.LeaveRequestHeaderId;
-                    notifvm.URL = "/Todo/Leave";
+                    notifvm.AssignId = param.ApproverId;                   
+                    notifvm.URL = "/Todo/Index";
                     notifvm.MarkRead = false;
                     notifvm.CreatedBy = param.CurrentUserId;
                     notifvm.IsActive = true;
@@ -355,8 +367,7 @@ namespace DCI.Repositories
                     notifvmRequestor.Description = String.Format("Your Leave request {0} has been submitted for approval.", entity.RequestNo);
                     notifvmRequestor.ModuleId = (int)EnumModulePage.Leave;
                     notifvmRequestor.TransactionId = entity.LeaveRequestHeaderId;
-                    notifvmRequestor.AssignId = param.CurrentUserId;
-                    //notifvm.URL = "/Todo/Index/?leaveId=" + entity.LeaveRequestHeaderId;
+                    notifvmRequestor.AssignId = param.CurrentUserId;        
                     notifvmRequestor.URL = "/Home/Notification";
                     notifvmRequestor.MarkRead = false;
                     notifvmRequestor.CreatedBy = param.CurrentUserId;

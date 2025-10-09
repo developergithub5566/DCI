@@ -85,8 +85,12 @@
                     <div class="row">
                         <div class="col-lg-8">
                             <div class="announcementInfo">
+                                @if (Model.AnnouncementList != null)
+                                {
                                 <div id="announementCarouselIndicators" class="carousel slide" data-ride="carousel">
+                                
                                     <div class="carousel-inner">
+                                        
                                         @for (int i = 0; i < Model.AnnouncementList.Count; i++)
                                         {
                                             var item = Model.AnnouncementList[i];
@@ -107,7 +111,9 @@
                                             <li data-target="#announementCarouselIndicators" data-slide-to="@i" class="@activeClass"></li>
                                         }
                                     </ol>
+                               
                                 </div>
+                               }
                             </div>
                         </div>
                         <div class="col-lg-4 text-center">

@@ -144,8 +144,11 @@
                                 </td>
 
                                 <td>
-                                    <a asp-controller="Report" asp-action="Form201" asp-route-EmployeeId="@item.EmployeeId" class="btn btn-primary  @(canEdit ? "" : "disabled") ">
+                                    <a asp-controller="Report" asp-action="Form201" asp-route-EmployeeId="@item.EmployeeId" title="201 Form" class="btn btn-primary  @(canEdit ? "" : "disabled") ">
                                         <i class="fa fa-search"></i>
+                                    </a>
+                                    <a asp-controller="Report" asp-action="Leave" asp-route-EmployeeId="@item.EmployeeId" title="Leave"  class="btn btn-primary  @(canEdit ? "" : "disabled") ">
+                                        <i class="fa fa-plane"></i>
                                     </a>
                                     @*      <a href="#" onclick="editForm(@item.EmployeeId,1)" title="View" class="btn btn-primary @(canView ? "" : "disabled") "><i class="fas fa-search"></i></a> *@ 
                                     @*    <a href="#" id="editForm" onclick="editForm(@item.EmployeeId,0)" title="Update" class="btn btn-info @(canEdit ? "" : "disabled") "><i class="fa fa-edit"></i></a> | *@

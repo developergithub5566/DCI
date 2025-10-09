@@ -1,6 +1,6 @@
 ﻿@model DCI.Models.ViewModel.LeaveViewModel
 @using Newtonsoft.Json;
-@* @using DCI.Core.Common; *@
+@using DCI.Core.Common;
 @using DCI.Models.ViewModel;
 
 
@@ -449,14 +449,15 @@
 
 @section scripts {
 
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
     <script src="~/js/dci-validation.js"></script>
 
 
-    @*  Export Button*@
+    @*  Export Button
+            <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/buttons/3.2.1/js/dataTables.buttons.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
@@ -465,6 +466,7 @@
     <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.print.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.1/css/buttons.dataTables.css">
+    *@
 
     <script>
         window.addEventListener('DOMContentLoaded', () => {
@@ -627,6 +629,7 @@
               }); //submit
                            }); //end doc
 
+
                     function newForm() {
                        const my_fp = document.querySelector("#dateCovered")._flatpickr;
                                        my_fp.clear();
@@ -637,6 +640,8 @@
                                   $('#datepickerLabel').hide();
                                $('#btnCancel').hide();
                                  $('#btnSubmit').show();
+                                  document.getElementById('ApprovalDate').textContent = '';
+                                       document.getElementById('ApprovalRemarks').textContent = '';
 
                           $.ajax({
                               type: 'POST',
@@ -763,46 +768,48 @@
                                           $('#NoOfDays').val(response.data.leaveRequestHeader.noofDays);
                                                  $('#Reason').val(response.data.leaveRequestHeader.reason);
 
-                                            $('#btnCancel').hide();
+                                             $('#btnCancel').hide();
 
                                                 document.getElementById('ApproverLabel').textContent = '';
                                                               document.getElementById('ApprovalDate').textContent = '';
                                        document.getElementById('ApprovalRemarks').textContent = '';
+                                         document.getElementById('deptHeadName').textContent = '';
 
-                                   if(response.data.leaveRequestHeader.status == 3){  //forapproval
+                                   if(response.data.leaveRequestHeader.status == @((int)EnumStatus.ForApproval)){  //forapproval
                                                 $('#btnCancel').show();
                                                  $('#btnSubmit').hide();
                                                      document.getElementById('deptHeadName').textContent = response.data.approverHead;
                                                        document.getElementById('ApproverLabel').textContent = 'For Approval of:';
                                               }
-                                else if(response.data.leaveRequestHeader.status == 4){     //approved
+                                else if(response.data.leaveRequestHeader.status == @((int)EnumStatus.Approved)){     //approved
                                                $('#btnSubmit').hide();
                                                    $('#btnCancel').hide();
                                                          document.getElementById('deptHeadName').textContent = response.data.approverHead;
                                                             document.getElementById('ApproverLabel').textContent = 'Approved By:';
-                                                             // document.getElementById('ApprovalDate').textContent = 'Approved Date and Time: ' + response.data.leaveRequestHeader.dateApprovedDisapproved;
-                                                                      let iso =  response.data.leaveRequestHeader.dateApprovedDisapproved;
-                                                       let formatted = iso.split(".")[0].replace("T", " ").slice(0, 16);
-                                                       document.getElementById('ApprovalDate').textContent = 'Approved Date and Time: ' +formatted;
+                                                       document.getElementById('ApprovalDate').textContent = 'Approved Date and Time: ' + response.data.leaveRequestHeader.dateApprovedDisapproved;
                                     }
-                                         else if(response.data.leaveRequestHeader.status == 5){     //Rejected
+                                         else if(response.data.leaveRequestHeader.status == @((int)EnumStatus.Rejected)){     //Rejected
                                                 $('#btnSubmit').hide();
                                                     $('#btnCancel').hide();
                                                           document.getElementById('deptHeadName').textContent = response.data.approverHead;
                                                             document.getElementById('ApproverLabel').textContent = 'Rejected By:';
-                                                            //  document.getElementById('ApprovalDate').textContent = 'Rejected Date and Time: ' + response.data.leaveRequestHeader.dateApprovedDisapproved;
                                             document.getElementById('ApprovalRemarks').textContent = 'Remarks: ' + response.data.leaveRequestHeader.approvalRemarks;
-                                                                 let iso =  response.data.leaveRequestHeader.dateApprovedDisapproved;
-                                                       let formatted = iso.split(".")[0].replace("T", " ").slice(0, 16);
-                                                       document.getElementById('ApprovalDate').textContent = 'Approved Date: ' +formatted;
+                                                       document.getElementById('ApprovalDate').textContent = 'Rejected Date and Time: ' + response.data.leaveRequestHeader.dateApprovedDisapproved;
                                      }
-                                       else if(response.data.leaveRequestHeader.status == 9){     //Deducted
+                                       else if(response.data.leaveRequestHeader.status == @((int)EnumStatus.VLDeducted) || response.data.leaveRequestHeader.status == @((int)EnumStatus.PayrollDeducted)){     //Deducted
                                                 $('#btnSubmit').hide();
                                                     $('#btnCancel').hide();
                                                           document.getElementById('deptHeadName').textContent = 'HR Processed Undertime Deduction';
                                                             document.getElementById('ApproverLabel').textContent = 'Deducted By:';
 
 
+                                     }
+                                       else if(response.data.leaveRequestHeader.status == @((int)EnumStatus.Cancelled)  && response.data.leaveRequestHeader.dateModified != null){     //canclled
+                                                $('#btnSubmit').hide();
+                                                    $('#btnCancel').hide();
+                                                                      let iso =  response.data.leaveRequestHeader.dateModified;
+                                                       let formatted = iso.split(".")[0].replace("T", " ").slice(0, 16);
+                                                      document.getElementById('ApprovalDate').textContent = 'Cancelled Date: ' + formatted;
                                      }
 
 

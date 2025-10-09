@@ -109,6 +109,7 @@ namespace DCI.Core.Common
 
     public enum EnumEmploymentType
     {
+        //IMPORTANT ORDERING FOR Leave Computaion Stored Procedure : get_LeaveBalance
         Regular = 1,
         Probationary = 2,
         Contractual = 3,
@@ -132,6 +133,7 @@ namespace DCI.Core.Common
 
     public enum EnumStatus
     {
+        //IMPORTANT ORDERING FOR Leave Computaion Stored Procedure : get_LeaveBalance
         Raw = 0,
         Draft = 1,
         Pending = 2,
@@ -148,16 +150,18 @@ namespace DCI.Core.Common
 
     public enum EnumLeaveType
     {
+        //IMPORTANT ORDERING FOR Leave Computaion Stored Procedure : get_LeaveBalance and Leave Module
         HD = 1,
         VL = 2,
         SL = 3,
         SPL = 4,
+        ML = 5,
         PL = 6,
-        MS = 7,
-        OB = 8,
-        VLMon = 9,
-        SLMon = 10,
-        UT = 11
+        OB = 7,
+        VLMon = 8,
+        SLMon = 9,
+        UT = 10,
+        LT = 11
     }
 
     public enum EnumEmployeeScope
