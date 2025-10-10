@@ -45,17 +45,7 @@ namespace DCI.WebApp.Controllers
                     {
                         model = JsonConvert.DeserializeObject<List<UserModel>>(responseBody)!;
                     }
-                }
-
-                //List<UserModel> vm = new List<UserModel>();
-                //vm.Options = vm.RoleList.Select(x =>
-                //							   new SelectListItem
-                //							   {
-                //								   Value = x.RoleId.ToString(),
-                //								   Text = x.RoleName
-                //							   }).ToList();
-
-
+                }       
                 return View(model);
 
             }
@@ -122,6 +112,8 @@ namespace DCI.WebApp.Controllers
             try
             {
                 var currentUser = _userSessionHelper.GetCurrentUser();
+                if (currentUser == null)
+                    return RedirectToAction("Logout", "Account");
                 model.CreatedBy = currentUser.UserId;
                 model.ModifiedBy = currentUser.UserId;
 
@@ -141,16 +133,7 @@ namespace DCI.WebApp.Controllers
                     }
                     request.Content = stringContent;
                     var response = await _httpclient.SendAsync(request);
-                    var responseBody = await response.Content.ReadAsStringAsync();
-                    //	UserModel vm = JsonConvert.DeserializeObject<UserModel>(responseBody)!;
-
-                    //vm.Options = vm.RoleList.Select(x =>
-                    //							   new SelectListItem
-                    //							   {
-                    //								   Value = x.RoleId.ToString(),
-                    //								   Text = x.RoleName
-                    //							   }).ToList();
-
+                    var responseBody = await response.Content.ReadAsStringAsync();              
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -262,6 +245,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
                     model.CreatedBy = currentUser.UserId;
                     model.ModifiedBy = currentUser.UserId;
 
@@ -296,6 +281,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
                     model.ModifiedBy = currentUser.UserId;
 
 
@@ -485,7 +472,7 @@ namespace DCI.WebApp.Controllers
                    new SelectListItem
                    {
                        Value = x.UserId.ToString(),
-                       Text = x.Lastname + ", " + x.Firstname
+                       Text = x.Fullname 
                    }).ToList();
 
 
@@ -514,6 +501,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
                     model.CreatedBy = currentUser.UserId;
                     model.ModifiedBy = currentUser.UserId;
 
@@ -549,6 +538,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
                     model.ModifiedBy = currentUser.UserId;
 
 
@@ -634,6 +625,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
                     model.CreatedBy = currentUser.UserId;
                     model.ModifiedBy = currentUser.UserId;
 
@@ -668,6 +661,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
                     model.ModifiedBy = currentUser.UserId;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -725,10 +720,7 @@ namespace DCI.WebApp.Controllers
         public async Task<IActionResult> SaveRoleModule([FromBody] Dictionary<string, ModuleJson> inputJson)
         {
             try
-            {
-                //int _roleId = inputJson.Values != null ?  Convert.ToInt32(inputJson.Values.FirstOrDefault().RoleId) : 0;
-                // string _roleName = inputJson.Values != null ? inputJson.Values.FirstOrDefault().RoleName.ToString() : 0;
-                // string _desc = inputJson.Values != null ? inputJson.Values.FirstOrDefault().Description.ToString() : 0;
+            {         
                 int _roleId = inputJson.Values?.FirstOrDefault(v => v.RoleId != null)?.RoleId ?? 0;
                 string _roleName = inputJson.Values?.FirstOrDefault(v => v.RoleName != null)?.RoleName ?? string.Empty;
                 string _desc = inputJson.Values?.FirstOrDefault(v => v.Description != null)?.Description ?? string.Empty;
@@ -807,6 +799,8 @@ namespace DCI.WebApp.Controllers
                 {
                     UserInRoleViewModel model = new UserInRoleViewModel();
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
                     model.ModifiedBy = currentUser.UserId;
                     model.RoleId = id;
 
@@ -891,6 +885,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
                     model.CreatedBy = currentUser.UserId;
                     model.ModifiedBy = currentUser.UserId;
 
@@ -925,6 +921,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
                     model.ModifiedBy = currentUser.UserId;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -1185,6 +1183,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
                     model.CreatedBy = currentUser.UserId;
                     model.ModifiedBy = currentUser.UserId;
 
@@ -1220,6 +1220,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
                     model.CreatedBy = currentUser.UserId;
                     model.ModifiedBy = currentUser.UserId;
 
@@ -1257,6 +1259,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
                     model.ModifiedBy = currentUser.UserId;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -1396,6 +1400,8 @@ namespace DCI.WebApp.Controllers
             try
             {
                 var currentUser = _userSessionHelper.GetCurrentUser();
+                if (currentUser == null)
+                    return RedirectToAction("Logout", "Account");
                 model.CreatedBy = currentUser.UserId;
                 model.ModifiedBy = currentUser.UserId;
 
@@ -1533,6 +1539,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
                     model.ModifiedBy = currentUser.UserId;
 
 
@@ -1638,6 +1646,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
                     model.CreatedBy = currentUser.UserId;
                     model.ModifiedBy = currentUser.UserId;
 
@@ -1673,6 +1683,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
                     model.ModifiedBy = currentUser.UserId;
 
 
@@ -1772,6 +1784,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
                     model.CreatedBy = currentUser.UserId;
                     model.ModifiedBy = currentUser.UserId;
 
@@ -1807,6 +1821,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
                     model.ModifiedBy = currentUser.UserId;
 
 

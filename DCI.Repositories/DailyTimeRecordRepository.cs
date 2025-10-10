@@ -237,7 +237,7 @@ namespace DCI.Repositories
                                    IsActive = dtr.IsActive,
                                    DateApprovedDisapproved = apprvl != null ? apprvl.DateCreated.ToString("yyyy-MM-dd HH:mm") : string.Empty,
                                    ApprovalRemarks = apprvl != null ? apprvl.Remarks : string.Empty,
-                                   DepartmentHead = depthead.Firstname + " " + depthead.Lastname// + " " + depthead.Suffix
+                                   DepartmentHead = depthead.Fullname ,
                                }).FirstOrDefaultAsync();
 
             return query;

@@ -55,17 +55,15 @@ namespace DCI.Repositories
                 //					EmployeeList = null
                 //				}).FirstOrDefault() ?? new UserModel();
 
-                var result = (from usr in _dbContext.User
-                              join role in _dbContext.Role on usr.RoleId equals role.RoleId
+                var result = (from usr in _dbContext.User.AsNoTracking()
+                              join role in _dbContext.Role.AsNoTracking() on usr.RoleId equals role.RoleId
                               where usr.IsActive == true && usr.UserId == userid
                               select new UserModel
                               {
                                   UserId = usr.UserId,
-                                  Lastname = usr.Lastname,
-                                  Middlename = usr.Middlename,
-                                  Firstname = usr.Firstname,
-                                  Email = usr.Email,
-                                  ContactNo = usr.ContactNo,
+                                  Fullname = usr.Fullname,         
+                                  EmployeeNo = usr.EmployeeNo,
+                                  Email = usr.Email,                                
                                   RoleId = usr.RoleId,
                                   RoleName = role.RoleName,
                                   EmailBiometricsNotification = usr.EmailBiometricsNotification,
@@ -75,10 +73,9 @@ namespace DCI.Repositories
 
 
 
-                result.RoleList = _dbContext.Role.Where(x => x.IsActive).ToList();
-                result.EmployeeList = _dbContext.User.ToList();
-                // result.DepartmentList = _dbContext.Department.Where(x => x.IsActive).ToList();
-                //result.Form201List = _dbContext.Employee.Where(x => x.IsActive).ToList();
+                result.RoleList = _dbContext.Role.AsNoTracking().Where(x => x.IsActive).ToList();
+                result.EmployeeList = _dbContext.User.AsNoTracking().ToList();
+
                 return result;
             }
             catch (Exception ex)
@@ -105,11 +102,10 @@ namespace DCI.Repositories
                         select new UserModel
                         {
                             UserId = usr.UserId,
-                            Lastname = usr.Lastname,
-                            Middlename = usr.Middlename,
-                            Firstname = usr.Firstname,
+                            Fullname = usr.Fullname,
+                            EmployeeNo = usr.EmployeeNo,                     
                             Email = usr.Email,
-                            ContactNo = usr.ContactNo,
+    
                             RoleId = usr.RoleId,
                             RoleName = role.RoleName,
                             //DepartmentId = usr.DepartmentId,
@@ -130,9 +126,8 @@ namespace DCI.Repositories
                 {
                     User user = new User();
                     user.Email = model.Email;
-                    user.Firstname = model.Firstname;
-                    user.Lastname = model.Lastname;
-                    user.ContactNo = model.ContactNo;
+                    user.Fullname = model.Fullname;
+                    //user.EmployeeNo = model.Lastname;   
                     user.RoleId = model.RoleId;
                     user.EmailBiometricsNotification = false;
                     user.DateCreated = DateTime.Now;
@@ -169,10 +164,10 @@ namespace DCI.Repositories
                 var entities = await _dbContext.User.FirstOrDefaultAsync(x => x.UserId == model.UserId);
 
 
-                entities.Firstname = model.Firstname;
-                entities.Middlename = model.Middlename;
-                entities.Lastname = model.Lastname;
-                entities.ContactNo = model.ContactNo;
+                entities.Fullname = model.Fullname;
+                entities.EmployeeNo = model.EmployeeNo;
+                //entities.Fullname = model.Lastname;
+                //entities.ContactNo = model.ContactNo;
                 entities.Email = model.Email;
                 entities.RoleId = model.RoleId;
                 entities.DateCreated = entities.DateCreated;
@@ -210,16 +205,16 @@ namespace DCI.Repositories
         {
 
             return await (
-                         from usr in _dbContext.User
-                         join emp in _dbContext.Employee on usr.EmployeeId equals emp.EmployeeId into empJoin
+                         from usr in _dbContext.User.AsNoTracking()
+                         join emp in _dbContext.Employee.AsNoTracking() on usr.EmployeeId equals emp.EmployeeId into empJoin
                          from emp in empJoin.DefaultIfEmpty()
-                         join empdtls in _dbContext.EmployeeWorkDetails on emp.EmployeeId equals empdtls.EmployeeId into empdtlsJoin
+                         join empdtls in _dbContext.EmployeeWorkDetails.AsNoTracking() on emp.EmployeeId equals empdtls.EmployeeId into empdtlsJoin
                          from empdtls in empdtlsJoin.DefaultIfEmpty()
-                         join dept in _dbContext.Department on empdtls.DepartmentId equals dept.DepartmentId into deptJoin
+                         join dept in _dbContext.Department.AsNoTracking() on empdtls.DepartmentId equals dept.DepartmentId into deptJoin
                          from dept in deptJoin.DefaultIfEmpty()
-                         join post in _dbContext.Position on empdtls.Position equals post.PositionId into postJoin
+                         join post in _dbContext.Position.AsNoTracking() on empdtls.Position equals post.PositionId into postJoin
                          from post in postJoin.DefaultIfEmpty()
-                         join approver in _dbContext.User on dept.ApproverId equals approver.UserId into approverJoin
+                         join approver in _dbContext.User.AsNoTracking() on dept.ApproverId equals approver.UserId into approverJoin
                          from approver in approverJoin.DefaultIfEmpty()
                          where usr.IsActive && usr.Email == email
                          select new UserManager
@@ -235,19 +230,18 @@ namespace DCI.Repositories
                              EmployeeId = usr.EmployeeId ?? 0,
                              DepartmentId = (int?)empdtls.DepartmentId ?? 0,
                              ApproverId = (int?)dept.ApproverId ?? 0,
-                             ApproverHead = approver.Firstname + " " + approver.Lastname,
+                             ApproverHead = approver.Fullname ,
                              ModulePageList = null,
                              ModulePageAccess = null,
-                         })
-                         .AsNoTracking()
+                         })                        
                          .FirstOrDefaultAsync();
 
         }
 
         public async Task<LoginViewModel> Login(string Email)
         {
-            var context = _dbContext.User.AsQueryable();
-            var userAccessdbContext = _dbContext.UserAccess.AsQueryable();
+            var context = _dbContext.User.AsNoTracking();
+            var userAccessdbContext = _dbContext.UserAccess.AsNoTracking();
 
             var query = from usr in context
                         join usraccess in userAccessdbContext
@@ -320,9 +314,9 @@ namespace DCI.Repositories
                 {
                     User user = new User();
                     user.Email = model.Email;
-                    user.Firstname = model.Firstname;
-                    user.Lastname = model.Lastname;
-                    user.ContactNo = string.Empty;
+                    user.Fullname = model.Firstname + " " + model.Lastname;
+                    //user.Lastname = model.Lastname;
+                    //user.ContactNo = string.Empty;
                     user.RoleId = (int)EnumRole.User;
                     user.DateCreated = DateTime.Now;
                     user.CreatedBy = 0;
@@ -374,11 +368,11 @@ namespace DCI.Repositories
                                 {
                                     UserId = usr.UserId,
                                     EmployeeId = usr.EmployeeId ?? 0,
-                                    Lastname = usr.Lastname,
-                                    Middlename = usr.Middlename,
-                                    Firstname = usr.Firstname,
+                                    Fullname = usr.Fullname,
+                                    EmployeeNo = usr.EmployeeNo,
+                                    //Firstname = usr.Firstname,
                                     Email = usr.Email,
-                                    ContactNo = usr.ContactNo,
+                                   // ContactNo = usr.ContactNo,
                                     RoleId = usr.RoleId,
                                     //  DepartmentId = usr.DepartmentId,
                                     RoleList = null,
@@ -425,10 +419,10 @@ namespace DCI.Repositories
                 {
                     User entities = new User();
                     entities.EmployeeId = employeeEntities.EmployeeId;
-                    entities.Firstname = employeeEntities.Firstname;
-                    entities.Middlename = employeeEntities.Middlename;
-                    entities.Lastname = employeeEntities.Lastname;
-                    entities.ContactNo = employeeEntities.MobileNoPersonal;
+                    entities.Fullname = employeeEntities.Firstname + " " + employeeEntities.Lastname;
+                    entities.EmployeeNo = employeeEntities.EmployeeNo;
+                    //entities.Lastname = employeeEntities.Lastname;
+                    //entities.ContactNo = employeeEntities.MobileNoPersonal;
                     entities.Email = employeeEntities?.Email ?? null;
                     entities.RoleId = model.RoleId;
                     entities.DateCreated = DateTime.Now;
@@ -441,8 +435,8 @@ namespace DCI.Repositories
 
                     model.UserId = entities.UserId;
                     model.Email = entities.Email;
-                    model.Lastname = entities.Lastname;
-                    model.Firstname = entities.Firstname;
+                    model.Fullname = entities.Fullname;// + " " + employeeEntities.Lastname;
+                    model.EmployeeNo = entities.EmployeeNo;
                     //_useraccessrepository.SaveUserAccess
 
 
@@ -472,10 +466,10 @@ namespace DCI.Repositories
                 entities.RoleId = model.RoleId;
                 entities.DateModified = DateTime.Now;
                 entities.ModifiedBy = model.ModifiedBy;
-                entities.Firstname = entities.Firstname;
-                entities.Middlename = entities.Middlename;
-                entities.Lastname = entities.Lastname;
-                entities.ContactNo = entities.ContactNo;
+                entities.Fullname = entities.Fullname;// + " " + entities.Lastname;
+                entities.EmployeeNo = entities.EmployeeNo;
+                //entities.Lastname = entities.Lastname;
+                //entities.ContactNo = entities.ContactNo;
                 entities.Email = entities.Email;
                 entities.DateCreated = entities.DateCreated;
                 entities.CreatedBy = entities.CreatedBy;

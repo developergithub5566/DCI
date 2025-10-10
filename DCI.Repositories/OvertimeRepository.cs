@@ -197,7 +197,7 @@ namespace DCI.Repositories
 
                     // RecommendedBy = usrApprover != null ? usrApprover.Firstname + " " + usrApprover.Lastname : string.Empty,
                     // ApprovedBy = "MARCO USTARIS",
-                    ApprovedBy = usrApprover != null ? usrApprover.Firstname + " " + usrApprover.Lastname : string.Empty,
+                    ApprovedBy = usrApprover != null ? usrApprover.Fullname : string.Empty,
                     otDetails = _dbContext.OvertimeDetail
                         .Where(x => x.OTHeaderId == ot.OTHeaderId && x.IsActive)
                         .OrderBy(x => x.OTDate).ThenBy(x => x.OTTimeFrom)

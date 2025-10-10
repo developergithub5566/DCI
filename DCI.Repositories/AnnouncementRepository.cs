@@ -25,8 +25,8 @@ namespace DCI.Repositories
         {
             try
             {
-                var query = from announce in _dbContext.Announcement
-                            join usr in _dbContext.User.Where(x => x.IsActive)
+                var query = from announce in _dbContext.Announcement.AsNoTracking()
+                            join usr in _dbContext.User.AsNoTracking().Where(x => x.IsActive)
                             on announce.CreatedBy equals usr.UserId
                             where announce.AnnouncementId == announceId
                             select new AnnouncementViewModel
@@ -41,7 +41,7 @@ namespace DCI.Repositories
                                 DateModified = announce.DateModified,
                                 ModifiedBy = announce.ModifiedBy,
                                 IsActive = announce.IsActive,
-                                CreatedName = usr.Firstname + " " + usr.Lastname
+                                CreatedName = usr.Fullname,
                             };
 
                 var result = query.FirstOrDefault();
@@ -84,7 +84,7 @@ namespace DCI.Repositories
                                 DateModified = announce.DateModified,
                                 ModifiedBy = announce.ModifiedBy,
                                 IsActive = announce.IsActive,
-                                CreatedName = usr.Firstname + " " + usr.Lastname
+                                CreatedName = usr.Fullname,
                             };
 
                 return query.ToList();

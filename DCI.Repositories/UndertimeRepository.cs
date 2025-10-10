@@ -484,7 +484,7 @@ namespace DCI.Repositories
             }
         }
 
-        public async Task SaveLeaveForUndertime(LeaveFormViewModel param)
+        private async Task SaveLeaveForUndertime(LeaveFormViewModel param)
         {
             LeaveViewModel model = new LeaveViewModel();
 

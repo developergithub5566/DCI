@@ -292,7 +292,7 @@ namespace DCI.Repositories
                     model.EmployeeId = emp.EmployeeId;
                     await UpdateLeaveInfo(model, true);
                   
-                    return (StatusCodes.Status200OK, "Registration successful");
+                    return (StatusCodes.Status200OK, "Employee registration successful.");
                 }
                 else
                 {
@@ -352,10 +352,8 @@ namespace DCI.Repositories
                     var usr = await _dbContext.User.FirstOrDefaultAsync(x => x.EmployeeId == model.EmployeeId);
                     if(usr != null)
                     {
-                        usr.Firstname = model.Firstname;
-                        usr.Middlename = model.Middlename;
-                        usr.Lastname = model.Lastname;
-                        usr.ContactNo = model.MobileNoPersonal ?? model.MobileNoOffice;
+                        usr.Fullname = model.Firstname + " " + model.Lastname;
+                        usr.EmployeeNo = model.EmployeeNo;
                         _dbContext.User.Entry(usr).State = EntityState.Modified;
                         await _dbContext.SaveChangesAsync();
                     }
@@ -363,7 +361,7 @@ namespace DCI.Repositories
 
                     await UpdateLeaveInfo(model, false);
 
-                    return (StatusCodes.Status200OK, "Registration updated");
+                    return (StatusCodes.Status200OK, "Employee registration updated successfully.");
                 }
             }
             catch (Exception ex)

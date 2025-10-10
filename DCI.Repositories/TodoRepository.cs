@@ -7,11 +7,6 @@ using DCI.Repositories.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Reflection.PortableExecutable;
-using System.Security.Cryptography.X509Certificates;
 
 
 namespace DCI.Repositories
@@ -261,18 +256,7 @@ namespace DCI.Repositories
         public async Task<(int statuscode, string message)> ApprovalLeave(ApprovalHistoryViewModel param)
         {
             try
-            {
-                ApprovalHistory entity = new ApprovalHistory();
-                entity.ModulePageId = (int)EnumModulePage.Leave;
-                entity.TransactionId = param.TransactionId;
-                entity.ApproverId = param.ApproverId;
-                entity.Status = param.Status;
-                entity.Remarks = param.Remarks;
-                entity.CreatedBy = param.CreatedBy;
-                entity.DateCreated = DateTime.Now;
-                entity.IsActive = true;
-                await _dbContext.ApprovalHistory.AddAsync(entity);
-                await _dbContext.SaveChangesAsync();
+            {        
 
                 int _currentYear = DateTime.Now.Year;
 
@@ -281,27 +265,37 @@ namespace DCI.Repositories
                 var emp = _dbContext.Employee.Where(x => x.EmployeeId == contextHdr.EmployeeId).FirstOrDefault();
                 var empDetails = _dbContext.EmployeeWorkDetails.Where(x => x.EmployeeId == contextHdr.EmployeeId).FirstOrDefault();
 
+                LeaveFormViewModel lvmodel = new LeaveFormViewModel();
+                lvmodel.EmployeeId = contextHdr.EmployeeId;
+
 
                 if (contextHdr != null && param.Status == (int)EnumStatus.Approved)
                 {
                     if (empDetails?.EmployeeStatusId == (int)EnumEmploymentType.Regular)
                     {
-                        var contextLeaveInfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == contextHdr.EmployeeId && x.DateCreated.Date.Year == _currentYear).OrderByDescending(x => x.DateCreated).FirstOrDefault();                                          
+                        var contextLeaveInfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == contextHdr.EmployeeId && x.DateCreated.Date.Year == _currentYear).OrderByDescending(x => x.DateCreated).FirstOrDefault();
 
 
                         if (contextHdr.LeaveTypeId == (int)EnumLeaveType.HD)
                         {
                             if (contextLeaveInfo.VLBalance >= contextHdr.NoOfDays)
                             {
-                                contextLeaveInfo.VLBalance = contextLeaveInfo.VLBalance -  contextHdr.NoOfDays;
+                                contextLeaveInfo.VLBalance = contextLeaveInfo.VLBalance - contextHdr.NoOfDays;
                                 contextHdr.DeductionType = (int)EnumDeductionType.VacationLeave;
-                            }
+                            }                        
                             else
                             {
+                                decimal excessDays = contextHdr.NoOfDays - contextLeaveInfo.VLBalance;
                                 contextLeaveInfo.VLBalance = 0;
-                                contextHdr.DeductionType = (int)EnumDeductionType.Payroll;
-                            }               
-                      
+                                contextHdr.DeductionType = (int)EnumDeductionType.VacationLeave;
+                                contextHdr.NoOfDays = contextLeaveInfo.VLBalance;
+
+                        
+                                lvmodel.NoOfDays = excessDays;                        
+                                lvmodel.LeaveTypeId = contextHdr.LeaveTypeId;
+                                lvmodel.Status = (int)EnumStatus.PayrollDeducted;
+                                await SaveLeaveForExcessLeave(lvmodel);
+                            }
                         }
                         else if (contextHdr.LeaveTypeId == (int)EnumLeaveType.VL || contextHdr.LeaveTypeId == (int)EnumLeaveType.VLMon)
                         {
@@ -312,12 +306,20 @@ namespace DCI.Repositories
                             }
                             else
                             {
+                                decimal excessDays = contextHdr.NoOfDays - contextLeaveInfo.VLBalance;
                                 contextLeaveInfo.VLBalance = 0;
-                                contextHdr.DeductionType = (int)EnumDeductionType.Payroll;
+                                contextHdr.DeductionType = (int)EnumDeductionType.VacationLeave;
+                                contextHdr.NoOfDays = contextLeaveInfo.VLBalance;
+
+
+                                lvmodel.NoOfDays = excessDays;
+                                lvmodel.LeaveTypeId = contextHdr.LeaveTypeId;
+                                lvmodel.Status = (int)EnumStatus.PayrollDeducted;
+                                await SaveLeaveForExcessLeave(lvmodel);
                             }
                         }
                         else if (contextHdr.LeaveTypeId == (int)EnumLeaveType.SL || contextHdr.LeaveTypeId == (int)EnumLeaveType.SLMon)
-                        {                         
+                        {
                             if (contextLeaveInfo.SLBalance >= contextHdr.NoOfDays)
                             {
                                 contextLeaveInfo.SLBalance = contextLeaveInfo.SLBalance - contextHdr.NoOfDays;
@@ -325,10 +327,17 @@ namespace DCI.Repositories
                             }
                             else
                             {
-                                contextLeaveInfo.SLBalance = 0;
-                                contextHdr.DeductionType = (int)EnumDeductionType.Payroll;
+                                decimal excessDays = contextHdr.NoOfDays - contextLeaveInfo.VLBalance;
+                                contextLeaveInfo.VLBalance = 0;
+                                contextHdr.DeductionType = (int)EnumDeductionType.SickLeave;
+                                contextHdr.NoOfDays = contextLeaveInfo.VLBalance;
+
+                                lvmodel.NoOfDays = excessDays;
+                                lvmodel.LeaveTypeId = contextHdr.LeaveTypeId;
+                                lvmodel.Status = (int)EnumStatus.PayrollDeducted;
+                                await SaveLeaveForExcessLeave(lvmodel);
                             }
-                        }                       
+                        }
                         else if (contextHdr.LeaveTypeId == (int)EnumLeaveType.SPL)
                         {
                             contextLeaveInfo.SPLBalance = contextLeaveInfo.SPLBalance - contextHdr.NoOfDays;
@@ -348,22 +357,17 @@ namespace DCI.Repositories
                     else // probitionary and contractual/projectbased
                     {
                         //bool isRegular = empDetails.DateHired != null && contextDtl.Any(x => x.LeaveDate >= empDetails.DateHired.Value.AddMonths(6));
-
                         //if (isRegular)
-                        //{
-
-                        //}
-                        //else
-                        //{
-                            foreach (var raw in contextDtl)
-                            {
-                                //Update DTR attendance summary status to Payroll DEDUCTED                    
-                                await _dbContext.tbl_raw_logs.Where(x => x.EMPLOYEE_ID == emp.EmployeeNo && x.DATE_TIME.Date == raw.LeaveDate.Date)
-                                                             .ExecuteUpdateAsync(s => s
-                                                             .SetProperty(r => r.STATUS, r => (int)EnumStatus.PayrollDeducted));
-                            }
-                            contextHdr.DeductionType = (int)EnumDeductionType.Payroll;
-                       // }
+                  
+                        foreach (var raw in contextDtl)
+                        {
+                            //Update DTR attendance summary status to Payroll DEDUCTED                    
+                            await _dbContext.tbl_raw_logs.Where(x => x.EMPLOYEE_ID == emp.EmployeeNo && x.DATE_TIME.Date == raw.LeaveDate.Date)
+                                                         .ExecuteUpdateAsync(s => s
+                                                         .SetProperty(r => r.STATUS, r => (int)EnumStatus.PayrollDeducted));
+                        }
+                        contextHdr.DeductionType = (int)EnumDeductionType.Payroll;
+                       
                     }
                 }
 
@@ -398,12 +402,78 @@ namespace DCI.Repositories
                 notifvm.IsActive = true;
                 await _homeRepository.SaveNotification(notifvm);
 
+                ApprovalHistory entity = new ApprovalHistory();
+                entity.ModulePageId = (int)EnumModulePage.Leave;
+                entity.TransactionId = param.TransactionId;
+                entity.ApproverId = param.ApproverId;
+                entity.Status = param.Status;
+                entity.Remarks = param.Remarks;
+                entity.CreatedBy = param.CreatedBy;
+                entity.DateCreated = DateTime.Now;
+                entity.IsActive = true;
+                await _dbContext.ApprovalHistory.AddAsync(entity);
+                await _dbContext.SaveChangesAsync();
+
                 return (StatusCodes.Status200OK, String.Format("Leave Request {0} has been {1}.", contextHdr.RequestNo, status));
             }
             catch (Exception ex)
             {
                 Log.Error(ex.ToString());
                 return (StatusCodes.Status406NotAcceptable, ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        private async Task SaveLeaveForExcessLeave(LeaveFormViewModel param)
+        {
+            LeaveViewModel model = new LeaveViewModel();
+
+            try
+            {
+
+                LeaveRequestHeader entity = new LeaveRequestHeader();
+                entity.EmployeeId = param.EmployeeId;
+                entity.RequestNo = await GenereteRequestNoForLeave();
+                entity.DateFiled = DateTime.Now;
+                entity.LeaveTypeId = param.LeaveTypeId;
+                entity.Status = param.Status;
+                entity.Reason = System.String.Format("System-Generated Leave Deduction.");
+                entity.NoOfDays = param.NoOfDays;
+                entity.ModifiedBy = null;
+                entity.DateModified = null;
+                entity.IsActive = true;
+                await _dbContext.LeaveRequestHeader.AddAsync(entity);
+                await _dbContext.SaveChangesAsync();
+
+                LeaveRequestDetails entityDtl = new LeaveRequestDetails();
+                entityDtl.LeaveRequestHeaderId = entity.LeaveRequestHeaderId;
+                entityDtl.LeaveDate = DateTime.Now;
+                entityDtl.Amount = param.NoOfDays;
+                entityDtl.IsActive = true;
+                await _dbContext.LeaveRequestDetails.AddAsync(entityDtl);
+                await _dbContext.SaveChangesAsync();
+
+
+                var usr = _dbContext.User.AsNoTracking().Where(x => x.EmployeeId == param.EmployeeId).FirstOrDefault();
+
+                NotificationViewModel notifvm = new NotificationViewModel();
+                notifvm.Title = "Undertime";
+                notifvm.Description = System.String.Format("System-Generated Leave Deduction has been processed.", entity.RequestNo);
+                notifvm.ModuleId = (int)EnumModulePage.Leave;
+                notifvm.TransactionId = entity.LeaveRequestHeaderId;
+                notifvm.AssignId = usr != null ? usr.UserId : 0;
+                notifvm.URL = "/DailyTimeRecord/Leave";
+                notifvm.MarkRead = false;
+                notifvm.CreatedBy = param.CurrentUserId;
+                notifvm.IsActive = true;
+                await _homeRepository.SaveNotification(notifvm);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
             }
             finally
             {
@@ -428,8 +498,6 @@ namespace DCI.Repositories
                 await _dbContext.SaveChangesAsync();
 
                 var _user = _dbContext.User.AsNoTracking().Where(x => x.UserId == param.CreatedBy).FirstOrDefault();
-                var _emp = _dbContext.Employee.AsNoTracking().Where(x => x.EmployeeId == _user.EmployeeId).FirstOrDefault();
-                string _middleInitial = string.IsNullOrWhiteSpace(_user.Middlename) ? string.Empty : _user.Middlename.Substring(0, 1).ToUpper();
 
                 var contextHdr = _dbContext.DTRCorrection.AsNoTracking().Where(x => x.DtrId == param.TransactionId).FirstOrDefault();
 
@@ -440,8 +508,8 @@ namespace DCI.Repositories
 
                 tbl_raw_logs raw_logs = new tbl_raw_logs();
                 raw_logs.ID = totalCount + 1;
-                raw_logs.EMPLOYEE_ID = _emp.EmployeeNo;
-                raw_logs.FULL_NAME = _user.Firstname + " " + _middleInitial + " " + _user.Lastname;
+                raw_logs.EMPLOYEE_ID = _user.EmployeeNo;
+                raw_logs.FULL_NAME = _user.Fullname; // + " " + _middleInitial + " " + _user.Lastname;
                 raw_logs.DATE_TIME = contextHdr.DtrDateTime;
                 raw_logs.CREATED_DATE = DateTime.Now;
                 raw_logs.CREATED_BY = Constants.SYSAD;
@@ -468,7 +536,6 @@ namespace DCI.Repositories
                 notifvm.ModuleId = (int)EnumModulePage.DTRCorrection;
                 notifvm.TransactionId = param.TransactionId;
                 notifvm.AssignId = contextHdr.CreatedBy;
-                // notifvm.URL = "/DailyTimeRecord/DTRCorrectionById/?dtrId=" + contextHdr.DtrId;
                 notifvm.URL = "/DailyTimeRecord/DTRCorrection";
                 notifvm.MarkRead = false;
                 notifvm.CreatedBy = param.CreatedBy;
@@ -841,5 +908,38 @@ namespace DCI.Repositories
                 Log.CloseAndFlush();
             }
         }
+
+        private async Task<string> GenereteRequestNoForLeave()
+        {
+
+            try
+            {
+                int _currentYear = DateTime.Now.Year;
+                int _currentMonth = DateTime.Now.Month;
+                var _leaveContext = await _dbContext.LeaveRequestHeader
+                                                .Where(x => x.IsActive == true && x.DateFiled.Date.Year == _currentYear)
+                                                .AsQueryable()
+                                                .ToListAsync();
+
+
+                int totalrecords = _leaveContext.Count() + 1;
+                string finalSetRecords = FormatHelper.GetFormattedRequestNo(totalrecords);
+                string yearMonth = DateTime.Now.ToString("yyyyMM");
+                string req = Constants.ModuleCode_Leave;
+
+                return $"{req}-{yearMonth}-{finalSetRecords}";
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return string.Empty;
+        }
+
+
     }
 }

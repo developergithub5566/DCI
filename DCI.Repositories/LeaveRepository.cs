@@ -161,14 +161,18 @@ namespace DCI.Repositories
         {
             LeaveViewModel model = new LeaveViewModel();
             try
-            {   
+            {
+           
+                var leaveinfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == param.EmployeeId && x.IsActive).OrderByDescending(x => x.DateCreated).FirstOrDefault();
+
                 var query = from lheader in _dbContext.LeaveRequestHeader.AsNoTracking()
-                            join lvtype in _dbContext.LeaveType.AsNoTracking() on lheader.LeaveTypeId equals lvtype.LeaveTypeId
+                            join lvtype in _dbContext.LeaveType.AsNoTracking() on lheader.LeaveTypeId equals lvtype.LeaveTypeId                            
                             join stat in _dbContext.Status.AsNoTracking() on lheader.Status equals stat.StatusId
                             join emp in _dbContext.Employee.AsNoTracking() on lheader.EmployeeId equals emp.EmployeeId
                             join apprvl in _dbContext.ApprovalHistory.AsNoTracking().Where(x => x.ModulePageId == (int)EnumModulePage.Leave)
                             on lheader.LeaveRequestHeaderId equals apprvl.TransactionId into ah
-                            from apprvl in ah.DefaultIfEmpty()
+                            from apprvl in ah.DefaultIfEmpty()  
+
                             where lheader.LeaveRequestHeaderId == param.LeaveRequestHeaderId //&& apprvl.IsActive 
                             select new LeaveRequestHeaderViewModel
                             {
@@ -187,33 +191,24 @@ namespace DCI.Repositories
                                 DateApprovedDisapproved = apprvl != null ? apprvl.DateCreated.ToString("yyyy-MM-dd HH:mm") : string.Empty,
                                 ApprovalRemarks = apprvl != null ? apprvl.Remarks : string.Empty,
                                 DateModified = lheader.DateModified,
-                                ModifiedBy = lheader.ModifiedBy,
+                                ModifiedBy = lheader.ModifiedBy,                           
                             };
-
+           
                 model.LeaveRequestHeader = await query.AsNoTracking().FirstOrDefaultAsync();
+           
 
                 if (param.LeaveRequestHeaderId == 0)
                 {
                     model = new LeaveViewModel();
+                    model.LeaveRequestHeader.SPLBalance = leaveinfo.SPLBalance;
                 }
                 else
                 {
-                    //var leaveDtl = (from dtl in _dbContext.LeaveRequestDetails
-                    //            where dtl.LeaveRequestHeaderId == param.LeaveRequestHeaderId
-                    //            select new LeaveRequestDetailViewModel
-                    //            {
-                    //                LeaveRequestHeaderId = dtl.LeaveRequestHeaderId,
-                    //                LeaveDate = dtl.LeaveDate,
-                    //                Amount = dtl.Amount                              
-                    //            }).ToList();
-
                     model.LeaveDateList = _dbContext.LeaveRequestDetails
                                      .Where(dtl => dtl.LeaveRequestHeaderId == param.LeaveRequestHeaderId)
                                      .Select(dtl => dtl.LeaveDate.Date.ToShortDateString())
                                      .ToList();
-                    // model.LeaveDateList = leaveDates;
-                    // model.LeaveRequestHeader.LeaveRequestDetailList = leaveDtl;
-                    // model.LeaveRequestHeader.LeaveRequestDetailList = _dbContext.LeaveRequestDetails.Where(x => x.LeaveRequestHeaderId == param.LeaveRequestHeaderId).ToList();
+                  
                 }
 
                 var leavetypeList = _dbContext.LeaveType.Where(x => x.IsActive == true).AsNoTracking().ToList();

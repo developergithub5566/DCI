@@ -64,6 +64,8 @@ namespace DCI.Models.ViewModel
         public IList<LeaveType>? LeaveTypeList { get; set; }
         //public List<DateTime>? LeaveDateList { get; set; }
 
+        public decimal SPLBalance { get; set; } = 0;
+
         public string DateApprovedDisapproved { get; set; } = string.Empty;
         public string ApprovalRemarks { get; set; } = string.Empty;
     }
@@ -116,6 +118,7 @@ namespace DCI.Models.ViewModel
         public List<DateTime> SelectedDateList { get; set; } = new();
         public int ApproverId { get; set; } = 0;
         public int CurrentUserId { get; set; } = 0;
+        public int Status { get; set; } = 0;
     }
 
     public class LeaveTypeViewModel

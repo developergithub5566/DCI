@@ -25,8 +25,8 @@ namespace DCI.Repositories
 		//}
 		public async Task<DepartmentViewModel> GetDepartmentById(int deptId)
 		{
-			var context =   _dbContext.Department.AsQueryable();
-			var userList = _dbContext.User.Where(x => x.IsActive).OrderBy(x => x.Lastname).ToList();
+			var context =   _dbContext.Department.AsNoTracking();
+			var userList = _dbContext.User.AsNoTracking().Where(x => x.IsActive).OrderBy(x => x.Fullname).ToList();
 
 			var query = from dept in context						
 						where dept.IsActive == true && dept.DepartmentId == deptId

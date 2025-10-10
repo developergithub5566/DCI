@@ -8,10 +8,10 @@ namespace DCI.Models.ViewModel
         public int UserId { get; set; } = 0;
         public int EmployeeId { get; set; } = 0;
         public string Username { get; set; } = string.Empty;
-        public string Firstname { get; set; }
-        public string Middlename { get; set; }
-        public string Lastname { get; set; }
-        public string ContactNo { get; set; }
+        public string Fullname { get; set; }
+        public string EmployeeNo { get; set; }
+        //public string Lastname { get; set; }
+        //public string ContactNo { get; set; }
         public string Email { get; set; }
         public int RoleId { get; set; }
         public string RoleName { get; set; }

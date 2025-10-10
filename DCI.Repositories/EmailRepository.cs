@@ -94,7 +94,7 @@ namespace DCI.Repositories
             <html>
             <body>
                 <h2>Reset Password Request</h2>
-                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
+                <p>Hi {userEntity.Fullname},</p>
                 <p>You requested a password reset. Please click the link below to reset your password:</p>              
                 <a href='{link + token}'>Reset Password</a>
                 <p>This link will expire on {DateTime.UtcNow.AddDays(1).ToShortDateString()}.</p>
@@ -144,7 +144,7 @@ namespace DCI.Repositories
 				<html>
 				<body>
 					<h2>Welcome to DCI Employee Self-Service</h2>
-					<p>Hi {model.Firstname + " " + model.Lastname},</p>
+					<p>Hi {model.Fullname},</p>
 					<p>Your account has been successfully created. To activate your account, please click the link below to set your password:</p>              
 					<a href='{link + token}'>Set Password</a>
 					<p>Please note: This link will expire on {DateTime.UtcNow.AddDays(1).ToShortDateString()} for security purposes.</p>
@@ -205,7 +205,7 @@ namespace DCI.Repositories
             model.EmailBody = $@"
             <html>
             <body>              
-                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
+                <p>Hi {userEntity.Fullname },</p>
                 
                        <p>This is an automated message from ESS System.</p>
                  
@@ -243,7 +243,7 @@ namespace DCI.Repositories
             model.EmailBody = $@"
             <html>
             <body>              
-                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
+                <p>Hi {userEntity.Fullname},</p>
                 
               <p>This is an automated message from ESS System.</p>
                  <p>Your Leave request {model.LeaveRequestHeader.RequestNo} has been {model.StatusName.ToLower()}.</p>   
@@ -296,7 +296,7 @@ namespace DCI.Repositories
             model.EmailBody = $@"
             <html>
             <body>              
-                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
+                <p>Hi {userEntity.Fullname},</p>
                 
                       <p>This is an automated message from ESS System.</p>
                  
@@ -345,7 +345,7 @@ namespace DCI.Repositories
             model.EmailBody = $@"
             <html>
             <body>              
-                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
+                <p>Hi {userEntity.Fullname},</p>
                 
                 <p>This is an automated message from ESS System.</p>
                  
@@ -383,7 +383,7 @@ namespace DCI.Repositories
             model.EmailBody = $@"
             <html>
             <body>              
-                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
+                <p>Hi {userEntity.Fullname},</p>
                 
                 <p>This is an automated message from ESS System.</p>
                  <p>Your DTR adjustment request {model.RequestNo} has been {model.StatusName.ToLower()}.</p>   
@@ -428,7 +428,7 @@ namespace DCI.Repositories
             model.EmailBody = $@"
             <html>
             <body>              
-                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
+                <p>Hi {userEntity.Fullname},</p>
                 
                       <p>This is an automated message from ESS System.</p>
                  
@@ -467,7 +467,7 @@ namespace DCI.Repositories
             model.EmailBody = $@"
             <html>
             <body>              
-                <p>Hi {userEntity.Firstname + " " + userEntity.Lastname},</p>
+                <p>Hi {userEntity.Fullname},</p>
                 
                 <p>This is an automated message from ESS System.</p>
                  <p>Your Work from home request {model.RequestNo} has been {model.StatusName.ToLower()}.</p>   

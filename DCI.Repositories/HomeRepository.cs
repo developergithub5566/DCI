@@ -48,7 +48,7 @@ namespace DCI.Repositories
                                               DateModified = announce.DateModified,
                                               ModifiedBy = announce.ModifiedBy,
                                               IsActive = announce.IsActive,
-                                              CreatedName = usr.Firstname + " " + usr.Lastname
+                                              CreatedName = usr.Fullname, // .Firstname + " " + usr.Lastname
                                           }).ToList();
 
                 int _currentMonth = DateTime.Now.Month;

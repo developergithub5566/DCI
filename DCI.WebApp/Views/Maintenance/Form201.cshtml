@@ -323,7 +323,7 @@
                             <div class="col-lg-3">
                                 <div class="form-group mb10 text-center">
                                     @*  <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.DateHired.ToString()) ? "-" : Model.DateHired?.ToString("MMMM dd, yyyy"))</label> *@
-                                    <input type="text" name="DateHired" id="DateHired" class="bg-gray-100 font-weight-bold form-control frmField text-center" autocomplete="off" required>
+                                    <input type="text" name="DateHired" id="DateHired" class="bg-gray-100 font-weight-bold form-control frmField text-center" autocomplete="off" value="@Model.DateHired?.ToString("yyyy-MM-dd")" required>
                                     <label class="bottomLabelText">Date Hired <span class="text-danger">*</span></label>
                                 </div>
                             </div>
