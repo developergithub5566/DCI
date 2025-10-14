@@ -1,6 +1,7 @@
 ﻿using DCI.Models.Configuration;
 using DCI.Trigger;
 using Hangfire;
+using Hangfire.Console;
 using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -37,11 +38,13 @@ public class Program
                           QueuePollInterval = TimeSpan.FromSeconds(15),
                           UseRecommendedIsolationLevel = true,
                           DisableGlobalLocks = true
-                      });
+                      })
+                  .UseConsole(); 
         });
 
-        builder.Services.AddHangfireServer();
 
+        builder.Services.AddHangfireServer();
+        builder.Services.Configure<APIConfigModel>(builder.Configuration.GetSection("WebAPI"));
         builder.Services.AddTransient<OutboxProcessor>();
         builder.Services.Configure<SMTPModel>(builder.Configuration.GetSection("SmtpSettings"));
         builder.Services.AddScoped<IEmailRepository, EmailRepository>();
@@ -51,14 +54,17 @@ public class Program
 
         app.UseHangfireDashboard();
 
+        //RecurringJob.AddOrUpdate<OutboxProcessor>("outbox-job",
+        //    processor => processor.ProcessPendingMessages(), Cron.Minutely);
         RecurringJob.AddOrUpdate<OutboxProcessor>("outbox-job",
-            processor => processor.ProcessPendingMessages(), Cron.Minutely);
+              processor => processor.ProcessPendingMessages(), Cron.Minutely);
+
 
         //RecurringJob.AddOrUpdate<LeaveProcessor>("leave-credit-job",
         // processor => processor.MonthlyLeaveCredit(), "0 0 1 * *"); // Runs on the 1st day of every month
 
- //       RecurringJob.AddOrUpdate<LeaveProcessor>("leave-credit-job",
- //processor => processor.MonthlyLeaveCredit(), Cron.Minutely);
+        //       RecurringJob.AddOrUpdate<LeaveProcessor>("leave-credit-job",
+        //processor => processor.MonthlyLeaveCredit(), Cron.Minutely);
 
         app.MapGet("/", () => "SQL Outbox + Hangfire is running");
 

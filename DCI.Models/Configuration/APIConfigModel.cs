@@ -5,5 +5,6 @@ namespace DCI.Models.Configuration
 	{
 		public string apiConnection { get; set; }
 		public string WebAppConnection { get; set; }
-	}
+        public string TriggerAPIConnection { get; set; }        
+    }
 }
