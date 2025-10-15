@@ -40,17 +40,24 @@
         var modulePageAccess = Context.Session.GetString("ModulePageAccess");
         var moduleList = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess ?? "[]") ?? new List<ModuleInRoleViewModel>();
 
+        int iCountModuleDeduction = moduleList.Where(x => x.ModulePageId == (int)EnumModulePage.Late || x.ModulePageId == (int)EnumModulePage.Undertime)
+        .Select(x => x.ModulePageId)
+        .Distinct()
+        .Count();
+        bool iCounterDeduction = false;
         var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
         var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
         var accountActions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-    {
-    "Login",
-    "ForgotPassword",
-    "VerifyToken",
-    "ChangePassword",
-    "Upload",
-    "Details"
-    };
+
+
+        {
+        "Login",
+        "ForgotPassword",
+        "VerifyToken",
+        "ChangePassword",
+        "Upload",
+        "Details"
+        };
 
         bool isNonAccountAction = !accountActions.Contains(currentAction);
         bool isNonAccountController = !string.Equals(currentController, "Account", StringComparison.OrdinalIgnoreCase);
@@ -92,12 +99,12 @@
                             </div>
                         </a>
                     }
-                                       
-                   
-                    @if (module.ModulePageId == (int)EnumModulePage.Todo)
-                    {                  
 
-          @*           <hr class='sidebar-divider'>
+
+                    @if (module.ModulePageId == (int)EnumModulePage.Todo)
+                    {
+
+                        @*           <hr class='sidebar-divider'>
                         <div role="group">
                             <a href="#" id="btnGroupDrop1" class="mainModule" data-bs-toggle="dropdown" aria-expanded="false">
                                 <div class='sidebar-heading mainModuleActive'>
@@ -113,15 +120,15 @@
                                            <li><a class="dropdown-item" href="/Todo/WFH/">WFH</a></li>     
                             </ul>
                         </div> *@
-                             <hr class='sidebar-divider'>
-                            <a href="/Todo/Index/" class='mainModule'>
-                                <div class='sidebar-heading mainModuleActive'>
-                                    <i class='fa-solid fa-list-ul'></i>
-                                    <span>To Do</span>
-                                    <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
-                                </div>
-                            </a>
-                    }                   
+                        <hr class='sidebar-divider'>
+                        <a href="/Todo/Index/" class='mainModule'>
+                            <div class='sidebar-heading mainModuleActive'>
+                                <i class='fa-solid fa-list-ul'></i>
+                                <span>To Do</span>
+                                <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
+                            </div>
+                        </a>
+                    }
 
                     @if (module.ModulePageId == (int)EnumModulePage.Administration)
                     {
@@ -145,7 +152,7 @@
                             </div>
                         </a>
                     }
-                @*     @if (module.ModulePageId == (int)EnumModulePage.DailyTimeRecord)
+                    @*     @if (module.ModulePageId == (int)EnumModulePage.DailyTimeRecord)
                     {                  
                         
                         <hr class='sidebar-divider'>
@@ -164,37 +171,37 @@
                         </div>
                     } *@
 
-                     @if (module.ModulePageId == (int)EnumModulePage.Attendance)
+                    @if (module.ModulePageId == (int)EnumModulePage.Attendance)
                     {
                         <hr class='sidebar-divider'>
-                     @*    <a href="/DailyTimeRecord/Attendance" class='mainModule'>
+                        @*    <a href="/DailyTimeRecord/Attendance" class='mainModule'>
                             <div class='sidebar-heading mainModuleActive'>
                                 <i class='fa-solid fa-file'></i>
                                 <span>Attendance</span>
                                 <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
                             </div>
                         </a> *@
-                   @*      <a asp-controller="DailyTimeRecord" asp-action="Attendance" asp-route-id="1">
+                        @*      <a asp-controller="DailyTimeRecord" asp-action="Attendance" asp-route-id="1">
                             <div class='sidebar-heading mainModuleActive'>
                                 <i class='fa-solid fa-file'></i>
                                 <span>Attendance</span>
                                 <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
                             </div>
                         </a> *@
-                           <a href="/DailyTimeRecord/Attendance/1" class='mainModule'>
+                        <a href="/DailyTimeRecord/Attendance/1" class='mainModule'>
                             <div class='sidebar-heading mainModuleActive'>
                                 <i class='fa-solid fa-users'></i>
                                 <span>Attendance</span>
                                 <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
                             </div>
                         </a>
-                     
+
                     }
 
                     @if (module.ModulePageId == (int)EnumModulePage.DTRCorrection)
                     {
                         <hr class='sidebar-divider'>
-                     @*    <a asp-controller="DailyTimeRecord" asp-action="DTRCorrection" asp-route-DtrId="1">
+                        @*    <a asp-controller="DailyTimeRecord" asp-action="DTRCorrection" asp-route-DtrId="1">
                             <div class='sidebar-heading mainModuleActive'>
                                 <i class='fa-solid fa-file'></i>
                                 <span>DTR Adjustment</span>
@@ -210,7 +217,7 @@
                         </a>
                     }
 
-            @*               @if (module.ModulePageId == (int)EnumModulePage.DTRManagement)
+                    @*               @if (module.ModulePageId == (int)EnumModulePage.DTRManagement)
                     {    
                         <hr class='sidebar-divider'>
                         <div role="group">
@@ -231,7 +238,7 @@
                     } *@
 
 
-                  @*   @if (module.ModulePageId == (int)EnumModulePage.DailyTimeRecord)
+                    @*   @if (module.ModulePageId == (int)EnumModulePage.DailyTimeRecord)
                     {
                         <hr class='sidebar-divider'>
                         <a href="/DailyTimeRecord/Timesheet/" class='mainModule'>
@@ -253,9 +260,9 @@
                             </div>
                         </a>
                     }
-                       @if (module.ModulePageId == (int)EnumModulePage.Overtime)
+                    @if (module.ModulePageId == (int)EnumModulePage.Overtime)
                     {
-                  @*       <hr class='sidebar-divider'>
+                        @*       <hr class='sidebar-divider'>
                         <a href="/DailyTimeRecord/Overtime" class='mainModule'>
                             <div class='sidebar-heading mainModuleActive'>
                                 <i class='fa-solid fa-plus'></i>
@@ -263,7 +270,7 @@
                                 <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
                             </div>
                         </a> *@
-                               <hr class='sidebar-divider'>
+                        <hr class='sidebar-divider'>
                         <div role="group">
                             <a href="#" id="btnGroupDrop1" class="mainModule" data-bs-toggle="dropdown" aria-expanded="false">
                                 <div class='sidebar-heading mainModuleActive'>
@@ -272,18 +279,18 @@
                                     <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
                                 </div>
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">         
-                               <li><a class="dropdown-item" href="/DailyTimeRecord/AddOvertime?OTHeaderId=0">File Overtime</a></li>   
-                                  <li><a class="dropdown-item" href="/DailyTimeRecord/Overtime/">Overtime Records</a></li>      
-                               
-                                <li><a class="dropdown-item" href="/DailyTimeRecord/OvertimeReport/">Overtime Report</a></li>     
+                            <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                <li><a class="dropdown-item" href="/DailyTimeRecord/AddOvertime?OTHeaderId=0">File Overtime</a></li>
+                                <li><a class="dropdown-item" href="/DailyTimeRecord/Overtime/">Overtime Records</a></li>
+
+                                <li><a class="dropdown-item" href="/DailyTimeRecord/OvertimeReport/">Overtime Report</a></li>
                             </ul>
                         </div>
 
                     }
-                              @if (module.ModulePageId == (int)EnumModulePage.WFH)
-                    {                  
-                        
+                    @if (module.ModulePageId == (int)EnumModulePage.WFH)
+                    {
+
                         <hr class='sidebar-divider'>
                         <div role="group">
                             <a href="#" id="btnGroupDrop1" class="mainModule" data-bs-toggle="dropdown" aria-expanded="false">
@@ -293,15 +300,15 @@
                                     <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
                                 </div>
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">         
-                              
-                                  <li><a class="dropdown-item" href="/DailyTimeRecord/WFH/">WFH Records</a></li>      
-                               
-                                <li><a class="dropdown-item" href="/DailyTimeRecord/WFHApplication/">WFH Application</a></li>     
+                            <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+
+                                <li><a class="dropdown-item" href="/DailyTimeRecord/WFH/">WFH Records</a></li>
+
+                                <li><a class="dropdown-item" href="/DailyTimeRecord/WFHApplication/">WFH Application</a></li>
                             </ul>
                         </div>
                     }
-                            @if (module.ModulePageId == (int)EnumModulePage.Undertime)
+                    @*              @if (module.ModulePageId == (int)EnumModulePage.Undertime)
                     {
                         <hr class='sidebar-divider'>
                         <a href="/DailyTimeRecord/Undertime" class='mainModule'>
@@ -323,8 +330,52 @@
                                 <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
                             </div>
                         </a>
+                    } *@
+
+                    @if (iCountModuleDeduction == 2 && iCounterDeduction == false && (module.ModulePageId == (int)EnumModulePage.Undertime || module.ModulePageId == (int)EnumModulePage.Late))
+                    {
+                        <hr class='sidebar-divider'>
+                        <div role="group">
+                            <a href="#" id="btnGroupDrop1" class="mainModule" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class='sidebar-heading mainModuleActive'>
+                                    <i class='fa-solid fa-eraser'></i>
+                                    <span>DTR Deduction</span>
+                                    <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                <li><a class="dropdown-item" href="/DailyTimeRecord/Late">Late</a></li>
+                                <li><a class="dropdown-item" href="/DailyTimeRecord/Undertime">Undertime</a></li>
+                            </ul>
+                        </div>
+                        iCounterDeduction = true;
                     }
-                     
+
+                    @if (iCountModuleDeduction == 1 && iCounterDeduction == false && (module.ModulePageId == (int)EnumModulePage.Undertime || module.ModulePageId == (int)EnumModulePage.Late))
+                    {
+                        <hr class='sidebar-divider'>
+                        <div role="group">
+                            <a href="#" id="btnGroupDrop1" class="mainModule" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class='sidebar-heading mainModuleActive'>
+                                    <i class='fa-solid fa-minus'></i>
+                                    <span>DTR Deduction</span>
+                                    <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                @if (module.ModulePageId == (int)EnumModulePage.Late)
+                                {
+                                    <li><a class="dropdown-item" href="/DailyTimeRecord/Late">Late</a></li>
+                                }
+                                @if (module.ModulePageId == (int)EnumModulePage.Undertime)
+                                {
+                                    <li><a class="dropdown-item" href="/DailyTimeRecord/Undertime">Undertime</a></li>
+                                }
+                            </ul>
+                        </div>
+
+                    }
+
 
                 }
                 <!-- Divider -->
@@ -355,7 +406,7 @@
                         @* 	<a href="http://202.57.47.34/DCI-ESS-STG/">
 					<h1 class="font-weight-bold h5 mb-0 text-gray-900 d-inline-block"><img src="~/icon/dci_logo.png" class="headerLogo"> </h1>
 					</a> *@
-                   @*      <a asp-controller="Home" asp-action="Index">
+                        @*      <a asp-controller="Home" asp-action="Index">
                             <h1 class="font-weight-bold h5 mb-0 text-gray-900 d-inline-block"><img src="~/icon/dci_logo.png" class="headerLogo"> </h1>
                         </a> *@
 
@@ -363,93 +414,93 @@
                         <ul class="navbar-nav ml-auto">
 
 
-                            			<li class="nav-item dropdown no-arrow mx-1">
-						<a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						<i class="fas fa-bell fa-fw"></i>
-						<!-- Counter - Alerts -->
-						<span class="badge badge-danger badge-counter"><div id="notification-count"></div></span>
-						</a>
-						    <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
-						        <h6 class="dropdown-header">
-						            Notifications
-						        </h6>
+                            <li class="nav-item dropdown no-arrow mx-1">
+                                <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-bell fa-fw"></i>
+                                    <!-- Counter - Alerts -->
+                                    <span class="badge badge-danger badge-counter"><div id="notification-count"></div></span>
+                                </a>
+                                <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
+                                    <h6 class="dropdown-header">
+                                        Notifications
+                                    </h6>
 
-					
-						       
-						              @*   No notification available *@
-                                      @* START*@
-                                         <div class='headerNotifDiv'>
-                                             <div id="notification-container"></div>
-                                         </div>
-                                         <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
 
-                                <script>
-                                    const connection = new signalR.HubConnectionBuilder()
-                                        .withUrl("/notificationHub")
-                                        .configureLogging(signalR.LogLevel.Information) // Add this for detailed logs
-                                        .build();
 
-                                    connection.on("ReceiveNotifications", function (notifications) {                                     
-                                         const container = document.getElementById("notification-container");
-                                             const countLabel = document.getElementById("notification-count");   
-                                             countLabel.innerHTML = notifications.filter(n => !n.markRead).length;
-                                        container.innerHTML = ""; // Clear existing
+                                    @*   No notification available *@
+                                    @* START*@
+                                    <div class='headerNotifDiv'>
+                                        <div id="notification-container"></div>
+                                    </div>
+                                    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
 
-                                                    // <a href="#" onclick="NotifMarkRead(${n.notificationId},'${n.url}')" class="dropdown-item preview-item ${n.markRead ?  ''  : 'bg-body-secondary' }">
-                                                       //       <div class="dropdown-divider"></div>
+                                    <script>
+                                        const connection = new signalR.HubConnectionBuilder()
+                                            .withUrl("/notificationHub")
+                                            .configureLogging(signalR.LogLevel.Information) // Add this for detailed logs
+                                            .build();
 
-                                            notifications.forEach(n => {
-                                                        const item = `
-                                                              <a href="#" onclick="NotifMarkRead(${n.notificationId},'${n.url}')" class="dropdown-item d-flex align-items-center ${n.markRead ?  ''  : 'bg-body-secondary'}">                                                   
-                                                                    <div class='mr-3'>
-												                            <div class='icon-circle bg-primary'> 
-													                            <i class='fa-regular fa-file-lines text-white'></i>
-												                            </div>
-											                        </div>
-											                  <div>
-												                    <div class='small text-gray-500'>${n.dateNotification}</div> 
-												                            <div class='small'>
-													                            <span class="${n.markRead ?  ''  : 'font-weight-bold'}">${n.description}</span>
-												                            </div>
-											                        </div>
-                                                              </a>
-                                                  
-                                                        `;
-                                                        container.innerHTML += item;
+                                        connection.on("ReceiveNotifications", function (notifications) {
+                                             const container = document.getElementById("notification-container");
+                                                 const countLabel = document.getElementById("notification-count");
+                                                 countLabel.innerHTML = notifications.filter(n => !n.markRead).length;
+                                            container.innerHTML = ""; // Clear existing
+
+                                                        // <a href="#" onclick="NotifMarkRead(${n.notificationId},'${n.url}')" class="dropdown-item preview-item ${n.markRead ?  ''  : 'bg-body-secondary' }">
+                                                           //       <div class="dropdown-divider"></div>
+
+                                                notifications.forEach(n => {
+                                                            const item = `
+                                                                  <a href="#" onclick="NotifMarkRead(${n.notificationId},'${n.url}')" class="dropdown-item d-flex align-items-center ${n.markRead ?  ''  : 'bg-body-secondary'}">
+                                                                        <div class='mr-3'>
+                                                                                <div class='icon-circle bg-primary'>
+                                                                                    <i class='fa-regular fa-file-lines text-white'></i>
+                                                                                </div>
+                                                                        </div>
+                                                                  <div>
+                                                                        <div class='small text-gray-500'>${n.dateNotification}</div>
+                                                                                <div class='small'>
+                                                                                    <span class="${n.markRead ?  ''  : 'font-weight-bold'}">${n.description}</span>
+                                                                                </div>
+                                                                        </div>
+                                                                  </a>
+
+                                                            `;
+                                                            container.innerHTML += item;
+                                                        });
                                                     });
-                                                });
 
-                                    connection.start()
-                                        .then(function () {
-                                            console.log("✅ Connected to SignalR");
-                                            connection.invoke("GetNotifications"); 
-                                        })
-                                        .catch(function (err) {
-                                            console.error("❌ Connection error:", err.toString()); 
-                                        });
+                                        connection.start()
+                                            .then(function () {
+                                                console.log("✅ Connected to SignalR");
+                                                connection.invoke("GetNotifications");
+                                            })
+                                            .catch(function (err) {
+                                                console.error("❌ Connection error:", err.toString());
+                                            });
 
-                                                         function NotifMarkRead(notificationId,url) {
-                                                              
-                                                                connection.invoke("MarkAsRead", notificationId)
-                                                                .then(() => {
-                                                                
-                                                                })
-                                                                .catch(err => {
-                                                                    console.error("❌ SignalR error:", err.toString());
-                                                                });                                                                                                                                  
-                                                              
-                                                                        window.location.href = window.location.origin + url;   
-                                                                           //  location.reload();   
-                                                          }  
-                                </script>
+                                                             function NotifMarkRead(notificationId,url) {
 
+                                                                    connection.invoke("MarkAsRead", notificationId)
+                                                                    .then(() => {
+
+                                                                    })
+                                                                    .catch(err => {
+                                                                        console.error("❌ SignalR error:", err.toString());
+                                                                    });
+
+                                                                            window.location.href = window.location.origin + url;
+                                                                               //  location.reload();
+                                                              }
+                                    </script>
 
 
-                                         @* END*@
-						       
-						        <a class="dropdown-item text-center small text-gray-500" href="/Home/Notification">Show All Notifications</a>
-						    </div>
-						</li>
+
+                                    @* END*@
+
+                                    <a class="dropdown-item text-center small text-gray-500" href="/Home/Notification">Show All Notifications</a>
+                                </div>
+                            </li>
 
 
                             <div class="topbar-divider d-none d-sm-block"></div>
@@ -476,8 +527,8 @@
                                         <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-800"></i>
                                         Activity Log
                                     </a>
-                                   
-                            
+
+
                                     <a asp-controller="Todo" asp-action="ApprovalLog" class="dropdown-item">
                                         <i class="fas fa-check fa-sm fa-fw mr-2 text-gray-800"></i>
                                         Approval Log
@@ -565,7 +616,7 @@
     @RenderBody()
     @if (isNonAccountAction && isNonAccountController)
     {
-   
+
         <footer class="sticky-footer">
             <div class="container my-auto">
                 <div class="copyright text-center my-auto">

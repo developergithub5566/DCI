@@ -34,7 +34,7 @@ namespace DCI.Trigger
 
                 using (var _httpclient = new HttpClient())
                 {
-                    //          var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllDTR");
+                 
                     response = await _httpclient.GetAsync(_apiconfig.Value.TriggerAPIConnection + "api/Attendance/GetAllAttendanceLogs");
                     responseBody = await response.Content.ReadAsStringAsync();
                     pending = JsonConvert.DeserializeObject<List<OutboxMessage>>(responseBody);
@@ -58,7 +58,7 @@ namespace DCI.Trigger
 
                             if (log.EMPLOYEE_ID != null)
                             {
-                               // var emp = _destDb.Employee.FirstOrDefault(x => x.EmployeeNo == log.EMPLOYEE_ID);
+                            
                                 var user = _destDb.User.FirstOrDefault(x => x.EmployeeNo == log.EMPLOYEE_ID);
                                 if (user != null && user.Email != null && user.EmailBiometricsNotification == true)
                                 {
@@ -80,7 +80,7 @@ namespace DCI.Trigger
                                 message.Status = "Failed";
                         }
                         outbox.Id = message.Id;
-                        // await _sourceDb.SaveChangesAsync();
+                        
                         using (var _httpclient = new HttpClient())
                         {                
 

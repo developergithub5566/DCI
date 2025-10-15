@@ -152,6 +152,8 @@
         public bool DTRCorrectionImport { get; set; } = false;
         public bool DTRCorrectionExport { get; set; } = false;
 
+        public bool Late { get; set; } = false;
+
         public int ViewEdit { get; set; } = 1;
 		public string DashboardLabel { get; set; } = string.Empty;
 	}

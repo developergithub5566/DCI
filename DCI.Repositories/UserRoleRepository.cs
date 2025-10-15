@@ -233,6 +233,10 @@ namespace DCI.Repositories
                     {
                         SysManageVM.DTRCorrection = true;
                     }
+                    else if (entity.ModulePageId == (int)EnumModulePage.Late)
+                    {
+                        SysManageVM.Late = true;
+                    }
 
                 }
                 SysManageVM.RoleId = roleEntity.RoleId;
