@@ -830,6 +830,44 @@ namespace DCI.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
+        //public async Task<IActionResult> WFHApplication(WFHHeaderViewModel param)
+        //{
+        //    List<WFHHeaderViewModel> model = new List<WFHHeaderViewModel>();
+        //    try
+        //    {
+        //        using (var _httpclient = new HttpClient())
+        //        {
+        //            var currentUser = _userSessionHelper.GetCurrentUser();
+        //            if (currentUser == null)
+        //                return RedirectToAction("Logout", "Account");
+
+
+
+        //            var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+        //            var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllWFHApplication");
+        //            request.Content = stringContent;
+        //            var response = await _httpclient.SendAsync(request);
+        //            var responseBody = await response.Content.ReadAsStringAsync();
+        //            if (response.IsSuccessStatusCode == true)
+        //            {
+        //                model = JsonConvert.DeserializeObject<List<WFHHeaderViewModel>>(responseBody)!;
+        //            }
+        //            ViewBag.Fullname = currentUser?.Fullname;
+        //        }
+        //        return View(model);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log.Error(ex.ToString());
+        //        return Json(new { success = false, message = ex.Message });
+        //    }
+        //    finally
+        //    {
+        //        Log.CloseAndFlush();
+        //    }
+        //    return Json(new { success = false, message = "An error occurred. Please try again." });
+        //}
+
         public async Task<IActionResult> WFHApplication(WFHHeaderViewModel param)
         {
             List<WFHHeaderViewModel> model = new List<WFHHeaderViewModel>();
@@ -840,7 +878,7 @@ namespace DCI.WebApp.Controllers
                     var currentUser = _userSessionHelper.GetCurrentUser();
                     if (currentUser == null)
                         return RedirectToAction("Logout", "Account");
-            
+
 
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
@@ -851,10 +889,11 @@ namespace DCI.WebApp.Controllers
                     if (response.IsSuccessStatusCode == true)
                     {
                         model = JsonConvert.DeserializeObject<List<WFHHeaderViewModel>>(responseBody)!;
+                        return Json(new { success = true, data = model });
                     }
                     ViewBag.Fullname = currentUser?.Fullname;
                 }
-                return View(model);
+                return Json(new { success = true, data = string.Empty });          
             }
             catch (Exception ex)
             {
@@ -864,8 +903,7 @@ namespace DCI.WebApp.Controllers
             finally
             {
                 Log.CloseAndFlush();
-            }
-            return Json(new { success = false, message = "An error occurred. Please try again." });
+            }           
         }
 
         public async Task<IActionResult> WFHApplicationDetails(WFHHeaderViewModel param)

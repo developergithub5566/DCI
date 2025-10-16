@@ -290,6 +290,18 @@
                     }
                     @if (module.ModulePageId == (int)EnumModulePage.WFH)
                     {
+                        <hr class='sidebar-divider'>
+                        <a href="/DailyTimeRecord/WFH" class='mainModule'>
+                            <div class='sidebar-heading mainModuleActive'>
+                                <i class='fa-solid fa-desktop'></i>
+                                <span>WFH</span>
+                                <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
+                            </div>
+                        </a>
+                    }
+
+      @*               @if (module.ModulePageId == (int)EnumModulePage.WFH)
+                    {
 
                         <hr class='sidebar-divider'>
                         <div role="group">
@@ -307,7 +319,7 @@
                                 <li><a class="dropdown-item" href="/DailyTimeRecord/WFHApplication/">WFH Application</a></li>
                             </ul>
                         </div>
-                    }
+                    } *@
                     @*              @if (module.ModulePageId == (int)EnumModulePage.Undertime)
                     {
                         <hr class='sidebar-divider'>

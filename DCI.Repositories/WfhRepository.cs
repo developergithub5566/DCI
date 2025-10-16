@@ -113,7 +113,8 @@ namespace DCI.Repositories
                                        StatusId = hdr.Status,
                                        Remarks = hdr.Remarks,   
                                        DateCreated = hdr.DateCreated,
-                                       StatusName = stat.StatusName,                   
+                                       DateCreatedString = hdr.DateCreated.ToString("yyyy-MM-dd HH:mm"),
+                                   StatusName = stat.StatusName,                   
                        
                                }).ToListAsync();
             return query;

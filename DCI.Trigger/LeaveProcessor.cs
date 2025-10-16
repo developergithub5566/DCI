@@ -13,7 +13,7 @@ namespace DCI.Trigger
         private readonly DestinationDbContext _dbContext;
 
         public LeaveProcessor(DestinationDbContext context)
-        {
+        { 
             _dbContext = context;            
         }
 

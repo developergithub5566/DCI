@@ -62,9 +62,13 @@
                 <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
                 <span class="text text-white"><small>File WFH</small></span>
             </a> *@
-            <a asp-controller="DailyTimeRecord" asp-action="WFHApplication" class="btn btnPrimary btn-icon-split">               
+       @*      <a asp-controller="DailyTimeRecord" asp-action="WFHApplication" class="btn btnPrimary btn-icon-split">               
                 <span class="icon text-white"><i class="fa-solid fa-list text-xs"></i></span>
                 <span class="text text-white"><small> WFH Application</small></span>
+            </a> *@
+            <a href="#" title="wfh application" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#" onclick="wfhapplicationModal()" id="viewWFHapplication">
+                <span class="icon text-white"><i class="fa-solid fa-list text-xs"></i></span>
+                <span class="text text-white"><small>WFH Application</small></span>
             </a>
             <a href="#" title="Add Overtime" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#" onclick="filewfhmodal()" id="AddOvertime">
                 <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
@@ -516,16 +520,6 @@
                                             <th>
                                                 <label>Time In</label>
                                             </th>
-
-
-
-                                            @*    <th>
-                                                <label>Source</label>
-                                            </th>
-                                            <th>
-                                                <label>Status</label>
-                                            </th> *@
-
                                         </tr>
                                     </thead>
                                     <tbody id="tblWfhLogs">
@@ -541,6 +535,133 @@
             </div>
         </div>
 
+
+        <div class="modal fade fade bd-example-modal-lg" id="wfhapplicationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">WFH Application</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="closeWFHApplicationModal();">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form id="wfhInfo">
+                        <div class="modal-body">
+                            <table class="table table-bordered text-dark text-xs" id="tblWFHApplication">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <label>Request No</label>
+                                        </th>
+                                        <th>
+                                            <label>Date Filed</label>
+                                        </th>
+                                        <th>
+                                            <label>Status</label>
+                                        </th>
+                                        <th>
+                                            <label>Action</label>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closeWFHApplicationModal();"><small>Close</small></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .custom-modal {
+          background-color: #e3f2fd;   /* light blue (same tone as Bootstrap info background) */
+          color: #0d47a1;              /* dark blue text for contrast */
+          border: 1px solid #90caf9;
+        }
+    </style>
+          <div class="modal fade" id="fileapplicationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header custom-modal">
+                            <h5 class="modal-title" id="exampleModalLabel">WFH Application Details</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="wfhInfo">
+                            <div class="modal-body">
+                                <table class="viewDetailsTblWFH table table-striped">
+                                    <tbody>
+                                        <input type="hidden" id="WfhHeaderId" name="WfhHeaderId" value="0" />
+                                        <tr>
+                                            <th>Request No:</th>
+                                            <td class="tblRequestNo"><label id="lblRequestNo"></label></td>
+                                        </tr>
+                                        <tr>  
+                                            <th>Date Filed:</th>
+                                            <td class="tblDate"><label id="lblDate"></label></td>
+                                        </tr>                               
+                                        <tr>
+                                            <th>Status:</th>
+                                            <td class="tblSource">                                 
+                                                    <label id="lblStatus"></label>                                               
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Remarks:</th>
+                                            <td class="tblRemarks">
+                   
+                                           <label id="Remarks"></label
+                                            </td>
+                                        </tr>
+                            
+                                    </tbody>
+                                </table>
+                             <div class="col-12">
+                                 <div class="form-group">
+                                    <label class="frmText" id="ApproverLabel" name="ApproverLabel"> </label><br>
+                                    <label class="font-weight-bold mb0 text-danger" id="deptHeadName" name="deptHeadName"></label>
+                                    <label class="d-block mt0 text-left text-xs" id="ApprovalDate" name="ApprovalDate"></label>
+                                    <label class="d-block mt0 text-left text-xs" id="ApprovalRemarks" name="ApprovalRemarks"></label>                            
+                                  </div>
+                             </div>
+
+                                <table class="table table-bordered text-dark text-xs" >
+                                    <thead>
+                                        <tr>                                         
+                                         
+                                            <th>
+                                                <label>Date</label>
+                                            </th>
+                                            <th>
+                                                <label>Time In</label>
+                                            </th>
+                                            <th>
+                                                <label>Time Out</label>
+                                            </th>
+                                            <th>
+                                                <label>Total Working Hours</label>
+                                            </th>                                      
+
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblFileforWFHapplication">
+                                     
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer bg-light">                               
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><small>Close</small></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
 
 
 
@@ -563,6 +684,29 @@
 
 
                         $(document).ready(function () {
+
+
+                            // js('#wfhapplicationModal').on('shown.bs.modal', function () {
+                               
+                            //     // Destroy previous instance if it exists
+                            //     if (js.fn.DataTable.isDataTable('#tblWFHApplication')) {
+                            //         $('#tblWFHApplication').DataTable().clear().destroy();
+                            //     }
+
+                            //            js('#tblWFHApplication tbody').empty();
+
+                            //     // Initialize DataTable inside modal
+                            //     // js('#tblWFHApplication').DataTable({
+                            //     //     order: [[0, 'desc']], // sort by first column
+                            //     //     pageLength: 10,
+                            //     //     lengthMenu: [5, 10, 25, 50]                             
+                            //     // });
+                               
+                            //  });
+
+
+
+
                                flatpickr("#minDate", {
                                    dateFormat: "Y-m-d",
                                     defaultDate: (function () {
@@ -656,6 +800,9 @@
                         $('#minDate, #maxDate').on('change', function () {
                             table.draw();
                         });
+
+                                        
+
 
 
 
@@ -764,6 +911,10 @@
 
                                                            
                         });//end document
+
+                        function closeWFHApplicationModal() {
+                          $('#wfhapplicationModal').modal('hide');
+                        }
 
 
                         function newForm(dtr) {
@@ -913,94 +1064,11 @@
 
 
 
-                                            //  function SubmitWFHApplication() {
-                                            //        e.preventDefault();
-
-                                            //      if( $("#Remarks").val() == "")
-                                            //      {
-
-                                            //                              Swal.fire({
-                                            //                     text: "Remarks is required!",
-                                            //                     icon: "warning",   // maybe warning instead of success?
-                                            //                     confirmButtonText: "Ok"
-                                            //                 });
-
-                                            //      }
-
-
-                                            //     let header = {
-                                            //         wfhHeaderId: document.getElementById("WfhHeaderId").value,
-                                            //         remarks: document.getElementById("Remarks").value
-                                            //        // ,requestNo: document.getElementById("RequestNo").value
-                                            //     };
-                                            //     debugger;
-                                            //     let details = [];
-
-                                            //     // get all checked rows
-                                            //     let checkedRows = document.querySelectorAll('#tblFileforWFH .row-checkbox:checked');
-
-                                            //     checkedRows.forEach((checkbox) => {
-                                            //         let row = checkbox.closest('tr');
-                                            //         let cells = row.querySelectorAll('td');
-
-                                            //         details.push({
-                                            //             id: cells[1].innerText.trim(),
-                                            //             date: cells[2].innerText.trim(),
-                                            //             timeIn: cells[3].innerText.trim(),
-                                            //             timeOut: cells[4].innerText.trim()
-                                            //         });
-                                            //     });
-
-                                            //     // combine header + details
-                                            //     let datax = {
-                                            //         header: header,
-                                            //         details: details
-                                            //     };
-
-                                            //     console.log(datax); // send this object via AJAX
-
-
-                                            //               $.ajax({
-                                            //                   type: 'POST',
-                                            //                   url: '@Url.Action("SaveWFHApplication", "DailyTimeRecord")',
-                                            //                     data: JSON.stringify(datax),
-                                            //                             contentType: 'application/json; charset=utf-8',
-                                            //                   success: function (response) {
-                                            //                       if (response.success) {
-
-                                            //                         //       $('#filewfhmodal')[0].reset();
-                                            //                         // js('#filewfhmodal').modal('hide');
-
-                                            //                        Swal.fire({
-                                            //                            text: response.message,
-                                            //                            icon: "success",
-                                            //                            confirmButtonText: "Ok"
-                                            //                        }).then((result) => {
-                                            //                            location.reload();
-                                            //                        });
-                                            //                       } else {
-                                            //                           Swal.fire({
-                                            //                               text: response.message,
-                                            //                               icon: "error"
-                                            //                           });
-                                            //                       }
-                                            //                       $('.spinner-overlay').hide();
-                                            //                   },
-                                            //                   error: function () {
-                                            //                       $('.spinner-overlay').hide();
-                                            //                       Swal.fire({
-                                            //                           text: "An error occurred. Please try again.",
-                                            //                           icon: "error"
-                                            //                       });
-                                            //                   }
-                                            //               });
-
-                                            // }
+                                            
 
 
 
-
-                                          function  wfhlogsForm(date){
+                         function  wfhlogsForm(date){
                                                   let d = new Date(date); // JS can parse ISO format correctly
                                                   d.setDate(d.getDate() + 1);
                                               //alert(d.toISOString() )
@@ -1050,5 +1118,305 @@
                                                       });
                                           }
 
+
+                       //  function wfhapplicationModal(){
+                            
+                              
+                            
+                       //                              $('.spinner-overlay').show();
+
+                       //                              $.ajax({
+                       //                                  type: 'POST',
+                       //                              url: '@Url.Action("WFHApplication", "DailyTimeRecord")',
+                                                      
+                       //                                  success: function (response) {                                                          
+
+                       //                                      if (response.success) {
+                       //                                        $('.spinner-overlay').hide();
+                       //                                          console.log(response.data);
+
+
+                                                           
+
+
+                       //                                           var tbodytable = $("#tblWFHApplication tbody");
+                       //                                              tbodytable.empty();
+
+                       //                                              if (response.data.length > 0) {
+                       //                                                  $.each(response.data, function(index, item) {
+
+                       //                                                              let cancelBtn = "";
+                       //                                                              if (item.statusId === 3) { // Replace 1 with EnumStatus.ForApproval value
+                       //                                                                  cancelBtn = `
+                       //                                                                      <a href="javascript:void(0)" 
+                       //                                                                         onclick="cancel(${item.wfhHeaderId})" 
+                       //                                                                         title="Cancel Request" 
+                       //                                                                         class="btn btn-secondary">
+                       //                                                                         <i class="fas fa-ban"></i>
+                       //                                                                      </a>`;
+                       //                                                              }
+
+
+                       //                                                      var row = `<tr>
+                       //                                                                       <td>${item.requestNo}</td>
+                       //                                                                       <td>${item.dateCreated}</td>
+                       //                                                                        <td>${item.statusName}</td>
+                       //                                                                              <td class="text-center">
+                       //                                                                                  <a href="javascript:void(0)"
+                       //                                                                                     onclick="viewWFHdDetails(${item.wfhHeaderId})"
+                       //                                                                                     title="View"
+                       //                                                                                     class="btn btn-primary">
+                       //                                                                                     <i class="fas fa-search"></i>
+                       //                                                                                  </a>
+
+                       //                                                                               ${cancelBtn}
+
+                       //                                                                              </td>
+                                                                                                
+                       //                                                                  </tr>`;
+                       //                                                      tbodytable.append(row);
+
+                                                                      
+                       //                                                  });
+                       //                                              } else {
+                       //                                                  tbodytable.html(`<tr><td colspan="3" class="text-center">No record found.</td></tr>`);
+                       //                                              }
+
+
+                       //                                                        // Destroy previous instance if it exists
+                       //                                                              if (js.fn.DataTable.isDataTable('#tblWFHApplication')) {
+                       //                                                                  $('#tblWFHApplication').DataTable().clear().destroy();
+                       //                                                              }
+
+                       //                                                              // Initialize DataTable inside modal
+                       //                                                              js('#tblWFHApplication').DataTable({
+                       //                                                                  order: [[0, 'desc']], // sort by first column
+                       //                                                                  pageLength: 10,
+                       //                                                                  lengthMenu: [5, 10, 25, 50]                             
+                       //                                                              });
+
+
+
+
+
+                       //                                      } else {
+                       //                                          Swal.fire({
+                       //                                              text: response.message,
+                       //                                              icon: "error"
+                       //                                          });
+                       //                                      }
+                       //                                  },
+                       //                                  error: function () {
+                       //                                      $('.spinner-overlay').hide();
+                       //                                      Swal.fire({
+                       //                                          text: "An error occurred. Please try again.",
+                       //                                          icon: "error"
+                       //                                      });
+                       //                                  }
+                       //                              });
+                                                             
+                       //       js('#wfhapplicationModal').modal('show');
+                       // }
+
+                       function wfhapplicationModal () {
+                                              const $modal = $('#wfhapplicationModal');
+                                              const $table = $('#tblWFHApplication');
+                                              const $tbody = $table.find('tbody');
+
+                                              $('.spinner-overlay').show();
+                                              $modal.modal('show'); // show first; we'll adjust columns when fully visible
+
+                                              $.ajax({
+                                                type: 'POST',
+                                                url: '@Url.Action("WFHApplication", "DailyTimeRecord")',
+                                                success: function (response) {
+                                                  $('.spinner-overlay').hide();
+
+                                                  if (!response?.success) {
+                                                    Swal.fire({ text: response?.message || "Request failed.", icon: "error" });
+                                                    return;
+                                                  }
+
+                                                  // 1) Kill any existing DT cleanly BEFORE touching the DOM
+                                                  if ($.fn.DataTable.isDataTable($table)) {
+                                                    $table.DataTable().clear().destroy();
+                                                  }
+
+                                                  // 2) Rebuild rows
+                                                  $tbody.empty();
+
+                                                  if (Array.isArray(response.data) && response.data.length) {
+                                                    response.data.forEach(item => {
+                                                      const cancelBtn = (item.statusId === 3)
+                                                        ? `<a href="javascript:void(0)" onclick="cancel(${item.wfhHeaderId})" title="Cancel Request" class="btn btn-secondary">
+                                                             <i class="fas fa-ban"></i>
+                                                           </a>` : "";
+
+                                                      const row = `
+                                                        <tr>
+                                                          <td>${item.requestNo ?? ''}</td>
+                                                          <td>${item.dateCreatedString ?? ''}</td>
+                                                          <td>${item.statusName ?? ''}</td>
+                                                          <td class="text-center">
+                                                            <a href="javascript:void(0)" onclick="viewWFHdDetails(${item.wfhHeaderId})" title="View" class="btn btn-primary">
+                                                              <i class="fas fa-search"></i>
+                                                            </a>
+                                                            ${cancelBtn}
+                                                          </td>
+                                                        </tr>`;
+                                                      $tbody.append(row);
+                                                    });
+                                                  } else {
+                                                    $tbody.html(`<tr><td colspan="4" class="text-center">No record found.</td></tr>`);
+                                                  }
+
+                                                  // 3) Initialize DT (inside modal)
+                                                  const dt = $table.DataTable({
+                                                    order: [[0, 'desc']],
+                                                    pageLength: 5,
+                                                    lengthMenu: [5, 10, 25, 50],
+                                                    deferRender: true,
+                                                    autoWidth: false
+                                                  });
+
+                                                  // 4) Fix layout after the modal finishes animating
+                                                  $modal.off('shown.bs.modal._dtfix').on('shown.bs.modal._dtfix', function () {
+                                                    dt.columns.adjust().draw(false);
+                                                  });
+                                                },
+                                                error: function () {
+                                                  $('.spinner-overlay').hide();
+                                                  Swal.fire({ text: "An error occurred. Please try again.", icon: "error" });
+                                                }
+                                              });
+                                            }
+
+
+
+
+                         function cancel(id){
+                                Swal.fire({
+                                    text: "Are you sure you want to cancel this request?",
+                                    icon: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonText: "Yes, cancel it!"
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        $.ajax({
+                                            type: 'POST',
+                                            url: '@Url.Action("CancelWFHApplication", "DailyTimeRecord")',
+                                            data: { WfhHeaderId: id },
+                                            success: function (response) {
+                                                if (response.success) {
+                                                    Swal.fire({
+                                                        text: response.message,
+                                                        icon: "success",
+                                                        confirmButtonText: "Ok"
+                                                    }).then((result) => {
+                                                        location.reload();
+                                                    });
+                                                } else {
+                                                    Swal.fire({
+                                                        text: response.message,
+                                                        icon: "error"
+                                                    });
+                                                }
+                                            },
+                                            error: function () {
+                                                Swal.fire({
+                                                    text: "An error occurred. Please try again.",
+                                                    icon: "error"
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                    }
+
+                      function viewWFHdDetails(headerId){
+
+                                      $.ajax({
+                                          type: 'POST',
+                                                url: '@Url.Action("WFHApplicationDetails", "DailyTimeRecord")',
+                                            data: { WFHHeaderId: headerId },
+                                          success: function (response) {
+                                              if (response.success) {
+
+                                                  console.log(response.data);
+                                                   document.getElementById('lblRequestNo').textContent = response.data.header.requestNo;
+                                                      document.getElementById('lblStatus').textContent = response.data.header.statusName;
+                                                         document.getElementById('lblDate').textContent = response.data.header.dateCreatedString;
+                                                          document.getElementById('Remarks').textContent = response.data.header.remarks
+
+                                             document.getElementById('ApproverLabel').textContent = '';
+                                                document.getElementById('ApprovalDate').textContent = '';
+                                               document.getElementById('ApprovalRemarks').textContent = '';
+                                                 document.getElementById('deptHeadName').textContent = '';
+
+                                            if (response.data.header.statusId == @((int)EnumStatus.ForApproval)) { // for approval
+                                                 document.getElementById('deptHeadName').textContent = response.data.header.approver;
+                                                   document.getElementById('ApproverLabel').textContent = 'For Approval of:';
+                                          }
+
+                                         else  if(response.data.header.statusId == @((int)EnumStatus.Approved)) {  //approved
+
+                                                   document.getElementById('deptHeadName').textContent = response.data.header.approver;
+                                                  document.getElementById('ApproverLabel').textContent = "Approved By: ";
+                                                   document.getElementById('ApprovalDate').textContent = 'Approved Date and Time: ' + response.data.header.dateApprovedDisapproved;
+                                          }
+                                                else if(response.data.header.statusId == @((int)EnumStatus.Rejected)){     //Rejected
+                                                      document.getElementById('deptHeadName').textContent = response.data.header.approver;
+                                                        document.getElementById('ApproverLabel').textContent = 'Rejected By:';
+                                               document.getElementById('ApprovalRemarks').textContent = 'Remarks: ' + response.data.headerapprovalRemarks;
+                                                   document.getElementById('ApprovalDate').textContent = 'Rejected Date and Time:: ' + response.data.header.dateApprovedDisapproved;
+
+                                           }  else if(response.data.header.statusId == @((int)EnumStatus.Cancelled)){     //canclled
+
+                                                  document.getElementById('ApprovalDate').textContent = 'Cancelled Date: ' +  response.data.header.dateModifiedString;
+
+                                         }
+
+
+
+
+                                                       var tbodytable = $("#tblFileforWFHapplication");
+                                                tbodytable.empty();
+
+                                                if (response.data.details.length > 0) {
+                                                    $.each(response.data.details, function(index, item) {
+                                                        var row = `<tr>
+
+                                                                             <td>${item.date}</td>
+                                                                                <td>${item.timeIn}</td>
+                                                                                <td>${item.timeOut}</td>
+                                                                                   <td>${item.totalWorkingHours}</td>
+                                                                    </tr>`;
+                                                        tbodytable.append(row);
+                                                    });
+                                                } else {
+                                                    tbodytable.html(`<tr><td colspan="4" class="text-center">No record found.</td></tr>`);
+                                                }
+
+                                                  js('#fileapplicationModal').modal('show');
+
+                                              } else {
+                                                  Swal.fire({
+                                                      text: response.message,
+                                                      icon: "error"
+                                                  });
+                                              }
+                                              $('.spinner-overlay').hide();
+                                          },
+                                          error: function () {
+                                              $('.spinner-overlay').hide();
+                                              Swal.fire({
+                                                  text: "An error occurred. Please try again.",
+                                                  icon: "error"
+                                              });
+                                          }
+                                      });
+            }
+
             </script>
+
 }

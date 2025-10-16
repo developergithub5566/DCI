@@ -232,7 +232,7 @@ namespace DCI.API.Controllers
         [Route("SaveDepartment")]
         public async Task<IActionResult> SaveDepartment([FromBody] DepartmentViewModel model)
         {
-            if (await _departmentRepository.IsExistsDepartmentCode(model.DepartmentCode))
+            if (await _departmentRepository.IsExistsDepartmentCode(model.DepartmentCode) && model.DepartmentId == 0)
             {
                 return NotFound("Department code already exists");
             }
@@ -480,7 +480,7 @@ namespace DCI.API.Controllers
         [Route("SavePosition")]
         public async Task<IActionResult> SavePosition([FromBody] PositionViewModel model)
         {
-            if (await _positionRepository.IsExistsPositionCode(model.PositionCode))
+            if (await _positionRepository.IsExistsPositionCode(model.PositionCode) && model.PositionId == 0)
             {
                 return NotFound("Position code already exists");
             }
