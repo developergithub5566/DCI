@@ -25,11 +25,11 @@ namespace DCI.Repositories
 		//}
 		public async Task<DepartmentViewModel> GetDepartmentById(int deptId)
 		{
-			var context =   _dbContext.Department.AsNoTracking();
+			//var context =   _dbContext.Department.AsNoTracking();
 			var userList = _dbContext.User.AsNoTracking().Where(x => x.IsActive).OrderBy(x => x.Fullname).ToList();
 
-			var query = from dept in context						
-						where dept.IsActive == true && dept.DepartmentId == deptId
+			var query = from dept in _dbContext.Department.AsNoTracking()
+                        where dept.IsActive == true && dept.DepartmentId == deptId
 						select new DepartmentViewModel
 						{
 							DepartmentId = dept.DepartmentId,
@@ -55,11 +55,11 @@ namespace DCI.Repositories
 			//return await _dbContext.Department.AsNoTracking().Where(x => x.IsActive == true).ToListAsync();
 			try
 			{
-				var context = _dbContext.Department.AsQueryable().ToList();
-				var userList = _dbContext.User.AsQueryable().ToList();			
+				//var context = _dbContext.Department.AsNoTracking().ToList();
+				//var userList = _dbContext.User.AsQueryable().ToList();			
 
-				var query = from dept in context
-							join user in userList on dept.CreatedBy equals user.UserId
+				var query = from dept in _dbContext.Department.AsNoTracking().ToList()
+                            join user in _dbContext.User.AsNoTracking().ToList() on dept.CreatedBy equals user.UserId
 							where dept.IsActive == true
 							select new DepartmentViewModel
 							{

@@ -35,7 +35,7 @@ namespace DCI.Repositories
                                 PositionCode = post.PositionCode,
                                 PositionName = post.PositionName,
                                 Description = post.Description,
-                                CreatedName =user.Fullname, // + " " + user.Lastname,
+                                CreatedName =user.Email, // + " " + user.Lastname,
                                 CreatedBy = post.CreatedBy,
                                 DateCreated = post.DateCreated
                             };
@@ -55,10 +55,10 @@ namespace DCI.Repositories
 
         public async Task<PositionViewModel> GetPositionById(int postId)
         {
-            var context = _dbContext.Position.AsQueryable();
-            var userList = _dbContext.User.Where(x => x.IsActive).OrderBy(x => x.Fullname).ToList();
+            //var context = _dbContext.Position.AsQueryable();
+            //var userList = _dbContext.User.Where(x => x.IsActive).OrderBy(x => x.Fullname).ToList();
 
-            var query = from post in context
+            var query = from post in _dbContext.Position.AsNoTracking()
                         where post.IsActive == true && post.PositionId == postId
                         select new PositionViewModel
                         {

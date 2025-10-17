@@ -138,7 +138,7 @@
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                              <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Nickname" name="Nickname" value="@(string.IsNullOrWhiteSpace(Model.Nickname) ? "-" : Model.Nickname)">                                  
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Nickname" name="Nickname" maxlength="30"  value="@(string.IsNullOrWhiteSpace(Model.Nickname) ? "-" : Model.Nickname)">
                                     <label class="bottomLabelText">Nickname</label>
                                 </div>
                             </div>
@@ -195,14 +195,14 @@
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="ContactPerson" name="ContactPerson" value="@(string.IsNullOrWhiteSpace(Model.ContactPerson) ? "-" : Model.ContactPerson)">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="ContactPerson" name="ContactPerson" maxlength="255"  value="@(string.IsNullOrWhiteSpace(Model.ContactPerson) ? "-" : Model.ContactPerson)">
                                     <label class="bottomLabelText">Contact Person</label>                                
                          
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                    <input type="number" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="ContactPersonNo" name="ContactPersonNo" value="@(string.IsNullOrWhiteSpace(Model.ContactPersonNo) ? "-" : Model.ContactPersonNo)">
+                                    <input type="number" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="ContactPersonNo" name="ContactPersonNo" max="999999999999999" value="@(string.IsNullOrWhiteSpace(Model.ContactPersonNo) ? "-" : Model.ContactPersonNo)">
                                     <label class="bottomLabelText">Contact Person Number</label>
                                 </div>
                             </div>
@@ -239,13 +239,13 @@
                             </div>
                         <div class="col-lg-6">    
                             <div class="form-group mb10 text-center">
-                                <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="EmailPersonal" name="EmailPersonal" value="@(string.IsNullOrWhiteSpace(Model.EmailPersonal) ? "-" : Model.EmailPersonal)">
+                                <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="EmailPersonal" name="EmailPersonal" maxlength="50" value="@(string.IsNullOrWhiteSpace(Model.EmailPersonal) ? "-" : Model.EmailPersonal)">
                                 <label class="bottomLabelText">Personal Email</label>
                             </div>
                         </div>
                             <div class="col-lg-6">
                                 <div class="form-group mb10 text-center">                             
-                                <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="MobileNoPersonal" name="MobileNoPersonal" value="@(string.IsNullOrWhiteSpace(Model.MobileNoPersonal) ? "-" : Model.MobileNoPersonal)">
+                                <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="MobileNoPersonal" name="MobileNoPersonal" maxlength="15"  value="@(string.IsNullOrWhiteSpace(Model.MobileNoPersonal) ? "-" : Model.MobileNoPersonal)">
                                     <label class="bottomLabelText">Personal Mobile No.</label>
                                 </div>
                             </div>

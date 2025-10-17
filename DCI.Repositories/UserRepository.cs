@@ -95,8 +95,8 @@ namespace DCI.Repositories
             //return await _dbContext.User.AsNoTracking().Where(x => x.IsActive == true).ToListAsync();
 
 
-            var query = from usr in _dbContext.User
-                        join role in _dbContext.Role on usr.RoleId equals role.RoleId
+            var query = from usr in _dbContext.User.AsNoTracking()
+                        join role in _dbContext.Role.AsNoTracking() on usr.RoleId equals role.RoleId
                         //join depart in _dbContext.Department on usr.DepartmentId equals depart.DepartmentId
                         where usr.IsActive == true
                         select new UserModel
@@ -363,30 +363,28 @@ namespace DCI.Repositories
         {
             try
             {
-                var result = _dbContext.User.Where(usr => usr.UserId == userid)
+                var result = _dbContext.User.AsNoTracking().Where(usr => usr.UserId == userid)
                                 .Select(usr => new UserModel
                                 {
                                     UserId = usr.UserId,
                                     EmployeeId = usr.EmployeeId ?? 0,
                                     Fullname = usr.Fullname,
-                                    EmployeeNo = usr.EmployeeNo,
-                                    //Firstname = usr.Firstname,
-                                    Email = usr.Email,
-                                   // ContactNo = usr.ContactNo,
-                                    RoleId = usr.RoleId,
-                                    //  DepartmentId = usr.DepartmentId,
+                                    EmployeeNo = usr.EmployeeNo,   
+                                    Email = usr.Email,                 
+                                    RoleId = usr.RoleId,                    
                                     RoleList = null,
                                     EmployeeList = null
                                 }).FirstOrDefault() ?? new UserModel();
 
-                result.RoleList = _dbContext.Role.Where(x => x.IsActive).ToList();
-                result.EmployeeList = _dbContext.User.ToList();
-                // result.DepartmentList = _dbContext.Department.Where(x => x.IsActive).ToList();
-                result.EmployeeDropdownList = (from emp in _dbContext.Employee
-                                               join wrkdtls in _dbContext.EmployeeWorkDetails
+                result.RoleList = _dbContext.Role.AsNoTracking().Where(x => x.IsActive).ToList();
+                result.EmployeeList = _dbContext.User.AsNoTracking().ToList();
+
+                result.EmployeeDropdownList = (from emp in _dbContext.Employee.AsNoTracking()
+                                               join wrkdtls in _dbContext.EmployeeWorkDetails.AsNoTracking()
                                                 on emp.EmployeeId equals wrkdtls.EmployeeId
                                                where emp.IsActive == true && wrkdtls.IsResigned == false
                                                && wrkdtls.EmployeeStatusId != (int)EnumEmploymentType.Resigned && wrkdtls.EmployeeStatusId != (int)EnumEmploymentType.AWOL
+                                               orderby emp.Lastname ascending
                                                select new EmployeeDropdownModel
                                                {
                                                    EmployeeId = emp.EmployeeId,

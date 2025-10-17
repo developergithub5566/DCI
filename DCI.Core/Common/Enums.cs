@@ -151,17 +151,31 @@ namespace DCI.Core.Common
     public enum EnumLeaveType
     {
         //IMPORTANT ORDERING FOR Leave Computaion Stored Procedure : get_LeaveBalance and Leave Module
-        HD = 1,
-        VL = 2,
-        SL = 3,
-        SPL = 4,
-        ML = 5,
-        PL = 6,
-        OB = 7,
-        VLMon = 8,
-        SLMon = 9,
-        UT = 10,
-        LT = 11
+        //HD = 1,
+        //VL = 2,
+        //SL = 3,
+        //SPL = 4,
+        //ML = 5,
+        //PL = 6,
+        //OB = 7,
+        //VLMon = 8,
+        //SLMon = 9,
+        //UT = 10,
+        //LT = 11
+        HDVL = 1,
+        HDSL = 2,
+        VL = 3,
+        SL = 4,
+        SPL = 5,
+        ML = 6,
+        PL = 7,
+        OB = 8,
+        VLMon = 9,
+        SLMon = 10,
+        UT = 11,
+        LT = 12,
+        OF = 13, //For OLD ESS Migration
+        WFH = 14 //For OLD ESS Migration
     }
 
     public enum EnumEmployeeScope

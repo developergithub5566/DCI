@@ -69,8 +69,8 @@ namespace DCI.Repositories
             try
             {             
 
-                var query = from announce in _dbContext.Announcement
-                            join usr in _dbContext.User.Where(x => x.IsActive) on announce.CreatedBy equals usr.UserId
+                var query = from announce in _dbContext.Announcement.AsNoTracking()
+                            join usr in _dbContext.User.AsNoTracking().Where(x => x.IsActive) on announce.CreatedBy equals usr.UserId
                             where announce.IsActive == true
                             select new AnnouncementViewModel
                             {
@@ -84,7 +84,7 @@ namespace DCI.Repositories
                                 DateModified = announce.DateModified,
                                 ModifiedBy = announce.ModifiedBy,
                                 IsActive = announce.IsActive,
-                                CreatedName = usr.Fullname,
+                                CreatedName = usr.Email,
                             };
 
                 return query.ToList();

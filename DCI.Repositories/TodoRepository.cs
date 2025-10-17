@@ -276,7 +276,7 @@ namespace DCI.Repositories
                         var contextLeaveInfo = _dbContext.LeaveInfo.Where(x => x.EmployeeId == contextHdr.EmployeeId && x.DateCreated.Date.Year == _currentYear).OrderByDescending(x => x.DateCreated).FirstOrDefault();
 
 
-                        if (contextHdr.LeaveTypeId == (int)EnumLeaveType.HD)
+                        if (contextHdr.LeaveTypeId == (int)EnumLeaveType.HDVL)
                         {
                             if (contextLeaveInfo.VLBalance >= contextHdr.NoOfDays)
                             {
@@ -292,6 +292,27 @@ namespace DCI.Repositories
 
                         
                                 lvmodel.NoOfDays = excessDays;                        
+                                lvmodel.LeaveTypeId = contextHdr.LeaveTypeId;
+                                lvmodel.Status = (int)EnumStatus.PayrollDeducted;
+                                await SaveLeaveForExcessLeave(lvmodel);
+                            }
+                        }
+                        if (contextHdr.LeaveTypeId == (int)EnumLeaveType.HDSL)
+                        {
+                            if (contextLeaveInfo.SLBalance >= contextHdr.NoOfDays)
+                            {
+                                contextLeaveInfo.SLBalance = contextLeaveInfo.SLBalance - contextHdr.NoOfDays;
+                                contextHdr.DeductionType = (int)EnumDeductionType.SickLeave;
+                            }
+                            else
+                            {
+                                decimal excessDays = contextHdr.NoOfDays - contextLeaveInfo.SLBalance;
+                                contextLeaveInfo.SLBalance = 0;
+                                contextHdr.DeductionType = (int)EnumDeductionType.SickLeave;
+                                contextHdr.NoOfDays = contextLeaveInfo.SLBalance;
+
+
+                                lvmodel.NoOfDays = excessDays;
                                 lvmodel.LeaveTypeId = contextHdr.LeaveTypeId;
                                 lvmodel.Status = (int)EnumStatus.PayrollDeducted;
                                 await SaveLeaveForExcessLeave(lvmodel);

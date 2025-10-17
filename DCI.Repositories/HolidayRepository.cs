@@ -25,10 +25,10 @@ namespace DCI.Repositories
         public async Task<HolidayViewModel> GetHolidayById(int holidayId)
         {
         //    var context = _dbContext.Holiday.AsQueryable();
-            var userList = _dbContext.User.Where(x => x.IsActive).OrderBy(x => x.Fullname).ToList();
+            //var userList = _dbContext.User.Where(x => x.IsActive).OrderBy(x => x.Fullname).ToList();
 
-            var query = from hol in _dbContext.Holiday.AsQueryable()
-                        join user in _dbContext.User.AsQueryable() on hol.CreatedBy equals user.UserId
+            var query = from hol in _dbContext.Holiday.AsNoTracking()
+                        join user in _dbContext.User.AsNoTracking() on hol.CreatedBy equals user.UserId
                         where hol.IsActive == true && hol.HolidayId == holidayId
                         select new HolidayViewModel
                         {
@@ -38,7 +38,7 @@ namespace DCI.Repositories
                             Description = hol.Description,
                             HolidayType = hol.HolidayType,
                             CreatedBy = hol.CreatedBy,
-                            CreatedName = user.Fullname, // + " " + user.Lastname,
+                            CreatedName = user.Email, // + " " + user.Lastname,
                             DateCreated = hol.DateCreated,
                             DateModified = hol.DateModified,
                             ModifiedBy = hol.ModifiedBy,
@@ -61,8 +61,8 @@ namespace DCI.Repositories
                 var context = _dbContext.Holiday.AsQueryable().ToList();
                 
 
-                var query = from hol in _dbContext.Holiday.AsQueryable()
-                            join user in _dbContext.User.AsQueryable() on hol.CreatedBy equals user.UserId
+                var query = from hol in _dbContext.Holiday.AsNoTracking()
+                            join user in _dbContext.User.AsNoTracking() on hol.CreatedBy equals user.UserId
                             where hol.IsActive == true
                             select new HolidayViewModel
                             {
@@ -73,7 +73,7 @@ namespace DCI.Repositories
                                 Description = hol.Description,
                                 HolidayType = hol.HolidayType,
                                 CreatedBy = hol.CreatedBy,
-                                CreatedName = user.Fullname, // + " " + user.Lastname,
+                                CreatedName = user.Email, // + " " + user.Lastname,
                                 DateCreated = hol.DateCreated,
                                 DateModified = hol.DateModified,
                                 ModifiedBy = hol.ModifiedBy,

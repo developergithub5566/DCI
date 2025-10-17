@@ -292,7 +292,7 @@ namespace DCI.Repositories
                     model.EmployeeId = emp.EmployeeId;
                     await UpdateLeaveInfo(model, true);
                   
-                    return (StatusCodes.Status200OK, "Employee registration successful.");
+                    return (StatusCodes.Status200OK, "Employee registration completed successfully.");
                 }
                 else
                 {
@@ -453,7 +453,7 @@ namespace DCI.Repositories
                     _dbContext.Employee.Entry(emp).State = EntityState.Modified;
                     await _dbContext.SaveChangesAsync();
 
-                    return (StatusCodes.Status200OK, "Registration updated");
+                    return (StatusCodes.Status200OK, "Information updated successfully.");
               
             }
             catch (Exception ex)
@@ -482,7 +482,7 @@ namespace DCI.Repositories
                 entity.DateModified = DateTime.Now;
                 _dbContext.Employee.Entry(entity).State = EntityState.Modified;
                 await _dbContext.SaveChangesAsync();
-                return (StatusCodes.Status200OK, "Successfully deleted");
+                return (StatusCodes.Status200OK, "Record deleted successfully.");
             }
             catch (Exception ex)
             {

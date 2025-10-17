@@ -223,7 +223,8 @@ namespace DCI.Repositories
                     join s in _dbContext.Status on b.Status equals s.StatusId into sj
                     from s in sj.DefaultIfEmpty()
                     where b.IsActive && c.LeaveDate.Date >= model.DateFrom.Date && c.LeaveDate.Date < dateTo && b.EmployeeId == _empId
-                                        && (b.LeaveTypeId == (int)EnumLeaveType.HD
+                                        && (b.LeaveTypeId == (int)EnumLeaveType.HDVL
+                                        || b.LeaveTypeId == (int)EnumLeaveType.HDSL
                                         || b.LeaveTypeId == (int)EnumLeaveType.OB
                                         || b.LeaveTypeId == (int)EnumLeaveType.SL)
                     select new

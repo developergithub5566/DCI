@@ -65,6 +65,8 @@ namespace DCI.Models.ViewModel
         //public List<DateTime>? LeaveDateList { get; set; }
 
         public decimal SPLBalance { get; set; } = 0;
+        public decimal SLBalance { get; set; } = 0;
+        public decimal VLBalance { get; set; } = 0;
 
         public string DateApprovedDisapproved { get; set; } = string.Empty;
         public string ApprovalRemarks { get; set; } = string.Empty;

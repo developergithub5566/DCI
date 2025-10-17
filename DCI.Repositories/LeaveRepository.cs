@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection.PortableExecutable;
 using System.Runtime.CompilerServices;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DCI.Repositories
 {
@@ -201,6 +202,8 @@ namespace DCI.Repositories
                 {
                     model = new LeaveViewModel();
                     model.LeaveRequestHeader.SPLBalance = leaveinfo.SPLBalance;
+                    model.LeaveRequestHeader.SLBalance = leaveinfo.SLBalance;
+                    model.LeaveRequestHeader.VLBalance = leaveinfo.VLBalance;
                 }
                 else
                 {
@@ -322,6 +325,17 @@ namespace DCI.Repositories
 
                     int count = param.SelectedDateList.Count();
 
+                    if(param.LeaveTypeId == (int)EnumLeaveType.VLMon || param.LeaveTypeId == (int)EnumLeaveType.SLMon)
+                    {
+                        LeaveRequestDetails entityDtl = new LeaveRequestDetails();
+                        entityDtl.LeaveRequestHeaderId = entity.LeaveRequestHeaderId;
+                        entityDtl.LeaveDate = DateTime.Now;
+                        entityDtl.Amount = param.NoOfDays;
+                        entityDtl.IsActive = true;
+                        await _dbContext.LeaveRequestDetails.AddAsync(entityDtl);
+                        await _dbContext.SaveChangesAsync();
+                    }
+
                     foreach (var date in param.SelectedDateList)
                     {
                         LeaveRequestDetails entityDtl = new LeaveRequestDetails();
@@ -345,7 +359,7 @@ namespace DCI.Repositories
                     //Send Application Notification to Approver
                     NotificationViewModel notifvm = new NotificationViewModel();
                     notifvm.Title = "Leave Request";
-                    notifvm.Description = String.Format("You have been assigned leave request {0} for approval", entity.RequestNo);
+                    notifvm.Description = System.String.Format("You have been assigned leave request {0} for approval", entity.RequestNo);
                     notifvm.ModuleId = (int)EnumModulePage.Leave;
                     notifvm.TransactionId = entity.LeaveRequestHeaderId;
                     notifvm.AssignId = param.ApproverId;                   
@@ -359,7 +373,7 @@ namespace DCI.Repositories
                     //Send Application Notification to Requestor
                     NotificationViewModel notifvmRequestor = new NotificationViewModel();
                     notifvmRequestor.Title = "Leave Request";
-                    notifvmRequestor.Description = String.Format("Your Leave request {0} has been submitted for approval.", entity.RequestNo);
+                    notifvmRequestor.Description = System.String.Format("Your Leave request {0} has been submitted for approval.", entity.RequestNo);
                     notifvmRequestor.ModuleId = (int)EnumModulePage.Leave;
                     notifvmRequestor.TransactionId = entity.LeaveRequestHeaderId;
                     notifvmRequestor.AssignId = param.CurrentUserId;        

@@ -86,21 +86,21 @@
                             <div class="col-lg-4">
                                 <div class="form-group mb0 text-center">
 
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" asp-for="Firstname" id="Firstname" name="Firstname" required>
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" maxlength="30" asp-for="Firstname" id="Firstname" name="Firstname" required>
                                     <label class="bottomLabelText" asp-for="Firstname">First Name  <span class="text-danger">*</span></label>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
 
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" asp-for="Middlename" id="Middlename" name="Middlename" value="@(string.IsNullOrWhiteSpace(Model.Middlename) ? "" : Model.Middlename)">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" maxlength="30" asp-for="Middlename" id="Middlename" name="Middlename" value="@(string.IsNullOrWhiteSpace(Model.Middlename) ? "" : Model.Middlename)">
                                     <label class="bottomLabelText">Middle Name</label>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
 
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Lastname" name="Lastname" value="@(string.IsNullOrWhiteSpace(Model.Lastname) ? "" : Model.Lastname)" required>
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Lastname" name="Lastname" maxlength="30" value="@(string.IsNullOrWhiteSpace(Model.Lastname) ? "" : Model.Lastname)" required>
                                     <label class="bottomLabelText">Last Name  <span class="text-danger">*</span></label>
                                 </div>
                             </div>
@@ -127,7 +127,7 @@
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Nickname" name="Nickname" value="@(string.IsNullOrWhiteSpace(Model.Nickname) ? "" : Model.Nickname)">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Nickname" name="Nickname" maxlength="30" value="@(string.IsNullOrWhiteSpace(Model.Nickname) ? "" : Model.Nickname)">
                                     <label class="bottomLabelText">Nickname</label>
                                 </div>
                             </div>
@@ -168,48 +168,48 @@
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
 
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="SSSNo" name="SSSNo" placeholder="00-0000000-0" value="@(string.IsNullOrWhiteSpace(Model.SSSNo) ? "" : Model.SSSNo)">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="SSSNo" name="SSSNo" placeholder="00-0000000-0" maxlength="15" value="@(string.IsNullOrWhiteSpace(Model.SSSNo) ? "" : Model.SSSNo)">
                                     <label class="bottomLabelText">SSS</label>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
 
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Tin" name="Tin" placeholder="000-000-000" value="@(string.IsNullOrWhiteSpace(Model.Tin) ? "" : Model.Tin)">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Tin" name="Tin" placeholder="000-000-000" maxlength="15"  value="@(string.IsNullOrWhiteSpace(Model.Tin) ? "" : Model.Tin)">
                                     <label class="bottomLabelText">TIN</label>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
 
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Pagibig" name="Pagibig" placeholder="0000-0000-0000" value="@(string.IsNullOrWhiteSpace(Model.Pagibig) ? "" : Model.Pagibig)">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Pagibig" name="Pagibig" placeholder="0000-0000-0000" maxlength="15"  value="@(string.IsNullOrWhiteSpace(Model.Pagibig) ? "" : Model.Pagibig)">
                                     <label class="bottomLabelText">Pagibig(HDMF)</label>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
 
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Philhealth" name="Philhealth" placeholder="00-000000000-0" value="@(string.IsNullOrWhiteSpace(Model.Philhealth) ? "" : Model.Philhealth)">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Philhealth" name="Philhealth" placeholder="00-000000000-0" maxlength="15"  value="@(string.IsNullOrWhiteSpace(Model.Philhealth) ? "" : Model.Philhealth)">
                                     <label class="bottomLabelText">Philhealth</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="NationalId" name="NationalId" placeholder="0000-0000-0000-0000" value="@(string.IsNullOrWhiteSpace(Model.NationalId) ? "" : Model.NationalId)">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="NationalId" name="NationalId" placeholder="0000-0000-0000-0000" maxlength="15" value="@(string.IsNullOrWhiteSpace(Model.NationalId) ? "" : Model.NationalId)">
                                     <label class="bottomLabelText">National ID</label>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="ContactPerson" name="ContactPerson" value="@(string.IsNullOrWhiteSpace(Model.ContactPerson) ? "" : Model.ContactPerson)">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="ContactPerson" name="ContactPerson" maxlength="255" value="@(string.IsNullOrWhiteSpace(Model.ContactPerson) ? "" : Model.ContactPerson)">
                                     <label class="bottomLabelText">Contact Person</label>
                                 </div>
 
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="ContactPersonNo" name="ContactPersonNo" value="@(string.IsNullOrWhiteSpace(Model.ContactPersonNo) ? "" : Model.ContactPersonNo)">
+                                    <input type="number" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="ContactPersonNo" name="ContactPersonNo" max="999999999999999" value="@(string.IsNullOrWhiteSpace(Model.ContactPersonNo) ? "" : Model.ContactPersonNo)">
                                     <label class="bottomLabelText">Contact Person No.</label>
                                 </div>
                             
@@ -236,26 +236,26 @@
                             <div class="col-lg-6">
                                 <div class="form-group mb10 text-center">
 
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Email" name="Email" placeholder="email@dci.ph" value="@(string.IsNullOrWhiteSpace(Model.Email) ? "" : Model.Email)" required>
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="Email" name="Email" placeholder="email@dci.ph" maxlength="50"  value="@(string.IsNullOrWhiteSpace(Model.Email) ? "" : Model.Email)" required>
                                     <label class="bottomLabelText">Company Email  <span class="text-danger">*</span></label>
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group mb10 text-center">
 
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="MobileNoOffice" name="MobileNoOffice" value="@(string.IsNullOrWhiteSpace(Model.MobileNoOffice) ? "" : Model.MobileNoOffice)">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="MobileNoOffice" name="MobileNoOffice" maxlength="15"  value="@(string.IsNullOrWhiteSpace(Model.MobileNoOffice) ? "" : Model.MobileNoOffice)">
                                     <label class="bottomLabelText">Company Mobile No.</label>
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group mb10 text-center">
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="EmailPersonal" name="EmailPersonal" value="@(string.IsNullOrWhiteSpace(Model.EmailPersonal) ? "" : Model.EmailPersonal)">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="EmailPersonal" name="EmailPersonal"  maxlength="50" value="@(string.IsNullOrWhiteSpace(Model.EmailPersonal) ? "" : Model.EmailPersonal)">
                                     <label class="bottomLabelText">Personal Email</label>
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group mb10 text-center">
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="MobileNoPersonal" name="MobileNoPersonal" value="@(string.IsNullOrWhiteSpace(Model.MobileNoPersonal) ? "" : Model.MobileNoPersonal)">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="MobileNoPersonal" name="MobileNoPersonal" maxlength="15" value="@(string.IsNullOrWhiteSpace(Model.MobileNoPersonal) ? "" : Model.MobileNoPersonal)">
                                     <label class="bottomLabelText">Personal Mobile No.</label>
                                 </div>
                             </div>
@@ -264,14 +264,14 @@
                             <div class="col-lg-12">
                                 <div class="form-group mb10 text-center">
 
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="PresentAddress" name="PresentAddress" value="@(string.IsNullOrWhiteSpace(Model.PresentAddress) ? "" : Model.PresentAddress)" required>
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="PresentAddress" name="PresentAddress" maxlength="255" value="@(string.IsNullOrWhiteSpace(Model.PresentAddress) ? "" : Model.PresentAddress)" required>
                                     <label class="bottomLabelText">Present Address  <span class="text-danger">*</span></label>
                                 </div>
                             </div>
 
                             <div class="col-lg-12">
                                 <div class="form-group mb10 text-center">
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="PermanentAddress" name="PermanentAddress" value="@(string.IsNullOrWhiteSpace(Model.PermanentAddress) ? "" : Model.PermanentAddress)">
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="PermanentAddress" name="PermanentAddress" maxlength="255" value="@(string.IsNullOrWhiteSpace(Model.PermanentAddress) ? "" : Model.PermanentAddress)">
                                     <label class="bottomLabelText">Permanent/Provincial Address</label>
                                 </div>
                             </div>
@@ -291,7 +291,7 @@
                             <div class="col-lg-3">
                                 <div class="form-group mb10 text-center">
 
-                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="EmployeeNo" name="EmployeeNo" value="@(string.IsNullOrWhiteSpace(Model.EmployeeNo) ? "" : Model.EmployeeNo)" required>
+                                    <input type="text" class="bg-gray-100 font-weight-bold form-control frmField text-center" id="EmployeeNo" name="EmployeeNo" maxlength="10"  value="@(string.IsNullOrWhiteSpace(Model.EmployeeNo) ? "" : Model.EmployeeNo)" required>
                                     <label class="bottomLabelText">Employee No  <span class="text-danger">*</span></label>
                                 </div>
                             </div>
@@ -485,7 +485,7 @@
                                                                 icon: "success",
                                                                 confirmButtonText: "Ok"
                                                             }).then((result) => {
-                                                                location.reload();
+                                                                      window.location = "/Maintenance/EmployeeList";
                                                             });
 
                                                         } else {
