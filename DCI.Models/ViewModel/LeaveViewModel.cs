@@ -40,6 +40,8 @@ namespace DCI.Models.ViewModel
         public string StatusName { get; set; } = string.Empty;
         public string ApproverHead { get; set; } = string.Empty;
 
+        public int ScopeTypeId { get; set; } = 0;
+
         public int FilterYear { get; set; } = 0;
     }
 

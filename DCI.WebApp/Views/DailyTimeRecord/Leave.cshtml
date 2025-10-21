@@ -246,9 +246,19 @@
                                 </tr>
                             </thead>
                             <tbody id="tblVL">
+                                @{
+                                    decimal totalCreditVL = 0;
+                                    decimal totalAvailedVL = 0;
+                                    decimal totalMonetizedVL = 0;
+                                }
                                 @foreach (var vl in Model.vlSummaries)
                                 {
                                     string rowClass = vl.AsOf == currentMonth ? "table-success" : "";
+
+                                    totalCreditVL += vl.Credit;
+                                    totalAvailedVL += vl.Availed;
+                                    totalMonetizedVL += vl.Monetized;
+
 
                                     <tr class='@rowClass'>
                                         <td><strong> @vl.AsOf  </strong></td>
@@ -259,6 +269,15 @@
                                         <td>@vl.EndBal</td>
                                     </tr>
                                 }
+
+                                <tr style="font-weight: bold;">
+                                    <td></td>
+                                    <td></td>
+                                    <td>@totalCreditVL.ToString("N4")</td>
+                                    <td>@totalAvailedVL.ToString("N4")</td>
+                                    <td>@totalMonetizedVL.ToString("N4")</td>
+                                    <td></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -288,10 +307,18 @@
                                 </tr>
                             </thead>
                             <tbody id="tblSL">
-                               
+                                @{
+                                    decimal totalCreditSL = 0;
+                                    decimal totalAvailedSL = 0;
+                                    decimal totalMonetizedSL = 0;
+                                }
                                 @foreach (var sl in Model.slSummaries)
                                 {                                 
                                     string rowClass = sl.AsOf == currentMonth ? "table-success" : "";
+
+                                    totalCreditSL += sl.Credit;
+                                    totalAvailedSL += sl.Availed;
+                                    totalMonetizedSL += sl.Monetized;
 
                                     <tr class='@rowClass'>
                                         <td><strong> @sl.AsOf  </strong></td>
@@ -302,6 +329,15 @@
                                         <td>@sl.EndBal</td>
                                     </tr>
                                 }
+                                <tr style="font-weight: bold;">
+                                    <td></td>
+                                    <td></td>
+                                    <td>@totalCreditSL.ToString("N4")</td>
+                                    <td>@totalAvailedSL.ToString("N4")</td>
+                                    <td>@totalMonetizedSL.ToString("N4")</td>
+                                    <td></td>
+                                </tr>
+                             
                             </tbody>
                         </table>
                     </div>
@@ -1081,9 +1117,16 @@
                                                 tbodytableVL.empty();
 
                                                 if (response.data.vlSummaries.length > 0) {
+                                                            let totalCreditVL = 0;
+                                                            let totalAvailedVL = 0;
+                                                            let totalMonetizedVL = 0;
 
                                                     $.each(response.data.vlSummaries, function(index, item) {
                                                            var highlightClass = (item.asOf === currentMonth) ? "table-success" : "";
+
+                                                                 totalCreditVL += parseFloat(item.credit) || 0;
+                                                                totalAvailedVL += parseFloat(item.availed) || 0;
+                                                                totalMonetizedVL += parseFloat(item.monetized) || 0;
 
                                                                     var row = `<tr class="${highlightClass}">
                                                                             <td><strong>${item.asOf}</strong></td>
@@ -1095,13 +1138,32 @@
                                                                         </tr>`;
                                                         tbodytableVL.append(row);
                                                     });
+                                                     
+                                                            const totalRow = `
+                                                                <tr style="font-weight:bold;">
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td>${totalCreditVL.toFixed(4)}</td>
+                                                                    <td>${totalAvailedVL.toFixed(4)}</td>
+                                                                    <td>${totalMonetizedVL.toFixed(4)}</td>
+                                                                    <td></td>
+                                                                </tr>`;
+                                                            tbodytableVL.append(totalRow);
                                                 }
 
                                                   var tbodytableSL = $("#tblSL");
                                                 tbodytableSL.empty();
                                                 if (response.data.slSummaries.length > 0) {
+                                                            let totalCreditSL = 0;
+                                                            let totalAvailedSL = 0;
+                                                            let totalMonetizedSL = 0;
+
                                                     $.each(response.data.slSummaries, function(index, item) {
                                                          var highlightClass = (item.asOf === currentMonth) ? "table-success" : "";
+
+                                                              totalCreditSL += parseFloat(item.credit) || 0;
+                                                                totalAvailedSL += parseFloat(item.availed) || 0;
+                                                                totalMonetizedSL += parseFloat(item.monetized) || 0;
 
                                                              var row = `<tr class="${highlightClass}">
                                                                             <td><strong>${item.asOf}</strong></td>
@@ -1113,6 +1175,17 @@
                                                                         </tr>`;
                                                         tbodytableSL.append(row);
                                                     });
+
+                                                         const totalRow = `
+                                                                <tr style="font-weight:bold;">
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td>${totalCreditSL.toFixed(4)}</td>
+                                                                    <td>${totalAvailedSL.toFixed(4)}</td>
+                                                                    <td>${totalMonetizedSL.toFixed(4)}</td>
+                                                                    <td></td>
+                                                                </tr>`;
+                                                            tbodytableSL.append(totalRow);
                                                 }
 
 

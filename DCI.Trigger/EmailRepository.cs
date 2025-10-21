@@ -78,7 +78,7 @@ namespace DCI.Trigger
                     <p>Your biometric attendance has been recorded as follows:</p>
 
                      <p>Date: {model.DateTimeInOut.ToLongDateString()}</p>
-				     <p>Time: {model.DateTimeInOut.ToString("HH:mm:ss tt")}</p>
+				     <p>Time: {model.DateTimeInOut.ToString("HH:mm:ss")}</p>
                      <p>Source: BIOMETRICS </p>
                 
                     <br/>

@@ -13,26 +13,31 @@
 <div class="container-fluid">
     <div class="d-sm-flex align-items-center justify-content-between mb-3">
         <h6 class="m-0 font-weight-bold text-gray-800">Leave Application & Balances</h6>
-        <div class="upperRightDivBtn">
-            @*    <button class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#leaveRequestModal">
-                <span class="icon text-white"><i class="fa-solid fa-file-pen text-xs"></i></span>
-                <span class="text"><small>Request Leave</small></span>
-            </button> *@
-@*             <a href="#" title="Request Leave" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#" onclick="newForm()">
-                <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
-                <span class="text text-white"><small>File Leave</small></span>
-            </a> *@
-        </div>
+  
     </div>
     <div class="col-12 p0">
-        <ul class="breadcrumb">
-            <li><a href="~/Home/Index">Dashboard</a></li>
-            <li><a href="~/Report/Index">Reports</a></li>
-            <li><a href="~/Report/LeaveList">Leave List</a></li>
-            <li>@Model.EmpNo - @Model.EmployeeName</li>
-        </ul>
-    </div>
+        @if (ViewBag.ScopeType == 0)
+        {
+            <ul class="breadcrumb">
+                <li><a href="~/Home/Index">Dashboard</a></li>
+                <li><a href="~/Report/Index">Reports</a></li>
+                <li><a href="~/Report/LeaveList">Leave List</a></li>
+                <li>@Model.EmpNo - @Model.EmployeeName</li>
+            </ul>
+        }
+        else
+        {
+            <ul class="breadcrumb">
+                <li><a href="/Home/Index/">Home</a></li>
+                <li><a href="/Maintenance/Index/">Maintenance</a></li>
+                <li><a href="/Maintenance/EmployeeList/">Employee List</a></li>
+                <li><a href="/Maintenance/Form201?EmployeeId=@Model.EmployeeId">201 File</a></li>
+                <li>Leaves</li>
+            </ul>
+        }
 
+    </div>
+    <input type="hidden" id="EmployeeId" name="EmployeeId" value="@Model.EmployeeId" />
     <div class="row">
         <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
             <div class="card shadow h-100 text-dark">
@@ -270,9 +275,19 @@
                                 </tr>
                             </thead>
                             <tbody id="tblVL">
+                                @{
+                                    decimal totalCreditVL = 0;
+                                    decimal totalAvailedVL = 0;
+                                    decimal totalMonetizedVL = 0;
+                                }
                                 @foreach (var vl in Model.vlSummaries)
                                 {
                                     string rowClass = vl.AsOf == currentMonth ? "table-success" : "";
+
+                                    totalCreditVL += vl.Credit;
+                                    totalAvailedVL += vl.Availed;
+                                    totalMonetizedVL += vl.Monetized;
+
 
                                     <tr class='@rowClass'>
                                         <td><strong> @vl.AsOf  </strong></td>
@@ -283,6 +298,15 @@
                                         <td>@vl.EndBal</td>
                                     </tr>
                                 }
+
+                                <tr style="font-weight: bold;">
+                                    <td></td>
+                                    <td></td>
+                                    <td>@totalCreditVL.ToString("N4")</td>
+                                    <td>@totalAvailedVL.ToString("N4")</td>
+                                    <td>@totalMonetizedVL.ToString("N4")</td>
+                                    <td></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -312,10 +336,18 @@
                                 </tr>
                             </thead>
                             <tbody id="tblSL">
-
+                                @{
+                                    decimal totalCreditSL = 0;
+                                    decimal totalAvailedSL = 0;
+                                    decimal totalMonetizedSL = 0;
+                                }
                                 @foreach (var sl in Model.slSummaries)
                                 {
                                     string rowClass = sl.AsOf == currentMonth ? "table-success" : "";
+
+                                    totalCreditSL += sl.Credit;
+                                    totalAvailedSL += sl.Availed;
+                                    totalMonetizedSL += sl.Monetized;
 
                                     <tr class='@rowClass'>
                                         <td><strong> @sl.AsOf  </strong></td>
@@ -326,6 +358,15 @@
                                         <td>@sl.EndBal</td>
                                     </tr>
                                 }
+                                <tr style="font-weight: bold;">
+                                    <td></td>
+                                    <td></td>
+                                    <td>@totalCreditSL.ToString("N4")</td>
+                                    <td>@totalAvailedSL.ToString("N4")</td>
+                                    <td>@totalMonetizedSL.ToString("N4")</td>
+                                    <td></td>
+                                </tr>
+
                             </tbody>
                         </table>
                     </div>
@@ -452,21 +493,6 @@
 
     <script src="~/js/dci-validation.js"></script>
 
-
-    @*  Export Button
-            <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.2.1/js/dataTables.buttons.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.2.1/js/buttons.print.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.1/css/buttons.dataTables.css">
-    *@
 
     <script>
         window.addEventListener('DOMContentLoaded', () => {
@@ -1026,11 +1052,14 @@
 
 
                   var _year = document.getElementById("yearSelect").value;
+                     var _empId = document.getElementById("EmployeeId").value;
+                  
+
 
                     $.ajax({
                               type: 'POST',
-                              url: '@Url.Action("LeaveDropdown", "DailyTimeRecord")',
-                              data: { filteryear : _year},
+                              url: '@Url.Action("LeaveDropdown", "Report")',
+                              data: { filteryear : _year, employeeId : _empId} ,
 
                               success: function (response) {
                                   if (response.success) {
@@ -1041,13 +1070,20 @@
                                             var currentMonth = monthNames[now.getMonth()] + "-" + now.getFullYear();
 
 
-                                       var tbodytableVL = $("#tblVL");
+                                        var tbodytableVL = $("#tblVL");
                                                 tbodytableVL.empty();
 
                                                 if (response.data.vlSummaries.length > 0) {
+                                                            let totalCreditVL = 0;
+                                                            let totalAvailedVL = 0;
+                                                            let totalMonetizedVL = 0;
 
                                                     $.each(response.data.vlSummaries, function(index, item) {
                                                            var highlightClass = (item.asOf === currentMonth) ? "table-success" : "";
+
+                                                                 totalCreditVL += parseFloat(item.credit) || 0;
+                                                                totalAvailedVL += parseFloat(item.availed) || 0;
+                                                                totalMonetizedVL += parseFloat(item.monetized) || 0;
 
                                                                     var row = `<tr class="${highlightClass}">
                                                                             <td><strong>${item.asOf}</strong></td>
@@ -1059,13 +1095,32 @@
                                                                         </tr>`;
                                                         tbodytableVL.append(row);
                                                     });
+
+                                                            const totalRow = `
+                                                                <tr style="font-weight:bold;">
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td>${totalCreditVL.toFixed(4)}</td>
+                                                                    <td>${totalAvailedVL.toFixed(4)}</td>
+                                                                    <td>${totalMonetizedVL.toFixed(4)}</td>
+                                                                    <td></td>
+                                                                </tr>`;
+                                                            tbodytableVL.append(totalRow);
                                                 }
 
                                                   var tbodytableSL = $("#tblSL");
                                                 tbodytableSL.empty();
                                                 if (response.data.slSummaries.length > 0) {
+                                                            let totalCreditSL = 0;
+                                                            let totalAvailedSL = 0;
+                                                            let totalMonetizedSL = 0;
+
                                                     $.each(response.data.slSummaries, function(index, item) {
                                                          var highlightClass = (item.asOf === currentMonth) ? "table-success" : "";
+
+                                                              totalCreditSL += parseFloat(item.credit) || 0;
+                                                                totalAvailedSL += parseFloat(item.availed) || 0;
+                                                                totalMonetizedSL += parseFloat(item.monetized) || 0;
 
                                                              var row = `<tr class="${highlightClass}">
                                                                             <td><strong>${item.asOf}</strong></td>
@@ -1077,8 +1132,18 @@
                                                                         </tr>`;
                                                         tbodytableSL.append(row);
                                                     });
-                                                }
 
+                                                         const totalRow = `
+                                                                <tr style="font-weight:bold;">
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td>${totalCreditSL.toFixed(4)}</td>
+                                                                    <td>${totalAvailedSL.toFixed(4)}</td>
+                                                                    <td>${totalMonetizedSL.toFixed(4)}</td>
+                                                                    <td></td>
+                                                                </tr>`;
+                                                            tbodytableSL.append(totalRow);
+                                                }
 
 
                                   } else {
