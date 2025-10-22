@@ -261,9 +261,9 @@ namespace DCI.API.Controllers
 				return (true, StatusCodes.Status403Forbidden, "Password cannot contain space.");
 			}
 
-			if (Utilities.IsMinCharacter(8, pass.NewPassword.ToString()))
+			if (Utilities.IsMinCharacter(14, pass.NewPassword.ToString()))
 			{
-				return (true, StatusCodes.Status403Forbidden, "Password cannot be less then 8 characters.");
+				return (true, StatusCodes.Status403Forbidden, "Password cannot be less then 14 characters.");
 			}
 
 			if (Utilities.IsMaxCharacter(32, pass.NewPassword.ToString()))
