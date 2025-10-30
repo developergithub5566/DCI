@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using static QRCoder.PayloadGenerator;
 using System.Runtime.Intrinsics.X86;
+using DCI.Core.Common;
 
 namespace DCI.Repositories
 {
@@ -502,7 +503,7 @@ namespace DCI.Repositories
             var _statusData = await (from emp in _dbContext.Employee
                                      join wrkdtls in _dbContext.EmployeeWorkDetails on emp.EmployeeId equals wrkdtls.EmployeeId
                                      join stat in _dbContext.EmployeeStatus on wrkdtls.EmployeeStatusId equals stat.EmployeeStatusId
-                                     where emp.IsActive == true
+                                     where emp.IsActive == true && wrkdtls.EmployeeStatusId != (int)EnumEmploymentType.Resigned
                                      group emp by stat.EmployeeStatusName into g
                                      select new ReportGraphViewModel
                                      {
@@ -513,7 +514,7 @@ namespace DCI.Repositories
             var _docTypeData = await (from emp in _dbContext.Employee
                                       join wrkdtls in _dbContext.EmployeeWorkDetails on emp.EmployeeId equals wrkdtls.EmployeeId
                                       join dep in _dbContext.Department on wrkdtls.DepartmentId equals dep.DepartmentId
-                                      where emp.IsActive == true
+                                      where emp.IsActive == true && wrkdtls.EmployeeStatusId != (int)EnumEmploymentType.Resigned
                                       group dep by dep.DepartmentName into g
                                       select new ReportGraphViewModel
                                       {
