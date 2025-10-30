@@ -36,8 +36,6 @@ namespace DCI.Repositories.Interface
         Task<User> GetUserByEmployeeId(int empId);
 
         Task<UserManager> GetUserManagerByEmail(string email);
-       
-        
-        // Task<User> GetUserByEmployeeNo(string empNo);
+        Task InsertAuditLog(int userId);
     }
 }

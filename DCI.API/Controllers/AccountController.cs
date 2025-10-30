@@ -144,8 +144,10 @@ namespace DCI.API.Controllers
 				if (PasswordHashingHelper.VerifyPassword(loginvm.Password, userEntity.Password))
 				{
 					var userContext = _userContextService.GetUserContext(loginvm.Email);
-					//var token = GenerateJwtToken(loginvm.Email);
-					return Ok(userContext.Result);
+                    //var token = GenerateJwtToken(loginvm.Email);
+                    await _userRepository.InsertAuditLog(userContext.Result.UserId);
+
+                    return Ok(userContext.Result);
 					//return Ok("Login Successful");
 				}
 				else

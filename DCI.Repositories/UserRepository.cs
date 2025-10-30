@@ -493,6 +493,22 @@ namespace DCI.Repositories
         {
             return await _dbContext.User.Where(x => x.EmployeeId == empId).FirstOrDefaultAsync();
         }
-                
+
+
+        public async Task InsertAuditLog(int userId)
+        {
+            AuditLog auditLog = new AuditLog();
+            auditLog.EntityName = "LOGIN";
+            auditLog.ActionType = "LOGIN";
+            auditLog.Username = userId.ToString();
+            auditLog.TimeStamp = DateTime.Now;
+            auditLog.EntityId = userId.ToString();
+            auditLog.Changes = new Dictionary<string, object>
+                        {
+                            { "Status", "Successfully Logged In" }
+                        };
+            await _dbContext.AuditLog.AddAsync(auditLog);
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }
