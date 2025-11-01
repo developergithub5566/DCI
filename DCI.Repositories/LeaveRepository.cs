@@ -171,8 +171,11 @@ namespace DCI.Repositories
                             join stat in _dbContext.Status.AsNoTracking() on lheader.Status equals stat.StatusId
                             join emp in _dbContext.Employee.AsNoTracking() on lheader.EmployeeId equals emp.EmployeeId
                             join apprvl in _dbContext.ApprovalHistory.AsNoTracking().Where(x => x.ModulePageId == (int)EnumModulePage.Leave)
-                            on lheader.LeaveRequestHeaderId equals apprvl.TransactionId into ah
-                            from apprvl in ah.DefaultIfEmpty()  
+                            on lheader.LeaveRequestHeaderId equals apprvl.TransactionId into ah                     
+                            from apprvl in ah.DefaultIfEmpty()
+
+                            join usr in _dbContext.User.AsNoTracking() on lheader.ApproverId equals usr.UserId into usrx
+                            from usr in usrx.DefaultIfEmpty()
 
                             where lheader.LeaveRequestHeaderId == param.LeaveRequestHeaderId //&& apprvl.IsActive 
                             select new LeaveRequestHeaderViewModel
@@ -191,6 +194,7 @@ namespace DCI.Repositories
                                 EmployeeName = emp.Firstname + " " + emp.Lastname,
                                 DateApprovedDisapproved = apprvl != null ? apprvl.DateCreated.ToString("yyyy-MM-dd HH:mm") : string.Empty,
                                 ApprovalRemarks = apprvl != null ? apprvl.Remarks : string.Empty,
+                                ApproverHead = usr.Fullname,
                                 DateModified = lheader.DateModified,
                                 ModifiedBy = lheader.ModifiedBy,                           
                             };

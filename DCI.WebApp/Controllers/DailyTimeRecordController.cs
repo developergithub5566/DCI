@@ -268,7 +268,7 @@ namespace DCI.WebApp.Controllers
                                         Value = x.LeaveTypeId.ToString(),
                                         Text = x.Description
                                     }).ToList();
-                        model.ApproverHead = currentUser?.ApproverHead;
+                        model.ApproverHead = model.LeaveRequestHeader != null ? model.LeaveRequestHeader.ApproverHead : currentUser?.ApproverHead;
                      
                     }
                     return Json(new { success = true, data = model });
