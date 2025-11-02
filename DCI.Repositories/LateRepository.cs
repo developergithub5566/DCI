@@ -170,6 +170,7 @@ namespace DCI.Repositories
                                         && (b.LeaveTypeId == (int)EnumLeaveType.HDVL
                                         || b.LeaveTypeId == (int)EnumLeaveType.HDSL
                                         || b.LeaveTypeId == (int)EnumLeaveType.OB
+                                        || b.LeaveTypeId == (int)EnumLeaveType.HDOB
                                         || b.LeaveTypeId == (int)EnumLeaveType.SL)
                     select new
                     {

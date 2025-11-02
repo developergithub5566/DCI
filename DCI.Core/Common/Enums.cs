@@ -175,7 +175,8 @@ namespace DCI.Core.Common
         UT = 11,
         LT = 12,
         OF = 13, //For OLD ESS Migration
-        WFH = 14 //For OLD ESS Migration
+        WFH = 14, //For OLD ESS Migration
+        HDOB = 15
     }
 
     public enum EnumEmployeeScope

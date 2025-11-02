@@ -60,6 +60,24 @@ namespace DCI.Data
                 serializedValue => JsonConvert.DeserializeObject<Dictionary<string, object>>(serializedValue));
 
             modelBuilder.Entity<LeaveSummary>().HasNoKey().ToView(null);
+
+            modelBuilder.Entity<LeaveInfo>(entity =>
+            {
+                entity.Property(e => e.VLBalance)
+                      .HasColumnType("decimal(7,4)");
+                entity.Property(e => e.SLBalance)
+                      .HasColumnType("decimal(7,4)");
+                entity.Property(e => e.SPLBalance)
+                     .HasColumnType("decimal(7,4)");
+                entity.Property(e => e.VLYear)
+                     .HasColumnType("decimal(7,4)");
+                entity.Property(e => e.SLYear)
+                      .HasColumnType("decimal(7,4)");
+                entity.Property(e => e.VLCredit)
+                     .HasColumnType("decimal(7,4)");
+                entity.Property(e => e.SLCredit)
+               .HasColumnType("decimal(7,4)");
+            });
         }
         public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
         {

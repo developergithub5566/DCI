@@ -100,8 +100,8 @@ namespace DCI.Repositories
             var officialBusiness = await (from dtl in _dbContext.LeaveRequestDetails.AsNoTracking()
                                           join ob in _dbContext.LeaveRequestHeader.AsNoTracking() on dtl.LeaveRequestHeaderId equals ob.LeaveRequestHeaderId
                                           join emp in _dbContext.Employee.AsNoTracking() on ob.EmployeeId equals emp.EmployeeId
-                                          where ob.IsActive == true && ob.LeaveTypeId == (int)EnumLeaveType.OB && ob.Status == (int)EnumStatus.Approved
-                                 select new DailyTimeRecordViewModel
+                                          where ob.IsActive == true && (ob.LeaveTypeId == (int)EnumLeaveType.OB || ob.LeaveTypeId == (int)EnumLeaveType.HDOB) && ob.Status == (int)EnumStatus.Approved 
+                                          select new DailyTimeRecordViewModel
                                  {
                                      ID = 0,
                                      EMPLOYEE_NO = emp.EmployeeNo,

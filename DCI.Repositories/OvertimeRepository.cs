@@ -70,7 +70,7 @@ namespace DCI.Repositories
                 {
                     var x = (from hdr in _dbContext.LeaveRequestHeader.AsNoTracking()
                              join dtl in _dbContext.LeaveRequestDetails.AsNoTracking() on hdr.LeaveRequestHeaderId equals dtl.LeaveRequestHeaderId
-                             where hdr.IsActive && dtl.LeaveDate.Date == model.OTDate.Date && hdr.LeaveTypeId == (int)EnumLeaveType.OB && hdr.ApproverId == (int)EnumStatus.Approved
+                             where hdr.IsActive && dtl.LeaveDate.Date == model.OTDate.Date && (hdr.LeaveTypeId == (int)EnumLeaveType.OB || hdr.LeaveTypeId == (int)EnumLeaveType.HDOB) && hdr.ApproverId == (int)EnumStatus.Approved
                              select new
                              {
                                  Exist = hdr.LeaveRequestHeaderId

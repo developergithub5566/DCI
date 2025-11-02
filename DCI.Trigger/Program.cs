@@ -61,7 +61,7 @@ public class Program
 
 
         RecurringJob.AddOrUpdate<LeaveProcessor>("leave-credit-job",
-         processor => processor.MonthlyLeaveCredit(), "0 0 1 * *"); // Runs on the 1st day of every month
+         processor => processor.MonthlyLeaveCredit(), "0 5 1 * *", TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila")); // Runs on the 1st day of every month at 5:00am
 
         //       RecurringJob.AddOrUpdate<LeaveProcessor>("leave-credit-job",
         //processor => processor.MonthlyLeaveCredit(), Cron.Minutely);

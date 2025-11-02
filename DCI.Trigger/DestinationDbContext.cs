@@ -15,5 +15,19 @@ namespace DCI.Trigger
         public DbSet<EmployeeWorkDetails> EmployeeWorkDetails { get; set; }
         public DbSet<Notification> Notification { get; set; }
         public DbSet<User> User { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<LeaveInfo>(entity =>
+            {
+                entity.Property(e => e.VLBalance)
+                      .HasColumnType("decimal(7,4)");   
+                entity.Property(e => e.SLBalance)
+                      .HasColumnType("decimal(7,4)");  
+            });
+        }
     }
+
 }

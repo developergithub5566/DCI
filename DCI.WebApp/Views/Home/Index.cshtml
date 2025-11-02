@@ -244,9 +244,10 @@
                                     }
                                     else
                                     {
-
-                                        @foreach (var bday in Model.BirthdayList.OrderBy(b => b.Birthday.HasValue &&
-                                                                            b.Birthday.Value.Day == DateTime.Now.Day))
+@* 
+                                        @foreach (var bday in Model.BirthdayList.OrderByDescending(b => b.Birthday.HasValue &&
+                                                                            b.Birthday.Value.Day == DateTime.Now.Day)) *@
+                                        @foreach (var bday in Model.BirthdayList.Where(b => b.Birthday.HasValue).OrderBy(b => b.Birthday.Value.Day))    
                                         {
                                             var isToday = bday.Birthday.HasValue &&
                                             bday.Birthday.Value.Month == DateTime.Now.Month &&

@@ -661,7 +661,7 @@
                    const leaveTypeId = $('#leaveTypeSelect').val();
                      const selectedDatesJson = $('#SelectedDatesJson').val();
 
-
+                   
 
                          const noOfDays = $('#NoOfDays').val();
                            const reason = $('#Reason').val();
@@ -710,6 +710,14 @@
                                                                                     }
                                                                               }
 
+                                                                              if(selectedDatesJson == "[]"){
+                                                                                    Swal.fire({
+                                                                                            text: "Please select the date covered.",
+                                                                                            icon: "warning",
+                                                                                            confirmButtonText: "Ok"
+                                                                                        });
+                                                                                        return;;
+                                                                              }
 
                   Swal.fire({
                       text: "Are you sure you want to submit this record?",
@@ -1026,7 +1034,7 @@
                              mode = 'single';
                            
                      }
-                   else if(leave == 1 || leave == 2){ //half day SLVL
+                   else if(leave == 1 || leave == 2 || leave == 15){ //half day SLVL
 
                        _amount = 0.5000;
                        $('#SelectedLeaveTypeAmount').val(_amount);
