@@ -140,7 +140,7 @@
                                             2 => "II",
                                             3 => "III",
                                             4 => "IV",
-                                            _ => string.Empty 
+                                            _ =>  "-" 
                                         };
                                     }
                                     <label class="topLabelText">@suffixLabel</label>                            
@@ -157,12 +157,12 @@
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
                                     @{
-                                        int sexId = int.TryParse(Model?.Sex, out int parsedsex) ? parsed : 0;
+                                        int sexId = int.TryParse(Model?.Sex, out int parsedsex) ? parsedsex : 0;
                                         string sexLabel = sexId switch
                                         {
                                             1 => "MALE",
                                             2 => "FEMALE",                                        
-                                            _ => string.Empty
+                                            _ => "-"
                                         };
                                     }
                                     <label class="topLabelText">@sexLabel</label>
@@ -179,7 +179,7 @@
                                             2 => "MARRIED",
                                             3 => "DIVORCED",
                                             4 => "WIDOWED",
-                                            _ => string.Empty
+                                            _ =>  "-"
                                         };
                                     }
                                     <label class="topLabelText">@civilLabel</label>                             
