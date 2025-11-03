@@ -132,7 +132,18 @@
                             </div> *@
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.Suffix) ? "-" : Model.Suffix)</label>
+                                    @{
+                                        int suffixid = int.TryParse(Model?.Suffix, out int parsed) ? parsed : 0;
+                                        string suffixLabel = suffixid switch
+                                        {
+                                            1 => "Jr.",
+                                            2 => "II",
+                                            3 => "III",
+                                            4 => "IV",
+                                            _ => string.Empty 
+                                        };
+                                    }
+                                    <label class="topLabelText">@suffixLabel</label>                            
                                     <label class="bottomLabelText">Suffix</label>
                                 </div>
                             </div>
@@ -145,13 +156,33 @@
 
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.Sex) ? "-" : Model.Sex)</label>
+                                    @{
+                                        int sexId = int.TryParse(Model?.Sex, out int parsedsex) ? parsed : 0;
+                                        string sexLabel = sexId switch
+                                        {
+                                            1 => "MALE",
+                                            2 => "FEMALE",                                        
+                                            _ => string.Empty
+                                        };
+                                    }
+                                    <label class="topLabelText">@sexLabel</label>
                                     <label class="bottomLabelText">Sex</label>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                    <label class="topLabelText">XX</label>
+                                    @{
+                                        
+                                       string civilLabel = Model.CivilStatus switch
+                                        {
+                                            1 => "SINGLE",
+                                            2 => "MARRIED",
+                                            3 => "DIVORCED",
+                                            4 => "WIDOWED",
+                                            _ => string.Empty
+                                        };
+                                    }
+                                    <label class="topLabelText">@civilLabel</label>                             
                                     <label class="bottomLabelText">Civil Status</label>
                                 </div>
                             </div>

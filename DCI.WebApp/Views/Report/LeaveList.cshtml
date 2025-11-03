@@ -84,9 +84,9 @@
                             <th><span>VL Balance</span></th>
                             <th><span>SL Balance</span></th>
                             <th><span>SPL Balance</span></th>
-                            <th><span>Pending Application</span></th>
+                         @*    <th><span>Pending Application</span></th>
                             <th><span>Total VL Filed</span></th>
-                            <th><span>Total SL Filed</span></th>                     
+                            <th><span>Total SL Filed</span></th> *@                     
                             <th><span>Action</span></th>
                         </tr>
                     </thead>
@@ -100,9 +100,9 @@
                                 <td>@hdr.VLBalance</td>
                                 <td>@hdr.SLBalance</td>
                                 <td>@hdr.SPLBalance</td>
-                                <td>@hdr.PendingApplication</td>
+                          @*       <td>@hdr.PendingApplication</td>
                                 <td>@hdr.VLFiled</td>
-                                <td>@hdr.SLFiled</td>
+                                <td>@hdr.SLFiled</td> *@
                                    <td class="text-center">                              
                                     <a asp-controller="Report" asp-action="Leave" asp-route-EmployeeId="@hdr.EmployeeId" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
                                 </td>

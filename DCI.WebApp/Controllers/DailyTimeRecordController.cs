@@ -60,7 +60,7 @@ namespace DCI.WebApp.Controllers
                     if (response.IsSuccessStatusCode == true)
                     {
                         model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
-                    }                   
+                    }
                     ViewBag.Fullname = currentUser?.Fullname;
                 }
 
@@ -89,7 +89,7 @@ namespace DCI.WebApp.Controllers
                     if (currentUser == null)
                         return RedirectToAction("Logout", "Account");
 
-                  
+
                     param.EMPLOYEE_ID = currentUser.EmployeeId;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
@@ -269,7 +269,7 @@ namespace DCI.WebApp.Controllers
                                         Text = x.Description
                                     }).ToList();
                         model.ApproverHead = model.LeaveRequestHeader.LeaveRequestHeaderId > 0 ? model.LeaveRequestHeader.ApproverHead : currentUser?.ApproverHead;
-                     
+
                     }
                     return Json(new { success = true, data = model });
                 }
@@ -423,7 +423,7 @@ namespace DCI.WebApp.Controllers
             {
                 using (var _httpclient = new HttpClient())
                 {
-             
+
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/DTRCorrectionById");
@@ -658,7 +658,7 @@ namespace DCI.WebApp.Controllers
             {
                 using (var _httpclient = new HttpClient())
                 {
-                    var currentUser = _userSessionHelper.GetCurrentUser();                   
+                    var currentUser = _userSessionHelper.GetCurrentUser();
                     if (currentUser == null)
                         return RedirectToAction("Logout", "Account");
 
@@ -700,7 +700,7 @@ namespace DCI.WebApp.Controllers
             {
                 using (var _httpclient = new HttpClient())
                 {
-                    var currentUser = _userSessionHelper.GetCurrentUser();        
+                    var currentUser = _userSessionHelper.GetCurrentUser();
                     if (currentUser == null)
                         return RedirectToAction("Logout", "Account");
 
@@ -810,7 +810,7 @@ namespace DCI.WebApp.Controllers
                     var response = await _httpclient.SendAsync(request);
                     var responseBody = await response.Content.ReadAsStringAsync();
 
-                   
+
                     if (response.IsSuccessStatusCode)
                     {
                         return Json(new { success = true, message = responseBody });
@@ -893,7 +893,7 @@ namespace DCI.WebApp.Controllers
                     }
                     ViewBag.Fullname = currentUser?.Fullname;
                 }
-                return Json(new { success = true, data = string.Empty });          
+                return Json(new { success = true, data = string.Empty });
             }
             catch (Exception ex)
             {
@@ -903,7 +903,7 @@ namespace DCI.WebApp.Controllers
             finally
             {
                 Log.CloseAndFlush();
-            }           
+            }
         }
 
         public async Task<IActionResult> WFHApplicationDetails(WFHHeaderViewModel param)
@@ -1020,7 +1020,7 @@ namespace DCI.WebApp.Controllers
         }
 
         public async Task<IActionResult> OvertimeReport(OvertimePayReport param)
-        {          
+        {
             OvertimePayReport model = new OvertimePayReport();
             try
             {
@@ -1029,7 +1029,7 @@ namespace DCI.WebApp.Controllers
                     return RedirectToAction("Logout", "Account");
 
                 using (var _httpclient = new HttpClient())
-                {          
+                {
                     param.EmployeeId = currentUser.EmployeeId;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
@@ -1265,15 +1265,15 @@ namespace DCI.WebApp.Controllers
 
 
                         //Working Hours
-               
-                            totalWorkingHours = lastout - firstin;
-                            totalWorkingHours = totalWorkingHours >= eightHours ? totalWorkingHours - lunchBreak : totalWorkingHours;
-                      
 
-                        if (param.IsOfficialBuss && !dtrmodel.IsOBFileRecord)
-                        {
-                            return Json(new { success = false, message = Constants.Msg_NoOfficialBusinessRecord });
-                        }
+                        totalWorkingHours = lastout - firstin;
+                        totalWorkingHours = totalWorkingHours >= eightHours ? totalWorkingHours - lunchBreak : totalWorkingHours;
+
+
+                        //if (param.IsOfficialBuss && !dtrmodel.IsOBFileRecord)
+                        //{
+                        //    return Json(new { success = false, message = Constants.Msg_NoOfficialBusinessRecord });
+                        //}
 
                         if (!param.IsOfficialBuss && !isHoliday && !isRestDay && !dtrmodel.IsWFHFileRecord && !dtrmodel.IsBiometricRecord)
                         {
@@ -1285,9 +1285,9 @@ namespace DCI.WebApp.Controllers
                             return Json(new { success = false, message = Constants.OverTime_Requires1Hr });
                         }
 
-                        if (!param.IsOfficialBuss && !isHoliday && !isRestDay &&  lastout > _lastoutFinalLog)
+                        if (!param.IsOfficialBuss && !isHoliday && !isRestDay && lastout > _lastoutFinalLog)
                         {
-                            return Json(new { success = false, message = Constants.OverTime_ExceedsActualTimeOut });  
+                            return Json(new { success = false, message = Constants.OverTime_ExceedsActualTimeOut });
                         }
 
                         //REGULAR or SPECIAL HOLIDAY and REST DAY
@@ -1348,10 +1348,10 @@ namespace DCI.WebApp.Controllers
                             otSpecialHoliday.OTTypeName = Constants.OverTime_SpecialHoliday;
                             param.otDetails.Add(otSpecialHoliday);
 
-                            if(totalWorkingHours >= eightHours)
+                            if (totalWorkingHours >= eightHours)
                             {
                                 TimeSpan spcHolidayStart8hrs;
-                                TimeSpan spcHolidayAfter8hrs;                              
+                                TimeSpan spcHolidayAfter8hrs;
 
                                 spcHolidayStart8hrs = firstin + eightHours + lunchBreak;
 
@@ -1362,7 +1362,7 @@ namespace DCI.WebApp.Controllers
                                 else
                                 {
                                     spcHolidayAfter8hrs = nightDiffStartTime - spcHolidayStart8hrs;
-                                }             
+                                }
 
                                 if ((int)spcHolidayAfter8hrs.TotalMinutes > (int)TimeSpan.Zero.TotalMinutes)
                                 {
@@ -1377,7 +1377,7 @@ namespace DCI.WebApp.Controllers
                                     otAfter8hrs.OTTypeName = Constants.OverTime_After8hrs;
                                     param.otDetails.Add(otAfter8hrs);
                                 }
-                            }                           
+                            }
 
                             if (lastout > nightDiffStartTime)
                             {
@@ -1394,8 +1394,8 @@ namespace DCI.WebApp.Controllers
                                 nightdiff.OTTypeName = Constants.OverTime_NightDifferential;
                                 param.otDetails.Add(nightdiff);
                             }
-                        }                
-                        
+                        }
+
                         else if (param.IsOfficialBuss == true && isHoliday == false && isRestDay == false)
                         {
                             var regOt = lastout - clockout;
@@ -1434,7 +1434,7 @@ namespace DCI.WebApp.Controllers
                             }
                         }
                         else
-                        {                         
+                        {
                             var regOt = lastout - clockout;
                             if (regOt >= morethan1hr)
                             {
@@ -1500,7 +1500,7 @@ namespace DCI.WebApp.Controllers
         public async Task<IActionResult> CheckOvertimeDate([FromBody] OvertimeEntryDto param)
         {
             OvertimeEntryDto model = new OvertimeEntryDto();
-           // OvertimeEntryDto param = new OvertimeEntryDto();
+            // OvertimeEntryDto param = new OvertimeEntryDto();
             try
             {
                 using (var _httpclient = new HttpClient())
@@ -1508,7 +1508,7 @@ namespace DCI.WebApp.Controllers
                     //var currentUser = _userSessionHelper.GetCurrentUser();
                     //   param.CurrentUserId = currentUser.UserId;
 
-                   // param.OTDate = OTDate ?? DateTime.Now;
+                    // param.OTDate = OTDate ?? DateTime.Now;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/CheckOvertimeDate");
@@ -1539,7 +1539,7 @@ namespace DCI.WebApp.Controllers
 
         public async Task<IActionResult> Late(DailyTimeRecordViewModel param)
         {
-            List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();            
+            List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();
             try
             {
                 using (var _httpclient = new HttpClient())
@@ -1616,7 +1616,7 @@ namespace DCI.WebApp.Controllers
                 Log.CloseAndFlush();
             }
         }
-       
+
         public async Task<IActionResult> SaveLate([FromBody] List<LateDeductionViewModel> model)
         {
             try
