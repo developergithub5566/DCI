@@ -150,7 +150,7 @@ namespace DCI.Repositories
 					<p>Please note: This link will expire on {DateTime.UtcNow.AddDays(1).ToShortDateString()} for security purposes.</p>
 					<p>If you have any questions or need assistance, feel free to reach out to our support team.</p>
 					<p>Thank you and welcome aboard!</p>
-					<p>Best regards,<br />DocTrack System Administrator</p>
+					<p>Best regards,<br />ESS System Administrator</p>
 				</body>
 				</html>";
 
@@ -227,7 +227,7 @@ namespace DCI.Repositories
 
             MailMessage mail = new MailMessage();
             mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-            mail.Subject = "DCI App - Your leave request " + model.LeaveRequestHeader.RequestNo + " has been " + model.StatusName.ToLower();
+            mail.Subject = "DCI ESS - Your leave request " + model.LeaveRequestHeader.RequestNo + " has been " + model.StatusName.ToLower();
             mail.Body = model.EmailBody;
             mail.IsBodyHtml = true;
             mail.To.Add(model.RequestorEmail);
@@ -246,7 +246,7 @@ namespace DCI.Repositories
                 <p>Hi {userEntity.Fullname},</p>
                 
               <p>This is an automated message from ESS System.</p>
-                 <p>Your Leave request {model.LeaveRequestHeader.RequestNo} has been {model.StatusName.ToLower()}.</p>   
+                 <p>Your leave request {model.LeaveRequestHeader.RequestNo} has been {model.StatusName.ToLower()}.</p>   
               
                        <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
                 <p>Best regards,<br />ESS System Administrator</p>
@@ -268,7 +268,7 @@ namespace DCI.Repositories
 
             MailMessage mail = new MailMessage();
             mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-            mail.Subject = "Action Required: Please check the Overtime Request no. " + model.RequestNo;
+            mail.Subject = "Action Required: Please check the Overtime Request " + model.RequestNo;
             mail.Body = model.EmailBody;
             mail.IsBodyHtml = true;
             mail.To.Add(model.ApproverEmail);
@@ -368,7 +368,7 @@ namespace DCI.Repositories
 
             MailMessage mail = new MailMessage();
             mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-            mail.Subject = "DCI ESS App - Your DTR adjustment " + model.RequestNo + " has been " + model.StatusName.ToLower();
+            mail.Subject = "DCI ESS - Your DTR adjustment " + model.RequestNo + " has been " + model.StatusName.ToLower();
             mail.Body = model.EmailBody;
             mail.IsBodyHtml = true;
             mail.To.Add(model.RequestorEmail);
@@ -406,7 +406,7 @@ namespace DCI.Repositories
 
             MailMessage mail = new MailMessage();
             mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-            mail.Subject = "Action Required: Please check the WFH Request no. " + model.RequestNo;
+            mail.Subject = "Action Required: Please check the WFH Request " + model.RequestNo;
             mail.Body = model.EmailBody;
             mail.IsBodyHtml = true;
             mail.To.Add(model.ApproverEmail);
@@ -452,7 +452,7 @@ namespace DCI.Repositories
 
             MailMessage mail = new MailMessage();
             mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-            mail.Subject = "DCI ESS App - Your Work from home " + model.RequestNo + " has been " + model.StatusName.ToLower();
+            mail.Subject = "DCI ESS - Your Work from home " + model.RequestNo + " has been " + model.StatusName.ToLower();
             mail.Body = model.EmailBody;
             mail.IsBodyHtml = true;
             mail.To.Add(model.RequestorEmail);

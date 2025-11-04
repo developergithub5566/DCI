@@ -628,9 +628,10 @@
 
                                                                              if(leave == 5){ //SPL leavetype
                                                                                const spl =   $('#hiddenSPLBalance').val();
-                                                                            
-                                                                               if(spl < formattedDays){                                                                                   
 
+                                                                               if(parseFloat(formattedDays) > parseFloat(spl)){
+                                                                                            console.log(spl);
+                                                                                            console.log(formattedDays);
                                                                                                 Swal.fire({
                                                                                                     text: "You cannot file a special leave that exceeds your remaining special leave balance.",
                                                                                                     icon: "warning",
@@ -658,6 +659,10 @@
 
                   $('#createForm').submit(function (event) {
                       event.preventDefault();
+
+                       $(this).find(':submit').prop('disabled', true);
+
+
                    const leaveTypeId = $('#leaveTypeSelect').val();
                      const selectedDatesJson = $('#SelectedDatesJson').val();
 
@@ -678,15 +683,20 @@
                                                                              if (leaveTypeId == 5) { // SPL leave type
                                                                                     const spl = parseFloat($('#hiddenSPLBalance').val()) || 0;                                                         
 
-                                                                                    if ( _noofdaysX > spl) {
+                                                                                    if ( _noofdaysX > spl) {                                                                                       
+
                                                                                         Swal.fire({
                                                                                             text: "You cannot file a special leave that exceeds your remaining special leave balance.",
                                                                                             icon: "warning",
                                                                                             confirmButtonText: "Ok"
-                                                                                        });
+                                                                                      }).then((result) => {
+                                                                                                       $('#createForm').find(':submit').prop('disabled', false)
+                                                                                                });
                                                                                         return;;
                                                                                     }
                                                                               }else if( leaveTypeId == 9){ //vl monetized
+                                                                                  
+
                                                                                     const vl = parseFloat($('#hiddenVLBalance').val()) || 0;
                                                                                     _noofdaysX = _noofdaysX + 1;
                                                                                     if ( _noofdaysX > vl) {
@@ -694,10 +704,15 @@
                                                                                             text: "You cannot file monetization that exceeds your remaining leave balance. Please ensure at least one day of leave remains after monetization.",
                                                                                             icon: "warning",
                                                                                             confirmButtonText: "Ok"
-                                                                                        });
+                                                                                         }).then((result) => {
+                                                                                                       $('#createForm').find(':submit').prop('disabled', false)
+                                                                                                });
+                                                                                         
                                                                                         return;;
                                                                                     }
                                                                               }else if( leaveTypeId == 10){ //sl monetized
+                                                                        
+
                                                                                     const sl = parseFloat($('#hiddenSLBalance').val()) || 0;
                                                                                     _noofdaysX = _noofdaysX + 1;
                                                                                     if ( _noofdaysX > sl) {
@@ -705,17 +720,33 @@
                                                                                             text: "You cannot file monetization that exceeds your remaining leave balance. Please ensure at least one day of leave remains after monetization.",
                                                                                             icon: "warning",
                                                                                             confirmButtonText: "Ok"
-                                                                                        });
+                                                                                       }).then((result) => {
+                                                                                                       $('#createForm').find(':submit').prop('disabled', false)
+                                                                                                });
                                                                                         return;;
                                                                                     }
                                                                               }
 
-                                                                              if(selectedDatesJson == "[]"){
+                                                                              if(selectedDatesJson == "[]" && (leaveTypeId != 9 && leaveTypeId != 10) ){
+                                                                                   
                                                                                     Swal.fire({
                                                                                             text: "Please select the date covered.",
                                                                                             icon: "warning",
                                                                                             confirmButtonText: "Ok"
-                                                                                        });
+                                                                                       }).then((result) => {
+                                                                                                       $('#createForm').find(':submit').prop('disabled', false)
+                                                                                                });
+                                                                                        return;;
+                                                                              }
+
+                                                                              if(noOfDaysX == 0){
+                                                                                    Swal.fire({
+                                                                                            text: "Please enter the number of days.",
+                                                                                            icon: "warning",
+                                                                                            confirmButtonText: "Ok"
+                                                                                       }).then((result) => {
+                                                                                                       $('#createForm').find(':submit').prop('disabled', false)
+                                                                                                });
                                                                                         return;;
                                                                               }
 
@@ -736,6 +767,7 @@
                                      contentType: false,
                               success: function (response) {
                                   if (response.success) {
+                                
                                       // $('#createForm')[0].reset();
                                       // js('#createmodal').modal('hide');
                                          $('.spinner-overlay').show();
@@ -745,6 +777,7 @@
                                           icon: "success",
                                           confirmButtonText: "Ok"
                                       }).then((result) => {
+                                                //  $('#createForm').find(':submit').prop('disabled', false);
                                           location.reload();
                                       });
 
@@ -757,6 +790,7 @@
                                   $('.spinner-overlay').hide();
                               },
                               error: function () {
+                                    $('#createForm').find(':submit').prop('disabled', false);
                                   $('.spinner-overlay').hide();
                                   Swal.fire({
                                       text: "An error occurred. Please try again.",
@@ -764,6 +798,9 @@
                                   });
                               }
                           });
+                      }
+                      else{
+                             $(this).find(':submit').prop('disabled', false);
                       }
                   });
 
@@ -806,7 +843,7 @@
                                       }
                                   });
 
-                             console.log(response);
+                            // console.log(response);
 
                           // $('#dateCovered').val(response.data.selectedDateJson);
                             $('#NoOfDays').val(response.data.leaveRequestHeader.noofDays);
@@ -818,6 +855,7 @@
                                $('#hiddenVLBalance').val((response?.data?.leaveRequestHeader?.vlBalance || 0).toFixed(4));
                             
                                  $('#NoOfDays').prop('disabled', true);
+                                              $('#createForm').find(':submit').prop('disabled', false);
                                       js('#createmodal').modal('show');
                                   } else {
                                       Swal.fire({

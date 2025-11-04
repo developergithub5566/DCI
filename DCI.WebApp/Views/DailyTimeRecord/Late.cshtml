@@ -122,7 +122,7 @@
                     </div>
                     <div class="form-group col-sm-4 col-md-4 col-lg-3 col-xl-2 mb0 ml-auto text-right align-self-center">
                         <a href="#" title="Submit"
-                           class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")"
+                           class="btn btnPrimary btn-icon-split"
                            data-toggle="modal" data-target="#" onclick="SubmitLateDeduction()" id="Submit">
                             <span class="icon text-white"><i class="fa fa-paper-plane" aria-hidden="true"></i></span>
                             <span class="text text-white"><small>Submit</small></span>
@@ -362,9 +362,9 @@
 
                         function editForm(empNo,datefrom,dateto) {
                                 //   event.preventDefault();
-                                     console.log(empNo);
-                                                     console.log(datefrom);
-                                                                     console.log(dateto);
+                                     // console.log(empNo);
+                                     //                 console.log(datefrom);
+                                     //                                 console.log(dateto);
 
                                       $.ajax({
                                           type: 'POST',

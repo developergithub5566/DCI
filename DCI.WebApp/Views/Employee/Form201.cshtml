@@ -2,7 +2,7 @@
 @using Newtonsoft.Json;
 @using DCI.Core.Common;
 @using DCI.Models.ViewModel;
-
+@using System.Text.RegularExpressions;
 
 @{
     var modulePageAccess = Context.Session.GetString("ModulePageAccess"); 
@@ -195,32 +195,47 @@
 
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.SSSNo) ? "00-0000000-0" : Model.SSSNo)</label>
+                                      @{ 
+                                         var _sss  = string.IsNullOrWhiteSpace(Model.SSSNo) ? "00-0000000-0" :  Regex.Replace(Model.SSSNo,@"^(\d{2})(\d{7})(\d{1})$", "$1-$2-$3");                                    
+                                      }
+                                    <label class="topLabelText">@_sss</label>
                                     <label class="bottomLabelText">SSS</label>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.Tin) ? "000-000-000" : Model.Tin)</label>
+                                     @{ 
+                                         var _tin  = string.IsNullOrWhiteSpace(Model.Tin) ? "000-000-000" :  Regex.Replace(Model.Tin, @"(\d{3})(\d{3})(\d{3})", "$1-$2-$3");                                    
+                                    }
+                                    <label class="topLabelText">@_tin</label>
                                     <label class="bottomLabelText">TIN</label>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.Pagibig) ? "0000-0000-0000" : Model.Pagibig)</label>
+                                    @{ 
+                                         var _pagibig  = string.IsNullOrWhiteSpace(Model.Pagibig) ? "0000-0000-0000" :  Regex.Replace(Model.Pagibig,@"(\d{4})(\d{4})(\d{4})", "$1-$2-$3");                                    
+                                    }
+                                    <label class="topLabelText">@_pagibig</label>
                                     <label class="bottomLabelText">Pagibig(HDMF)</label>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.Philhealth) ? "00-000000000-0" : Model.Philhealth)</label>
+                                      @{ 
+                                         var _philhealth  = string.IsNullOrWhiteSpace(Model.Philhealth) ? "00-000000000-0" :  Regex.Replace(Model.Philhealth,@"^(\d{2})(\d{9})(\d{1})$", "$1-$2-$3");                                    
+                                      }
+                                    <label class="topLabelText">@_philhealth</label>
                                     <label class="bottomLabelText">Philhealth</label>
                                 </div>
                             </div>
                          
                             <div class="col-lg-4">
                                 <div class="form-group mb10 text-center">
-                                    <label class="topLabelText">@(string.IsNullOrWhiteSpace(Model.NationalId) ? "0000-0000-0000-0000" : Model.NationalId)</label>
+                                      @{ 
+                                         var _nationalId  = string.IsNullOrWhiteSpace(Model.NationalId) ? "0000-0000-0000-0000" :  Regex.Replace(Model.NationalId,@"^(\d{4})(\d{4})(\d{4})(\d{4})$", "$1-$2-$3-$4");                                    
+                                    }
+                                    <label class="topLabelText">@_nationalId</label>
                                     <label class="bottomLabelText">National ID</label>
                                 </div>
                             </div>

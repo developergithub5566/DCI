@@ -104,7 +104,8 @@ namespace DCI.Repositories
             var query = await (from hdr in _dbContext.WfhHeader.AsQueryable()
                                join emp in _dbContext.Employee.AsNoTracking() on hdr.EmployeeId equals emp.EmployeeId
                                join stat in _dbContext.Status on hdr.Status equals stat.StatusId
-                               //orderby hdr.DateCreated descending, hdr.NAME descending
+                               orderby hdr.DateCreated // descending, hdr.NAME descending
+                               where hdr.EmployeeId == model.EmployeeId
                                select new WFHHeaderViewModel
                                {                                  
                                        WfhHeaderId = hdr.WfhHeaderId,

@@ -879,7 +879,7 @@ namespace DCI.WebApp.Controllers
                     if (currentUser == null)
                         return RedirectToAction("Logout", "Account");
 
-
+                    param.EmployeeId = currentUser.EmployeeId;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllWFHApplication");
