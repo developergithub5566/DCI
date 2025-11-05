@@ -127,18 +127,9 @@ namespace DCI.Repositories
         async Task<string> SetPasswordBodyMessage(UserViewModel model)
         {
             try
-            {
-
-
-                // var userEntity = await _userRepository.GetUserByEmail(email);
-
-                //  var userAccessEntity = await _userAccessRepository.GetUserAccessByUserId(model.UserId);
-
-                var token = TokenGeneratorHelper.GetToken();
-                //var userAccessEntity = usraccssentity.FirstOrDefault();
-
-
-                //string link = "http://192.168.1.78:83/Account/ValidateToken?token=";
+            {           
+                var token = TokenGeneratorHelper.GetToken();     
+              
                 string link = _apiconfig.Value.WebAppConnection + "Account/ValidateToken?token=";
                 string emailBody = $@"
 				<html>
@@ -190,28 +181,32 @@ namespace DCI.Repositories
         {
             var userEntity = new User();
             string statusName = string.Empty;
-
+            //style=""color: #007bff; text-decoration: none;""
 
             if (model.LeaveRequestHeader.Status == (int)EnumStatus.ForApproval)
             {
                 userEntity = await _userRepository.GetUserById(model.ApproverId ?? default(int));
                 statusName = "for approval";
             }
-
-            //string link = _apiconfig.Value.WebAppConnection + "Document/Details?DocId=" + model.DocId;
-
-            //<p>Please check the Leave Request {model.LeaveRequestHeader.RequestNo} {statusName}. </p> 
             model.ApproverEmail = userEntity.Email;
             model.EmailBody = $@"
             <html>
             <body>              
-                <p>Hi {userEntity.Fullname },</p>
+                <p>Hi {userEntity.Fullname},</p>
                 
-                       <p>This is an automated message from ESS System.</p>
+                <p>This is an automated message from ESS System.</p>
                  
 				<p>You have been assigned leave request {model.LeaveRequestHeader.RequestNo} {statusName}. Kindly review and proceed accordingly. </p> 
             
-                        <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
+
+                <p>
+                    You may log in to your account using the link below:<br />
+                    <a href=' { _apiconfig.Value.WebAppConnection }' target='_blank' >
+                        Click here to log in to the DCI ESS System
+                    </a>
+                </p>
+
+                <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
                 <p>Best regards,<br />ESS System Administrator</p>
             </body>
             </html>";
@@ -248,6 +243,13 @@ namespace DCI.Repositories
               <p>This is an automated message from ESS System.</p>
                  <p>Your leave request {model.LeaveRequestHeader.RequestNo} has been {model.StatusName.ToLower()}.</p>   
               
+                <p>
+                    You may log in to your account using the link below:<br />
+                    <a href=' {_apiconfig.Value.WebAppConnection}' target='_blank' >
+                        Click here to log in to the DCI ESS System
+                    </a>
+                </p>
+
                        <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
                 <p>Best regards,<br />ESS System Administrator</p>
             </body>
@@ -279,13 +281,7 @@ namespace DCI.Repositories
         {
             var userEntity = new User();
             string statusName = string.Empty;
-
-
-            //if (model.StatusId == (int)EnumStatus.Pending)
-            //{
-            //    userEntity = await _userRepository.GetUserById(model.RecommendedById);
-            //    statusName = "for approval";
-            //}
+          
             if (model.StatusId == (int)EnumStatus.ForApproval)
             {
                 userEntity = await _userRepository.GetUserById(model.ApproverId);
@@ -302,6 +298,13 @@ namespace DCI.Repositories
                  
 				<p>You have been assigned overtime request {model.RequestNo} {statusName}. Kindly review and proceed accordingly. </p> 
             
+                 <p>
+                    You may log in to your account using the link below:<br />
+                    <a href=' {_apiconfig.Value.WebAppConnection}' target='_blank' >
+                        Click here to log in to the DCI ESS System
+                    </a>
+                </p>
+
                 <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
                 <p>Best regards,<br />ESS System Administrator</p>
             </body>
@@ -350,6 +353,13 @@ namespace DCI.Repositories
                 <p>This is an automated message from ESS System.</p>
                  
 				<p>You have been assigned DTR Adjustment request {model.RequestNo} {statusName}. Kindly review and proceed accordingly. </p> 
+
+                <p>
+                    You may log in to your account using the link below:<br />
+                    <a href=' {_apiconfig.Value.WebAppConnection}' target='_blank' >
+                        Click here to log in to the DCI ESS System
+                    </a>
+                </p>
             
                 <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
                 <p>Best regards,<br />ESS System Administrator</p>
@@ -368,7 +378,7 @@ namespace DCI.Repositories
 
             MailMessage mail = new MailMessage();
             mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-            mail.Subject = "DCI ESS - Your DTR adjustment " + model.RequestNo + " has been " + model.StatusName.ToLower();
+            mail.Subject = "DCI ESS - Your DTR Adjustment " + model.RequestNo + " has been " + model.StatusName.ToLower();
             mail.Body = model.EmailBody;
             mail.IsBodyHtml = true;
             mail.To.Add(model.RequestorEmail);
@@ -386,8 +396,15 @@ namespace DCI.Repositories
                 <p>Hi {userEntity.Fullname},</p>
                 
                 <p>This is an automated message from ESS System.</p>
-                 <p>Your DTR adjustment request {model.RequestNo} has been {model.StatusName.ToLower()}.</p>   
+                 <p>Your DTR Adjustment request {model.RequestNo} has been {model.StatusName.ToLower()}.</p>   
               
+                 <p>
+                    You may log in to your account using the link below:<br />
+                    <a href=' {_apiconfig.Value.WebAppConnection}' target='_blank' >
+                        Click here to log in to the DCI ESS System
+                    </a>
+                </p>
+
                   <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
                   <p>Best regards,<br />ESS System Administrator</p>
             </body>
@@ -434,6 +451,13 @@ namespace DCI.Repositories
                  
 				<p>You have been assigned wfh request {model.RequestNo} {statusName}. Kindly review and proceed accordingly. </p> 
             
+                  <p>
+                    You may log in to your account using the link below:<br />
+                    <a href=' {_apiconfig.Value.WebAppConnection}' target='_blank' >
+                        Click here to log in to the DCI ESS System
+                    </a>
+                </p>
+
                 <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
                 <p>Best regards,<br />ESS System Administrator</p>
             </body>
@@ -470,8 +494,15 @@ namespace DCI.Repositories
                 <p>Hi {userEntity.Fullname},</p>
                 
                 <p>This is an automated message from ESS System.</p>
-                 <p>Your Work from home request {model.RequestNo} has been {model.StatusName.ToLower()}.</p>   
+                <p>Your Work from home request {model.RequestNo} has been {model.StatusName.ToLower()}.</p>   
               
+                <p>
+                    You may log in to your account using the link below:<br />
+                    <a href=' {_apiconfig.Value.WebAppConnection}' target='_blank' >
+                        Click here to log in to the DCI ESS System
+                    </a>
+                </p>
+
                   <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
                   <p>Best regards,<br />ESS System Administrator</p>
             </body>

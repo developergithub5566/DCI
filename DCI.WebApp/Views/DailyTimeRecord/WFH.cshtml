@@ -1229,78 +1229,150 @@
                        //       js('#wfhapplicationModal').modal('show');
                        // }
 
+                       // function wfhapplicationModal () {
+                       //                        const $modal = $('#wfhapplicationModal');
+                       //                        const $table = $('#tblWFHApplication');
+                       //                        const $tbody = $table.find('tbody');
+
+                       //                        $('.spinner-overlay').show();
+                       //                        $modal.modal('show'); // show first; we'll adjust columns when fully visible
+
+                       //                        $.ajax({
+                       //                          type: 'POST',
+                       //                          url: '@Url.Action("WFHApplication", "DailyTimeRecord")',
+                       //                          success: function (response) {
+                       //                            $('.spinner-overlay').hide();
+
+                       //                            if (!response?.success) {
+                       //                              Swal.fire({ text: response?.message || "Request failed.", icon: "error" });
+                       //                              return;
+                       //                            }
+
+                       //                            // 1) Kill any existing DT cleanly BEFORE touching the DOM
+                       //                            if ($.fn.DataTable.isDataTable($table)) {
+                       //                              $table.DataTable().clear().destroy();
+                       //                            }
+
+                       //                            // 2) Rebuild rows
+                       //                            $tbody.empty();
+
+                       //                            if (Array.isArray(response.data) && response.data.length) {
+                       //                              response.data.forEach(item => {
+                       //                                const cancelBtn = (item.statusId === 3)
+                       //                                  ? `<a href="javascript:void(0)" onclick="cancel(${item.wfhHeaderId})" title="Cancel Request" class="btn btn-secondary">
+                       //                                       <i class="fas fa-ban"></i>
+                       //                                     </a>` : "";
+
+                       //                                const row = `
+                       //                                  <tr>
+                       //                                    <td>${item.requestNo ?? ''}</td>
+                       //                                    <td>${item.dateCreatedString ?? ''}</td>
+                       //                                    <td>${item.statusName ?? ''}</td>
+                       //                                    <td class="text-center">
+                       //                                      <a href="javascript:void(0)" onclick="viewWFHdDetails(${item.wfhHeaderId})" title="View" class="btn btn-primary">
+                       //                                        <i class="fas fa-search"></i>
+                       //                                      </a>
+                       //                                      ${cancelBtn}
+                       //                                    </td>
+                       //                                  </tr>`;
+                       //                                $tbody.append(row);
+                       //                              });
+                       //                            } else {
+                       //                              $tbody.html(`<tr><td colspan="4" class="text-center">No record found.</td></tr>`);
+                       //                            }
+
+                       //                            // 3) Initialize DT (inside modal)
+                       //                            const dt = $table.DataTable({
+                       //                              order: [[0, 'desc']],
+                       //                              pageLength: 5,
+                       //                              lengthMenu: [5, 10, 25, 50],
+                       //                              deferRender: true,
+                       //                              autoWidth: false
+                       //                            });
+
+                       //                            // 4) Fix layout after the modal finishes animating
+                       //                            $modal.off('shown.bs.modal._dtfix').on('shown.bs.modal._dtfix', function () {
+                       //                              dt.columns.adjust().draw(false);
+                       //                            });
+                       //                          },
+                       //                          error: function () {
+                       //                            $('.spinner-overlay').hide();
+                       //                            Swal.fire({ text: "An error occurred. Please try again.", icon: "error" });
+                       //                          }
+                       //                        });
+                       //                      }
+                       
+
                        function wfhapplicationModal () {
-                                              const $modal = $('#wfhapplicationModal');
-                                              const $table = $('#tblWFHApplication');
-                                              const $tbody = $table.find('tbody');
+                                         const $modal = $('#wfhapplicationModal'); 
+                                                    const $table = $('#tblWFHApplication');
 
-                                              $('.spinner-overlay').show();
-                                              $modal.modal('show'); // show first; we'll adjust columns when fully visible
+                                                    $('.spinner-overlay').show();
+                                                    $modal.modal('show');
 
-                                              $.ajax({
-                                                type: 'POST',
-                                                url: '@Url.Action("WFHApplication", "DailyTimeRecord")',
-                                                success: function (response) {
-                                                  $('.spinner-overlay').hide();
+                                                    $.ajax({
+                                                      type: 'POST',
+                                                      url: '@Url.Action("WFHApplication", "DailyTimeRecord")',
+                                                      success: function (response) {
+                                                        $('.spinner-overlay').hide();
 
-                                                  if (!response?.success) {
-                                                    Swal.fire({ text: response?.message || "Request failed.", icon: "error" });
-                                                    return;
-                                                  }
+                                                        if (!response?.success) {
+                                                          Swal.fire({ text: response?.message || "Request failed.", icon: "error" });
+                                                          return;
+                                                        }
 
-                                                  // 1) Kill any existing DT cleanly BEFORE touching the DOM
-                                                  if ($.fn.DataTable.isDataTable($table)) {
-                                                    $table.DataTable().clear().destroy();
-                                                  }
+                                                        // Destroy existing DT cleanly
+                                                        if ($.fn.DataTable.isDataTable($table)) {
+                                                          $table.DataTable().clear().destroy();
+                                                        }
 
-                                                  // 2) Rebuild rows
-                                                  $tbody.empty();
+                                                        // IMPORTANT: Don't manually add rows. Let DT do it from data:
+                                                        const rows = Array.isArray(response.data) ? response.data : [];
 
-                                                  if (Array.isArray(response.data) && response.data.length) {
-                                                    response.data.forEach(item => {
-                                                      const cancelBtn = (item.statusId === 3)
-                                                        ? `<a href="javascript:void(0)" onclick="cancel(${item.wfhHeaderId})" title="Cancel Request" class="btn btn-secondary">
-                                                             <i class="fas fa-ban"></i>
-                                                           </a>` : "";
+                                                        const dt = $table.DataTable({
+                                                          data: rows,
+                                                          // Map columns to property names; defaultContent prevents the 'unknown parameter' error on null/undefined
+                                                          columns: [
+                                                            { data: 'requestNo',          defaultContent: '' },
+                                                            { data: 'dateCreatedString',  defaultContent: '' },
+                                                            { data: 'statusName',         defaultContent: '' },
+                                                            {
+                                                              data: null,
+                                                              orderable: false,
+                                                              searchable: false,
+                                                              render: function (row) {
+                                                                const viewBtn = `<a href="javascript:void(0)" onclick="viewWFHdDetails(${row?.wfhHeaderId ?? 0})" title="View" class="btn btn-primary">
+                                                                                    <i class="fas fa-search"></i>
+                                                                                  </a>`;
+                                                                const cancelBtn = (row?.statusId === 3)
+                                                                  ? `<a href="javascript:void(0)" onclick="cancel(${row?.wfhHeaderId ?? 0})" title="Cancel Request" class="btn btn-secondary">
+                                                                       <i class="fas fa-ban"></i>
+                                                                     </a>` : '';
+                                                                return `<div class="text-center">${viewBtn} ${cancelBtn}</div>`;
+                                                              }
+                                                            }
+                                                          ],
+                                                          order: [[0, 'desc']],
+                                                          pageLength: 5,
+                                                          lengthMenu: [5, 10, 25, 50],
+                                                          deferRender: true,
+                                                          autoWidth: false,
+                                                          language: {
+                                                            emptyTable: "No record found."
+                                                          }
+                                                        });
 
-                                                      const row = `
-                                                        <tr>
-                                                          <td>${item.requestNo ?? ''}</td>
-                                                          <td>${item.dateCreatedString ?? ''}</td>
-                                                          <td>${item.statusName ?? ''}</td>
-                                                          <td class="text-center">
-                                                            <a href="javascript:void(0)" onclick="viewWFHdDetails(${item.wfhHeaderId})" title="View" class="btn btn-primary">
-                                                              <i class="fas fa-search"></i>
-                                                            </a>
-                                                            ${cancelBtn}
-                                                          </td>
-                                                        </tr>`;
-                                                      $tbody.append(row);
-                                                    });
-                                                  } else {
-                                                    $tbody.html(`<tr><td colspan="4" class="text-center">No record found.</td></tr>`);
-                                                  }
-
-                                                  // 3) Initialize DT (inside modal)
-                                                  const dt = $table.DataTable({
-                                                    order: [[0, 'desc']],
-                                                    pageLength: 5,
-                                                    lengthMenu: [5, 10, 25, 50],
-                                                    deferRender: true,
-                                                    autoWidth: false
-                                                  });
-
-                                                  // 4) Fix layout after the modal finishes animating
-                                                  $modal.off('shown.bs.modal._dtfix').on('shown.bs.modal._dtfix', function () {
-                                                    dt.columns.adjust().draw(false);
-                                                  });
-                                                },
-                                                error: function () {
-                                                  $('.spinner-overlay').hide();
-                                                  Swal.fire({ text: "An error occurred. Please try again.", icon: "error" });
-                                                }
-                                              });
-                                            }
+                                                        // Adjust after modal is visible
+                                                        $modal.off('shown.bs.modal._dtfix').on('shown.bs.modal._dtfix', function () {
+                                                          dt.columns.adjust().draw(false);
+                                                        });
+                                                      },
+                                                      error: function () {
+                                                        $('.spinner-overlay').hide();
+                                                        Swal.fire({ text: "An error occurred. Please try again.", icon: "error" });
+                                                      }
+                                           });
+                              }
 
 
 

@@ -259,7 +259,7 @@ namespace DCI.Repositories
                     emp.ContactPerson = model.ContactPerson;
                     emp.ContactPersonNo = model.ContactPersonNo;
                     emp.DateCreated = DateTime.Now;
-                    emp.CreatedBy = model.CreatedBy;
+                    emp.CreatedBy = model.CurrentUserId;
                     emp.DateModified = null;
                     emp.ModifiedBy = null;
                     emp.IsActive = true;
@@ -321,7 +321,7 @@ namespace DCI.Repositories
                     //emp.DateCreated = emp.DateCreated;
                     //emp.CreatedBy = emp.CreatedBy;
                     emp.DateModified = DateTime.Now;
-                    emp.ModifiedBy = model.ModifiedBy;
+                    emp.ModifiedBy = model.CurrentUserId;
                     _dbContext.Employee.Entry(emp).State = EntityState.Modified;
                     await _dbContext.SaveChangesAsync();
 
@@ -345,7 +345,7 @@ namespace DCI.Repositories
                     dtl.WorkLocation = model.WorkLocation;
                     dtl.PayrollType = model.PayrollType;
                     dtl.DateModified = DateTime.Now;
-                    dtl.ModifiedBy = model.ModifiedBy;
+                    dtl.ModifiedBy = model.CurrentUserId;
                     dtl.IsActive = true;
                     _dbContext.EmployeeWorkDetails.Entry(dtl).State = EntityState.Modified;
                     await _dbContext.SaveChangesAsync();
@@ -450,7 +450,7 @@ namespace DCI.Repositories
                     emp.ContactPerson = model.ContactPerson;
                     emp.ContactPersonNo = model.ContactPersonNo;
                     emp.DateModified = DateTime.Now;
-                    emp.ModifiedBy = model.ModifiedBy;
+                    emp.ModifiedBy = model.CurrentUserId;// model.ModifiedBy;
                     _dbContext.Employee.Entry(emp).State = EntityState.Modified;
                     await _dbContext.SaveChangesAsync();
 

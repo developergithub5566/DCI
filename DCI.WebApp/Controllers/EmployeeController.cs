@@ -90,7 +90,12 @@ namespace DCI.WebApp.Controllers
             try
             {
                 using (var _httpclient = new HttpClient())
-                {   
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+                    model.CurrentUserId = currentUser.UserId;
+
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Employee/SaveEmployee");
                     request.Content = stringContent;
@@ -120,6 +125,11 @@ namespace DCI.WebApp.Controllers
         {
             try
             {
+                var currentUser = _userSessionHelper.GetCurrentUser();
+                if (currentUser == null)
+                    return RedirectToAction("Logout", "Account");
+                model.CurrentUserId = currentUser.UserId;
+
                 using (var _httpclient = new HttpClient())
                 {
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
