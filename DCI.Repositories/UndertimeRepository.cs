@@ -558,7 +558,7 @@ namespace DCI.Repositories
 
 
                 int totalrecords = _leaveContext.Count() + 1;
-                string finalSetRecords = GetFormattedRecordForUndertime(totalrecords);
+                string finalSetRecords = FormatHelper.GetFormattedRequestNo(totalrecords);
                 string yearMonth = DateTime.Now.ToString("yyyyMM");
                 string req = Constants.ModuleCode_Leave;
 
@@ -575,14 +575,14 @@ namespace DCI.Repositories
             return string.Empty;
         }
 
-        private string GetFormattedRecordForUndertime(int totalRecords)
-        {
-            int setA = totalRecords % 1000;
-            int setB = totalRecords / 1000;
-            string formattedA = setA.ToString("D4");
-            string formattedB = setB.ToString("D4");
-            return $"{formattedA}";
-        }
+        //private string GetFormattedRecordForUndertime(int totalRecords)
+        //{
+        //    int setA = totalRecords % 1000;
+        //    int setB = totalRecords / 1000;
+        //    string formattedA = setA.ToString("D4");
+        //    string formattedB = setB.ToString("D4");
+        //    return $"{formattedA}";
+        //}
 
         private async Task<string> GenereteRequestNoForUndertimeDeduction()
         {
@@ -598,7 +598,7 @@ namespace DCI.Repositories
 
 
                 int totalrecords = _leaveContext.Count() + 1;
-                string finalSetRecords = GetFormattedRecordForUndertime(totalrecords);
+                string finalSetRecords = FormatHelper.GetFormattedRequestNo(totalrecords);
                 string yearMonth = DateTime.Now.ToString("yyyyMM");
                 string req = Constants.ModuleCode_Undertime_Deduction;
 
@@ -619,9 +619,9 @@ namespace DCI.Repositories
         public async Task<IList<UndertimeHeaderViewModel>> GetUndertimeDeduction(DailyTimeRecordViewModel model)
         {
             var rows = await (
-                from ot in _dbContext.UndertimeHeader
-                join usr in _dbContext.User on ot.CreatedBy equals usr.UserId
-                join emp in _dbContext.Employee on usr.EmployeeId equals emp.EmployeeId
+                from ot in _dbContext.UndertimeHeader.AsNoTracking()
+                join usr in _dbContext.User.AsNoTracking() on ot.CreatedBy equals usr.UserId
+                join emp in _dbContext.Employee.AsNoTracking() on usr.EmployeeId equals emp.EmployeeId
                 where ot.IsActive 
                 orderby ot.DateCreated descending
                 select new UndertimeHeaderViewModel

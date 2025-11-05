@@ -1,4 +1,5 @@
 ﻿using DCI.Core.Common;
+using DCI.Core.Helpers;
 using DCI.Data;
 using DCI.Models.Entities;
 using DCI.Models.ViewModel;
@@ -418,7 +419,7 @@ namespace DCI.Repositories
 
 
                 int totalrecords = _leaveContext.Count() + 1;
-                string finalSetRecords = GetFormattedRecord(totalrecords);
+                string finalSetRecords = FormatHelper.GetFormattedRequestNo(totalrecords);
                 string yearMonth = DateTime.Now.ToString("yyyyMM");
                 string req = "RQT";
 
@@ -435,14 +436,14 @@ namespace DCI.Repositories
             return string.Empty;
         }
 
-        private string GetFormattedRecord(int totalRecords)
-        {
-            int setA = totalRecords % 1000;
-            int setB = totalRecords / 1000;
-            string formattedA = setA.ToString("D4");
-            string formattedB = setB.ToString("D4");
-            return $"{formattedA}";
-        }
+        //private string GetFormattedRecord(int totalRecords)
+        //{
+        //    int setA = totalRecords % 1000;
+        //    int setB = totalRecords / 1000;
+        //    string formattedA = setA.ToString("D4");
+        //    string formattedB = setB.ToString("D4");
+        //    return $"{formattedA}";
+        //}
 
         public async Task<IList<LeaveReportViewModel>> GetAllLeaveReport()
         {

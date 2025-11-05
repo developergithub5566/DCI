@@ -463,7 +463,7 @@ namespace DCI.Repositories
 
 
                 int totalrecords = _leaveContext.Count() + 1;
-                string finalSetRecords = GetFormattedRecordForLate(totalrecords);
+                string finalSetRecords = FormatHelper.GetFormattedRequestNo(totalrecords);
                 string yearMonth = DateTime.Now.ToString("yyyyMM");
                 string req = Constants.ModuleCode_Leave;
 
@@ -480,14 +480,14 @@ namespace DCI.Repositories
             return string.Empty;
         }
 
-        private string GetFormattedRecordForLate(int totalRecords)
-        {
-            int setA = totalRecords % 1000;
-            int setB = totalRecords / 1000;
-            string formattedA = setA.ToString("D4");
-            string formattedB = setB.ToString("D4");
-            return $"{formattedA}";
-        }
+        //private string GetFormattedRecordForLate(int totalRecords)
+        //{
+        //    int setA = totalRecords % 1000;
+        //    int setB = totalRecords / 1000;
+        //    string formattedA = setA.ToString("D4");
+        //    string formattedB = setB.ToString("D4");
+        //    return $"{formattedA}";
+        //}
 
         private async Task<string> GenereteRequestNoForLateDeduction()
         {
@@ -503,7 +503,7 @@ namespace DCI.Repositories
 
 
                 int totalrecords = _leaveContext.Count() + 1;
-                string finalSetRecords = GetFormattedRecordForLate(totalrecords);
+                string finalSetRecords = FormatHelper.GetFormattedRequestNo(totalrecords);
                 string yearMonth = DateTime.Now.ToString("yyyyMM");
                 string req = Constants.ModuleCode_Late_Deduction;
 

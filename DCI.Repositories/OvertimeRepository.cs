@@ -418,7 +418,7 @@ namespace DCI.Repositories
 
 
                 int totalrecords = _dtr.Count() + 1;
-                string finalSetRecords = GetFormattedRecord(totalrecords);
+                string finalSetRecords = FormatHelper.GetFormattedRequestNo(totalrecords);
                 string yearMonth = DateTime.Now.ToString("yyyyMM");
                 string req = "OT";
 
@@ -435,14 +435,14 @@ namespace DCI.Repositories
             return string.Empty;
         }
 
-        private string GetFormattedRecord(int totalRecords)
-        {
-            int setA = totalRecords % 1000;
-            int setB = totalRecords / 1000;
-            string formattedA = setA.ToString("D4");
-            string formattedB = setB.ToString("D4");
-            return $"{formattedA}";
-        }
+        //private string GetFormattedRecord(int totalRecords)
+        //{
+        //    int setA = totalRecords % 1000;
+        //    int setB = totalRecords / 1000;
+        //    string formattedA = setA.ToString("D4");
+        //    string formattedB = setB.ToString("D4");
+        //    return $"{formattedA}";
+        //}
 
         public async Task<OvertimePayReport> GetOvertimeSummaryAsync(OvertimePayReport param)
         {
@@ -507,6 +507,7 @@ namespace DCI.Repositories
                             join dtls in _dbContext.EmployeeWorkDetails.AsNoTracking()
                                 on emp.EmployeeId equals dtls.EmployeeId
                             where emp.IsActive && dtls.IsActive && !dtls.IsResigned
+                            && (dtls.EmployeeStatusId == (int)EnumEmploymentType.Regular || dtls.EmployeeStatusId == (int)EnumEmploymentType.Probationary)
                             select new EmployeeViewModel
                             {
                                 EmployeeId = emp.EmployeeId,
