@@ -7,6 +7,7 @@ using DCI.Repositories.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System.Globalization;
 
 
 namespace DCI.Repositories
@@ -402,7 +403,7 @@ namespace DCI.Repositories
                 lv.LeaveRequestHeaderId = contextHdr.LeaveRequestHeaderId;
 
                 var entitiesToViewModel = await _leaveRepository.RequestLeave(lv);
-
+                entitiesToViewModel.LeaveTypeId = contextHdr.LeaveTypeId;
                 // Send Email Notif
                 await _emailRepository.SendToRequestorLeave(entitiesToViewModel);
 
@@ -411,9 +412,13 @@ namespace DCI.Repositories
 
                 var user = _dbContext.User.Where(x => x.EmployeeId == contextHdr.EmployeeId).FirstOrDefault();
 
+                string _leavetype = FormatHelper.GetLeaveTypeName(contextHdr.LeaveTypeId);
+                TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
+
                 NotificationViewModel notifvm = new NotificationViewModel();
-                notifvm.Title = "Leave";
-                notifvm.Description = String.Format("Leave request {0} has been {1}.", contextHdr.RequestNo, status);
+                notifvm.Title = $"{textInfo.ToTitleCase(_leavetype.ToLower())} Request";
+                // notifvm.Description = String.Format("Leave request {0} has been {1}.", contextHdr.RequestNo, status);
+                notifvm.Description = $"{textInfo.ToTitleCase(_leavetype.ToLower())} request {contextHdr.RequestNo} has been {status}.";
                 notifvm.ModuleId = (int)EnumModulePage.Leave;
                 notifvm.TransactionId = param.TransactionId;
                 notifvm.AssignId = user.UserId;
@@ -435,7 +440,8 @@ namespace DCI.Repositories
                 await _dbContext.ApprovalHistory.AddAsync(entity);
                 await _dbContext.SaveChangesAsync();
 
-                return (StatusCodes.Status200OK, String.Format("Leave Request {0} has been {1}.", contextHdr.RequestNo, status));
+                return (StatusCodes.Status200OK, $"{textInfo.ToTitleCase(_leavetype.ToLower())} request {contextHdr.RequestNo} has been {status}.");
+                // return (StatusCodes.Status200OK, String.Format("Leave request {0} has been {1}.", contextHdr.RequestNo, status));
             }
             catch (Exception ex)
             {
@@ -564,7 +570,7 @@ namespace DCI.Repositories
                 await _homeRepository.SaveNotification(notifvm);
 
 
-                return (StatusCodes.Status200OK, String.Format("DTR adjustment request {0} has been {1}.", contextHdr.RequestNo, status));
+                return (StatusCodes.Status200OK, String.Format("DTR Adjustment request {0} has been {1}.", contextHdr.RequestNo, status));
             }
             catch (Exception ex)
             {
@@ -671,7 +677,7 @@ namespace DCI.Repositories
 
                 NotificationViewModel notifvm = new NotificationViewModel();
                 notifvm.Title = "WFH";
-                notifvm.Description = String.Format("WFH Request No {0} has been {1}", contextHdr.RequestNo, status);
+                notifvm.Description = String.Format("WFH Request {0} has been {1}", contextHdr.RequestNo, status);
                 notifvm.ModuleId = (int)EnumModulePage.WFH;
                 notifvm.TransactionId = param.TransactionId;
                 notifvm.AssignId = contextHdr.CreatedBy;
@@ -681,7 +687,7 @@ namespace DCI.Repositories
                 notifvm.IsActive = true;
                 await _homeRepository.SaveNotification(notifvm);
 
-                return (StatusCodes.Status200OK, String.Format("WFH Request No {0} has been {1}.", contextHdr.RequestNo, status));
+                return (StatusCodes.Status200OK, String.Format("WFH Request {0} has been {1}.", contextHdr.RequestNo, status));
             }
             catch (Exception ex)
             {
@@ -900,15 +906,15 @@ namespace DCI.Repositories
                 OvertimeViewModel otvm = new OvertimeViewModel();
                 otvm.RequestNo = contextOT.RequestNo;
                 otvm.StatusId = contextOT.StatusId;
-                otvm.ApproverId = contextOT.ApproverId ?? 0;
-                await _emailRepository.SentToApprovalOvertime(otvm);
+                otvm.CreatedBy = contextOT.CreatedBy;
+                await _emailRepository.SendToRequestorOT(otvm);
 
                 string status = param.Status == (int)EnumStatus.Approved ? "approved" : "disapproved";
 
                 NotificationViewModel notifvm = new NotificationViewModel();
-                notifvm.Title = "Overtime";
-                notifvm.Description = String.Format("Overtime Request No {0} has been {1}", contextOT.RequestNo, status);
-                notifvm.ModuleId = (int)EnumModulePage.WFH;
+                notifvm.Title = "Overtime";        
+                notifvm.Description = $"Overtime request {contextOT.RequestNo} has been {status}.";
+                notifvm.ModuleId = (int)EnumModulePage.Overtime;
                 notifvm.TransactionId = param.TransactionId;
                 notifvm.AssignId = contextOT.CreatedBy;
                 notifvm.URL = "/DailyTimeRecord/Overtime";
@@ -917,7 +923,7 @@ namespace DCI.Repositories
                 notifvm.IsActive = true;
                 await _homeRepository.SaveNotification(notifvm);
 
-                return (StatusCodes.Status200OK, String.Format("Overtime Request No {0} has been {1}.", "RequestNo", status));
+                return (StatusCodes.Status200OK, String.Format("Overtime request {0} has been {1}.", contextOT.RequestNo, status));
             }
             catch (Exception ex)
             {

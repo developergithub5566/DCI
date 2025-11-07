@@ -102,9 +102,9 @@
                         <div class="input-group">
 
                             <input type="text" name="minDate" id="minDate" class="form-control frmField" autocomplete="off">
-                            <div class="input-group-prepend prependBtn">
-                                <i class="fa fa-calendar"></i>
-                            </div>
+                           <div class="input-group-prepend prependBtn" id="calendarIconFrom">
+      <i class="fa fa-calendar"></i>
+  </div>
                             <label for="minDate" generated="true" class="error"></label>
                         </div>
                     </div>
@@ -114,9 +114,9 @@
 
 
                             <input type="text" name="maxDate" id="maxDate" class="form-control frmField" autocomplete="off">
-                            <div class="input-group-prepend prependBtn">
-                                <i class="fa fa-calendar"></i>
-                            </div>
+                            <div class="input-group-prepend prependBtn" id="calendarIconTo">
+    <i class="fa fa-calendar"></i>
+</div>
                             <label for="maxDate" generated="true" class="error"></label>
                         </div>
                     </div>
@@ -363,7 +363,7 @@
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">File WFH</h5>
+                            <h5 class="modal-title" id="exampleModalLabel">WFH</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -492,7 +492,7 @@
                                 </table>
                             </div>
                             <div class="modal-footer">
-                                <button class="btn btn-primary  btn-icon-split d-block" onclick="SubmitWFHApplication()">
+                                <button class="btn btn-primary  btn-icon-split d-block" >
                                          <span class="icon text-white"><i class="fa fa-paper-plane" aria-hidden="true"></i></span>
                                          <span class="text text-white"><small>Submit</small></span>
                                 </button>
@@ -715,6 +715,14 @@
                                
                             //  });
 
+                                                        $('#calendarIconFrom').on('click', function () {
+                               $('#minDate').trigger('click');
+                    });
+                      $('#calendarIconTo').on('click', function () {
+                               $('#maxDate').trigger('click');
+                    });
+
+
 
 
 
@@ -830,7 +838,7 @@
                                                                $('#savewfhapp').submit(function (e) {
                                                                         e.preventDefault();
 
-                                                                       
+                                                                             $(this).find(':submit').prop('disabled', true);
                                                                        
                                                                    
                                                                                 let header = {
@@ -854,12 +862,15 @@
                                                                                     });
                                                                                 });
 
-                                                                                console.log(details);
+                                                                                //console.log(details);
                                                                                  if (!details || details.length === 0) {
+
                                                                                                 Swal.fire({
                                                                                                     text: "Please select at least one row before submitting.",
                                                                                                     icon: "warning",
                                                                                                     confirmButtonText: "Ok"
+                                                                                                 }).then((result) => {
+                                                                                                       $('#savewfhapp').find(':submit').prop('disabled', false);
                                                                                                 });
                                                                                                 return; // stop here
                                                                                             }
@@ -869,52 +880,57 @@
                                                                                     details: details
                                                                                 };
 
-                                                                                console.log(datax);
+                                                                                //console.log(datax);
 
                                                                                      Swal.fire({
                                                                                             text: "Are you sure you want to submit this record?",
                                                                                             icon: "question",
                                                                                             showCancelButton: true,
                                                                                             confirmButtonText: "Ok"
-                                                                                        }).then((result) => {
+                                                                                        }).then((result) => {                                                                                           
                                                                                             if (result.isConfirmed) {
-
-                                                                                          $('.spinner-overlay').show();
+                                                                                          $('#savewfhapp').find(':submit').prop('disabled', true);
+                                                                                                   $('.spinner-overlay').show();     
+                                                                                              
                                                                                                            
-                                                                                $.ajax({
-                                                                                    type: 'POST',
-                                                                                    url: '@Url.Action("SaveWFHApplication", "DailyTimeRecord")',
-                                                                                    data: JSON.stringify(datax),
-                                                                                    contentType: 'application/json; charset=utf-8',
-                                                                                    success: function (response) {
-                                                                                        if (response.success) {
-                                                                                            Swal.fire({
-                                                                                                text: response.message,
-                                                                                                icon: "success",
-                                                                                                confirmButtonText: "Ok"
-                                                                                            }).then(() => {
-                                                                                                 $('.spinner-overlay').hide();
-                                                                                                location.reload();
-                                                                                            });
-                                                                                        } else {
-                                                                                            Swal.fire({
-                                                                                                text: response.message,
-                                                                                                icon: "error"
-                                                                                            });
-                                                                                        }
-                                                                                        $('.spinner-overlay').hide();
-                                                                                    },
-                                                                                    error: function () {
-                                                                                        $('.spinner-overlay').hide();
-                                                                                        Swal.fire({
-                                                                                            text: "An error occurred. Please try again.",
-                                                                                            icon: "error"
-                                                                                        });
-                                                                                    }
-                                                                                }); // ajax
-                                                                            }
+                                                                                                $.ajax({
+                                                                                                    type: 'POST',
+                                                                                                    url: '@Url.Action("SaveWFHApplication", "DailyTimeRecord")',
+                                                                                                    data: JSON.stringify(datax),
+                                                                                                    contentType: 'application/json; charset=utf-8',
+                                                                                                    success: function (response) {
+                                                                                                        if (response.success) {
+                                                                                                            Swal.fire({
+                                                                                                                text: response.message,
+                                                                                                                icon: "success",
+                                                                                                                confirmButtonText: "Ok"
+                                                                                                            }).then(() => {
+                                                                                                                 $('.spinner-overlay').hide();
+                                                                                                                location.reload();
+                                                                                                            });
+                                                                                                        } else {
+                                                                                                            Swal.fire({
+                                                                                                                text: response.message,
+                                                                                                                icon: "error"
+                                                                                                            });
+                                                                                                        }
+                                                                                                        $('.spinner-overlay').hide();
+                                                                                                    },
+                                                                                                    error: function () {
+                                                                                                               $('#savewfhapp').find(':submit').prop('disabled', false);
+                                                                                                        $('.spinner-overlay').hide();
+                                                                                                        Swal.fire({
+                                                                                                            text: "An error occurred. Please try again.",
+                                                                                                            icon: "error"
+                                                                                                        });
+                                                                                                    }
+                                                                                                }); // ajax
+                                                                            }else{
+                                                                                                         $(this).find(':submit').prop('disabled', false);
+                                                                                 }
 
                                                                             $('.spinner-overlay').hide();
+                                                                         
                                                                         }); // Swal.then
                                                                     }); // submit
 

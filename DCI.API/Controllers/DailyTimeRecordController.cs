@@ -234,7 +234,9 @@ namespace DCI.API.Controllers
         [Route("SaveOvertime")]
         public async Task<IActionResult> SaveOvertime([FromBody] OvertimeViewModel param)
         {
-            return Ok(await _overtimeRepository.SaveOvertime(param));
+            //return Ok(await _overtimeRepository.SaveOvertime(param));
+            var result = await _overtimeRepository.SaveOvertime(param);
+            return StatusCode(result.statuscode, result.message);
         }
 
         [HttpPost]

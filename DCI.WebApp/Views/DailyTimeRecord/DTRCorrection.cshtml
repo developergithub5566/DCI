@@ -87,7 +87,7 @@
                         <div class="input-group">
 
                             <input type="text" name="minDate" id="minDate" class="form-control frmField" autocomplete="off">
-                            <div class="input-group-prepend prependBtn">
+                            <div class="input-group-prepend prependBtn" id="calendarIconFrom">
                                 <i class="fa fa-calendar"></i>
                             </div>
                             <label for="minDate" generated="true" class="error"></label>
@@ -96,10 +96,8 @@
                     <div class="form-group col-3">
                         <label class="frmText">Date Covered To: </label>
                         <div class="input-group">
-
-
                             <input type="text" name="maxDate" id="maxDate" class="form-control frmField" autocomplete="off">
-                            <div class="input-group-prepend prependBtn">
+                            <div class="input-group-prepend prependBtn" id="calendarIconTo">
                                 <i class="fa fa-calendar"></i>
                             </div>
                             <label for="maxDate" generated="true" class="error"></label>
@@ -239,9 +237,9 @@
                                             <label class="frmText"><span class="required">*</span>DTR Date & Time</label>
                                             <div class="input-group">
                                                 <input type="text" name="dateCovered" id="dateCovered" class="form-control frmField" autocomplete="off" required>
-                                                <div class="input-group-prepend prependBtn">
-                                                    <i class="fa fa-calendar"></i>
-                                                </div>
+                                                        <div class="input-group-prepend prependBtn" id="calendarIconId">
+                                                            <i class="fa fa-calendar"></i>
+                                                        </div>
                                             </div>
                                             <label for="dateCovered" generated="true" class="error"></label>
                                         </div>                                 
@@ -307,9 +305,6 @@
 @section scripts {
 
 
-
-            
-
           
                 <script type="text/javascript">
                         var js = jQuery.noConflict(true);
@@ -322,7 +317,19 @@
 
 
                         $(document).ready(function () {
-                                flatpickr("#minDate", {
+
+                                   $('#calendarIconId').on('click', function () {
+                                      $('#dateCovered').trigger('click');
+                                    });
+                                                     $('#calendarIconFrom').on('click', function () {
+                               $('#minDate').trigger('click');
+                    });
+                      $('#calendarIconTo').on('click', function () {
+                               $('#maxDate').trigger('click');
+                    });
+
+
+                                            flatpickr("#minDate", {
                                    dateFormat: "Y-m-d",
                                      defaultDate: (function () {
                                     let d = new Date();

@@ -83,7 +83,7 @@
                         <div class="input-group">
 
                             <input type="text" name="minDate" id="minDate" class="form-control frmField" autocomplete="off">
-                            <div class="input-group-prepend prependBtn">
+                            <div class="input-group-prepend prependBtn" id="calendarIconFrom">
                                 <i class="fa fa-calendar"></i>
                             </div>
                             <label for="minDate" generated="true" class="error"></label>
@@ -95,7 +95,7 @@
 
 
                             <input type="text" name="maxDate" id="maxDate" class="form-control frmField" autocomplete="off">
-                            <div class="input-group-prepend prependBtn">
+                            <div class="input-group-prepend prependBtn" id="calendarIconTo">
                                 <i class="fa fa-calendar"></i>
                             </div>
                             <label for="maxDate" generated="true" class="error"></label>
@@ -286,8 +286,14 @@
 
 
                             $(document).ready(function () {
-
-                                   flatpickr("#minDate", {
+                                              $('#calendarIconFrom').on('click', function () {
+                               $('#minDate').trigger('click');
+                    });
+                      $('#calendarIconTo').on('click', function () {
+                               $('#maxDate').trigger('click');
+                    });
+            
+                    flatpickr("#minDate", {
                                    dateFormat: "Y-m-d",
                                         defaultDate: (function () {
                                                let d = new Date();

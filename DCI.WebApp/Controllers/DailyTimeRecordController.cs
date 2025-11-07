@@ -1081,8 +1081,9 @@ namespace DCI.WebApp.Controllers
                         model = JsonConvert.DeserializeObject<OvertimeViewModel>(responseBody)!;
 
                         model.ApprovedBy = model.OTHeaderId == 0 ? currentUser.ApproverHead : model.ApprovedBy;
-                        model.StatusName = model.OTHeaderId == 0 ? "Draft" : model.StatusName;
-
+                        model.StatusName = model.OTHeaderId == 0 ? "Draft" : model.StatusName;                 
+                        model.Total = model.otDetails?.Sum(x => x.TotalMinutes) ?? 0;
+                        model.TotalString = TimeHelper.ConvertMinutesToHHMM(model.Total);
                         return View(model);
                     }
 
@@ -1123,6 +1124,8 @@ namespace DCI.WebApp.Controllers
                     if (response.IsSuccessStatusCode == true)
                     {
                         model = JsonConvert.DeserializeObject<OvertimeViewModel>(responseBody)!;
+                        model.Total = model.otDetails?.Sum(x => x.TotalMinutes) ?? 0;
+                        model.TotalString = TimeHelper.ConvertMinutesToHHMM(model.Total);
                         return Json(new { success = true, data = model });
                     }
 
@@ -1153,6 +1156,7 @@ namespace DCI.WebApp.Controllers
                         return RedirectToAction("Logout", "Account");
                     param.ApproverId = currentUser.ApproverId;
                     param.CurrentUserId = currentUser.UserId;
+                    param.EmployeeId = currentUser.EmployeeId;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/SaveOvertime");

@@ -108,7 +108,7 @@
                                 <div class="input-group">
 
                                     <input type="text" name="minDate" id="minDate" class="form-control frmField" autocomplete="off">
-                                    <div class="input-group-prepend prependBtn">
+                                    <div class="input-group-prepend prependBtn" id="calendarIconFrom">
                                         <i class="fa fa-calendar"></i>
                                     </div>
                                     <label for="minDate" generated="true" class="error"></label>
@@ -120,7 +120,7 @@
 
 
                                     <input type="text" name="maxDate" id="maxDate" class="form-control frmField" autocomplete="off">
-                                    <div class="input-group-prepend prependBtn">
+                                    <div class="input-group-prepend prependBtn" id="calendarIconTo">
                                         <i class="fa fa-calendar"></i>
                                     </div>
                                     <label for="maxDate" generated="true" class="error"></label>
@@ -382,7 +382,7 @@
                                 <label class="frmText"><span class="required">*</span> Period Covered: </label>
                                 <div class="input-group">
                                     <input type="text" name="COVERED_DATE" id="dateCovered" class="form-control frmField" autocomplete="off" required>
-                                    <div class="input-group-prepend prependBtn">
+                                    <div class="input-group-prepend prependBtn" id="calendarIconId">
                                         <i class="fa fa-calendar"></i>
                                     </div>
                                 </div>
@@ -496,6 +496,15 @@
 
                         $(document).ready(function () {
                           //  GetLeaveTypeAmount();
+                                $('#calendarIconId').on('click', function () {
+                          $('#dateCovered').trigger('click');
+                        });
+                        $('#calendarIconFrom').on('click', function () {
+                   $('#minDate').trigger('click');
+        });
+          $('#calendarIconTo').on('click', function () {
+                   $('#maxDate').trigger('click');
+        });
 
 
 

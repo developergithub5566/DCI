@@ -303,8 +303,8 @@ namespace DCI.Repositories
                     notifvmToRequestor.IsActive = true;
                     await _homeRepository.SaveNotification(notifvmToRequestor);
 
-
-                    return (StatusCodes.Status200OK, string.Format("DTR request {0} has been submitted for approval.", entity.RequestNo));
+                    return (StatusCodes.Status200OK,  $"DTR Adjustment request {entity.RequestNo} has been submitted for approval.");
+                    // return (StatusCodes.Status200OK, string.Format("DTR request {0} has been submitted for approval.", entity.RequestNo));
                 }
                 return (StatusCodes.Status200OK, "Successfully updated");
             }

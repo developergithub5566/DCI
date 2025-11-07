@@ -358,13 +358,17 @@ namespace DCI.Repositories
                     model.ApproverId = param.ApproverId;//.ApproverId;
                     model.LeaveRequestHeader.Status = entity.Status;
                     model.LeaveRequestHeader.RequestNo = entity.RequestNo;
+                    model.LeaveTypeId = entity.LeaveTypeId;
                     await _emailRepository.SendToApprovalLeave(model);
 
+                    string _leavetype = FormatHelper.GetLeaveTypeName(entity.LeaveTypeId);
+                    TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
 
                     //Send Application Notification to Approver
                     NotificationViewModel notifvm = new NotificationViewModel();
-                    notifvm.Title = "Leave Request";
-                    notifvm.Description = System.String.Format("You have been assigned leave request {0} for approval", entity.RequestNo);
+                    notifvm.Title = $"{textInfo.ToTitleCase(_leavetype.ToLower())} Request";
+                    notifvm.Description = $"You have been assigned {_leavetype.ToLower()} request {entity.RequestNo} for approval";
+                    // notifvm.Description = System.String.Format("You have been assigned {0} request {1} for approval",, entity.RequestNo);
                     notifvm.ModuleId = (int)EnumModulePage.Leave;
                     notifvm.TransactionId = entity.LeaveRequestHeaderId;
                     notifvm.AssignId = param.ApproverId;                   
@@ -377,8 +381,10 @@ namespace DCI.Repositories
 
                     //Send Application Notification to Requestor
                     NotificationViewModel notifvmRequestor = new NotificationViewModel();
-                    notifvmRequestor.Title = "Leave Request";
-                    notifvmRequestor.Description = System.String.Format("Your Leave request {0} has been submitted for approval.", entity.RequestNo);
+                    notifvmRequestor.Title = $"{textInfo.ToTitleCase(_leavetype.ToLower())} Request";
+                    //notifvmRequestor.Title = "Leave Request";
+                    //notifvmRequestor.Description = System.String.Format("Your {0} request {1} has been submitted for approval.", _leavetype.ToLower(), entity.RequestNo);
+                    notifvmRequestor.Description = $"Your {_leavetype.ToLower()} request {entity.RequestNo} has been submitted for approval.";
                     notifvmRequestor.ModuleId = (int)EnumModulePage.Leave;
                     notifvmRequestor.TransactionId = entity.LeaveRequestHeaderId;
                     notifvmRequestor.AssignId = param.CurrentUserId;        
@@ -388,9 +394,9 @@ namespace DCI.Repositories
                     notifvmRequestor.IsActive = true;
                     await _homeRepository.SaveNotification(notifvmRequestor);
 
-
-                    return (StatusCodes.Status200OK, string.Format("Leave request {0} has been submitted for approval.", entity.RequestNo));
-
+                    return (StatusCodes.Status200OK, $"{textInfo.ToTitleCase(_leavetype.ToLower())} request {entity.RequestNo} has been submitted for approval.");
+                    //   return (StatusCodes.Status200OK, string.Format("{0} request {1} has been submitted for approval.", textInfo.ToTitleCase(_leavetype.ToLower()),entity.RequestNo ));
+                    //  return (StatusCodes.Status200OK, string.Format("Leave request {0} has been submitted for approval.", entity.RequestNo));
                 }
                 return (StatusCodes.Status400BadRequest, "An error occurred. Please try again.");
             }

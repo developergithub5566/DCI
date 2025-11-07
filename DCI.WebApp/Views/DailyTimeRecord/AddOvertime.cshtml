@@ -80,7 +80,7 @@
 
     <div class="card shadow mb-4">
         <div class="card-header">
-            <label class="mb0">Details</label>
+            <label class="mb0">Overtime Form</label>
         </div>
         <div class="card-body">
             <div class="table-responsive mt20">
@@ -105,7 +105,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="frmText">Total</label>
-                            <input type="text" min="0" step="any" id="GrandTotal" name="GrandTotal" class="form-control frmField" readonly="true" value="0">
+                            <input type="text" min="0" step="any" id="GrandTotal" name="GrandTotal" class="form-control frmField" readonly="true" value="@Model.TotalString">
                         </div>
                     </div>
                 </div>
@@ -227,18 +227,18 @@
                                     <label class="frmText"><span class="required">*</span> Date: </label>
                                     <div class="input-group">
                                         <input type="text" name="OTDate" id="OTDate" class="form-control frmField" onchange="checkOvertimeDate()">
-                                        <div class="input-group-prepend prependBtn">
+                                        <div class="input-group-prepend prependBtn" id="calendarIconOT">
                                             <i class="fa fa-calendar"></i>
                                         </div>
                                     </div>
                                     <label for="OTDate" generated="true" class="error"></label>
 
 
-                                    <div id="timeparam">
+                                   
                                         <label class="frmText"><span class="required">*</span> Time From: </label>
                                         <div class="input-group clockpicker" data-autoclose="true">
                                             <input type="text" name="OTTimeFrom" id="OTTimeFrom" class="form-control frmField" autocomplete="off" readonly placeholder="24-Hour Format">
-                                            <div class="input-group-prepend prependBtn">
+                                            <div class="input-group-prepend prependBtn" id="calendarIconOTFrom">
                                                 <i class="fa fa-calendar"></i>
                                             </div>
                                         </div>
@@ -252,7 +252,7 @@
                                         <label class="frmText"><span class="required">*</span> Time To: </label>
                                         <div class="input-group clockpicker" data-autoclose="true">
                                             <input type="text" name="OTTimeTo" id="OTTimeTo" class="form-control frmField" autocomplete="off" readonly placeholder="24-Hour Format">
-                                            <div class="input-group-prepend prependBtn">
+                                            <div class="input-group-prepend prependBtn" id="calendarIconOTTo">
                                                 <i class="fa fa-calendar"></i>
                                             </div>
                                         </div>
@@ -263,7 +263,7 @@
                                             </div>
                                         </div> *@
                                         <label for="OTTimeTo" generated="true" class="error"></label>
-                                    </div>
+                                    
 
 
                                @*      <div class="input-group clockpicker" data-autoclose="true">
@@ -310,6 +310,10 @@
 
 
                             $(document).ready(function () {
+                                         $('#calendarIconOT').on('click', function () {
+                                               $('#OTDate').trigger('click');                                              
+                                    });                                      
+
                              
                                   var otHeaderId = $('#OTHeaderId').val();
                                    var statusName = $('#StatusId').val();
@@ -481,7 +485,7 @@
                                                 otDetails : entries   // your list of entries
                                             }
 
-                                   console.log(payload)
+                                //   console.log(payload)
 
                                                     Swal.fire({
                                             text: "Are you sure you want to save this record?",

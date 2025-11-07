@@ -11,6 +11,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Reflection.PortableExecutable;
 using System.Text;
@@ -23,10 +24,12 @@ namespace DCI.Repositories
     {
         private DCIdbContext _dbContext;
         private IEmailRepository _emailRepository;
-        public OvertimeRepository(DCIdbContext dbContext, IEmailRepository emailRepository)
+        private readonly IHomeRepository _homeRepository;
+        public OvertimeRepository(DCIdbContext dbContext, IEmailRepository emailRepository, IHomeRepository homeRepository)
         {
             _dbContext = dbContext;
             _emailRepository = emailRepository;
+            _homeRepository = homeRepository;
         }
         public void Dispose()
         {
@@ -239,7 +242,7 @@ namespace DCI.Repositories
 
                     entity.RequestNo = await GenereteRequestNo();
                     entity.StatusId = (int)EnumStatus.ForApproval;
-                    entity.EmployeeId = param.CurrentUserId;
+                    entity.EmployeeId = param.EmployeeId;
                     entity.Remarks = param.Remarks;
                     entity.ApproverId = param.ApproverId;
                     entity.DateCreated = DateTime.Now;
@@ -262,6 +265,7 @@ namespace DCI.Repositories
                         entityDtl.OTDate = DateTime.Parse(dtl.OTDate);
                         entityDtl.OTTimeFrom = DateTime.Parse(dtl.OTDate) + TimeSpan.Parse(dtl.OTTimeFrom);
                         entityDtl.OTTimeTo = DateTime.Parse(dtl.OTDate) + TimeSpan.Parse(dtl.OTTimeTo);
+                        entityDtl.TotalMinutes = dtl.TotalMinutes;
                         entityDtl.IsActive = true;
                         await _dbContext.OvertimeDetail.AddAsync(entityDtl);
                         await _dbContext.SaveChangesAsync();
@@ -283,15 +287,45 @@ namespace DCI.Repositories
                                 RecommendedById = d.ApproverId
                             };
 
-                    var hrHead = _dbContext.Department.AsNoTracking().Where(x => x.DepartmentCode == "HR").FirstOrDefault();
+                   // var hrHead = _dbContext.Department.AsNoTracking().Where(x => x.DepartmentCode == "HR").FirstOrDefault();
 
                     param.RecommendedById = result.FirstOrDefault().RecommendedById ?? 0;
-                    param.ApproverId = hrHead.ApproverId ?? 0;
+                    param.ApproverId = param.ApproverId;//hrHead.ApproverId ?? 0;
                     param.RequestNo = entity.RequestNo;
                     param.StatusId = entity.StatusId;
                     await _emailRepository.SentToApprovalOvertime(param);
 
-                    return (StatusCodes.Status200OK, "Successfully saved");
+
+                    //Send Application Notification to Approver
+                    NotificationViewModel notifvm = new NotificationViewModel();
+                    notifvm.Title = $"Overtime";
+                    notifvm.Description = $"You have been assigned overtime request {entity.RequestNo} for approval";                   
+                    notifvm.ModuleId = (int)EnumModulePage.Overtime;
+                    notifvm.TransactionId = entity.OTHeaderId;
+                    notifvm.AssignId = param.ApproverId;
+                    notifvm.URL = "/Todo/Index";
+                    notifvm.MarkRead = false;
+                    notifvm.CreatedBy = param.CurrentUserId;
+                    notifvm.IsActive = true;
+                    await _homeRepository.SaveNotification(notifvm);
+
+
+                    //Send Application Notification to Requestor
+                    NotificationViewModel notifvmRequestor = new NotificationViewModel();
+                    notifvm.Title = $"Overtime";
+                    notifvmRequestor.Description = $"Your overtime request {entity.RequestNo} has been submitted for approval.";
+                    notifvmRequestor.ModuleId = (int)EnumModulePage.Overtime;
+                    notifvmRequestor.TransactionId = entity.OTHeaderId;
+                    notifvmRequestor.AssignId = param.CurrentUserId;
+                    notifvmRequestor.URL = "/Home/Notification";
+                    notifvmRequestor.MarkRead = false;
+                    notifvmRequestor.CreatedBy = param.CurrentUserId;
+                    notifvmRequestor.IsActive = true;
+                    await _homeRepository.SaveNotification(notifvmRequestor);
+
+
+                    return (StatusCodes.Status200OK, $"Overtime request {entity.RequestNo} has been submitted for approval.");               
+                    // return (StatusCodes.Status200OK, "Successfully saved");
                 }
                 else
                 {

@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Client;
 using Serilog;
+using System.Globalization;
 using System.Net;
 using System.Net.Mail;
 using System.Reflection.Metadata;
@@ -88,7 +89,7 @@ namespace DCI.Repositories
 
             var userAccessEntity = await _userAccessRepository.GetUserAccessByUserId(userEntity.UserId);
 
-            //string link = "http://192.168.1.78:83/Account/ValidateToken?token=";
+          
             string link = _apiconfig.Value.WebAppConnection + "Account/ValidateToken?token=";
             string emailBody = $@"
             <html>
@@ -167,10 +168,14 @@ namespace DCI.Repositories
         {
             model = await ApprovalNotificationBodyMessage(model);
 
+            string _leavetype = FormatHelper.GetLeaveTypeName(model.LeaveTypeId);
+            TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
 
             MailMessage mail = new MailMessage();
             mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-            mail.Subject = "Action Required: Please check the Leave Request " + model.LeaveRequestHeader.RequestNo;
+            //mail.Subject = System.String.Format("DCI ESS - Action Required: Please check the {0} Request {1}", textInfo.ToTitleCase(_leavetype.ToLower()), model.LeaveRequestHeader.RequestNo);
+            mail.Subject = $"DCI ESS - Action Required: Please check the {textInfo.ToTitleCase(_leavetype.ToLower())} Request" + " " + model.LeaveRequestHeader.RequestNo;
+            
             mail.Body = model.EmailBody;
             mail.IsBodyHtml = true;
             mail.To.Add(model.ApproverEmail);
@@ -179,14 +184,11 @@ namespace DCI.Repositories
 
         async Task<LeaveViewModel> ApprovalNotificationBodyMessage(LeaveViewModel model)
         {
-            var userEntity = new User();
-            string statusName = string.Empty;
-            //style=""color: #007bff; text-decoration: none;""
+            var userEntity = new User();       
 
             if (model.LeaveRequestHeader.Status == (int)EnumStatus.ForApproval)
             {
-                userEntity = await _userRepository.GetUserById(model.ApproverId ?? default(int));
-                statusName = "for approval";
+                userEntity = await _userRepository.GetUserById(model.ApproverId ?? default(int));                
             }
             model.ApproverEmail = userEntity.Email;
             model.EmailBody = $@"
@@ -196,8 +198,7 @@ namespace DCI.Repositories
                 
                 <p>This is an automated message from ESS System.</p>
                  
-				<p>You have been assigned leave request {model.LeaveRequestHeader.RequestNo} {statusName}. Kindly review and proceed accordingly. </p> 
-            
+				<p>You have been assigned { FormatHelper.GetLeaveTypeName(model.LeaveTypeId).ToLower() } request {model.LeaveRequestHeader.RequestNo} for approval. Kindly review and proceed accordingly.</p>             
 
                 <p>
                     You may log in to your account using the link below:<br />
@@ -219,10 +220,13 @@ namespace DCI.Repositories
             model.StatusName = model.LeaveRequestHeader.Status == (int)EnumStatus.Approved ? Constants.Approval_Approved : Constants.Approval_Disapproved;
 
             model = await RequestorNotificationBodyMessage(model);
+            string _leavetype = FormatHelper.GetLeaveTypeName(model.LeaveTypeId);
+            TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
+
 
             MailMessage mail = new MailMessage();
             mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-            mail.Subject = "DCI ESS - Your leave request " + model.LeaveRequestHeader.RequestNo + " has been " + model.StatusName.ToLower();
+            mail.Subject = $"DCI ESS - Your {textInfo.ToTitleCase(_leavetype.ToLower())} request {model.LeaveRequestHeader.RequestNo} has been {model.StatusName.ToLower()}.";       
             mail.Body = model.EmailBody;
             mail.IsBodyHtml = true;
             mail.To.Add(model.RequestorEmail);
@@ -235,22 +239,25 @@ namespace DCI.Repositories
             var userEntity = await _userRepository.GetUserByEmployeeId(model.LeaveRequestHeader.EmployeeId);
             model.RequestorEmail = userEntity?.Email ?? string.Empty;
 
+            string _leavetype = FormatHelper.GetLeaveTypeName(model.LeaveTypeId);
+
+
             model.EmailBody = $@"
             <html>
             <body>              
                 <p>Hi {userEntity.Fullname},</p>
                 
               <p>This is an automated message from ESS System.</p>
-                 <p>Your leave request {model.LeaveRequestHeader.RequestNo} has been {model.StatusName.ToLower()}.</p>   
+                 <p>Your {_leavetype.ToLower()} request {model.LeaveRequestHeader.RequestNo} has been {model.StatusName.ToLower()}.</p>   
               
                 <p>
                     You may log in to your account using the link below:<br />
-                    <a href=' {_apiconfig.Value.WebAppConnection}' target='_blank' >
+                    <a href=' { _apiconfig.Value.WebAppConnection }' target='_blank' >
                         Click here to log in to the DCI ESS System
                     </a>
                 </p>
 
-                       <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
+                <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
                 <p>Best regards,<br />ESS System Administrator</p>
             </body>
             </html>";
@@ -267,10 +274,9 @@ namespace DCI.Repositories
         {
             model = await OvertimeNotificationBodyMessage(model);
 
-
             MailMessage mail = new MailMessage();
             mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-            mail.Subject = "Action Required: Please check the Overtime Request " + model.RequestNo;
+            mail.Subject = $"DCI ESS - Action Required: Please check the Overtime Request {model.RequestNo}";
             mail.Body = model.EmailBody;
             mail.IsBodyHtml = true;
             mail.To.Add(model.ApproverEmail);
@@ -279,13 +285,11 @@ namespace DCI.Repositories
 
         async Task<OvertimeViewModel> OvertimeNotificationBodyMessage(OvertimeViewModel model)
         {
-            var userEntity = new User();
-            string statusName = string.Empty;
+            var userEntity = new User();         
           
             if (model.StatusId == (int)EnumStatus.ForApproval)
             {
-                userEntity = await _userRepository.GetUserById(model.ApproverId);
-                statusName = "for approval";
+                userEntity = await _userRepository.GetUserById(model.ApproverId);              
             }
 
             model.ApproverEmail = userEntity.Email;
@@ -296,7 +300,7 @@ namespace DCI.Repositories
                 
                       <p>This is an automated message from ESS System.</p>
                  
-				<p>You have been assigned overtime request {model.RequestNo} {statusName}. Kindly review and proceed accordingly. </p> 
+				<p>You have been assigned overtime request {model.RequestNo} for approval. Kindly review and proceed accordingly. </p> 
             
                  <p>
                     You may log in to your account using the link below:<br />
@@ -307,6 +311,49 @@ namespace DCI.Repositories
 
                 <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
                 <p>Best regards,<br />ESS System Administrator</p>
+            </body>
+            </html>";
+
+            return model;
+        }
+
+        public async Task SendToRequestorOT(OvertimeViewModel model)
+        {
+            model.StatusName = model.StatusId == (int)EnumStatus.Approved ? Constants.Approval_Approved : Constants.Approval_Disapproved;
+
+            model = await RequestorNotificationBodyMessageOT(model);
+
+            MailMessage mail = new MailMessage();
+            mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
+            mail.Subject = $"DCI ESS - Your Overtime request {model.RequestNo} has been {model.StatusName.ToLower()}";
+            mail.Body = model.EmailBody;
+            mail.IsBodyHtml = true;
+            mail.To.Add(model.RequestorEmail);
+            await SendMessage(mail);
+        }
+
+        async Task<OvertimeViewModel> RequestorNotificationBodyMessageOT(OvertimeViewModel model)
+        {
+            var userEntity = await _userRepository.GetUserById(model.CreatedBy);
+            model.RequestorEmail = userEntity.Email;
+
+            model.EmailBody = $@"
+            <html>
+            <body>              
+                <p>Hi {userEntity.Fullname},</p>
+                
+                <p>This is an automated message from ESS System.</p>
+                <p>Your overtime request {model.RequestNo} has been {model.StatusName.ToLower()}.</p>   
+              
+                <p>
+                    You may log in to your account using the link below:<br />
+                    <a href=' {_apiconfig.Value.WebAppConnection}' target='_blank' >
+                        Click here to log in to the DCI ESS System
+                    </a>
+                </p>
+
+                  <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
+                  <p>Best regards,<br />ESS System Administrator</p>
             </body>
             </html>";
 
@@ -326,7 +373,7 @@ namespace DCI.Repositories
 
             MailMessage mail = new MailMessage();
             mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-            mail.Subject = "Action Required: Please check the DTR adjustment request " + model.RequestNo;
+            mail.Subject = $"DCI ESS - Action Required: Please check the DTR Adjustment Request {model.RequestNo}";
             mail.Body = model.EmailBody;
             mail.IsBodyHtml = true;
             mail.To.Add(model.ApproverEmail);
@@ -335,13 +382,11 @@ namespace DCI.Repositories
 
         async Task<DTRCorrectionViewModel> DTRAdjustmentNotificationBodyMessage(DTRCorrectionViewModel model)
         {
-            var userEntity = new User();
-            string statusName = string.Empty;
+            var userEntity = new User();        
 
             if (model.Status == (int)EnumStatus.ForApproval)
             {
-                userEntity = await _userRepository.GetUserById(model.ApproverId);
-                statusName = "for approval";
+                userEntity = await _userRepository.GetUserById(model.ApproverId);              
             }
 
             model.ApproverEmail = userEntity.Email;
@@ -352,7 +397,7 @@ namespace DCI.Repositories
                 
                 <p>This is an automated message from ESS System.</p>
                  
-				<p>You have been assigned DTR Adjustment request {model.RequestNo} {statusName}. Kindly review and proceed accordingly. </p> 
+				<p>You have been assigned DTR Adjustment request {model.RequestNo} for approval. Kindly review and proceed accordingly. </p> 
 
                 <p>
                     You may log in to your account using the link below:<br />
@@ -378,7 +423,7 @@ namespace DCI.Repositories
 
             MailMessage mail = new MailMessage();
             mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-            mail.Subject = "DCI ESS - Your DTR Adjustment " + model.RequestNo + " has been " + model.StatusName.ToLower();
+            mail.Subject = $"DCI ESS - Your DTR Adjustment {model.RequestNo} has been {model.StatusName.ToLower()}";
             mail.Body = model.EmailBody;
             mail.IsBodyHtml = true;
             mail.To.Add(model.RequestorEmail);
@@ -423,7 +468,7 @@ namespace DCI.Repositories
 
             MailMessage mail = new MailMessage();
             mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-            mail.Subject = "Action Required: Please check the WFH Request " + model.RequestNo;
+            mail.Subject = $"DCI ESS - Action Required: Please check the WFH Request {model.RequestNo}";
             mail.Body = model.EmailBody;
             mail.IsBodyHtml = true;
             mail.To.Add(model.ApproverEmail);
@@ -432,13 +477,11 @@ namespace DCI.Repositories
 
         async Task<WFHHeaderViewModel> WFHNotificationBodyMessage(WFHHeaderViewModel model)
         {
-            var userEntity = new User();
-            string statusName = string.Empty;
+            var userEntity = new User();         
             
             if (model.StatusId == (int)EnumStatus.ForApproval)
             {
-                userEntity = await _userRepository.GetUserById(model.ApproverId);
-                statusName = "for approval";
+                userEntity = await _userRepository.GetUserById(model.ApproverId);               
             }
 
             model.ApproverEmail = userEntity.Email;
@@ -449,7 +492,7 @@ namespace DCI.Repositories
                 
                       <p>This is an automated message from ESS System.</p>
                  
-				<p>You have been assigned wfh request {model.RequestNo} {statusName}. Kindly review and proceed accordingly. </p> 
+				<p>You have been assigned wfh request {model.RequestNo} for approval. Kindly review and proceed accordingly.</p> 
             
                   <p>
                     You may log in to your account using the link below:<br />
@@ -476,7 +519,7 @@ namespace DCI.Repositories
 
             MailMessage mail = new MailMessage();
             mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-            mail.Subject = "DCI ESS - Your Work from home " + model.RequestNo + " has been " + model.StatusName.ToLower();
+            mail.Subject = $"DCI ESS - Your Work from home {model.RequestNo} has been {model.StatusName.ToLower()}";
             mail.Body = model.EmailBody;
             mail.IsBodyHtml = true;
             mail.To.Add(model.RequestorEmail);
