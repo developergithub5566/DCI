@@ -67,6 +67,7 @@ namespace DCI.Repositories
                                   RoleId = usr.RoleId,
                                   RoleName = role.RoleName,
                                   EmailBiometricsNotification = usr.EmailBiometricsNotification,
+                                  EmailAttendanceConfirmation = usr.EmailAttendanceConfirmation,
                                   EmployeeList = null,
                                   RoleList = null
                               }).FirstOrDefault() ?? new UserModel();

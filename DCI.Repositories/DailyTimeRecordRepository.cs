@@ -393,14 +393,98 @@ namespace DCI.Repositories
             return string.Empty;
         }
 
-        //private string GetFormattedRecord(int totalRecords)
-        //{
-        //    int setA = totalRecords % 1000;
-        //    int setB = totalRecords / 1000;
-        //    string formattedA = setA.ToString("D4");
-        //    string formattedB = setB.ToString("D4");
-        //    return $"{formattedA}";
-        //}
+        public async Task<IList<DailyTimeRecordViewModel>> GetAllDTRByDate(DailyTimeRecordViewModel model) //Job Trigger. Everyday Email Attendance Confirmation
+        {
+            var biometriclogs = await (from dtr in _dbContext.vw_AttendanceSummary.AsNoTracking()
+                                       join emp in _dbContext.Employee.AsNoTracking() on dtr.EMPLOYEE_NO equals emp.EmployeeNo
+                                        where dtr.DATE.Date == model.DATE.Date
+                                       orderby dtr.DATE descending
+                                       select new DailyTimeRecordViewModel
+                                       {
+                                           ID = dtr.ID,
+                                           EMPLOYEE_NO = dtr.EMPLOYEE_NO,
+                                           NAME = emp.Firstname + " " + emp.Lastname,
+                                           DATE = dtr.DATE,
+                                           FIRST_IN = dtr.FIRST_IN,
+                                           LAST_OUT = dtr.LAST_OUT,
+                                           LATE = dtr.LATE,
+                                           CLOCK_OUT = dtr.CLOCK_OUT,
+                                           UNDER_TIME = dtr.UNDER_TIME,
+                                           OVERTIME = dtr.OVERTIME,
+                                           TOTAL_HOURS = dtr.TOTAL_HOURS,
+                                           TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS,
+                                           SOURCE = Constants.Source_Biometrics
+                                       }).ToListAsync();
+
+
+            var wfhlogs = await (from dtr in _dbContext.vw_AttendanceSummary_WFH.AsNoTracking()
+                                 join emp in _dbContext.Employee.AsNoTracking() on dtr.EMPLOYEE_NO equals emp.EmployeeNo
+                                 where dtr.STATUS == (int)EnumStatus.Approved  && dtr.DATE.Date == model.DATE.Date
+                                 orderby dtr.DATE descending
+                                 select new DailyTimeRecordViewModel
+                                 {
+                                     ID = dtr.ID,
+                                     EMPLOYEE_NO = dtr.EMPLOYEE_NO,
+                                     NAME = emp.Firstname + " " + emp.Lastname,
+                                     DATE = dtr.DATE,
+                                     FIRST_IN = dtr.FIRST_IN,
+                                     LAST_OUT = dtr.LAST_OUT,
+                                     LATE = dtr.LATE,
+                                     CLOCK_OUT = dtr.CLOCK_OUT,
+                                     UNDER_TIME = dtr.UNDER_TIME,
+                                     OVERTIME = dtr.OVERTIME,
+                                     TOTAL_HOURS = dtr.TOTAL_HOURS,
+                                     TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS,
+                                     SOURCE = Constants.Source_Remote
+                                 }).ToListAsync();
+
+            //var holiday = await (from hol in _dbContext.Holiday.AsNoTracking()
+            //                     where hol.IsActive == true && dtr.DATE.Date == model.DATE.Date
+            //                     select new DailyTimeRecordViewModel
+            //                     {
+            //                         ID = 0,
+            //                         EMPLOYEE_NO = string.Empty,
+            //                         NAME = hol.HolidayName,
+            //                         DATE = hol.HolidayDate.Date,
+            //                         FIRST_IN = "00:00:00",
+            //                         LAST_OUT = "00:00:00",
+            //                         LATE = "00:00:00",
+            //                         CLOCK_OUT = "00:00:00",
+            //                         UNDER_TIME = "00:00:00",
+            //                         OVERTIME = "00:00:00",
+            //                         TOTAL_HOURS = "00:00:00",
+            //                         TOTAL_WORKING_HOURS = "00:00:00",
+            //                         SOURCE = hol.HolidayType == (int)EnumHoliday.Suspension ? Constants.Source_Suspension : Constants.Source_Holiday
+            //                     }).ToListAsync();
+
+            var officialBusiness = await (from dtl in _dbContext.LeaveRequestDetails.AsNoTracking()
+                                          join ob in _dbContext.LeaveRequestHeader.AsNoTracking() on dtl.LeaveRequestHeaderId equals ob.LeaveRequestHeaderId
+                                          join emp in _dbContext.Employee.AsNoTracking() on ob.EmployeeId equals emp.EmployeeId
+                                          where ob.IsActive == true && (ob.LeaveTypeId == (int)EnumLeaveType.OB || ob.LeaveTypeId == (int)EnumLeaveType.HDOB) 
+                                          && ob.Status == (int)EnumStatus.Approved
+                                          && dtl.LeaveDate.Date == model.DATE.Date
+                                          select new DailyTimeRecordViewModel
+                                          {
+                                              ID = 0,
+                                              EMPLOYEE_NO = emp.EmployeeNo,
+                                              NAME = emp.Firstname + " " + emp.Lastname,
+                                              DATE = dtl.LeaveDate.Date,
+                                              FIRST_IN = "00:00:00",
+                                              LAST_OUT = "00:00:00",
+                                              LATE = "00:00:00",
+                                              CLOCK_OUT = "00:00:00",
+                                              UNDER_TIME = "00:00:00",
+                                              OVERTIME = "00:00:00",
+                                              TOTAL_HOURS = "00:00:00",
+                                              TOTAL_WORKING_HOURS = "00:00:00",
+                                              SOURCE = Constants.Source_OfficialBusiness
+                                          }).ToListAsync();
+
+
+            var attendance = biometriclogs.Concat(wfhlogs).Concat(officialBusiness).ToList();
+
+            return attendance.ToList();
+        }
 
     }
 }

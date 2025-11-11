@@ -129,6 +129,10 @@
 				<input class="form-check-input force-color" type="checkbox" role="switch" id="switchCheckDefault" @(Model.EmailBiometricsNotification ? "checked" : "") onchange="onChangeEnableEmailBiometrcis(this)">
 				<label class="form-check-label" for="switchCheckDefault">Enable Email Notifications for Biometric Time In/Out</label>
 			</div>
+			<div class="form-switch">
+				<input class="form-check-input force-color" type="checkbox" role="switch" id="switchCheckDefaultAttdnc" @(Model.EmailAttendanceConfirmation ? "checked" : "") onchange="onChangeEnableEmailAttendanceConfirmation(this)">
+				<label class="form-check-label" for="switchCheckDefaultAttdnc">Enable Email Notifications for Attendance Confirmation</label>
+			</div>
 
 			<div class="d-flex align-items-center my-3">
 				<hr class="flex-grow-1">
@@ -196,5 +200,40 @@
 										}
 									});
 			}
+
+			function onChangeEnableEmailAttendanceConfirmation(element){
+				  var ischecked = $(element).is(':checked');
+
+
+								$.ajax({
+										type: 'POST',
+										url: '@Url.Action("SaveEmailNotificationForAttendanceConfirmation", "Home")',
+										data: {  EmailAttendanceConfirmation : ischecked},
+										success: function (response) {
+											if (response.success) {
+												Swal.fire({
+													text: response.message,
+													icon: "success",
+													confirmButtonText: "Ok"
+												}).then((result) => {
+													 location.reload();
+												});
+											} else {
+												Swal.fire({
+													text: response.message,
+													icon: "error"
+												});
+											}
+										},
+										error: function () {
+											Swal.fire({
+												text: "An error occurred. Please try again.",
+												icon: "error"
+											});
+										}
+									});
+			}
+
+
 		</script>
 	}

@@ -41,6 +41,7 @@ namespace DCI.Trigger
             }
             catch (Exception ex)
             {
+                Log.Information("ProcessPendingMessages...");
                 Log.Information("Biometrics API call failed...");
                 Log.Error(ex.ToString());
             }

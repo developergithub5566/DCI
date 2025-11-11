@@ -14,6 +14,6 @@ namespace DCI.Repositories.Interface
         //Task<IList<WFHViewModel>> GetAllWFHById(WFHViewModel model);
         //Task<IList<DailyTimeRecordViewModel>> GetAllWFH(DailyTimeRecordViewModel model);
         // Task<(int statuscode, string message)> SaveWFHTimeIn(WFHViewModel model);
-
+        Task<IList<DailyTimeRecordViewModel>> GetAllDTRByDate(DailyTimeRecordViewModel model); //Job Trigger. Everyday Email Attendance Confirmation
     }
 }

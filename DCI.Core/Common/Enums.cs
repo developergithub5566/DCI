@@ -217,4 +217,11 @@ namespace DCI.Core.Common
         HOLIDAY = 3,
         SUSPENSION = 4
     }
+    //public enum EnumBiometricConfirmationType
+    //{
+    //    NoAttendance = 1,
+    //    HalfdayOB = 2,
+    //    NoTimeIn = 3,
+    //    NoTimeOut = 4
+    //}
 }

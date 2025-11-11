@@ -10,5 +10,6 @@ namespace DCI.Trigger
     public interface IEmailRepository : IDisposable
     {
         Task SendEmailBiometricsNotification(BiometricViewModel model);
+        Task SendEmailAttendanceConfirmationNotification(BiometricViewModel model);
     }
 }

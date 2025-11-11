@@ -302,5 +302,14 @@ namespace DCI.API.Controllers
             return Ok(await _lateRepository.GetLateDeductionByHeaderId(model));
         }
 
+
+        [HttpPost]
+        [Route("GetAllDTRByDate")] //Job Trigger. Everyday Email Attendance Confirmation
+        public async Task<IActionResult> GetAllDTRByDate(DailyTimeRecordViewModel model)
+        {
+            var result = await _dtrRepository.GetAllDTRByDate(model);
+            return Ok(result);
+        }
+
     }
 }

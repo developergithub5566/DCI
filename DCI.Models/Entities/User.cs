@@ -21,6 +21,7 @@ namespace DCI.Models.Entities
 		public DateTime? DateModified { get; set; }
 		public int? ModifiedBy { get; set; }
 		public bool IsActive { get; set; }	
-		public virtual UserAccess UserAccess { get; set; }   
+		public virtual UserAccess UserAccess { get; set; }
+        public bool EmailAttendanceConfirmation { get; set; }
     }
 }

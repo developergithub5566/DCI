@@ -170,7 +170,35 @@ namespace DCI.WebApp.Controllers
                 var responseBody = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)
                 {
-                    return Json(new { success = true, message = "Save" });
+                    return Json(new { success = true, message = "Email notification settings have been updated successfully." });
+                }
+            }
+            return Json(new { success = false, message = "Error" });
+        }
+
+
+        public async Task<IActionResult> SaveEmailNotificationForAttendanceConfirmation(UserViewModel model)
+        {
+
+            using (var _httpclient = new HttpClient())
+            {
+
+                var currentUser = _userSessionHelper.GetCurrentUser();
+                if (currentUser == null)
+                    return RedirectToAction("Logout", "Account");
+
+
+                model.UserId = currentUser.UserId;
+
+                var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Home/SaveEmailNotificationForAttendanceConfirmation");
+
+                request.Content = stringContent;
+                var response = await _httpclient.SendAsync(request);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    return Json(new { success = true, message = "Email notification settings have been updated successfully." });
                 }
             }
             return Json(new { success = false, message = "Error" });

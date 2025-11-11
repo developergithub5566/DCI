@@ -107,7 +107,7 @@ namespace DCI.Trigger
                             Title = "Leave Credit",
                             Description = "Your leave credits have been updated today.",
                             ModuleId = (int)EnumModulePage.TriggerLeaveCreditProcess,
-                            TransactionId = 1,
+                            TransactionId = 0,
                             AssignId = emp.UserId,
                             URL = "/DailyTimeRecord/Leave",
                             MarkRead = false,

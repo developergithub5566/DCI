@@ -200,5 +200,30 @@ namespace DCI.Repositories
             }
         }
 
+        public async Task SaveEmailNotificationForAttendanceConfirmation(UserViewModel model)
+        {
+            try
+            {
+                var entities = await _dbContext.User.FirstOrDefaultAsync(x => x.UserId == model.UserId);
+
+                entities.EmailAttendanceConfirmation = model.EmailAttendanceConfirmation;
+                entities.DateModified = DateTime.Now;
+                entities.ModifiedBy = model.UserId;
+                entities.IsActive = true;
+
+                _dbContext.User.Entry(entities).State = EntityState.Modified;
+                await _dbContext.SaveChangesAsync();
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
     }
 }

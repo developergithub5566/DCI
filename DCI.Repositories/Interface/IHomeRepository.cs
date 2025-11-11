@@ -9,5 +9,6 @@ namespace DCI.Repositories.Interface
         Task SaveNotification(NotificationViewModel model);
         Task MarkAsRead(NotificationViewModel model);
         Task SaveEmailNotificationForBiometrics(UserViewModel model);
+        Task SaveEmailNotificationForAttendanceConfirmation(UserViewModel model);
     }
 }

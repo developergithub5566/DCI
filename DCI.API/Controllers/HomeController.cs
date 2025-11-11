@@ -50,6 +50,16 @@ namespace DCI.API.Controllers
            
         }
 
+        [HttpPost]
+        [Route("SaveEmailNotificationForAttendanceConfirmation")]
+        public async Task<IActionResult> SaveEmailNotificationForAttendanceConfirmation([FromBody] UserViewModel model)
+        {
+            await _homeRepository.SaveEmailNotificationForAttendanceConfirmation(model);
+
+            return Ok();
+
+        }
+
     }
 }
 
