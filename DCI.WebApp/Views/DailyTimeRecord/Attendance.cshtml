@@ -378,7 +378,9 @@
                                        js.fn.dataTable.ext.search.push(function (settings, data) {
                                                  min = $('#minDate').val();   // e.g. "2025-09-01"
                                                  max = $('#maxDate').val();   // e.g. "2025-09-10"
-                                                let rawDateTime = (data[1] || '').trim(); // adjust index to your date column
+                                                
+                                                 
+                                                 let rawDateTime = (data[0] || '').trim(); // adjust index to your date column
                                 
 
                                                 if (!rawDateTime) return false;

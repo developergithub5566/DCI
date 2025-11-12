@@ -196,7 +196,7 @@ namespace DCI.Repositories
             <body>              
                 <p>Hi {userEntity.Fullname},</p>
                 
-                <p>This is an automated message from ESS System.</p>
+               <p>This is an automated message from the <strong>ESS System</strong>.</p>
                  
 				<p>You have been assigned { FormatHelper.GetLeaveTypeName(model.LeaveTypeId).ToLower() } request {model.LeaveRequestHeader.RequestNo} for approval. Kindly review and proceed accordingly.</p>             
 
@@ -207,8 +207,22 @@ namespace DCI.Repositories
                     </a>
                 </p>
 
-                <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
-                <p>Best regards,<br />ESS System Administrator</p>
+                  <hr style='border:none; border-top:1px solid #ddd; margin:20px 0;' />
+
+                                    <p style='font-size:13px; color:#777;'>
+                                      If you encounter any issues, contact our support team at 
+                                      <a href='mailto:info@dci.ph' style='color:#0066cc;'>info@dci.ph</a>.
+                                    </p>
+    
+                                     <p style='font-size:13px; color:#777;'>
+                                      Best regards,<br>
+                                      <strong>ESS System Administrator</strong><br>
+                                      <span style='color:#999;'>DCI Employee Self-Service Portal</span>
+                                    </p>
+
+                                    <p style='font-size:11px; color:#aaa; margin-top:20px;'>
+                                      This email was automatically generated. Please do not reply directly to this message.
+                                    </p>
             </body>
             </html>";
 
@@ -220,13 +234,11 @@ namespace DCI.Repositories
             model.StatusName = model.LeaveRequestHeader.Status == (int)EnumStatus.Approved ? Constants.Approval_Approved : Constants.Approval_Disapproved;
 
             model = await RequestorNotificationBodyMessage(model);
-            string _leavetype = FormatHelper.GetLeaveTypeName(model.LeaveTypeId);
-            TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
-
+            string _leavetype = FormatHelper.GetLeaveTypeName(model.LeaveTypeId);   
 
             MailMessage mail = new MailMessage();
             mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-            mail.Subject = $"DCI ESS - Your {textInfo.ToTitleCase(_leavetype.ToLower())} request {model.LeaveRequestHeader.RequestNo} has been {model.StatusName.ToLower()}.";       
+            mail.Subject = $"DCI ESS - Your {_leavetype.ToLower()} request {model.LeaveRequestHeader.RequestNo} has been {model.StatusName.ToLower()}.";       
             mail.Body = model.EmailBody;
             mail.IsBodyHtml = true;
             mail.To.Add(model.RequestorEmail);
@@ -257,8 +269,22 @@ namespace DCI.Repositories
                     </a>
                 </p>
 
-                <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
-                <p>Best regards,<br />ESS System Administrator</p>
+                  <hr style='border:none; border-top:1px solid #ddd; margin:20px 0;' />
+
+                                    <p style='font-size:13px; color:#777;'>
+                                      If you encounter any issues, contact our support team at 
+                                      <a href='mailto:info@dci.ph' style='color:#0066cc;'>info@dci.ph</a>.
+                                    </p>
+    
+                                     <p style='font-size:13px; color:#777;'>
+                                      Best regards,<br>
+                                      <strong>ESS System Administrator</strong><br>
+                                      <span style='color:#999;'>DCI Employee Self-Service Portal</span>
+                                    </p>
+
+                                    <p style='font-size:11px; color:#aaa; margin-top:20px;'>
+                                      This email was automatically generated. Please do not reply directly to this message.
+                                    </p>
             </body>
             </html>";
 
@@ -309,8 +335,22 @@ namespace DCI.Repositories
                     </a>
                 </p>
 
-                <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
-                <p>Best regards,<br />ESS System Administrator</p>
+                 <hr style='border:none; border-top:1px solid #ddd; margin:20px 0;' />
+
+                                    <p style='font-size:13px; color:#777;'>
+                                      If you encounter any issues, contact our support team at 
+                                      <a href='mailto:info@dci.ph' style='color:#0066cc;'>info@dci.ph</a>.
+                                    </p>
+    
+                                     <p style='font-size:13px; color:#777;'>
+                                      Best regards,<br>
+                                      <strong>ESS System Administrator</strong><br>
+                                      <span style='color:#999;'>DCI Employee Self-Service Portal</span>
+                                    </p>
+
+                                    <p style='font-size:11px; color:#aaa; margin-top:20px;'>
+                                      This email was automatically generated. Please do not reply directly to this message.
+                                    </p>
             </body>
             </html>";
 
@@ -352,8 +392,22 @@ namespace DCI.Repositories
                     </a>
                 </p>
 
-                  <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
-                  <p>Best regards,<br />ESS System Administrator</p>
+                   <hr style='border:none; border-top:1px solid #ddd; margin:20px 0;' />
+
+                                    <p style='font-size:13px; color:#777;'>
+                                      If you encounter any issues, contact our support team at 
+                                      <a href='mailto:info@dci.ph' style='color:#0066cc;'>info@dci.ph</a>.
+                                    </p>
+    
+                                     <p style='font-size:13px; color:#777;'>
+                                      Best regards,<br>
+                                      <strong>ESS System Administrator</strong><br>
+                                      <span style='color:#999;'>DCI Employee Self-Service Portal</span>
+                                    </p>
+
+                                    <p style='font-size:11px; color:#aaa; margin-top:20px;'>
+                                      This email was automatically generated. Please do not reply directly to this message.
+                                    </p>
             </body>
             </html>";
 
@@ -406,8 +460,22 @@ namespace DCI.Repositories
                     </a>
                 </p>
             
-                <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
-                <p>Best regards,<br />ESS System Administrator</p>
+                  <hr style='border:none; border-top:1px solid #ddd; margin:20px 0;' />
+
+                                    <p style='font-size:13px; color:#777;'>
+                                      If you encounter any issues, contact our support team at 
+                                      <a href='mailto:info@dci.ph' style='color:#0066cc;'>info@dci.ph</a>.
+                                    </p>
+    
+                                     <p style='font-size:13px; color:#777;'>
+                                      Best regards,<br>
+                                      <strong>ESS System Administrator</strong><br>
+                                      <span style='color:#999;'>DCI Employee Self-Service Portal</span>
+                                    </p>
+
+                                    <p style='font-size:11px; color:#aaa; margin-top:20px;'>
+                                      This email was automatically generated. Please do not reply directly to this message.
+                                    </p>
             </body>
             </html>";
 
@@ -450,8 +518,22 @@ namespace DCI.Repositories
                     </a>
                 </p>
 
-                  <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
-                  <p>Best regards,<br />ESS System Administrator</p>
+                    <hr style='border:none; border-top:1px solid #ddd; margin:20px 0;' />
+
+                                    <p style='font-size:13px; color:#777;'>
+                                      If you encounter any issues, contact our support team at 
+                                      <a href='mailto:info@dci.ph' style='color:#0066cc;'>info@dci.ph</a>.
+                                    </p>
+    
+                                     <p style='font-size:13px; color:#777;'>
+                                      Best regards,<br>
+                                      <strong>ESS System Administrator</strong><br>
+                                      <span style='color:#999;'>DCI Employee Self-Service Portal</span>
+                                    </p>
+
+                                    <p style='font-size:11px; color:#aaa; margin-top:20px;'>
+                                      This email was automatically generated. Please do not reply directly to this message.
+                                    </p>
             </body>
             </html>";
 
@@ -501,8 +583,22 @@ namespace DCI.Repositories
                     </a>
                 </p>
 
-                <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
-                <p>Best regards,<br />ESS System Administrator</p>
+                   <hr style='border:none; border-top:1px solid #ddd; margin:20px 0;' />
+
+                                    <p style='font-size:13px; color:#777;'>
+                                      If you encounter any issues, contact our support team at 
+                                      <a href='mailto:info@dci.ph' style='color:#0066cc;'>info@dci.ph</a>.
+                                    </p>
+    
+                                     <p style='font-size:13px; color:#777;'>
+                                      Best regards,<br>
+                                      <strong>ESS System Administrator</strong><br>
+                                      <span style='color:#999;'>DCI Employee Self-Service Portal</span>
+                                    </p>
+
+                                    <p style='font-size:11px; color:#aaa; margin-top:20px;'>
+                                      This email was automatically generated. Please do not reply directly to this message.
+                                    </p>
             </body>
             </html>";
 
@@ -546,8 +642,22 @@ namespace DCI.Repositories
                     </a>
                 </p>
 
-                  <p>If you encounter any issues, feel free to contact our support team at info@dci.ph.</p>            
-                  <p>Best regards,<br />ESS System Administrator</p>
+                   <hr style='border:none; border-top:1px solid #ddd; margin:20px 0;' />
+
+                                    <p style='font-size:13px; color:#777;'>
+                                      If you encounter any issues, contact our support team at 
+                                      <a href='mailto:info@dci.ph' style='color:#0066cc;'>info@dci.ph</a>.
+                                    </p>
+    
+                                     <p style='font-size:13px; color:#777;'>
+                                      Best regards,<br>
+                                      <strong>ESS System Administrator</strong><br>
+                                      <span style='color:#999;'>DCI Employee Self-Service Portal</span>
+                                    </p>
+
+                                    <p style='font-size:11px; color:#aaa; margin-top:20px;'>
+                                      This email was automatically generated. Please do not reply directly to this message.
+                                    </p>
             </body>
             </html>";
 

@@ -349,10 +349,10 @@ namespace DCI.Repositories
                             }
                             else
                             {
-                                decimal excessDays = contextHdr.NoOfDays - contextLeaveInfo.VLBalance;
-                                contextLeaveInfo.VLBalance = 0;
+                                decimal excessDays = contextHdr.NoOfDays - contextLeaveInfo.SLBalance;
+                                contextLeaveInfo.SLBalance = 0;
                                 contextHdr.DeductionType = (int)EnumDeductionType.SickLeave;
-                                contextHdr.NoOfDays = contextLeaveInfo.VLBalance;
+                                contextHdr.NoOfDays = contextLeaveInfo.SLBalance;
 
                                 lvmodel.NoOfDays = excessDays;
                                 lvmodel.LeaveTypeId = contextHdr.LeaveTypeId;
@@ -944,7 +944,7 @@ namespace DCI.Repositories
                 int _currentYear = DateTime.Now.Year;
                 int _currentMonth = DateTime.Now.Month;
                 var _leaveContext = await _dbContext.LeaveRequestHeader
-                                                .Where(x => x.IsActive == true && x.DateFiled.Date.Year == _currentYear)
+                                                .Where(x => x.IsActive == true && x.DateFiled.Date.Year == _currentYear && x.DateFiled.Date.Month == _currentMonth)
                                                 .AsQueryable()
                                                 .ToListAsync();
 
