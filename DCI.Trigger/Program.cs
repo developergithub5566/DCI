@@ -45,8 +45,9 @@ public class Program
 
         builder.Services.AddHangfireServer();
         builder.Services.Configure<APIConfigModel>(builder.Configuration.GetSection("WebAPI"));
-        builder.Services.AddTransient<OutboxProcessor>();
         builder.Services.AddTransient<AttendanceProcessor>();
+        builder.Services.AddTransient<OutboxProcessor>();
+        builder.Services.AddTransient<LeaveProcessor>();
         builder.Services.Configure<SMTPModel>(builder.Configuration.GetSection("SmtpSettings"));
         builder.Services.AddScoped<IEmailRepository, EmailRepository>();
         Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).CreateLogger();
@@ -55,14 +56,10 @@ public class Program
 
         app.UseHangfireDashboard();
 
-        var jobId = "attendance-confirmation-job";
-        RecurringJob.RemoveIfExists(jobId);
-        RecurringJob.AddOrUpdate<AttendanceProcessor>(
-            jobId,
-            p => p.AttendanceConfirmationProcessor(),
-            "0 22 * * 1-5",
-            TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila")
-        );
+    
+
+        RecurringJob.AddOrUpdate<AttendanceProcessor>("attendance-confirmation-job",
+    processor => processor.AttendanceConfirmationProcessor(), "0 22 * * 1-5", TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila")); // 10:00 PM, Monday–Friday
 
 
         RecurringJob.AddOrUpdate<OutboxProcessor>("outbox-job",
@@ -71,13 +68,7 @@ public class Program
 
         RecurringJob.AddOrUpdate<LeaveProcessor>("leave-credit-job",
          processor => processor.MonthlyLeaveCredit(), "0 5 1 * *", TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila")); // Runs on the 1st day of every month at 5:00am
-
-
-    
-
-        //RecurringJob.RemoveIfExists("attendance-confirmation-job");
-        //RecurringJob.AddOrUpdate<AttendanceProcessor>("attendance-confirmation-job",
-        // processor => processor.AttendanceConfirmationProcessor(), "0 22 * * 1-5", TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila")); // 10:00 PM, Monday–Friday
+   
 
 
         app.MapGet("/", () => "SQL Outbox + Hangfire is running");
