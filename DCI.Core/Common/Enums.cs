@@ -224,4 +224,10 @@ namespace DCI.Core.Common
     //    NoTimeIn = 3,
     //    NoTimeOut = 4
     //}
+    //
+    public enum EnumScopeTypeJobRecurring
+    {
+        DAILY = 1,
+        MONTHLY = 2    
+    }
 }

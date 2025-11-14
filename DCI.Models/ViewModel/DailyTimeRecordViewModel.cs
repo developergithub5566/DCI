@@ -51,6 +51,11 @@ namespace DCI.Models.ViewModel
         public string LAST_OUT_WFH { get; set; } = string.Empty;
         public string CLOCK_OUT_WFH { get; set; } = string.Empty;
         public string TOTAL_WORKING_HOURS_WFH { get; set; } = string.Empty;
+
+        public int ScopeTypeJobRecurring { get; set; } = 0;
+        //   public string DayType { get; set; } = string.Empty;
+      //  public DateTime DateFilter { get; set; } = DateTime.Now;
+
     }
     public class DTRCorrectionViewModel
     {

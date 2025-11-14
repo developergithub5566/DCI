@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.Reflection.PortableExecutable;
 using System.Text.RegularExpressions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using static QRCoder.PayloadGenerator;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DCI.Repositories
@@ -97,11 +98,13 @@ namespace DCI.Repositories
                                      SOURCE = hol.HolidayType == (int)EnumHoliday.Suspension ? Constants.Source_Suspension : Constants.Source_Holiday
                                  }).ToListAsync();
 
+            var filterDate = new DateTime(2025, 10, 1); //migration start Oct28
+
             var officialBusiness = await (from dtl in _dbContext.LeaveRequestDetails.AsNoTracking()
                                           join ob in _dbContext.LeaveRequestHeader.AsNoTracking() on dtl.LeaveRequestHeaderId equals ob.LeaveRequestHeaderId
                                           join emp in _dbContext.Employee.AsNoTracking() on ob.EmployeeId equals emp.EmployeeId
-                                          // where ob.IsActive == true && (ob.LeaveTypeId == (int)EnumLeaveType.OB || ob.LeaveTypeId == (int)EnumLeaveType.HDOB) && ob.Status == (int)EnumStatus.Approved 
-                                          where ob.IsActive == true && ob.Status == (int)EnumStatus.Approved
+                                           where ob.IsActive == true && (ob.LeaveTypeId == (int)EnumLeaveType.OB || ob.LeaveTypeId == (int)EnumLeaveType.HDOB) && ob.Status == (int)EnumStatus.Approved 
+                                          && ob.IsActive == true && ob.Status == (int)EnumStatus.Approved && dtl.LeaveDate >= filterDate
                                           select new DailyTimeRecordViewModel
                                  {
                                      ID = 0,
@@ -394,11 +397,12 @@ namespace DCI.Repositories
             return string.Empty;
         }
 
-        public async Task<IList<DailyTimeRecordViewModel>> GetAllDTRByDate(DailyTimeRecordViewModel model) //Job Trigger. Everyday Email Attendance Confirmation
-        {
+        //Job Trigger. Everyday Email Attendance Confirmation
+        //Source Code from DCI.Trigger.API/AttendanceProcessor.cs
+        public async Task<IList<DailyTimeRecordViewModel>> GetAllDTRByDate(DailyTimeRecordViewModel model) 
+        {  
             var biometriclogs = await (from dtr in _dbContext.vw_AttendanceSummary.AsNoTracking()
-                                       join emp in _dbContext.Employee.AsNoTracking() on dtr.EMPLOYEE_NO equals emp.EmployeeNo
-                                        where dtr.DATE.Date == model.DATE.Date
+                                       join emp in _dbContext.Employee.AsNoTracking() on dtr.EMPLOYEE_NO equals emp.EmployeeNo                                       
                                        orderby dtr.DATE descending
                                        select new DailyTimeRecordViewModel
                                        {
@@ -417,53 +421,56 @@ namespace DCI.Repositories
                                            SOURCE = Constants.Source_Biometrics
                                        }).ToListAsync();
 
+            if ((int)EnumScopeTypeJobRecurring.DAILY == model.ScopeTypeJobRecurring) //DAILY
+            {             
+                biometriclogs = biometriclogs.Where(x => x.DATE.Date == model.DATE.Date).ToList();
+            }
+            else  // MONTHLY
+            {
+                biometriclogs = biometriclogs.Where(x => x.DATE.Month == model.DATE.Month && x.DATE.Year == model.DATE.Year).ToList();
+            }
 
-            var wfhlogs = await (from dtr in _dbContext.vw_AttendanceSummary_WFH.AsNoTracking()
-                                 join emp in _dbContext.Employee.AsNoTracking() on dtr.EMPLOYEE_NO equals emp.EmployeeNo
-                                 where dtr.STATUS == (int)EnumStatus.Approved  && dtr.DATE.Date == model.DATE.Date
-                                 orderby dtr.DATE descending
-                                 select new DailyTimeRecordViewModel
-                                 {
-                                     ID = dtr.ID,
-                                     EMPLOYEE_NO = dtr.EMPLOYEE_NO,
-                                     NAME = emp.Firstname + " " + emp.Lastname,
-                                     DATE = dtr.DATE,
-                                     FIRST_IN = dtr.FIRST_IN,
-                                     LAST_OUT = dtr.LAST_OUT,
-                                     LATE = dtr.LATE,
-                                     CLOCK_OUT = dtr.CLOCK_OUT,
-                                     UNDER_TIME = dtr.UNDER_TIME,
-                                     OVERTIME = dtr.OVERTIME,
-                                     TOTAL_HOURS = dtr.TOTAL_HOURS,
-                                     TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS,
-                                     SOURCE = Constants.Source_Remote
-                                 }).ToListAsync();
+                var wfhlogs = await (from dtr in _dbContext.vw_AttendanceSummary_WFH.AsNoTracking()
+                                     join emp in _dbContext.Employee.AsNoTracking() on dtr.EMPLOYEE_NO equals emp.EmployeeNo
+                                     where dtr.STATUS == (int)EnumStatus.Approved // && dtr.DATE.Date == model.DATE.Date
+                                     orderby dtr.DATE descending
+                                     select new DailyTimeRecordViewModel
+                                     {
+                                         ID = dtr.ID,
+                                         EMPLOYEE_NO = dtr.EMPLOYEE_NO,
+                                         NAME = emp.Firstname + " " + emp.Lastname,
+                                         DATE = dtr.DATE,
+                                         FIRST_IN = dtr.FIRST_IN,
+                                         LAST_OUT = dtr.LAST_OUT,
+                                         LATE = dtr.LATE,
+                                         CLOCK_OUT = dtr.CLOCK_OUT,
+                                         UNDER_TIME = dtr.UNDER_TIME,
+                                         OVERTIME = dtr.OVERTIME,
+                                         TOTAL_HOURS = dtr.TOTAL_HOURS,
+                                         TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS,
+                                         SOURCE = Constants.Source_Remote
+                                     }).ToListAsync();
 
-            //var holiday = await (from hol in _dbContext.Holiday.AsNoTracking()
-            //                     where hol.IsActive == true && dtr.DATE.Date == model.DATE.Date
-            //                     select new DailyTimeRecordViewModel
-            //                     {
-            //                         ID = 0,
-            //                         EMPLOYEE_NO = string.Empty,
-            //                         NAME = hol.HolidayName,
-            //                         DATE = hol.HolidayDate.Date,
-            //                         FIRST_IN = "00:00:00",
-            //                         LAST_OUT = "00:00:00",
-            //                         LATE = "00:00:00",
-            //                         CLOCK_OUT = "00:00:00",
-            //                         UNDER_TIME = "00:00:00",
-            //                         OVERTIME = "00:00:00",
-            //                         TOTAL_HOURS = "00:00:00",
-            //                         TOTAL_WORKING_HOURS = "00:00:00",
-            //                         SOURCE = hol.HolidayType == (int)EnumHoliday.Suspension ? Constants.Source_Suspension : Constants.Source_Holiday
-            //                     }).ToListAsync();
+
+            if ((int)EnumScopeTypeJobRecurring.DAILY == model.ScopeTypeJobRecurring) //DAILY
+            {
+                wfhlogs = wfhlogs.Where(x => x.DATE.Date == model.DATE.Date).ToList();
+            }
+            else  // MONTHLY
+            {
+                wfhlogs = wfhlogs.Where(x => x.DATE.Month == model.DATE.Month && x.DATE.Year == model.DATE.Year).ToList();
+            }
+                      
 
             var officialBusiness = await (from dtl in _dbContext.LeaveRequestDetails.AsNoTracking()
                                           join ob in _dbContext.LeaveRequestHeader.AsNoTracking() on dtl.LeaveRequestHeaderId equals ob.LeaveRequestHeaderId
                                           join emp in _dbContext.Employee.AsNoTracking() on ob.EmployeeId equals emp.EmployeeId
-                                          where ob.IsActive == true && (ob.LeaveTypeId == (int)EnumLeaveType.OB || ob.LeaveTypeId == (int)EnumLeaveType.HDOB) 
+                                          join lvtype in _dbContext.LeaveType.AsNoTracking() on ob.LeaveTypeId equals lvtype.LeaveTypeId
+                                          where ob.IsActive == true
+                                          //&& (ob.LeaveTypeId == (int)EnumLeaveType.OB || ob.LeaveTypeId == (int)EnumLeaveType.HDOB) 
+                                          && (ob.LeaveTypeId != (int)EnumLeaveType.SLMon || ob.LeaveTypeId != (int)EnumLeaveType.VLMon) 
                                           && ob.Status == (int)EnumStatus.Approved
-                                          && dtl.LeaveDate.Date == model.DATE.Date
+                                          //&& dtl.LeaveDate.Date == model.DATE.Date
                                           select new DailyTimeRecordViewModel
                                           {
                                               ID = 0,
@@ -478,11 +485,49 @@ namespace DCI.Repositories
                                               OVERTIME = "00:00:00",
                                               TOTAL_HOURS = "00:00:00",
                                               TOTAL_WORKING_HOURS = "00:00:00",
-                                              SOURCE = Constants.Source_OfficialBusiness
+                                              //SOURCE = Constants.Source_OfficialBusiness
+                                              SOURCE = lvtype.Description
                                           }).ToListAsync();
+
+            if ((int)EnumScopeTypeJobRecurring.DAILY == model.ScopeTypeJobRecurring) //DAILY
+            {
+                officialBusiness = officialBusiness.Where(x => x.DATE.Date == model.DATE.Date).ToList();
+            }
+            else  // MONTHLY
+            {
+                officialBusiness = officialBusiness.Where(x => x.DATE.Month == model.DATE.Month && x.DATE.Year == model.DATE.Year).ToList();
+            }
 
 
             var attendance = biometriclogs.Concat(wfhlogs).Concat(officialBusiness).ToList();
+
+
+            if ((int)EnumScopeTypeJobRecurring.MONTHLY == model.ScopeTypeJobRecurring) //MONTHLY ONLY
+            {
+                //MONTHLY ONLY
+                var holiday = await (from hol in _dbContext.Holiday.AsNoTracking()
+                                     where hol.IsActive == true
+                                     && hol.HolidayDate.Month == model.DATE.Month
+                                     && hol.HolidayDate.Year == model.DATE.Year
+                                     select new DailyTimeRecordViewModel
+                                     {
+                                         ID = 0,
+                                         EMPLOYEE_NO = string.Empty,
+                                         NAME = hol.HolidayName,
+                                         DATE = hol.HolidayDate.Date,
+                                         FIRST_IN = "00:00:00",
+                                         LAST_OUT = "00:00:00",
+                                         LATE = "00:00:00",
+                                         CLOCK_OUT = "00:00:00",
+                                         UNDER_TIME = "00:00:00",
+                                         OVERTIME = "00:00:00",
+                                         TOTAL_HOURS = "00:00:00",
+                                         TOTAL_WORKING_HOURS = "00:00:00",
+                                         SOURCE = hol.HolidayType == (int)EnumHoliday.Suspension ? Constants.Source_Suspension : Constants.Source_Holiday
+                                     }).ToListAsync();
+
+                attendance = attendance.Concat(holiday).ToList();
+            }
 
             return attendance.ToList();
         }

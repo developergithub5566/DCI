@@ -56,10 +56,14 @@ public class Program
 
         app.UseHangfireDashboard();
 
-    
+
+
+        RecurringJob.AddOrUpdate<AttendanceProcessor>("attendance-confirmation-job-monthly",
+             processor => processor.AttendanceConfirmationProcessorMonthly(), "0 22 28-31 * *", TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila")); // 11:00 PM, END OF THE MONTH
 
         RecurringJob.AddOrUpdate<AttendanceProcessor>("attendance-confirmation-job",
-    processor => processor.AttendanceConfirmationProcessor(), "0 22 * * 1-5", TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila")); // 10:00 PM, Monday–Friday
+        processor => processor.AttendanceConfirmationProcessor(), "0 22 * * 1-5", TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila")); // 10:00 PM, Monday–Friday
+
 
 
         RecurringJob.AddOrUpdate<OutboxProcessor>("outbox-job",
@@ -68,7 +72,7 @@ public class Program
 
         RecurringJob.AddOrUpdate<LeaveProcessor>("leave-credit-job",
          processor => processor.MonthlyLeaveCredit(), "0 5 1 * *", TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila")); // Runs on the 1st day of every month at 5:00am
-   
+
 
 
         app.MapGet("/", () => "SQL Outbox + Hangfire is running");

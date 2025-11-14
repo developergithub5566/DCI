@@ -11,5 +11,6 @@ namespace DCI.Trigger
     {
         Task SendEmailBiometricsNotification(BiometricViewModel model);
         Task SendEmailAttendanceConfirmationNotification(BiometricViewModel model);
+        Task SendEmailAttendanceConfirmationNotificationMonthly(BiometricViewModel model);
     }
 }

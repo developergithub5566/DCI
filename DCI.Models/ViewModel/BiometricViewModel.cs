@@ -14,5 +14,7 @@
         public string LAST_OUT { get; set; } = string.Empty;
         public string STATUS_STRING { get; set; } = string.Empty;
         public string REMARKS { get; set; } = string.Empty;
+
+        public string BODYTABLE { get; set; } = string.Empty;
     }
 }
