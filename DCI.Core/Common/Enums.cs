@@ -230,4 +230,11 @@ namespace DCI.Core.Common
         DAILY = 1,
         MONTHLY = 2    
     }
+
+    public enum EnumRequestFiledBy
+    {
+        Self = 0,
+        HR = 1,
+        Admin = 2
+    }
 }

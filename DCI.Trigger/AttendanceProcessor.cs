@@ -40,11 +40,11 @@ namespace DCI.Trigger
 
             try
             {
+                DailyTimeRecordViewModel param = new DailyTimeRecordViewModel();
+                param.DATE = DateTime.Now;
+               // param.DATE = DateTime.Parse("2025-11-17");
                 using (var _httpclient = new HttpClient())
-                {
-                    DailyTimeRecordViewModel param = new DailyTimeRecordViewModel();
-                    param.DATE = DateTime.Now;
-                     //param.DateFilter = DateTime.Parse("2025-11-13");
+                {   
                     param.ScopeTypeJobRecurring = (int)EnumScopeTypeJobRecurring.DAILY;
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllDTRByDate");
@@ -61,7 +61,7 @@ namespace DCI.Trigger
                 if (attendance is not null && attendance.Count() > 5) // temporary validation for holiday 
                 {
                     Log.Information("Attendance records retrieved successfully from Biometrics API.");
-                    var userlist = _destDb.User.Where(x => x.IsActive).ToList();
+                    var userlist = _destDb.User.Where(x => x.IsActive && x.EmailAttendanceConfirmation).ToList();
                    // userlist = userlist.Where(x => x.EmployeeNo == "080349").ToList();
 
                     foreach (var emp in userlist)
@@ -117,9 +117,9 @@ namespace DCI.Trigger
                             viewModel.Email = emp.Email;
                             viewModel.STATUS_STRING = emailSubject;
                             viewModel.REMARKS = remarks;
-                            viewModel.DATE = biometrics.DATE.ToString("MMMM dd, yyyy");
-                            viewModel.FIRST_IN = string.IsNullOrEmpty(biometrics.FIRST_IN) ? "N/A" : biometrics.FIRST_IN;
-                            viewModel.LAST_OUT = string.IsNullOrEmpty(biometrics.LAST_OUT) ? "N/A" : biometrics.LAST_OUT;
+                            viewModel.DATE = biometrics !=null ? biometrics?.DATE.ToString("MMMM dd, yyyy") : param.DATE.ToString("MMMM dd, yyyy");
+                            viewModel.FIRST_IN = biometrics != null ? biometrics.FIRST_IN : "N/A";
+                            viewModel.LAST_OUT = biometrics != null ? biometrics.LAST_OUT : "N/A";
 
                             await _emailRepository.SendEmailAttendanceConfirmationNotification(viewModel);
                         }

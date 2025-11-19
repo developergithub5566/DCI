@@ -1662,5 +1662,152 @@ namespace DCI.WebApp.Controllers
         }
 
 
+        public async Task<IActionResult> LeaveManagement(LeaveViewModel model)
+        {
+            //   LeaveViewModel model = new LeaveViewModel();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+
+                    model.CurrentUserId = currentUser.UserId;
+                    model.EmployeeId = currentUser.EmployeeId;
+                    
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllLeave");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<LeaveViewModel>(responseBody)!;
+                    }
+                    ViewBag.Fullname = currentUser?.Fullname;
+                }
+
+                return View(model);
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return View(model);
+        }
+        public async Task<IActionResult> RequestLeaveMangement(LeaveViewModel model)
+        {
+
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+
+
+                    model.CurrentUserId = currentUser.UserId;
+                    model.EmployeeId = currentUser.EmployeeId;
+                    model.ApproverId = currentUser.ApproverId;
+                    model.RequestFiledBy = (int)EnumRequestFiledBy.HR;
+                 
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/RequestLeave");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<LeaveViewModel>(responseBody)!;
+
+                        model.OptionsLeaveType = model.LeaveRequestHeader.LeaveTypeList.Select(x =>
+                                    new SelectListItem
+                                    {
+                                        Value = x.LeaveTypeId.ToString(),
+                                        Text = x.Description
+                                    }).ToList();
+
+
+                        model.OptionsForm201List = model.EmployeeDropdownList?.Select(x =>
+                                   new SelectListItem
+                                   {
+                                       Value = x.EmployeeId.ToString(),
+                                       Text = x.Display
+                                   }).ToList();
+
+                        model.ApproverHead = currentUser.Fullname;
+
+                    }
+                    return Json(new { success = true, data = model });
+                }
+                return Json(new { success = false, message = "" });
+                // return View(model);
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        public async Task<IActionResult> SaveLeaveManagement(LeaveFormViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+
+                   
+                    model.EmployeeId = model.EmployeeId; //selected Employee
+                    model.ApproverId = currentUser.UserId;
+                    model.CurrentUserId = currentUser.UserId;
+
+                    model.SelectedDateList = JsonConvert.DeserializeObject<List<DateTime>>(model.SelectedDateJson);
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/SaveLeaveManagement");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = responseBody });
+                    }
+                    return Json(new { success = false, message = responseBody });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
+
     }
 }

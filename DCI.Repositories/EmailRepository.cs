@@ -291,7 +291,66 @@ namespace DCI.Repositories
             return model;
         }
 
+        public async Task SendToLeaveManagement(LeaveViewModel model)
+        {
+            model = await LeaveManagementNotificationBodyMessage(model);
 
+            string _leavetype = FormatHelper.GetLeaveTypeName(model.LeaveTypeId);
+            TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
+
+            MailMessage mail = new MailMessage();
+            mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);   
+            mail.Subject = $"DCI ESS - Your {_leavetype.ToLower()} request {model.LeaveRequestHeader?.RequestNo} has been processed.";
+            mail.Body = model.EmailBody;
+            mail.IsBodyHtml = true;
+            mail.To.Add(model.RequestorEmail);
+            await SendMessage(mail);
+        }
+
+        async Task<LeaveViewModel> LeaveManagementNotificationBodyMessage(LeaveViewModel model)
+        {
+            var userEntity = await _userRepository.GetUserByEmployeeId(model.LeaveRequestHeader.EmployeeId);
+            model.RequestorEmail = userEntity?.Email ?? string.Empty;
+
+            string _leavetype = FormatHelper.GetLeaveTypeName(model.LeaveTypeId);
+
+
+            model.EmailBody = $@"
+            <html>
+            <body>              
+                <p>Hi {userEntity.Fullname},</p>
+                
+              <p>This is an automated message from ESS System.</p>
+                 <p>Your {_leavetype.ToLower()} request {model.LeaveRequestHeader.RequestNo} has been approved and processed by { "JC" }.</p>   
+              
+                <p>
+                    You may log in to your account using the link below:<br />
+                    <a href=' {_apiconfig.Value.WebAppConnection}' target='_blank' >
+                        Click here to log in to the DCI ESS System
+                    </a>
+                </p>
+
+                  <hr style='border:none; border-top:1px solid #ddd; margin:20px 0;' />
+
+                                    <p style='font-size:13px; color:#777;'>
+                                      If you encounter any issues, contact our support team at 
+                                      <a href='mailto:info@dci.ph' style='color:#0066cc;'>info@dci.ph</a>.
+                                    </p>
+    
+                                     <p style='font-size:13px; color:#777;'>
+                                      Best regards,<br>
+                                      <strong>ESS System Administrator</strong><br>
+                                      <span style='color:#999;'>DCI Employee Self-Service Portal</span>
+                                    </p>
+
+                                    <p style='font-size:11px; color:#aaa; margin-top:20px;'>
+                                      This email was automatically generated. Please do not reply directly to this message.
+                                    </p>
+            </body>
+            </html>";
+
+            return model;
+        }
         #endregion
 
         #region Overtime

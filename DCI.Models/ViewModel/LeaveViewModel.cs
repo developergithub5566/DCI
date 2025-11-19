@@ -43,6 +43,10 @@ namespace DCI.Models.ViewModel
         public int ScopeTypeId { get; set; } = 0;
 
         public int FilterYear { get; set; } = 0;
+
+        public int RequestFiledBy { get; set; } = 0; //for EnumRequestFiledBy
+        public IList<EmployeeDropdownModel>? EmployeeDropdownList { get; set; }
+        public List<SelectListItem>? OptionsForm201List { get; set; }
     }
 
     public class LeaveRequestHeaderViewModel

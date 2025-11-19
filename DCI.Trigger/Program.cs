@@ -64,11 +64,8 @@ public class Program
         RecurringJob.AddOrUpdate<AttendanceProcessor>("attendance-confirmation-job",
         processor => processor.AttendanceConfirmationProcessor(), "0 22 * * 1-5", TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila")); // 10:00 PM, Monday–Friday
 
-
-
         RecurringJob.AddOrUpdate<OutboxProcessor>("outbox-job",
          processor => processor.ProcessPendingMessages(), Cron.Minutely);
-
 
         RecurringJob.AddOrUpdate<LeaveProcessor>("leave-credit-job",
          processor => processor.MonthlyLeaveCredit(), "0 5 1 * *", TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila")); // Runs on the 1st day of every month at 5:00am

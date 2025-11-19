@@ -311,5 +311,13 @@ namespace DCI.API.Controllers
             return Ok(result);
         }
 
+        [HttpPost]
+        [Route("SaveLeaveManagement")]
+        public async Task<IActionResult> SaveLeaveManagement([FromBody] LeaveFormViewModel model)
+        {            
+            var result = await _leaveRepository.SaveLeaveManagement(model);
+            return StatusCode(result.statuscode, result.message);
+        }
+
     }
 }

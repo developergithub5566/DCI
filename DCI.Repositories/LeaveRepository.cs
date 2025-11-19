@@ -222,6 +222,26 @@ namespace DCI.Repositories
                 var leavetypeList = _dbContext.LeaveType.Where(x => x.IsActive == true).AsNoTracking().ToList();
                 model.LeaveRequestHeader.LeaveTypeList = leavetypeList.Count() > 0 ? leavetypeList : null;
 
+
+                if((int)EnumRequestFiledBy.HR == param.RequestFiledBy)
+                {
+                    model.EmployeeDropdownList = (from emp in _dbContext.Employee.AsNoTracking()
+                                                  join wrkdtls in _dbContext.EmployeeWorkDetails.AsNoTracking()
+                                                   on emp.EmployeeId equals wrkdtls.EmployeeId
+                                                  where emp.IsActive == true && wrkdtls.IsResigned == false
+                                                  && wrkdtls.EmployeeStatusId != (int)EnumEmploymentType.Resigned 
+                                                  && wrkdtls.EmployeeStatusId != (int)EnumEmploymentType.AWOL 
+                                                  && wrkdtls.EmployeeStatusId != (int)EnumEmploymentType.Contractual
+                                                  orderby emp.Lastname ascending
+                                                  select new EmployeeDropdownModel
+                                                  {
+                                                      EmployeeId = emp.EmployeeId,
+                                                      Display = $"{emp.Lastname}, {emp.Firstname}"
+                                                  }).ToList();
+                }
+             
+
+
                 return model;
             }
             catch (Exception ex)
@@ -488,6 +508,111 @@ namespace DCI.Repositories
 
                             return data;
 
+        }
+
+
+        public async Task<(int statuscode, string message)> SaveLeaveManagement(LeaveFormViewModel param)
+        {
+
+
+            try
+            {
+                if (param.LeaveRequestHeader == 0)
+                {
+                    LeaveRequestHeader entity = new LeaveRequestHeader();
+                    entity.EmployeeId = param.EmployeeId;
+                    entity.RequestNo = await GenereteRequestNo();
+                    entity.DateFiled = DateTime.Now;
+                    entity.LeaveTypeId = param.LeaveTypeId;
+                    entity.Status = (int)EnumStatus.Approved;
+                    entity.ApproverId = param.ApproverId;
+                    entity.Reason = param.Reason;
+                    entity.NoOfDays = param.NoOfDays;
+                    entity.ModifiedBy = null;
+                    entity.DateModified = null;
+                    entity.IsActive = true;
+                    await _dbContext.LeaveRequestHeader.AddAsync(entity);
+                    await _dbContext.SaveChangesAsync();
+
+                    int count = param.SelectedDateList.Count();
+
+                    if (param.LeaveTypeId == (int)EnumLeaveType.VLMon || param.LeaveTypeId == (int)EnumLeaveType.SLMon)
+                    {
+                        LeaveRequestDetails entityDtl = new LeaveRequestDetails();
+                        entityDtl.LeaveRequestHeaderId = entity.LeaveRequestHeaderId;
+                        entityDtl.LeaveDate = DateTime.Now;
+                        entityDtl.Amount = param.NoOfDays;
+                        entityDtl.IsActive = true;
+                        await _dbContext.LeaveRequestDetails.AddAsync(entityDtl);
+                        await _dbContext.SaveChangesAsync();
+                    }
+
+                    foreach (var date in param.SelectedDateList)
+                    {
+                        LeaveRequestDetails entityDtl = new LeaveRequestDetails();
+                        entityDtl.LeaveRequestHeaderId = entity.LeaveRequestHeaderId;
+                        entityDtl.LeaveDate = date;
+                        entityDtl.Amount = param.NoOfDays / count;
+                        entityDtl.IsActive = true;
+                        await _dbContext.LeaveRequestDetails.AddAsync(entityDtl);
+                        await _dbContext.SaveChangesAsync();
+                    }
+
+                    LeaveViewModel model = new LeaveViewModel();
+
+                    model.ApproverId = param.ApproverId;//.ApproverId;
+                    model.LeaveRequestHeader.Status = entity.Status;
+                    model.LeaveRequestHeader.RequestNo = entity.RequestNo;
+                    model.LeaveTypeId = entity.LeaveTypeId;
+                    model.LeaveRequestHeader.EmployeeId = entity.EmployeeId;
+                    await _emailRepository.SendToLeaveManagement(model);
+
+                    string _leavetype = FormatHelper.GetLeaveTypeName(entity.LeaveTypeId);
+                    TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
+
+                    var empNo = _dbContext.User.AsNoTracking().Where(x => x.EmployeeId == param.EmployeeId).FirstOrDefault();
+
+                    //Send Application Notification to Approver
+                    NotificationViewModel notifvm = new NotificationViewModel();
+                    notifvm.Title = $"{textInfo.ToTitleCase(_leavetype.ToLower())} Request";
+                    // notifvm.Description = $"You have been assigned {_leavetype.ToLower()} request {entity.RequestNo} for approval";
+                    notifvm.Description = $"{textInfo.ToTitleCase(_leavetype.ToLower())} request for Employee No. {empNo?.EmployeeNo} has been submitted successfully.";
+                    notifvm.ModuleId = (int)EnumModulePage.Leave;
+                    notifvm.TransactionId = entity.LeaveRequestHeaderId;
+                    notifvm.AssignId = param.ApproverId;
+                    notifvm.URL = "/DailyTimeRecord/LeaveManagement";
+                    notifvm.MarkRead = false;
+                    notifvm.CreatedBy = param.CurrentUserId;
+                    notifvm.IsActive = true;
+                    await _homeRepository.SaveNotification(notifvm);
+
+
+                    //Send Application Notification to Requestor
+                    NotificationViewModel notifvmRequestor = new NotificationViewModel();
+                    notifvmRequestor.Title = $"{textInfo.ToTitleCase(_leavetype.ToLower())} Request";                 
+                    notifvmRequestor.Description = $"Your {_leavetype.ToLower()} request {entity.RequestNo} has been approved and processed.";
+                    notifvmRequestor.ModuleId = (int)EnumModulePage.Leave;
+                    notifvmRequestor.TransactionId = entity.LeaveRequestHeaderId;
+                    notifvmRequestor.AssignId = empNo.UserId;
+                    notifvmRequestor.URL = "/Home/Notification";
+                    notifvmRequestor.MarkRead = false;
+                    notifvmRequestor.CreatedBy = param.CurrentUserId;
+                    notifvmRequestor.IsActive = true;
+                    await _homeRepository.SaveNotification(notifvmRequestor);
+
+                    return (StatusCodes.Status200OK, $"{textInfo.ToTitleCase(_leavetype.ToLower())} request {entity.RequestNo} has been submitted and approved.");                
+                }
+                return (StatusCodes.Status400BadRequest, "An error occurred. Please try again.");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return (StatusCodes.Status406NotAcceptable, ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
     }
 }

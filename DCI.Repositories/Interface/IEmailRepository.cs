@@ -23,5 +23,7 @@ namespace DCI.Repositories.Interface
         //Task SendEmailBiometricsNotification(BiometricViewModel model);
 
         Task SendToRequestorOT(OvertimeViewModel model);
+
+        Task SendToLeaveManagement(LeaveViewModel model);
     }
 }
