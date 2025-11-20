@@ -47,6 +47,7 @@ namespace DCI.Models.ViewModel
         public int RequestFiledBy { get; set; } = 0; //for EnumRequestFiledBy
         public IList<EmployeeDropdownModel>? EmployeeDropdownList { get; set; }
         public List<SelectListItem>? OptionsForm201List { get; set; }
+        public string PreparedBy { get; set; } = string.Empty;
     }
 
     public class LeaveRequestHeaderViewModel

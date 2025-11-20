@@ -1771,14 +1771,16 @@ namespace DCI.WebApp.Controllers
             {
                 using (var _httpclient = new HttpClient())
                 {
+                    _httpclient.Timeout = TimeSpan.FromSeconds(30);
+
                     var currentUser = _userSessionHelper.GetCurrentUser();
                     if (currentUser == null)
                         return RedirectToAction("Logout", "Account");
 
                    
                     model.EmployeeId = model.EmployeeId; //selected Employee
-                    model.ApproverId = currentUser.UserId;
-                    model.CurrentUserId = currentUser.UserId;
+                    model.ApproverId = currentUser.UserId;  //PreparedBy
+                    model.CurrentUserId = currentUser.UserId;//PreparedBy
 
                     model.SelectedDateList = JsonConvert.DeserializeObject<List<DateTime>>(model.SelectedDateJson);
 

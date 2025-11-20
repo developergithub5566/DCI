@@ -313,6 +313,8 @@ namespace DCI.Repositories
             model.RequestorEmail = userEntity?.Email ?? string.Empty;
 
             string _leavetype = FormatHelper.GetLeaveTypeName(model.LeaveTypeId);
+            var preparedByEntity = await _userRepository.GetUserById(model.ApproverId ?? 0);
+            model.PreparedBy = preparedByEntity?.Fullname ?? string.Empty;
 
 
             model.EmailBody = $@"
@@ -321,7 +323,7 @@ namespace DCI.Repositories
                 <p>Hi {userEntity.Fullname},</p>
                 
               <p>This is an automated message from ESS System.</p>
-                 <p>Your {_leavetype.ToLower()} request {model.LeaveRequestHeader.RequestNo} has been approved and processed by { "JC" }.</p>   
+                 <p>Your {_leavetype.ToLower()} request {model.LeaveRequestHeader.RequestNo} has been approved and processed by { model.PreparedBy }.</p>   
               
                 <p>
                     You may log in to your account using the link below:<br />
