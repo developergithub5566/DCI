@@ -237,7 +237,10 @@ namespace DCI.Repositories
                     {
                         SysManageVM.Late = true;
                     }
-
+                    else if (entity.ModulePageId == (int)EnumModulePage.LeaveManagement)
+                    {
+                        SysManageVM.LeaveManagement = true;
+                    }
                 }
                 SysManageVM.RoleId = roleEntity.RoleId;
                 SysManageVM.RoleName = roleEntity.RoleName;

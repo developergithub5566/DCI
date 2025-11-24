@@ -860,5 +860,55 @@ namespace DCI.Repositories
             }
             return string.Empty;
         }
+
+        public async Task<LeaveViewModel> GetAllLeaveMangement(LeaveViewModel param)
+        {
+            LeaveViewModel model = new LeaveViewModel();
+           
+
+            model.LeaveRequestHeaderList = (from lheader in _dbContext.LeaveRequestHeader
+                                            join lvtype in _dbContext.LeaveType
+                                            on lheader.LeaveTypeId equals lvtype.LeaveTypeId
+                                            join stat in _dbContext.Status
+                                            on lheader.Status equals stat.StatusId
+                                            join usr in _dbContext.User
+                                           on lheader.EmployeeId equals usr.EmployeeId
+                                            join processedBy in _dbContext.User
+                                           on lheader.ApproverId equals processedBy.UserId
+                                            where lheader.IsActive && lheader.ApproverId == param.CurrentUserId 
+                                            select new LeaveRequestHeaderViewModel
+                                            {
+                                                LeaveRequestHeaderId = lheader.LeaveRequestHeaderId,
+                                                EmployeeId = lheader.EmployeeId,
+                                                RequestNo = lheader.RequestNo,
+                                                EmployeeNo = usr.EmployeeNo,
+                                                EmployeeName =  usr.Fullname,
+                                                ProcessedBy = processedBy.Fullname,
+                                                DateFiled = lheader.DateFiled,
+                                                LeaveTypeId = lheader.LeaveTypeId,
+                                                LeaveName = lvtype.Description,
+                                                Status = lheader.Status,
+                                                StatusName = stat.StatusName,
+                                                Reason = lheader.Reason,
+                                                DateModified = lheader.DateModified,
+                                                ModifiedBy = lheader.ModifiedBy,
+                                                IsActive = lheader.IsActive,
+                                                //NoofDays = _dbContext.LeaveRequestDetails
+                                                //                                .Where(ld => ld.LeaveRequestHeaderId == lheader.LeaveRequestHeaderId)
+                                                //                                .Sum(ld => (decimal?)ld.Amount) ?? 0,
+
+                                                LeaveRequestDetailList = _dbContext.LeaveRequestDetails
+                                                    .Where(ld => ld.LeaveRequestHeaderId == lheader.LeaveRequestHeaderId)
+                                                    .Select(ld => new LeaveRequestDetailViewModel
+                                                    {
+                                                        LeaveRequestDetailId = ld.LeaveRequestDetailId,
+                                                        LeaveRequestHeaderId = ld.LeaveRequestHeaderId,
+                                                        LeaveDate = ld.LeaveDate,
+                                                        Amount = ld.Amount,
+                                                        IsActive = ld.IsActive
+                                                    }).ToList()
+                                            }).OrderByDescending(x => x.LeaveRequestHeaderId).ToList();
+                        return model;
+        }
     }
 }

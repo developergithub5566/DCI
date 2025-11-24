@@ -53,7 +53,8 @@ namespace DCI.Core.Common
         [Description("DTR Adjustment")]
         DTRCorrection = 23,
         Late = 24,
-        TriggerLeaveCreditProcess = 25
+        TriggerLeaveCreditProcess = 25,
+        LeaveManagement = 26
     }
 
     public enum EnumRole

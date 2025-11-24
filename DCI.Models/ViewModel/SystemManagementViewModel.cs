@@ -156,5 +156,7 @@
 
         public int ViewEdit { get; set; } = 1;
 		public string DashboardLabel { get; set; } = string.Empty;
-	}
+
+        public bool LeaveManagement { get; set; } = false;
+    }
 }

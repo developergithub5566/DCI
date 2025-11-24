@@ -78,6 +78,8 @@ namespace DCI.Models.ViewModel
         public string DateApprovedDisapproved { get; set; } = string.Empty;
         public string ApprovalRemarks { get; set; } = string.Empty;
         public string ApproverHead { get; set; } = string.Empty;
+        public string EmployeeNo { get; set; } = string.Empty;
+        public string ProcessedBy { get; set; } = string.Empty;
     }
 
     public class LeaveRequestDetailViewModel

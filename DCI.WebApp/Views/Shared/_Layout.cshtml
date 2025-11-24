@@ -388,6 +388,18 @@
 
                     }
 
+                    @if (module.ModulePageId == (int)EnumModulePage.LeaveManagement)
+                    {
+                        <hr class='sidebar-divider'>
+                        <a href="/DailyTimeRecord/LeaveManagement" class='mainModule'>
+                            <div class='sidebar-heading mainModuleActive'>
+                                <i class='fa-solid fa-briefcase'></i>
+                                <span>HR Leave Management</span>
+                                <i class='fa-solid fa-angle-right float-right text-gray-300 d-none d-lg-block iconRight'></i>
+                            </div>
+                        </a>
+                    }
+
 
                 }
                 <!-- Divider -->

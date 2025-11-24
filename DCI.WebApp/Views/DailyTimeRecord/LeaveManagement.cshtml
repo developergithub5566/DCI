@@ -17,7 +17,7 @@
         </div>
     </div>
     <div class="d-sm-flex align-items-center justify-content-between mb-3">
-        <h6 class="m-0 font-weight-bold text-gray-800">Leave Application & Balances</h6>
+        <h6 class="m-0 font-weight-bold text-gray-800">HR Leave Management</h6>
         <div class="upperRightDivBtn">
 
             <a href="#" title="Request Leave" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#" onclick="newForm()">
@@ -29,7 +29,7 @@
     <div class="col-12 p0">
         <ul class="breadcrumb">
             <li><a href="~/Home/Index">Dashboard</a></li>
-            <li>Leave Application</li>
+            <li>HR Leave Management</li>
         </ul>
     </div>
 
@@ -39,7 +39,7 @@
             <div class="card shadow mb-4">
                 <!-- Card Header -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0  small font-weight-bold text-gray-800">Data</h6>
+                    <h6 class="m-0  small font-weight-bold text-gray-800"></h6>
                 </div>
 
                 <!-- Card Body -->
@@ -78,12 +78,14 @@
                             <thead>
                                 <tr>
                                     <th><span>Request No.</span></th>
+                                    <th><span>Employee No</span></th>
+                                    <th><span>Employee Name</span></th>
                                     <th><span>Leave Type</span></th>
                                     <th><span>Date Filed</span></th>
                                     <th><span>Date Covered</span></th>
-                                    <th width="10%"><span>No. of Days</span></th>
+                 @*                    <th width="10%"><span>No. of Days</span></th> *@
                                     <th width="10%"><span>Status</span></th>
-                                    <th><span>Action</span></th>
+                                    <th><span>Processed By</span></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -103,6 +105,8 @@
 
                                     <tr>
                                         <td><strong>@hdr.RequestNo</strong></td>
+                                        <td><strong>@hdr.EmployeeNo</strong></td>
+                                        <td><strong>@hdr.EmployeeName</strong></td>
                                         <td>@hdr.LeaveName</td>
                                         <td>@hdr.DateFiled.ToString("yyyy-MM-dd HH:mm")</td>
                                         <td>
@@ -113,20 +117,13 @@
                                                 }
                                             </strong>
                                         </td>
-                                        <td><strong>@hdr.NoofDays</strong></td>
+                                @*         <td><strong>@hdr.NoofDays</strong></td> *@
                                         <td class="text-center">
                                             <strong>
                                                 <span class="@statusClass applicationStatus">@hdr.StatusName</span>
                                             </strong>
                                         </td>
-                                        <td class="text-center">
-                                            <a href="javascript:void(0)" onclick="editForm(@hdr.LeaveRequestHeaderId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
-
-                                            @if (hdr.Status == (int)EnumStatus.ForApproval)
-                                            {
-                                                <a href="javascript:void(0)" onclick="cancel(@hdr.LeaveRequestHeaderId)" title="Cancel Request" class="btn btn-secondary"><i class="fas fa-ban"></i></a>
-                                            }
-                                        </td>
+                                        <td>@hdr.ProcessedBy</td>
                                     </tr>
                                 }
                             </tbody>
@@ -142,7 +139,8 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Request Form</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Request Form</h5>                      
+                       
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -159,8 +157,11 @@
                         <input type="hidden" id="preloadedDates" />
                         <input type="hidden" id="isMultiple" name="isMultiple" value="1">
 
+                           @*  <div class="col-md-12">
+                                <label for="note"><h6>This module allows HR to submit leave, monetization, official business, and other requests on behalf of employees.</h6></label>
+                            </div> *@
                             <div class="col-md-12">
-                                <label for="EmployeeId" class="col-form-label required">Employee:</label>
+                                <label class="frmText"><span class="required">*</span> Employee:</label>
                                 <input type="hidden" id="EmployeeId" name="EmployeeId" value="0">
                                 <select id="employeeSelect" class="form-select" required>
                                     <option value="">Select Employee</option>
@@ -170,7 +171,7 @@
 
                         <div class="col-lg-6">
                             <div class="form-group">
-                                <label class="frmText"><span class="required">*</span> Type</label>
+                                <label class="frmText"><span class="required">*</span> Type:</label>
                                 <select id="leaveTypeSelect" class="form-select" required onchange="GetLeaveTypeAmount()" required>
                                     <option value="0" disabled>select type</option>
                                 </select>
@@ -205,7 +206,7 @@
 
                         <div class="col-lg-6">
                             <div class="form-group">
-                                <label class="frmText"><span class="required">*</span> No. of Days</label>
+                                <label class="frmText"><span class="required">*</span> No. of Days:</label>
                                 @*  <input type="number" min="0" step="any" name="NO_DAYS" class="form-control frmField" autocomplete="off"> *@
                                 @*  <input type="text" step="any" id="NoOfDays" name="NoOfDays" class="form-control frmField" autocomplete="off" onkeypress="return isNumericDecimalKey(event,this);"> *@
                                 <input type="text" id="NoOfDays" name="NoOfDays" class="form-control frmField" autocomplete="off" onkeypress="return isNumericDecimalKey(event, this)" oninput="checkingNumber(this)" />
@@ -228,7 +229,7 @@
                                 <label class="d-block mt0 text-left text-xs" id="ApprovalDate"></label>
                                 <label class="d-block mt0 text-left text-xs" id="ApprovalRemarks"></label>
                                 @*          <label class="d-block mt0 text-left text-xs">(Department Head)</label> *@
-                                    <label class="d-block mt0 text-left text-xs text-danger" id="HRNte">Note: This request is automatically approved.</label>
+                                    <label class="d-block mt0 text-left text-xs text-danger" id="HRNte">Note: This module allows HR to submit leave, monetization, official business, and other requests on behalf of employees.  This request is automatically approved.</label>
                             </div>
                         </div>
 
@@ -333,7 +334,7 @@
                                  js.fn.dataTable.ext.search.push(function (settings, data) {
                                      min = $('#minDate').val();   // e.g. "2025-09-01"
                                      max = $('#maxDate').val();   // e.g. "2025-09-10"
-                                    let rawDateTime = (data[2] || '').trim(); // adjust index to your date column
+                                    let rawDateTime = (data[4] || '').trim(); // adjust index to your date column
                                     // rawDateTime = "2025-09-09 15:45"
 
                                     if (!rawDateTime) return false;
@@ -343,12 +344,12 @@
                                     // "2025-09-09 15:45" → "2025-09-09T15:45" → valid ISO date
 
                                     // Parse min/max (flatpickr gives YYYY-MM-DD)
-                                    let minDate = min ? new Date(min + "T00:00:00") : null;
-                                    let maxDate = max ? new Date(max + "T23:59:59") : null;
+                                         let minDate = min ? new Date(min + "T00:00:00") : null;
+                                          let maxDate = max ? new Date(max + "T23:59:59") : null;
 
                                     if (minDate && rowDate < minDate) return false;
                                     if (maxDate && rowDate > maxDate) return false;
-
+                                          
                                     return true;
                                 });
 
@@ -403,13 +404,13 @@
                                             ],
                                             margin: [20, 0]
                                         };
-                                    };
+                                    }
                                 }
                             }
                         ],
                          lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
                          pageLength: 10 ,// Default entries per page
-                                 order: [[2, 'desc']]
+                                 order: [[4, 'desc']]
                               });
                                 // Event listener for date inputs
                         $('#minDate, #maxDate').on('change', function () {
