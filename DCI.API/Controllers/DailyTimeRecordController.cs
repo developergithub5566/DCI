@@ -326,5 +326,13 @@ namespace DCI.API.Controllers
             return Ok(await _leaveRepository.GetAllLeaveMangement(model));
         }
 
+
+        [HttpPost]
+        [Route("GetAllLeaveMangementByEmpId")]
+        public async Task<IActionResult> GetAllLeaveMangementByEmpId([FromBody] LeaveViewModel model)
+        {
+            return Ok(await _leaveRepository.GetAllLeaveMangementByEmpId(model));
+        }
+
     }
 }

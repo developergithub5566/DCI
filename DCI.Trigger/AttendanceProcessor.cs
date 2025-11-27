@@ -76,6 +76,8 @@ namespace DCI.Trigger
                             bool hasFirstIn = TimeSpan.TryParse(biometrics.FIRST_IN, out TimeSpan firstin);
                             bool hasLastOut = TimeSpan.TryParse(biometrics.LAST_OUT, out TimeSpan lastout);
                             bool hasClockOut = TimeSpan.TryParse(biometrics.CLOCK_OUT, out TimeSpan clockout);
+                            TimeSpan halfday = TimeSpan.FromHours(4);
+                            TimeSpan ClockOutWOUndertime = TimeSpan.Parse(biometrics.CLOCK_OUT) - halfday; //remove undertime
 
                             if (hasFirstIn && hasLastOut && firstin == TimeSpan.Zero && lastout == TimeSpan.Zero)
                             {
@@ -94,7 +96,7 @@ namespace DCI.Trigger
                                 emailSubject = "No Time In";
                                 remarks = "Please file a Half-Day Leave, Official Business, or DTR Adjustment request.";
                             }
-                            else if (hasLastOut && hasClockOut && lastout < clockout)
+                            else if (hasLastOut && hasClockOut && lastout < ClockOutWOUndertime) //orig: biometrics.CLOCK_OUT //remove undertime
                             {
                                 // Logged out early
                                 emailSubject = "Half Day or OB";

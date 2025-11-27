@@ -1810,6 +1810,47 @@ namespace DCI.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
+        public async Task<IActionResult> GetAllLeaveMangementByEmpId(LeaveViewModel param)
+        {          
+            try
+            {
+                LeaveViewModel model = new LeaveViewModel();
+
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+
+                    param.CurrentUserId = currentUser.UserId;
+                    param.EmployeeId = param.EmployeeId;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllLeaveMangementByEmpId");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<LeaveViewModel>(responseBody)!;
+                    }
+                    ViewBag.Fullname = currentUser?.Fullname;
+
+                    return Json(new { success = true, data = model });
+                }             
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.ToString() });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }           
+        }
 
     }
 }

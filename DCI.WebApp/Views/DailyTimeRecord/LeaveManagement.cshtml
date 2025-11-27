@@ -150,9 +150,9 @@
 
                         <input type="hidden" id="SelectedDatesJson" name="SelectedDates" />
                         <input type="hidden" id="dateSelected" name="dateSelected" />
-                        <input type="hidden" id="hiddenSPLBalance" name="hiddenSPLBalance" value="0" />
-                        <input type="hidden" id="hiddenVLBalance" name="hiddenVLBalance" value="0" />
-                        <input type="hidden" id="hiddenSLBalance" name="hiddenSLBalance" value="0" />
+                @*        <input type="hidden" id="hiddenVLBalance" name="hiddenVLBalance" value="0" />
+                       <input type="hidden" id="hiddenSLBalance" name="hiddenSLBalance" value="0" />
+                       <input type="hidden" id="hiddenSPLBalance" name="hiddenSPLBalance" value="0" /> *@
                         <input type="hidden" id="SelectedLeaveTypeAmount" name="SelectedLeaveTypeAmount" value="0" />
                         <input type="hidden" id="preloadedDates" />
                         <input type="hidden" id="isMultiple" name="isMultiple" value="1">
@@ -160,10 +160,27 @@
                            @*  <div class="col-md-12">
                                 <label for="note"><h6>This module allows HR to submit leave, monetization, official business, and other requests on behalf of employees.</h6></label>
                             </div> *@
+                                       <div class="col-md-12">
+                                                <div class="d-flex justify-content-between" style="font-size: 15px">
+                                                    <div><strong>Remaining Balance:</strong></div>
+                                                    <div><strong>VL:</strong>   <small> <div id="hiddenVLBalance" name="hiddenVLBalance" value="0"></div> </small>  </div>
+                                                    <div><strong>SL:</strong> <small><div id="hiddenSLBalance" name="hiddenSLBalance" value="0"></div> </small>  </div>
+                                                    <div><strong>SPL:</strong> <small> <div id="hiddenSPLBalance" name="hiddenSPLBalance" value="0"></div>  </small> </div>
+
+
+                                                @*     <div><strong>VL:</strong>   <small> <input type="hidden" id="hiddenVLBalance" name="hiddenVLBalance" value="0" /> </small>  </div>
+                                                    <div><strong>SL:</strong> <small>  <input type="hidden" id="hiddenSLBalance" name="hiddenSLBalance" value="0" /> </small>  </div>
+                                                    <div><strong>SPL:</strong> <small>   <input type="hidden" id="hiddenSPLBalance" name="hiddenSPLBalance" value="0" />  </small> </div>  *@
+                                                                           
+                                                                         
+                                                                         
+                                                </div>
+                                    </div>
+                                    <hr />
                             <div class="col-md-12">
                                 <label class="frmText"><span class="required">*</span> Employee:</label>
                                 <input type="hidden" id="EmployeeId" name="EmployeeId" value="0">
-                                <select id="employeeSelect" class="form-select" required>
+                                <select id="employeeSelect" class="form-select" required onchange="GetEmployeeLeaveInfo()">
                                     <option value="">Select Employee</option>
                                 </select>
                             </div>
@@ -487,14 +504,21 @@
                             formData.append('LeaveTypeId', leaveTypeId);
                              formData.append('NoOfDays', noOfDays);
                               formData.append('SelectedDateJson', selectedDatesJson);
-                                            formData.append('EmployeeId', selectedEmployee);
+                                formData.append('EmployeeId', selectedEmployee);
                                formData.append('Reason', reason);
+                                
+                               console.log(leaveTypeId);
+                               
+                                       console.log($('#hiddenSLBalance').val());
+                                                                                        console.log($('#hiddenSPLBalance').val());
 
                                                                                         const noOfDaysX = parseFloat(noOfDays) || 0; // ensure it's numeric
                                                                                         let  _noofdaysX = parseFloat(noOfDaysX.toFixed(4));
+
                                                                              if (leaveTypeId == 5) { // SPL leave type
                                                                                     const spl = parseFloat($('#hiddenSPLBalance').val()) || 0;
-
+                                                                                    console.log("spl");
+                                                                                     console.log(spl);
                                                                                     if ( _noofdaysX > spl) {
 
                                                                                         Swal.fire({
@@ -562,6 +586,14 @@
                                                                                         return;
                                                                               }
 
+
+
+
+                                                                               console.log("leave");
+                                                                               console.log($('#hiddenVLBalance').val());
+                                                                                        console.log($('#hiddenSLBalance').val());
+                                                                                        console.log($('#hiddenSPLBalance').val());
+                                                                                            
                   Swal.fire({
                       text: "Are you sure you want to submit this request? It will be automatically approved.",
                       icon: "question",
@@ -640,7 +672,7 @@
                               success: function (response) {
                                   if (response.success) {
                                         document.getElementById('deptHeadName').textContent = response.data.approverHead;
-                                        document.getElementById('ApproverLabel').textContent = 'Performed By:';
+                                            document.getElementById('ApproverLabel').textContent = 'Processed By:';
                                       $('#createForm').find('input, select, textarea').prop('disabled', false);
 
                                  var $select = $('#leaveTypeSelect');
@@ -667,6 +699,16 @@
 									}
 								});
 
+                                  $('#hiddenSPLBalance').val((0).toFixed(4));
+                               $('#hiddenSLBalance').val((0).toFixed(4));
+                               $('#hiddenVLBalance').val((0).toFixed(4));
+                                    document.getElementById('hiddenSPLBalance').textContent = (0).toFixed(4);
+                                      document.getElementById('hiddenSLBalance').textContent = (0).toFixed(4);
+                                       document.getElementById('hiddenVLBalance').textContent = (0).toFixed(4);
+
+                               //  $('#hiddenSPLBalance').val((response?.data?.leaveRequestHeader?.splBalance || 0).toFixed(4));
+                               // $('#hiddenSLBalance').val((response?.data?.leaveRequestHeader?.slBalance || 0).toFixed(4));
+                               // $('#hiddenVLBalance').val((response?.data?.leaveRequestHeader?.vlBalance || 0).toFixed(4));
 
 
                             // console.log(response);
@@ -675,10 +717,7 @@
                             $('#NoOfDays').val(response.data.leaveRequestHeader.noofDays);
                                  $('#Reason').val(response.data.leaveRequestHeader.reason);
                              //  const spl =   response.data.leaveRequestHeader.splBalance;
-                               $('#hiddenSPLBalance').val((response?.data?.leaveRequestHeader?.splBalance || 0).toFixed(4));
-
-                               $('#hiddenSLBalance').val((response?.data?.leaveRequestHeader?.slBalance || 0).toFixed(4));
-                               $('#hiddenVLBalance').val((response?.data?.leaveRequestHeader?.vlBalance || 0).toFixed(4));
+                              
 
                                  $('#NoOfDays').prop('disabled', true);
                                               $('#createForm').find(':submit').prop('disabled', false);
@@ -963,8 +1002,46 @@
                             // Block everything else (e, E, -, +, spaces, etc.)
                             evt.preventDefault();
                             return false;
-                        }
+                        }                         
 
+                                  function GetEmployeeLeaveInfo(){
+                                                let empId =  $('#employeeSelect').val();
+                                                                                     
+                                            $.ajax({
+                                                type: 'POST',
+                                                    url: '@Url.Action("GetAllLeaveMangementByEmpId", "DailyTimeRecord")',
+                                                    data: { EmployeeId: empId },
+                                                success: function (response) {
+                                                    if (response.success) {
+                                   
+                                                        console.log(response.data)
 
+                             
+                                     document.getElementById('hiddenSPLBalance').textContent = (response?.data?.splBalance || 0).toFixed(4);
+                                      document.getElementById('hiddenSLBalance').textContent = (response?.data?.slBalance || 0).toFixed(4);
+                                       document.getElementById('hiddenVLBalance').textContent = (response?.data?.vlBalance || 0).toFixed(4);
+
+               
+                                   $('#hiddenSPLBalance').val((response?.data?.splBalance || 0).toFixed(4));
+                                   $('#hiddenSLBalance').val((response?.data?.slBalance || 0).toFixed(4));
+                                   $('#hiddenVLBalance').val((response?.data?.vlBalance || 0).toFixed(4));
+
+                                  
+                                                    } else {
+                                                        Swal.fire({
+                                                            text: response.message,
+                                                            icon: "error"
+                                                        });
+                                                    }
+                                                },
+                                                error: function () {
+                                                    Swal.fire({
+                                                        text: "An error occurred. Please try again.",
+                                                        icon: "error"
+                                                    });
+                                                }
+                                            });    
+
+                              }
     </script>
 }
