@@ -37,6 +37,11 @@
         public const string Source_Suspension = "SUSPENSION";
         public const string Source_Holiday = "HOLIDAY";
         public const string Source_OfficialBusiness = "OFFICIAL BUSINESS";
+        public const string Source_VacationLeave = "VACATION LEAVE";
+        public const string Source_SickLeave = "SICK LEAVE";
+        public const string Source_SpecialLeave = "SPECIAL LEAVE";
+        public const string Source_MaternityLeave = "MATERNITY LEAVE";
+        public const string Source_PaternityLeave = "PATERNITY LEAVE";
 
         public const string OverTime_Regular = "125% REGULAR (AFTER OFFICE HRS. /MON - FRI / EXCEPT HOLIDAY)";
         public const string OverTime_NightDifferential = "10% NIGHT DIFFERENTIAL (10PM - 6AM) MON - SUN / HOLIDAY";

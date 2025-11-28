@@ -183,9 +183,13 @@
                                     {
                                         <span class="btnPrimary applicationStatus">@item.SOURCE</span>
                                     }
-                                    else 
+                                    else if (item.SOURCE == "HOLIDAY" || item.SOURCE == "SUSPENSION")
                                     {
                                         <span class="btn-secondary applicationStatus">@item.SOURCE</span>
+                                    }
+                                    else 
+                                    {
+                                        <span class="btn-secondary applicationStatus">@item.SOURCE | @item.STATUSNAME </span>                                       
                                     }
                                 </td>
                                 @*       <td class="text-center">
@@ -202,7 +206,7 @@
                                                         date:"@item.DATE.ToString("MM/dd/yyyy")",
                                                         emp:"@item.EMPLOYEE_NO",
                                                         name :"@item.NAME" ,
-                                                        source : "@item.SOURCE",
+                                                            source : "@item.SOURCE @item.RequestNo",
                                                         timein : "@item.FIRST_IN",
                                                         timeout : "@item.LAST_OUT",
                                                         clockout : "@item.CLOCK_OUT",

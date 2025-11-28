@@ -751,8 +751,7 @@ namespace DCI.WebApp.Controllers
                 //    {
                 //        return Json(new { success = false, message = "Invalid password!" });
                 //    }
-                //}
-
+                //}              
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
@@ -1851,6 +1850,49 @@ namespace DCI.WebApp.Controllers
                 Log.CloseAndFlush();
             }           
         }
+
+        public async Task<IActionResult> OnSite(DailyTimeRecordViewModel param)
+        {
+            List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+
+                    param.ScopeTypeEmp = (int)EnumEmployeeScope.PerEmployee;
+                    param.EMPLOYEE_ID = currentUser.EmployeeId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllWFH");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
+                    }
+
+                    ViewBag.ApproverHead = currentUser?.ApproverHead;
+                    ViewBag.Fullname = currentUser?.Fullname;
+                }
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
 
     }
 }

@@ -54,9 +54,9 @@ namespace DCI.Models.ViewModel
 
         public int ScopeTypeJobRecurring { get; set; } = 0;
         //   public string DayType { get; set; } = string.Empty;
-      //  public DateTime DateFilter { get; set; } = DateTime.Now;
-
+        //  public DateTime DateFilter { get; set; } = DateTime.Now;         
     }
+
     public class DTRCorrectionViewModel
     {
         public int DtrId { get; set; } = 0;

@@ -1,0 +1,1545 @@
+﻿@model IEnumerable<DCI.Models.ViewModel.DailyTimeRecordViewModel>
+@using Newtonsoft.Json;
+@using DCI.Core.Common;
+@using DCI.Models.ViewModel;
+
+<link href="~/css/dcicustom.css" rel="stylesheet" />
+
+@{
+    var modulePageAccess = Context.Session.GetString("ModulePageAccess");
+    var canView = false;
+    var canAdd = false;
+    var canEdit = false;
+    var canDelete = false;
+
+    if (modulePageAccess == null)
+    {
+        <script>
+            $.ajax({
+            type: 'POST',
+            url: '@Url.Action("Logout", "Account")',
+            success: function (response) {
+
+            Swal.fire({
+            text: "Your session has timed out. Please log in again.",
+            icon: "info",
+            confirmButtonText: "Ok"
+            }).then((result) => {
+            window.location.href = '/Account/Logout';
+            });
+            },
+            error: function () {
+            Swal.fire({
+            text: "An error occurred. Please try again.",
+            icon: "error"
+            });
+            }
+            })
+        </script>
+    }
+    else
+    {
+        var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
+                    .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.WFH);
+        canView = module?.View ?? false;
+        canAdd = module?.Add ?? false;
+        canEdit = module?.Update ?? false;
+        canDelete = module?.Delete ?? false;
+    }
+
+}
+
+<div class="container-fluid">
+    <div class="spinner-overlay">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <div class="d-sm-flex align-items-center justify-content-between mb-3">
+        <h6 class="m-0 font-weight-bold text-gray-800">Attendance</h6>
+        <div class="upperRightDivBtn">
+         @*    <a href="#" title="Add Overtime" class="btn btnPrimary btn-icon-split @(canAdd ? "" : "disabled")" data-toggle="modal" data-target="#" onclick="filewfhmodal()" id="AddOvertime">
+                <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
+                <span class="text text-white"><small>File WFH</small></span>
+            </a> *@
+       @*      <a asp-controller="DailyTimeRecord" asp-action="WFHApplication" class="btn btnPrimary btn-icon-split">               
+                <span class="icon text-white"><i class="fa-solid fa-list text-xs"></i></span>
+                <span class="text text-white"><small> WFH Application</small></span>
+            </a> *@
+            <a href="#" title="wfh application" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#" onclick="wfhapplicationModal()" id="viewWFHapplication">
+                <span class="icon text-white"><i class="fa-solid fa-list text-xs"></i></span>
+                <span class="text text-white"><small>DTR Application</small></span>
+            </a>
+            <a href="#" title="Add Overtime" class="btn btnPrimary btn-icon-split" data-toggle="modal" data-target="#" onclick="filewfhmodal()" id="AddOvertime">
+                <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
+                <span class="text text-white"><small>File DTR</small></span>
+            </a>
+            <a href="#" class="btn btnSuccess btn-icon-split" data-toggle="modal" data-target="#createmodal">
+                <span class="icon text-white"><i class="fa-regular fa-clock text-xs"></i></span>
+                <span class="text"><small>Time Clock</small></span>
+            </a>
+        </div>
+
+    </div>
+    <div class="col-12 p0">
+        <ul class="breadcrumb">
+            <li><a href="~/Home/Index">Dashboard</a></li>
+            <li><a href="~/DailyTimeRecord/OnSite">Daily Time Record</a></li>
+            <li><a href="#">OnSite</a></li>
+            @*         <li><a asp-controller="DailyTimeRecord" asp-action="Attendance" asp-route-id="1">Attendance</a></li> *@
+        </ul>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header">
+            <label class="mb0">Data</label>
+        </div>
+        <div class="card-body">
+            <div id="accordion">
+                <form id="frmFilter" class="row">
+                    <div class="form-group col-3">
+                        <label class="frmText">Date Covered From: </label>
+                        <div class="input-group">
+
+                            <input type="text" name="minDate" id="minDate" class="form-control frmField" autocomplete="off">
+                           <div class="input-group-prepend prependBtn" id="calendarIconFrom">
+      <i class="fa fa-calendar"></i>
+  </div>
+                            <label for="minDate" generated="true" class="error"></label>
+                        </div>
+                    </div>
+                    <div class="form-group col-3">
+                        <label class="frmText">Date Covered To: </label>
+                        <div class="input-group">
+
+
+                            <input type="text" name="maxDate" id="maxDate" class="form-control frmField" autocomplete="off">
+                            <div class="input-group-prepend prependBtn" id="calendarIconTo">
+    <i class="fa fa-calendar"></i>
+</div>
+                            <label for="maxDate" generated="true" class="error"></label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-responsive mt20">
+                <table class="table table-bordered" id="tblDTR">
+                    <thead>
+                        <tr>
+                          <th>
+                                <label>Employee No.</label>
+                            </th>
+                              
+                            <th>
+                                    <label>Name</label>
+                                </th>   
+                            <th>
+                                <label>Date</label>
+                            </th>
+                            <th>
+                                <label>Time In</label>
+                            </th>
+                            <th>
+                                <label>Time Out</label>
+                            </th>
+                            <th>
+                                <label>Total Working Hours</label>
+                            </th>
+
+
+                            <th>
+                                <label>Status</label>
+                            </th>
+                            <th>
+                                <label>Source</label>
+                            </th>
+                            <th>
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                                 string statusClass = item.STATUS switch
+                            {
+                                (int)EnumStatus.Approved => "btn-primary",
+                                (int)EnumStatus.ForApproval => "btn-success",
+                                (int)EnumStatus.Rejected => "btn-danger",
+                                (int)EnumStatus.Cancelled => "btn-secondary",
+                                (int)EnumStatus.VLDeducted
+                                or (int)EnumStatus.PayrollDeducted => "btn-warning",
+                                _ => "btn-dark"
+                            };
+
+                            <tr>
+
+                                <td>
+                                    @item.EMPLOYEE_NO
+                                </td>
+
+                                <td>
+                                        @item.NAME
+                                    </td>   
+                                <td>
+                                    @item.DATE.ToString("yyyy-MM-dd")
+                                </td>
+                                <td>
+                                    @item.FIRST_IN
+                                </td>
+                                <td>
+                                    @item.LAST_OUT
+                                </td>
+                                <td>
+                                    @item.TOTAL_WORKING_HOURS
+                                </td>
+                                <td class="text-center">
+                                    <strong>
+                                        <span class="@statusClass applicationStatus">@item.STATUSNAME</span>
+                                    </strong>
+                                </td>
+                                <td>
+                                    REMOTE                           
+                                </td>
+
+                                <td class="text-center">
+                                    <a href="javascript:void(0)" onclick='newForm({
+                                                                    date:"@item.DATE.ToString("MM/dd/yyyy")",
+                                                                    emp:"@item.EMPLOYEE_NO",
+                                                                    name :"@item.NAME" ,
+                                                                    source : "REMOTE",
+                                                                    timein : "@item.FIRST_IN",
+                                                                    timeout : "@item.LAST_OUT",
+                                                                    clockout : "@item.CLOCK_OUT",
+                                                                    Late : "@item.LATE",
+                                                                    UnderTime : "@item.UNDER_TIME",
+                                                                    OT : "@item.OVERTIME",
+                                                                    Hours : "@item.TOTAL_HOURS",
+                                                                    WorkingHours : "@item.TOTAL_WORKING_HOURS"
+                                                                        })' title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
+
+                                    <a href="javascript:void(0)" onclick="wfhlogsForm('@item.DATE.ToString("yyyy-MM-ddTHH:mm:ss")')" title="remote logs" class="btn btn-secondary"><i class="fas fa-history"></i></a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            </<div>
+            </div>
+
+            <style>
+                #clock {
+                    display: flex;
+                    align-items: center; /* vertical align (cross-axis) */
+                    justify-content: center; /* horizontal align (main axis) */
+                    gap: 5px; /* optional: spacing between numbers */
+                    height: 100px; /* or 100vh if you want full screen */
+                    text-align: center;
+                }
+            </style>
+
+
+            <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Clock In</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="divTimeClock">
+                                <i class="fa-regular fa-clock"></i>
+                                <label>@DateTime.Now.ToLongDateString()</label>
+                                @*    <div id="clock"> *@
+
+                                <div id="clock" style="display: flex; align-items: center;">
+                                    <h2 id="h">12</h2>
+                                    <h2>:</h2>
+                                    <h2 id="m">20</h2>
+                                    <h2>:</h2>
+                                    <h2 id="s">00</h2>
+                                    <h2 id="ap">AM</h2>
+                                </div>
+                                @*  <div class="clock"> <div class="bg"> <h2 id="h">12</h2> </div> <h2>:</h2> <div class="bg"> <h2 id="m">20</h2> </div> <h2>:</h2> <div class="bg"> <h2 id="s">00</h2> </div> <div class="bg"> <h2 id="ap">AM</h2> </div> </div> *@
+                            </div>
+
+                            <form id="createFormTimeIn">
+                                @*  @Html.AntiForgeryToken() *@
+                                @*      <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
+                                    </div>
+                                    <input type="text" name="Password" id="Password" class="form-control frmField" placeholder="Password">
+                                </div> *@
+                        @*                <input type="hidden" id="Latitude" name="Latitude" />
+                                              <input type="hidden" id="Longitude" name="Longitude" /> *@
+
+
+                                <button class="btn btn-primary d-block w-100 mb-2" onclick="submitTimeClock()"><small>Clock In</small></button>
+                                <button type="button" class="btn btn-secondary d-block w-100" data-dismiss="modal"><small>Close</small></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="modal fade" id="detailsmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Daily Time Record</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="createForm">
+                            <div class="modal-body">
+                                <table class="viewDetailsTbl table table-striped">
+                                    <tbody>
+                                        <tr>
+                                            <th>Date:</th>
+                                            <th class="tblDate">  <label id="lblDate"></label>  </th>
+                                        </tr>
+                                        <tr>
+                                            <th>Employee No.:</th>
+                                            <th class="tblEmNo">  <label id="lblEmpNo"></label></th>
+                                        </tr>
+                                        <tr>
+                                            <th>Name:</th>
+                                            <th class="tblName"> <label id="lblName"></label> </th>
+                                        </tr>
+                                        <tr>
+                                            <th>DTR Source:</th>
+                                            <td class="tblSource"><span class="btnSuccess applicationStatus"><label id="lblSource"></label></span></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Time In:</th>
+                                            <th class="tblTimeIn"><label id="lblTimeIn"></label></th>
+                                        </tr>
+                                        <tr>
+                                            <th>Time Out:</th>
+                                            <th class="tblTimeOut"><label id="lblTimeOut"></label></th>
+                                        </tr>
+                                        <tr>
+                                            <th>Clock Out:</th>
+                                            <td class="tblClockOut"><label id="lblClockOut"></label></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Late:</th>
+                                            <td class="tblLate"><label id="lblLate"></label></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Under Time:</th>
+                                            <td class="tblUnderTime"><label id="lblUnderTime"></label></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Overtime:</th>
+                                            <td class="tblOT"><label id="lblOT"></label></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total Hours:</th>
+                                            <td class="tblHours"><label id="lblHours"></label></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total Working Hours:</th>
+                                            <th class="tblWorkingHours"><label id="lblWorkingHours"></label></th>
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><small>Close</small></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="modal fade" id="filewfhmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">DTR</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="savewfhapp">
+                            <div class="modal-body">
+
+                                <table class="viewDetailsTblWFH table table-striped">
+                                    <tbody>
+                                        <tr>
+                                            <input type="hidden" id="WfhHeaderId" name="WfhHeaderId" value="0" />
+                                            <th>Date File:</th>
+                                            <td class="tblDate"><label id="lblDate">@DateTime.Now.ToString("MM/dd/yyyy")</label></td>
+                                        </tr>
+                                        @*    <tr>
+                                            <th>Approver:</th>
+                                            <td class="tblEmNo"><label id="lblEmpNo"></label></td>
+                                        </tr> *@
+                                        <tr>
+                                            <th>Status:</th>
+                                            <td class="tblSource">
+                                                <span class="btnSuccess applicationStatus">
+                                                    <label id="lblSource">Draft</label>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Reason:</th>
+                                            <td class="tblRemarks">
+                                                <textarea id="Remarks" name="Remarks" rows="3" style="width:100%" required></textarea>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                                <div class="col-12">
+
+                                    <div class="form-group">
+                                        <label class="frmText">For Approval of: </label><br>
+                                        <label class="font-weight-bold mb0 text-danger" id="deptHeadName"></label>
+                                        @* <label class="d-block mt0 text-left text-xs">(Department Head)</label> *@
+                                    </div>
+                                </div>
+
+
+                                <hr>
+
+                                <table class="table table-bordered text-dark text-xs" id="tblFileforWFH">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <input type="checkbox" id="selectAll" />
+                                            </th>
+                                            <th>
+                                                <label>ID</label>
+                                            </th>
+                                            <th>
+                                                <label>Date</label>
+                                            </th>
+                                            <th>
+                                                <label>Time In</label>
+                                            </th>
+                                            <th>
+                                                <label>Time Out</label>
+                                            </th>
+                                            <th>
+                                                <label>Total Working Hours</label>
+                                            </th>
+
+                                           
+                                            <th>
+                                                <label>Status</label>
+                                            </th>
+                                          @*   <th>
+                                                <label>Source</label>
+                                            </th> *@
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.Where(x => x.STATUS == 1))
+                                        {
+                                             string statusClass = item.STATUS switch
+                                                    {
+                                                        (int)EnumStatus.Approved => "btn-primary",
+                                                        (int)EnumStatus.ForApproval => "btn-success",
+                                                        (int)EnumStatus.Rejected => "btn-danger",
+                                                        (int)EnumStatus.Cancelled => "btn-secondary",
+                                                        (int)EnumStatus.VLDeducted
+                                                        or (int)EnumStatus.PayrollDeducted => "btn-warning",
+                                                        _ => "btn-dark"
+                                                    };
+
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox" class="row-checkbox" />
+                                                </td>
+                                                <td>
+                                                    @item.ID
+                                                </td>
+                                                <td>
+                                                    @item.DATE.ToShortDateString()
+                                                </td>
+                                                <td>
+                                                    @item.FIRST_IN
+                                                </td>
+                                                <td>
+                                                    @item.LAST_OUT
+                                                </td>
+                                                <td>
+                                                    @item.TOTAL_WORKING_HOURS
+                                                </td>
+
+                                               
+                                                <td class="text-center">
+                                                    <strong>
+                                                        <span class="@statusClass applicationStatus">@item.STATUSNAME</span>
+                                                    </strong>
+                                                </td>
+                                           @*      <td>
+                                                    REMOTE
+                                                </td> *@
+
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-primary  btn-icon-split d-block" >
+                                         <span class="icon text-white"><i class="fa fa-paper-plane" aria-hidden="true"></i></span>
+                                         <span class="text text-white"><small>Submit</small></span>
+                                </button>
+                                
+                          
+
+                                <button type="button" class="btn btn-secondary btn-icon-split d-block" data-dismiss="modal">
+                                  <span class="icon text-white">
+                                        <i class="fa-solid fa-xmark text-xs"></i>
+                                    </span>
+                                    <span class="text text-white"><small>Close </small></span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="rawlogsmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">WFH Logs</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="wfhInfo">
+                            <div class="modal-body">
+                                <table class="table table-bordered text-dark text-xs">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <label>Date</label>
+                                            </th>
+                                            <th>
+                                                <label>Time In</label>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblWfhLogs">
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><small>Close</small></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade fade bd-example-modal-lg" id="wfhapplicationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">WFH Application</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="closeWFHApplicationModal();">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form id="wfhInfo">
+                        <div class="modal-body">
+                            <table class="table table-bordered text-dark text-xs" id="tblWFHApplication">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <label>Request No</label>
+                                        </th>
+                                        <th>
+                                            <label>Date Filed</label>
+                                        </th>
+                                        <th>
+                                            <label>Status</label>
+                                        </th>
+                                        <th>
+                                            <label>Action</label>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closeWFHApplicationModal();"><small>Close</small></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .custom-modal {
+          background-color: #e3f2fd;   /* light blue (same tone as Bootstrap info background) */
+          color: #0d47a1;              /* dark blue text for contrast */
+          border: 1px solid #90caf9;
+        }
+    </style>
+          <div class="modal fade" id="fileapplicationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header custom-modal">
+                            <h5 class="modal-title" id="exampleModalLabel">WFH Application Details</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="wfhInfo">
+                            <div class="modal-body">
+                                <table class="viewDetailsTblWFH table table-striped">
+                                    <tbody>
+                                        <input type="hidden" id="WfhHeaderId" name="WfhHeaderId" value="0" />
+                                        <tr>
+                                            <th>Request No:</th>
+                                            <td class="tblRequestNo"><label id="lblRequestNo"></label></td>
+                                        </tr>
+                                        <tr>  
+                                            <th>Date Filed:</th>
+                                            <td class="tblDate"><label id="lblDate"></label></td>
+                                        </tr>                               
+                                        <tr>
+                                            <th>Status:</th>
+                                            <td class="tblSource">                                 
+                                                    <label id="lblStatus"></label>                                               
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Remarks:</th>
+                                            <td class="tblRemarks">
+                   
+                                           <label id="Remarks"></label
+                                            </td>
+                                        </tr>
+                            
+                                    </tbody>
+                                </table>
+                             <div class="col-12">
+                                 <div class="form-group">
+                                    <label class="frmText" id="ApproverLabel" name="ApproverLabel"> </label><br>
+                                    <label class="font-weight-bold mb0 text-danger" id="deptHeadName" name="deptHeadName"></label>
+                                    <label class="d-block mt0 text-left text-xs" id="ApprovalDate" name="ApprovalDate"></label>
+                                    <label class="d-block mt0 text-left text-xs" id="ApprovalRemarks" name="ApprovalRemarks"></label>                            
+                                  </div>
+                             </div>
+
+                                <table class="table table-bordered text-dark text-xs" >
+                                    <thead>
+                                        <tr>                                         
+                                         
+                                            <th>
+                                                <label>Date</label>
+                                            </th>
+                                            <th>
+                                                <label>Time In</label>
+                                            </th>
+                                            <th>
+                                                <label>Time Out</label>
+                                            </th>
+                                            <th>
+                                                <label>Total Working Hours</label>
+                                            </th>                                      
+
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblFileforWFHapplication">
+                                     
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer bg-light">                               
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><small>Close</small></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+
+@section scripts {
+
+
+            <script src="~/js/dci-validation.js"></script>
+
+
+          
+
+            <script type="text/javascript">
+                        var js = jQuery.noConflict(true);
+
+                                $('.spinner-overlay').show();
+
+                    setTimeout(() => {
+                        $('.spinner-overlay').hide();
+                    }, 200);
+
+
+                        $(document).ready(function () {
+
+
+                            // js('#wfhapplicationModal').on('shown.bs.modal', function () {
+                               
+                            //     // Destroy previous instance if it exists
+                            //     if (js.fn.DataTable.isDataTable('#tblWFHApplication')) {
+                            //         $('#tblWFHApplication').DataTable().clear().destroy();
+                            //     }
+
+                            //            js('#tblWFHApplication tbody').empty();
+
+                            //     // Initialize DataTable inside modal
+                            //     // js('#tblWFHApplication').DataTable({
+                            //     //     order: [[0, 'desc']], // sort by first column
+                            //     //     pageLength: 10,
+                            //     //     lengthMenu: [5, 10, 25, 50]                             
+                            //     // });
+                               
+                            //  });
+
+                                                        $('#calendarIconFrom').on('click', function () {
+                               $('#minDate').trigger('click');
+                    });
+                      $('#calendarIconTo').on('click', function () {
+                               $('#maxDate').trigger('click');
+                    });
+
+
+
+
+
+                               flatpickr("#minDate", {
+                                   dateFormat: "Y-m-d",
+                                    defaultDate: (function () {
+                                    let d = new Date();
+                                    d.setMonth(d.getMonth() - 1);
+                                    return d;
+                                     })()
+                                });
+
+                                  flatpickr("#maxDate", {
+                                   dateFormat: "Y-m-d",
+                                   defaultDate: new Date()
+                                });
+
+                                    // Create custom filtering function
+                                   let min = null;
+                                     let max = null;
+
+                        js.fn.dataTable.ext.search.push(function (settings, data) {
+                         min = $('#minDate').val();   // e.g. "2025-09-10"
+                         max = $('#maxDate').val();   // e.g. "2025-09-20"
+                        let date = (data[2] || '').trim(); // use correct column index! (2 = 3rd col)
+
+                        if (!date) return false;
+                        
+                        if (min && date < min) return false;
+                        if (max && date > max) return false;
+
+                        return true;
+                    });
+
+
+                        let table =    js('#tblDTR').DataTable({
+                                      dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
+                         buttons: [
+                         
+                             {
+                                 extend: 'pdf',
+                                 text: 'Export to PDF',
+                                 title: 'WFH Report',
+                                 exportOptions: {
+                                     columns: ':not(:last-child)' // Excludes the last column
+                                 }, 
+                                 customize: function (doc) {
+                                                                   doc.watermark = {
+                                                                    text: 'Property of DBP Data Center, Inc.',   // watermark text
+                                                                    color: 'red',
+                                                                    opacity: 0.1,
+                                                                    bold: true,
+                                                                    italics: false
+                                                                };
+
+                                                                doc.content.splice(1, 0,
+                                                                    {
+                                                                        text: 'Period: ' + min + " to " + max,
+                                                                        alignment: 'center',
+                                                                        margin: [0, 0, 0, 4], // tighter spacing
+                                                                        fontSize: 10,
+                                                                        italics: true
+                                                                    },
+                                                                    {
+                                                                        text: 'Prepared by: ' + '@Html.Raw(ViewBag.Fullname)', // dynamic from Razor
+                                                                        alignment: 'center',
+                                                                        margin: [0, 0, 0, 12],
+                                                                        fontSize: 10,
+                                                                        bold: true
+                                                                    }
+                                                                  );
+                                                                // Add "Date Printed" at bottom-right
+                                                                var now = new Date();
+                                                                var jsDate = now.toLocaleString(); // e.g. 9/21/2025, 3:25:10 PM
+
+                                                                doc['footer'] = function (currentPage, pageCount) {
+                                                                    return {
+                                                                        columns: [
+                                                                            { text: 'Date Printed: ' + jsDate, alignment: 'left', margin: [20, 0] },
+                                                                            { text: 'Page ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', margin: [0, 0, 20, 0] }
+                                                                        ],
+                                                                        margin: [20, 0]
+                                                                    };
+                                                                };
+                                                            }
+                                                        }
+                                                    ],
+                         lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
+                         pageLength: 10 ,// Default entries per page
+                                 order: [[2, 'desc']]
+                            });
+
+                                   // Event listener for date inputs
+                        $('#minDate, #maxDate').on('change', function () {
+                            table.draw();
+                        });
+
+                                        
+
+
+
+
+                            realTime();
+
+
+                                 $('#selectAll').on('click', function () {
+                                      $('.row-checkbox').prop('checked', this.checked);
+                                 });
+
+
+
+
+                                                               $('#savewfhapp').submit(function (e) {
+                                                                        e.preventDefault();
+
+                                                                             $(this).find(':submit').prop('disabled', true);
+                                                                       
+                                                                   
+                                                                                let header = {
+                                                                                    wfhHeaderId: document.getElementById("WfhHeaderId").value,
+                                                                                    remarks: document.getElementById("Remarks").value
+                                                                                    // ,requestNo: document.getElementById("RequestNo").value
+                                                                                };
+
+                                                                                 let details = [];
+                                                                                let checkedRows = document.querySelectorAll('#tblFileforWFH .row-checkbox:checked');
+
+                                                                                checkedRows.forEach((checkbox) => {
+                                                                                    let row = checkbox.closest('tr');
+                                                                                    let cells = row.querySelectorAll('td');
+
+                                                                                    details.push({
+                                                                                        id: cells[1].innerText.trim(),
+                                                                                        date: cells[2].innerText.trim(),
+                                                                                        timeIn: cells[3].innerText.trim(),
+                                                                                        timeOut: cells[4].innerText.trim()
+                                                                                    });
+                                                                                });
+
+                                                                                //console.log(details);
+                                                                                 if (!details || details.length === 0) {
+
+                                                                                                Swal.fire({
+                                                                                                    text: "Please select at least one row before submitting.",
+                                                                                                    icon: "warning",
+                                                                                                    confirmButtonText: "Ok"
+                                                                                                 }).then((result) => {
+                                                                                                       $('#savewfhapp').find(':submit').prop('disabled', false);
+                                                                                                });
+                                                                                                return; // stop here
+                                                                                            }
+
+                                                                                let datax = {
+                                                                                    header: header,
+                                                                                    details: details
+                                                                                };
+
+                                                                                //console.log(datax);
+
+                                                                                     Swal.fire({
+                                                                                            text: "Are you sure you want to submit this record?",
+                                                                                            icon: "question",
+                                                                                            showCancelButton: true,
+                                                                                            confirmButtonText: "Ok"
+                                                                                        }).then((result) => {                                                                                           
+                                                                                            if (result.isConfirmed) {
+                                                                                          $('#savewfhapp').find(':submit').prop('disabled', true);
+                                                                                                   $('.spinner-overlay').show();     
+                                                                                              
+                                                                                                           
+                                                                                                $.ajax({
+                                                                                                    type: 'POST',
+                                                                                                    url: '@Url.Action("SaveWFHApplication", "DailyTimeRecord")',
+                                                                                                    data: JSON.stringify(datax),
+                                                                                                    contentType: 'application/json; charset=utf-8',
+                                                                                                    success: function (response) {
+                                                                                                        if (response.success) {
+                                                                                                            Swal.fire({
+                                                                                                                text: response.message,
+                                                                                                                icon: "success",
+                                                                                                                confirmButtonText: "Ok"
+                                                                                                            }).then(() => {
+                                                                                                                 $('.spinner-overlay').hide();
+                                                                                                                location.reload();
+                                                                                                            });
+                                                                                                        } else {
+                                                                                                            Swal.fire({
+                                                                                                                text: response.message,
+                                                                                                                icon: "error"
+                                                                                                            });
+                                                                                                        }
+                                                                                                        $('.spinner-overlay').hide();
+                                                                                                    },
+                                                                                                    error: function () {
+                                                                                                               $('#savewfhapp').find(':submit').prop('disabled', false);
+                                                                                                        $('.spinner-overlay').hide();
+                                                                                                        Swal.fire({
+                                                                                                            text: "An error occurred. Please try again.",
+                                                                                                            icon: "error"
+                                                                                                        });
+                                                                                                    }
+                                                                                                }); // ajax
+                                                                            }else{
+                                                                                                         $(this).find(':submit').prop('disabled', false);
+                                                                                 }
+
+                                                                            $('.spinner-overlay').hide();
+                                                                         
+                                                                        }); // Swal.then
+                                                                    }); // submit
+
+
+
+                                                           
+                        });//end document
+
+                        function closeWFHApplicationModal() {
+                          $('#wfhapplicationModal').modal('hide');
+                        }
+
+
+                        function newForm(dtr) {
+                           // console.log(dtr)
+                                document.getElementById('lblDate').textContent = dtr.date;
+                                document.getElementById('lblEmpNo').textContent = dtr.emp;
+                                 document.getElementById('lblName').textContent = dtr.name;
+                                 document.getElementById('lblSource').textContent = dtr.source;
+                                 document.getElementById('lblTimeIn').textContent = dtr.timein;
+                                  document.getElementById('lblTimeOut').textContent = dtr.timeout
+                                document.getElementById('lblClockOut').textContent = dtr.clockout;
+                                document.getElementById('lblLate').textContent = dtr.Late;
+                                document.getElementById('lblUnderTime').textContent = dtr.UnderTime;
+                                document.getElementById('lblOT').textContent = dtr.OT;
+                                document.getElementById('lblHours').textContent = dtr.Hours;
+                                document.getElementById('lblWorkingHours').textContent = dtr.WorkingHours;
+
+                               
+                                js('#detailsmodal').modal('show');
+                        }
+
+
+                                            function realTime() {
+
+                    var date = new Date();
+                    var hour = date.getHours();
+                    var min = date.getMinutes();
+                    var sec = date.getSeconds();
+                    var halfday = "AM";
+                    halfday = (hour >= 12) ? "PM" : "AM";
+                    hour = (hour == 0) ? 12 : ((hour > 12) ? (hour - 12): hour);
+                    hour = update(hour);
+                    min = update(min);
+                    sec = update(sec);
+                    document.getElementById("h").innerText = hour;
+                    document.getElementById("m").innerText = min;
+                    document.getElementById("s").innerText = sec;
+                    document.getElementById("ap").innerText = halfday;
+
+                    setTimeout(realTime, 1000);
+                    }
+
+
+                    function update(k) {
+                    if (k < 10) { return "0" + k; } else { return k; } }
+
+
+                                    function submitTimeClock(e) {
+                                                  
+                                          navigator.geolocation.getCurrentPosition(function (pos) {
+                                                   const geolocation = {
+                                                            latitude: pos.coords.latitude,
+                                                            longitude: pos.coords.longitude
+                                                        };
+                                                        // console.log(data);
+                                                        //         $("#Latitude").val(data.latitude);
+                                                        //                 $("#Longitude").val(data.longitude);
+                                                
+                                                        // $("#Latitude").val(geolocation.latitude);
+                                                        // $("#Longitude").val(geolocation.longitude);
+
+                                                   console.log(geolocation);
+                                                  // var formData = $(this).serialize();
+                                             
+                                                               // console.log(formData);
+
+                                                    $('.spinner-overlay').show();
+                                           
+                                                    $.ajax({
+                                                        type: 'POST',
+                                                        url: '@Url.Action("WFHTimeIn", "DailyTimeRecord")',
+                                                          // data: formData,
+                                                            data: {
+                                                            Latitude : geolocation.latitude,
+                                                            Longitude : geolocation.longitude
+                                                            },
+                                                        success: function (response) {
+                                                           
+
+                                                            if (response.success) {
+                                                              
+                                                                Swal.fire({
+                                                                    title: "Success",
+                                                                    text: response.message,
+                                                                    icon: "success",
+                                                                    confirmButtonText: "OK",                                                                          
+                                                                    allowOutsideClick: false
+                                                                }).then(() => {
+                                                                     $('.spinner-overlay').hide();
+                                                                    setTimeout(() => location.reload(), 1000);
+                                                                });
+
+
+                                                            } else {
+                                                                Swal.fire({
+                                                                    text: response.message,
+                                                                    icon: "error"
+                                                                });
+                                                            }
+                                                        },
+                                                        error: function () {
+                                                            $('.spinner-overlay').hide();
+                                                            Swal.fire({
+                                                                text: "An error occurred. Please try again.",
+                                                                icon: "error"
+                                                            });
+                                                        }
+                                                    });
+
+
+                                                     });//end geo
+                                  }
+
+
+
+                // function submitTimeClock(e){
+                        
+                //                 var formData = $(this).serialize();                
+
+                //                           $.ajax({
+                //                               type: 'POST',
+
+                //                               url: '@Url.Action("WFHTimeIn", "DailyTimeRecord")',                                          
+                                                        
+                //                               success: function (response) {                                                
+                //                                   if (response.success) {
+
+                //                                                      Swal.fire({
+                //                                                               text: "Are you sure you want to submit this record?",
+                //                                                               icon: "question",
+                //                                                               showCancelButton: true,
+                //                                                               confirmButtonText: "Ok"
+                //                                                           }).then((result) => {
+                //                                                               if (result.isConfirmed) {
+                //                                                                   alert("ok")
+
+
+                //                                                             }
+                //                                                         }); //swal alert
+                //                                     } else {
+                //                                       Swal.fire({
+                //                                           text: response.message,
+                //                                           icon: "error"
+                //                                       });
+                //                                   }
+                //                                   $('.spinner-overlay').hide();
+                //                               },
+                //                               error: function () {
+                //                                   $('.spinner-overlay').hide();
+                //                                   Swal.fire({
+                //                                       text: "An error occurred. Please try again.",
+                //                                       icon: "error"
+                //                                   });
+                //                               }
+                //                           });
+
+                // }
+
+
+                   function filewfhmodal() {
+
+                          $("#Remarks").val("");
+                         $('.row-checkbox').prop('checked', false);
+
+                          document.getElementById('deptHeadName').textContent = @Html.Raw(JsonConvert.SerializeObject(ViewBag.ApproverHead));
+                                js('#filewfhmodal').modal('show');
+                        }
+
+
+
+                                            
+
+
+
+                         function  wfhlogsForm(date){
+                                                  let d = new Date(date); // JS can parse ISO format correctly
+                                                  d.setDate(d.getDate() + 1);
+                                              //alert(d.toISOString() )
+                                                    $.ajax({
+                                                          type: 'POST',
+                                                          url: '@Url.Action("WFHLogs", "DailyTimeRecord")',
+                                                                           data: JSON.stringify({
+                                                                        DATE_TIME: d.toISOString()
+                                                                    }),
+                                                               contentType: 'application/json',
+                                                          success: function (response) {
+                                                              if (response.success) {
+
+                                                                  console.log(response.data)
+                                                                         var tbodytable = $("#tblWfhLogs");
+                                                                        tbodytable.empty();
+
+                                                                        if (response.data.length > 0) {
+                                                                            $.each(response.data, function(index, item) {
+                                                                                var row = `<tr>
+                                                                                                     <td>${item.date}</td>
+                                                                                                     <td>${item.timE_IN}</td>
+
+                                                                                            </tr>`;
+                                                                                tbodytable.append(row);
+                                                                            });
+                                                                        } else {
+                                                                            tbodytable.html(`<tr><td colspan="4" class="text-center">No record found.</td></tr>`);
+                                                                        }
+
+                                                                    js('#rawlogsmodal').modal('show');
+                                                              } else {
+                                                                  Swal.fire({
+                                                                      text: response.message,
+                                                                      icon: "error"
+                                                                  });
+                                                              }
+                                                              $('.spinner-overlay').hide();
+                                                          },
+                                                          error: function () {
+                                                              $('.spinner-overlay').hide();
+                                                              Swal.fire({
+                                                                  text: "An error occurred. Please try again.",
+                                                                  icon: "error"
+                                                              });
+                                                          }
+                                                      });
+                                          }
+
+
+                       //  function wfhapplicationModal(){
+                            
+                              
+                            
+                       //                              $('.spinner-overlay').show();
+
+                       //                              $.ajax({
+                       //                                  type: 'POST',
+                       //                              url: '@Url.Action("WFHApplication", "DailyTimeRecord")',
+                                                      
+                       //                                  success: function (response) {                                                          
+
+                       //                                      if (response.success) {
+                       //                                        $('.spinner-overlay').hide();
+                       //                                          console.log(response.data);
+
+
+                                                           
+
+
+                       //                                           var tbodytable = $("#tblWFHApplication tbody");
+                       //                                              tbodytable.empty();
+
+                       //                                              if (response.data.length > 0) {
+                       //                                                  $.each(response.data, function(index, item) {
+
+                       //                                                              let cancelBtn = "";
+                       //                                                              if (item.statusId === 3) { // Replace 1 with EnumStatus.ForApproval value
+                       //                                                                  cancelBtn = `
+                       //                                                                      <a href="javascript:void(0)" 
+                       //                                                                         onclick="cancel(${item.wfhHeaderId})" 
+                       //                                                                         title="Cancel Request" 
+                       //                                                                         class="btn btn-secondary">
+                       //                                                                         <i class="fas fa-ban"></i>
+                       //                                                                      </a>`;
+                       //                                                              }
+
+
+                       //                                                      var row = `<tr>
+                       //                                                                       <td>${item.requestNo}</td>
+                       //                                                                       <td>${item.dateCreated}</td>
+                       //                                                                        <td>${item.statusName}</td>
+                       //                                                                              <td class="text-center">
+                       //                                                                                  <a href="javascript:void(0)"
+                       //                                                                                     onclick="viewWFHdDetails(${item.wfhHeaderId})"
+                       //                                                                                     title="View"
+                       //                                                                                     class="btn btn-primary">
+                       //                                                                                     <i class="fas fa-search"></i>
+                       //                                                                                  </a>
+
+                       //                                                                               ${cancelBtn}
+
+                       //                                                                              </td>
+                                                                                                
+                       //                                                                  </tr>`;
+                       //                                                      tbodytable.append(row);
+
+                                                                      
+                       //                                                  });
+                       //                                              } else {
+                       //                                                  tbodytable.html(`<tr><td colspan="3" class="text-center">No record found.</td></tr>`);
+                       //                                              }
+
+
+                       //                                                        // Destroy previous instance if it exists
+                       //                                                              if (js.fn.DataTable.isDataTable('#tblWFHApplication')) {
+                       //                                                                  $('#tblWFHApplication').DataTable().clear().destroy();
+                       //                                                              }
+
+                       //                                                              // Initialize DataTable inside modal
+                       //                                                              js('#tblWFHApplication').DataTable({
+                       //                                                                  order: [[0, 'desc']], // sort by first column
+                       //                                                                  pageLength: 10,
+                       //                                                                  lengthMenu: [5, 10, 25, 50]                             
+                       //                                                              });
+
+
+
+
+
+                       //                                      } else {
+                       //                                          Swal.fire({
+                       //                                              text: response.message,
+                       //                                              icon: "error"
+                       //                                          });
+                       //                                      }
+                       //                                  },
+                       //                                  error: function () {
+                       //                                      $('.spinner-overlay').hide();
+                       //                                      Swal.fire({
+                       //                                          text: "An error occurred. Please try again.",
+                       //                                          icon: "error"
+                       //                                      });
+                       //                                  }
+                       //                              });
+                                                             
+                       //       js('#wfhapplicationModal').modal('show');
+                       // }
+
+                       // function wfhapplicationModal () {
+                       //                        const $modal = $('#wfhapplicationModal');
+                       //                        const $table = $('#tblWFHApplication');
+                       //                        const $tbody = $table.find('tbody');
+
+                       //                        $('.spinner-overlay').show();
+                       //                        $modal.modal('show'); // show first; we'll adjust columns when fully visible
+
+                       //                        $.ajax({
+                       //                          type: 'POST',
+                       //                          url: '@Url.Action("WFHApplication", "DailyTimeRecord")',
+                       //                          success: function (response) {
+                       //                            $('.spinner-overlay').hide();
+
+                       //                            if (!response?.success) {
+                       //                              Swal.fire({ text: response?.message || "Request failed.", icon: "error" });
+                       //                              return;
+                       //                            }
+
+                       //                            // 1) Kill any existing DT cleanly BEFORE touching the DOM
+                       //                            if ($.fn.DataTable.isDataTable($table)) {
+                       //                              $table.DataTable().clear().destroy();
+                       //                            }
+
+                       //                            // 2) Rebuild rows
+                       //                            $tbody.empty();
+
+                       //                            if (Array.isArray(response.data) && response.data.length) {
+                       //                              response.data.forEach(item => {
+                       //                                const cancelBtn = (item.statusId === 3)
+                       //                                  ? `<a href="javascript:void(0)" onclick="cancel(${item.wfhHeaderId})" title="Cancel Request" class="btn btn-secondary">
+                       //                                       <i class="fas fa-ban"></i>
+                       //                                     </a>` : "";
+
+                       //                                const row = `
+                       //                                  <tr>
+                       //                                    <td>${item.requestNo ?? ''}</td>
+                       //                                    <td>${item.dateCreatedString ?? ''}</td>
+                       //                                    <td>${item.statusName ?? ''}</td>
+                       //                                    <td class="text-center">
+                       //                                      <a href="javascript:void(0)" onclick="viewWFHdDetails(${item.wfhHeaderId})" title="View" class="btn btn-primary">
+                       //                                        <i class="fas fa-search"></i>
+                       //                                      </a>
+                       //                                      ${cancelBtn}
+                       //                                    </td>
+                       //                                  </tr>`;
+                       //                                $tbody.append(row);
+                       //                              });
+                       //                            } else {
+                       //                              $tbody.html(`<tr><td colspan="4" class="text-center">No record found.</td></tr>`);
+                       //                            }
+
+                       //                            // 3) Initialize DT (inside modal)
+                       //                            const dt = $table.DataTable({
+                       //                              order: [[0, 'desc']],
+                       //                              pageLength: 5,
+                       //                              lengthMenu: [5, 10, 25, 50],
+                       //                              deferRender: true,
+                       //                              autoWidth: false
+                       //                            });
+
+                       //                            // 4) Fix layout after the modal finishes animating
+                       //                            $modal.off('shown.bs.modal._dtfix').on('shown.bs.modal._dtfix', function () {
+                       //                              dt.columns.adjust().draw(false);
+                       //                            });
+                       //                          },
+                       //                          error: function () {
+                       //                            $('.spinner-overlay').hide();
+                       //                            Swal.fire({ text: "An error occurred. Please try again.", icon: "error" });
+                       //                          }
+                       //                        });
+                       //                      }
+                       
+
+                       function wfhapplicationModal () {
+                                         const $modal = $('#wfhapplicationModal'); 
+                                                    const $table = $('#tblWFHApplication');
+
+                                                    $('.spinner-overlay').show();
+                                                    $modal.modal('show');
+
+                                                    $.ajax({
+                                                      type: 'POST',
+                                                      url: '@Url.Action("WFHApplication", "DailyTimeRecord")',
+                                                      success: function (response) {
+                                                        $('.spinner-overlay').hide();
+
+                                                        if (!response?.success) {
+                                                          Swal.fire({ text: response?.message || "Request failed.", icon: "error" });
+                                                          return;
+                                                        }
+
+                                                        // Destroy existing DT cleanly
+                                                        if ($.fn.DataTable.isDataTable($table)) {
+                                                          $table.DataTable().clear().destroy();
+                                                        }
+
+                                                        // IMPORTANT: Don't manually add rows. Let DT do it from data:
+                                                        const rows = Array.isArray(response.data) ? response.data : [];
+
+                                                        const dt = $table.DataTable({
+                                                          data: rows,
+                                                          // Map columns to property names; defaultContent prevents the 'unknown parameter' error on null/undefined
+                                                          columns: [
+                                                            { data: 'requestNo',          defaultContent: '' },
+                                                            { data: 'dateCreatedString',  defaultContent: '' },
+                                                            { data: 'statusName',         defaultContent: '' },
+                                                            {
+                                                              data: null,
+                                                              orderable: false,
+                                                              searchable: false,
+                                                              render: function (row) {
+                                                                const viewBtn = `<a href="javascript:void(0)" onclick="viewWFHdDetails(${row?.wfhHeaderId ?? 0})" title="View" class="btn btn-primary">
+                                                                                    <i class="fas fa-search"></i>
+                                                                                  </a>`;
+                                                                const cancelBtn = (row?.statusId === 3)
+                                                                  ? `<a href="javascript:void(0)" onclick="cancel(${row?.wfhHeaderId ?? 0})" title="Cancel Request" class="btn btn-secondary">
+                                                                       <i class="fas fa-ban"></i>
+                                                                     </a>` : '';
+                                                                return `<div class="text-center">${viewBtn} ${cancelBtn}</div>`;
+                                                              }
+                                                            }
+                                                          ],
+                                                          order: [[0, 'desc']],
+                                                          pageLength: 5,
+                                                          lengthMenu: [5, 10, 25, 50],
+                                                          deferRender: true,
+                                                          autoWidth: false,
+                                                          language: {
+                                                            emptyTable: "No record found."
+                                                          }
+                                                        });
+
+                                                        // Adjust after modal is visible
+                                                        $modal.off('shown.bs.modal._dtfix').on('shown.bs.modal._dtfix', function () {
+                                                          dt.columns.adjust().draw(false);
+                                                        });
+                                                      },
+                                                      error: function () {
+                                                        $('.spinner-overlay').hide();
+                                                        Swal.fire({ text: "An error occurred. Please try again.", icon: "error" });
+                                                      }
+                                           });
+                              }
+
+
+
+
+                         function cancel(id){
+                                Swal.fire({
+                                    text: "Are you sure you want to cancel this request?",
+                                    icon: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonText: "Yes, cancel it!"
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        $.ajax({
+                                            type: 'POST',
+                                            url: '@Url.Action("CancelWFHApplication", "DailyTimeRecord")',
+                                            data: { WfhHeaderId: id },
+                                            success: function (response) {
+                                                if (response.success) {
+                                                    Swal.fire({
+                                                        text: response.message,
+                                                        icon: "success",
+                                                        confirmButtonText: "Ok"
+                                                    }).then((result) => {
+                                                        location.reload();
+                                                    });
+                                                } else {
+                                                    Swal.fire({
+                                                        text: response.message,
+                                                        icon: "error"
+                                                    });
+                                                }
+                                            },
+                                            error: function () {
+                                                Swal.fire({
+                                                    text: "An error occurred. Please try again.",
+                                                    icon: "error"
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                    }
+
+                      function viewWFHdDetails(headerId){
+
+                                      $.ajax({
+                                          type: 'POST',
+                                                url: '@Url.Action("WFHApplicationDetails", "DailyTimeRecord")',
+                                            data: { WFHHeaderId: headerId },
+                                          success: function (response) {
+                                              if (response.success) {
+
+                                                  console.log(response.data);
+                                                   document.getElementById('lblRequestNo').textContent = response.data.header.requestNo;
+                                                      document.getElementById('lblStatus').textContent = response.data.header.statusName;
+                                                         document.getElementById('lblDate').textContent = response.data.header.dateCreatedString;
+                                                          document.getElementById('Remarks').textContent = response.data.header.remarks
+
+                                             document.getElementById('ApproverLabel').textContent = '';
+                                                document.getElementById('ApprovalDate').textContent = '';
+                                               document.getElementById('ApprovalRemarks').textContent = '';
+                                                 document.getElementById('deptHeadName').textContent = '';
+
+                                            if (response.data.header.statusId == @((int)EnumStatus.ForApproval)) { // for approval
+                                                 document.getElementById('deptHeadName').textContent = response.data.header.approver;
+                                                   document.getElementById('ApproverLabel').textContent = 'For Approval of:';
+                                          }
+
+                                         else  if(response.data.header.statusId == @((int)EnumStatus.Approved)) {  //approved
+
+                                                   document.getElementById('deptHeadName').textContent = response.data.header.approver;
+                                                  document.getElementById('ApproverLabel').textContent = "Approved By: ";
+                                                   document.getElementById('ApprovalDate').textContent = 'Approved Date and Time: ' + response.data.header.dateApprovedDisapproved;
+                                          }
+                                                else if(response.data.header.statusId == @((int)EnumStatus.Rejected)){     //Rejected
+                                                      document.getElementById('deptHeadName').textContent = response.data.header.approver;
+                                                        document.getElementById('ApproverLabel').textContent = 'Rejected By:';
+                                               document.getElementById('ApprovalRemarks').textContent = 'Remarks: ' + response.data.headerapprovalRemarks;
+                                                   document.getElementById('ApprovalDate').textContent = 'Rejected Date and Time:: ' + response.data.header.dateApprovedDisapproved;
+
+                                           }  else if(response.data.header.statusId == @((int)EnumStatus.Cancelled)){     //canclled
+
+                                                  document.getElementById('ApprovalDate').textContent = 'Cancelled Date: ' +  response.data.header.dateModifiedString;
+
+                                         }
+
+
+
+
+                                                       var tbodytable = $("#tblFileforWFHapplication");
+                                                tbodytable.empty();
+
+                                                if (response.data.details.length > 0) {
+                                                    $.each(response.data.details, function(index, item) {
+                                                        var row = `<tr>
+
+                                                                             <td>${item.date}</td>
+                                                                                <td>${item.timeIn}</td>
+                                                                                <td>${item.timeOut}</td>
+                                                                                   <td>${item.totalWorkingHours}</td>
+                                                                    </tr>`;
+                                                        tbodytable.append(row);
+                                                    });
+                                                } else {
+                                                    tbodytable.html(`<tr><td colspan="4" class="text-center">No record found.</td></tr>`);
+                                                }
+
+                                                  js('#fileapplicationModal').modal('show');
+
+                                              } else {
+                                                  Swal.fire({
+                                                      text: response.message,
+                                                      icon: "error"
+                                                  });
+                                              }
+                                              $('.spinner-overlay').hide();
+                                          },
+                                          error: function () {
+                                              $('.spinner-overlay').hide();
+                                              Swal.fire({
+                                                  text: "An error occurred. Please try again.",
+                                                  icon: "error"
+                                              });
+                                          }
+                                      });
+            }
+
+            </script>
+
+}

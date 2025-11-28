@@ -100,27 +100,76 @@ namespace DCI.Repositories
 
             var filterDate = new DateTime(2025, 10, 1); //migration start Oct28
 
+            //var officialBusiness = await (from dtl in _dbContext.LeaveRequestDetails.AsNoTracking()
+            //                              join ob in _dbContext.LeaveRequestHeader.AsNoTracking() on dtl.LeaveRequestHeaderId equals ob.LeaveRequestHeaderId
+            //                              join emp in _dbContext.Employee.AsNoTracking() on ob.EmployeeId equals emp.EmployeeId
+            //                               where 
+            //                               ob.IsActive == true 
+            //                               && (ob.LeaveTypeId == (int)EnumLeaveType.OB || ob.LeaveTypeId == (int)EnumLeaveType.HDOB) 
+            //                               && ob.Status == (int)EnumStatus.Approved 
+            //                               && ob.Status == (int)EnumStatus.Approved && dtl.LeaveDate >= filterDate
+            //                              select new DailyTimeRecordViewModel
+            //                     {
+            //                         ID = 0,
+            //                         EMPLOYEE_NO = emp.EmployeeNo,
+            //                         NAME = emp.Firstname + " " + emp.Lastname,
+            //                         DATE = dtl.LeaveDate.Date,
+            //                         FIRST_IN = "00:00:00",
+            //                         LAST_OUT = "00:00:00",
+            //                         LATE = "00:00:00",
+            //                         CLOCK_OUT = "00:00:00",
+            //                         UNDER_TIME = "00:00:00",
+            //                         OVERTIME = "00:00:00",
+            //                         TOTAL_HOURS = "00:00:00",
+            //                         TOTAL_WORKING_HOURS = "00:00:00",
+            //                         SOURCE = Constants.Source_OfficialBusiness
+            //                     }).ToListAsync();
+            //string statusClass = item.STATUS switch
+            //{
+            //    (int)EnumStatus.Approved => "btn-primary",
+            //    (int)EnumStatus.ForApproval => "btn-success",
+            //    (int)EnumStatus.Rejected => "btn-danger",
+            //    (int)EnumStatus.Cancelled => "btn-secondary",
+            //    (int)EnumStatus.VLDeducted
+            //    or (int)EnumStatus.PayrollDeducted => "btn-warning",
+            //    _ => "btn-dark"
+            //};
+
             var officialBusiness = await (from dtl in _dbContext.LeaveRequestDetails.AsNoTracking()
                                           join ob in _dbContext.LeaveRequestHeader.AsNoTracking() on dtl.LeaveRequestHeaderId equals ob.LeaveRequestHeaderId
                                           join emp in _dbContext.Employee.AsNoTracking() on ob.EmployeeId equals emp.EmployeeId
-                                           where ob.IsActive == true && (ob.LeaveTypeId == (int)EnumLeaveType.OB || ob.LeaveTypeId == (int)EnumLeaveType.HDOB) && ob.Status == (int)EnumStatus.Approved 
-                                          && ob.IsActive == true && ob.Status == (int)EnumStatus.Approved && dtl.LeaveDate >= filterDate
+                                          join stat in _dbContext.Status.AsNoTracking() on ob.Status equals stat.StatusId
+                                          where
+                                          ob.IsActive == true
+                                          && (ob.LeaveTypeId != (int)EnumLeaveType.SLMon && ob.LeaveTypeId != (int)EnumLeaveType.VLMon)
+                                         // && ob.Status == (int)EnumStatus.Approved
+                                          && dtl.LeaveDate >= filterDate
                                           select new DailyTimeRecordViewModel
-                                 {
-                                     ID = 0,
-                                     EMPLOYEE_NO = emp.EmployeeNo,
-                                     NAME = emp.Firstname + " " + emp.Lastname,
-                                     DATE = dtl.LeaveDate.Date,
-                                     FIRST_IN = "00:00:00",
-                                     LAST_OUT = "00:00:00",
-                                     LATE = "00:00:00",
-                                     CLOCK_OUT = "00:00:00",
-                                     UNDER_TIME = "00:00:00",
-                                     OVERTIME = "00:00:00",
-                                     TOTAL_HOURS = "00:00:00",
-                                     TOTAL_WORKING_HOURS = "00:00:00",
-                                     SOURCE = Constants.Source_OfficialBusiness
-                                 }).ToListAsync();
+                                          {
+                                              ID = 0,
+                                              EMPLOYEE_NO = emp.EmployeeNo,
+                                              NAME = emp.Firstname + " " + emp.Lastname,
+                                              DATE = dtl.LeaveDate.Date,
+                                              FIRST_IN = "00:00:00",
+                                              LAST_OUT = "00:00:00",
+                                              LATE = "00:00:00",
+                                              CLOCK_OUT = "00:00:00",
+                                              UNDER_TIME = "00:00:00",
+                                              OVERTIME = "00:00:00",
+                                              TOTAL_HOURS = "00:00:00",
+                                              TOTAL_WORKING_HOURS = "00:00:00",
+                                              // SOURCE = Constants.Source_OfficialBusiness
+                                              STATUSNAME = stat.StatusName,
+                                              RequestNo = ob.RequestNo,
+                                              SOURCE =
+                                                    (ob.LeaveTypeId == (int)EnumLeaveType.OB || ob.LeaveTypeId == (int)EnumLeaveType.HDOB) ? Constants.Source_OfficialBusiness
+                                                        : (ob.LeaveTypeId == (int)EnumLeaveType.VL || ob.LeaveTypeId == (int)EnumLeaveType.HDVL) ? Constants.Source_VacationLeave
+                                                        : (ob.LeaveTypeId == (int)EnumLeaveType.SL || ob.LeaveTypeId == (int)EnumLeaveType.HDSL) ? Constants.Source_SickLeave
+                                                        : ob.LeaveTypeId == (int)EnumLeaveType.SPL ? Constants.Source_SpecialLeave
+                                                        : ob.LeaveTypeId == (int)EnumLeaveType.ML ? Constants.Source_MaternityLeave
+                                                        : ob.LeaveTypeId == (int)EnumLeaveType.PL ? Constants.Source_PaternityLeave
+                                                        : "Leave"
+                                          }).ToListAsync();
 
 
             var attendance = biometriclogs.Concat(wfhlogs).Concat(officialBusiness).ToList();
