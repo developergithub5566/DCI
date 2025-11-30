@@ -182,8 +182,8 @@ namespace DCI.Trigger
                 using (var _httpclient = new HttpClient())
                 {
 
-                    //ram.DATE = DateTime.Now;
-                    param.DATE = DateTime.Parse("2025-10-02");
+                    param.DATE = DateTime.Now;
+                   // param.DATE = DateTime.Parse("2025-10-02");
                     param.ScopeTypeJobRecurring = (int)EnumScopeTypeJobRecurring.MONTHLY;
 
 
