@@ -632,24 +632,24 @@
                                                                      
                                                                          let formattedDays = total.toFixed(4);
 
+                                                                             //2025-12-02
+                                                                             // let leave =  $('#leaveTypeSelect').val();
 
-                                                                             let leave =  $('#leaveTypeSelect').val();
+                                                                             // if(leave == 5){ //SPL leavetype
+                                                                             //   const spl =   $('#hiddenSPLBalance').val();
 
-                                                                             if(leave == 5){ //SPL leavetype
-                                                                               const spl =   $('#hiddenSPLBalance').val();
-
-                                                                               if(parseFloat(formattedDays) > parseFloat(spl)){
-                                                                                            console.log(spl);
-                                                                                            console.log(formattedDays);
-                                                                                                Swal.fire({
-                                                                                                    text: "You cannot file a special leave that exceeds your remaining special leave balance.",
-                                                                                                    icon: "warning",
-                                                                                                    confirmButtonText: "Ok"
-                                                                                                }).then((result) => {
-                                                                                                       fp.clear();
-                                                                                                });
-                                                                                }
-                                                                             }
+                                                                             //   if(parseFloat(formattedDays) > parseFloat(spl)){
+                                                                             //                console.log(spl);
+                                                                             //                console.log(formattedDays);
+                                                                             //                    Swal.fire({
+                                                                             //                        text: "You cannot file a special leave that exceeds your remaining special leave balance.",
+                                                                             //                        icon: "warning",
+                                                                             //                        confirmButtonText: "Ok"
+                                                                             //                    }).then((result) => {
+                                                                             //                           fp.clear();
+                                                                             //                    });
+                                                                             //    }
+                                                                             // }
 
 
                                                                              $('#NoOfDays').val(formattedDays);

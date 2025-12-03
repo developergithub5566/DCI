@@ -515,11 +515,10 @@ namespace DCI.Repositories
                                           join ob in _dbContext.LeaveRequestHeader.AsNoTracking() on dtl.LeaveRequestHeaderId equals ob.LeaveRequestHeaderId
                                           join emp in _dbContext.Employee.AsNoTracking() on ob.EmployeeId equals emp.EmployeeId
                                           join lvtype in _dbContext.LeaveType.AsNoTracking() on ob.LeaveTypeId equals lvtype.LeaveTypeId
-                                          where ob.IsActive == true
-                                          //&& (ob.LeaveTypeId == (int)EnumLeaveType.OB || ob.LeaveTypeId == (int)EnumLeaveType.HDOB) 
+                                          join stat in _dbContext.Status.AsNoTracking() on ob.Status equals stat.StatusId
+                                          where ob.IsActive == true                                       
                                           && (ob.LeaveTypeId != (int)EnumLeaveType.SLMon || ob.LeaveTypeId != (int)EnumLeaveType.VLMon) 
-                                          && ob.Status == (int)EnumStatus.Approved
-                                          //&& dtl.LeaveDate.Date == model.DATE.Date
+                                        //  && ob.Status == (int)EnumStatus.Approved                                        
                                           select new DailyTimeRecordViewModel
                                           {
                                               ID = 0,
@@ -535,7 +534,14 @@ namespace DCI.Repositories
                                               TOTAL_HOURS = "00:00:00",
                                               TOTAL_WORKING_HOURS = "00:00:00",
                                               //SOURCE = Constants.Source_OfficialBusiness
-                                              SOURCE = lvtype.Description
+                                              SOURCE =
+                                                    ((ob.LeaveTypeId == (int)EnumLeaveType.OB || ob.LeaveTypeId == (int)EnumLeaveType.HDOB) ? Constants.Source_OfficialBusiness
+                                                        : (ob.LeaveTypeId == (int)EnumLeaveType.VL || ob.LeaveTypeId == (int)EnumLeaveType.HDVL) ? Constants.Source_VacationLeave
+                                                        : (ob.LeaveTypeId == (int)EnumLeaveType.SL || ob.LeaveTypeId == (int)EnumLeaveType.HDSL) ? Constants.Source_SickLeave
+                                                        : ob.LeaveTypeId == (int)EnumLeaveType.SPL ? Constants.Source_SpecialLeave
+                                                        : ob.LeaveTypeId == (int)EnumLeaveType.ML ? Constants.Source_MaternityLeave
+                                                        : ob.LeaveTypeId == (int)EnumLeaveType.PL ? Constants.Source_PaternityLeave
+                                                        : "Leave") + "|" +  stat.StatusName
                                           }).ToListAsync();
 
             if ((int)EnumScopeTypeJobRecurring.DAILY == model.ScopeTypeJobRecurring) //DAILY
@@ -553,7 +559,7 @@ namespace DCI.Repositories
 
             if ((int)EnumScopeTypeJobRecurring.MONTHLY == model.ScopeTypeJobRecurring) //MONTHLY ONLY
             {
-                //MONTHLY ONLY
+               // MONTHLY ONLY
                 var holiday = await (from hol in _dbContext.Holiday.AsNoTracking()
                                      where hol.IsActive == true
                                      && hol.HolidayDate.Month == model.DATE.Month

@@ -29,19 +29,42 @@ namespace DCI.Repositories
 
         public async Task<IList<DailyTimeRecordViewModel>> GetAllLate(DailyTimeRecordViewModel model)
         {
-            // var context = _dbContext.vw_AttendanceSummary.AsNoTracking().Where(x => x.STATUS != (int)EnumStatus.PayrollDeducted && x.STATUS != (int)EnumStatus.VLDeducted);
-           
-            var context = (from dtr in _dbContext.vw_AttendanceSummary.AsNoTracking()
+
+            var leaverequest = await (from dtl in _dbContext.LeaveRequestDetails.AsNoTracking()
+                                      join hd in _dbContext.LeaveRequestHeader.AsNoTracking() on dtl.LeaveRequestHeaderId equals hd.LeaveRequestHeaderId
+                                      join emp in _dbContext.Employee.AsNoTracking() on hd.EmployeeId equals emp.EmployeeId
+                                      where hd.IsActive == true && hd.Status == (int)EnumStatus.Approved && (hd.LeaveTypeId != (int)EnumLeaveType.SLMon || hd.LeaveTypeId != (int)EnumLeaveType.VLMon)
+                                      select new
+                                      {
+                                          EMPLOYEE_NO = emp.EmployeeNo,
+                                          DATE = dtl.LeaveDate,
+                                      }).ToListAsync();
+
+            var attendce = (from dtr in _dbContext.vw_AttendanceSummary.AsNoTracking()
                            join emp in _dbContext.Employee.AsNoTracking() on dtr.EMPLOYEE_NO equals emp.EmployeeNo
                            where dtr.STATUS == (int)EnumStatus.Raw
-                           select new 
-                           {                          
+                           select new
+                           {
                                EMPLOYEE_NO = dtr.EMPLOYEE_NO,
                                DATE = dtr.DATE,
-                               NAME = emp.Firstname + " " + emp.Lastname,                            
-                               LATE = dtr.LATE,                              
+                               NAME = emp.Firstname + " " + emp.Lastname,
+                               LATE = dtr.LATE,
                            }).ToList();
 
+            var context =
+                (from ctx in attendce
+                 join lr in leaverequest
+                     on new { ctx.EMPLOYEE_NO, ctx.DATE }
+                     equals new { lr.EMPLOYEE_NO, lr.DATE }
+                     into lrJoin
+                 from lr in lrJoin.DefaultIfEmpty()
+                 select new
+                 {
+                     EMPLOYEE_NO = ctx.EMPLOYEE_NO,
+                     DATE = ctx.DATE,
+                     NAME = ctx.NAME,
+                     LATE = lr != null ? "00:00:00" : ctx.LATE
+                 }).ToList();
 
             int _currentYear = DateTime.Now.Year;
 
@@ -171,6 +194,8 @@ namespace DCI.Repositories
                                         || b.LeaveTypeId == (int)EnumLeaveType.HDSL
                                         || b.LeaveTypeId == (int)EnumLeaveType.OB
                                         || b.LeaveTypeId == (int)EnumLeaveType.HDOB
+                                         || b.LeaveTypeId == (int)EnumLeaveType.ML
+                                         || b.LeaveTypeId == (int)EnumLeaveType.VL
                                         || b.LeaveTypeId == (int)EnumLeaveType.SL)
                     select new
                     {

@@ -223,8 +223,8 @@ namespace DCI.Trigger
         public async Task SendEmailAttendanceConfirmationNotificationMonthly(BiometricViewModel model)
         {
             MailMessage mail = new MailMessage();
-            mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-            mail.Subject = $"DCI ESS - Action Required: Confirmation on Attendance | {"October 2025"}";
+            mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);      
+            mail.Subject = $"DCI ESS - Action Required: Confirmation on Attendance | { model.DATE }";
             mail.Body = await SetEmailAttendanceConfirmationNotificationMonthly(model);
             mail.IsBodyHtml = true;
             mail.To.Add(model.Email);

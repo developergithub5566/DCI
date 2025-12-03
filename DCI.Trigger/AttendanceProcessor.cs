@@ -183,7 +183,7 @@ namespace DCI.Trigger
                 {
 
                     param.DATE = DateTime.Now;
-                   // param.DATE = DateTime.Parse("2025-10-02");
+                   // param.DATE = DateTime.Parse("2025-11-30");
                     param.ScopeTypeJobRecurring = (int)EnumScopeTypeJobRecurring.MONTHLY;
 
 
@@ -222,7 +222,7 @@ namespace DCI.Trigger
                     viewModel.Fullname = emp.Fullname;
                     viewModel.Email = emp.Email;     
                     viewModel.BODYTABLE = attendanceTable;
-
+                    viewModel.DATE = param.DATE.ToString("MMMM yyyy");
                     await _emailRepository.SendEmailAttendanceConfirmationNotificationMonthly(viewModel);
                 }
 

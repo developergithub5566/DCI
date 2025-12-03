@@ -42,7 +42,8 @@ namespace DCI.WebApp.Controllers
                     return RedirectToAction("Logout", "Account");
               
                 model.CurrentUserId = currentUser.UserId;
-          
+                
+                ViewBag.IsBirthdayToday = false;
 
                 var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                 var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Home/GetAllAnnouncement");
@@ -53,6 +54,7 @@ namespace DCI.WebApp.Controllers
                 if (response.IsSuccessStatusCode == true)
                 {
                     model = JsonConvert.DeserializeObject<DashboardViewModel>(responseBody)!;
+                    ViewBag.IsBirthdayToday = model.BirthdayList?.Any(b => b.Birthday.Value.Month == DateTime.Now.Month && b.Birthday.Value.Day == DateTime.Now.Day) == true;
                     return View(model);
                 }           
             }
