@@ -1,0 +1,65 @@
+﻿/**************************************************\ 
+(XL) Large Monitor Only
+\**************************************************/
+@media screen and (min-width: 1200px) {
+}
+
+/**************************************************\ 
+(LG) Small Monitor Only
+\**************************************************/
+@media screen and (min-width:992px) and (max-width: 1199px) {
+}
+
+/**************************************************\ 
+(MD) Tablet Only
+\**************************************************/
+@media screen and (min-width:768px) and (max-width: 991px) {
+}
+
+/**************************************************\ 
+(SM) Phablet
+\**************************************************/
+@media screen and (min-width: 576px) and (max-width:767px) {
+    .mainModule i {
+        display: block;
+        margin: auto;
+        margin-bottom: 5px;
+    }
+
+    .mainModule .sidebar-heading > span {
+        border-left: 0px;
+        padding-left: 0px;
+    }
+}
+
+/**************************************************\ 
+(XS) Phone
+\**************************************************/
+@media screen and (min-width: 391px) and (max-width:575px) {
+    .mainModule i {
+        display: block;
+        margin: auto;
+        margin-bottom: 5px;
+    }
+
+    .mainModule .sidebar-heading > span {
+        border-left: 0px;
+        padding-left: 0px;
+    }
+}
+
+/**************************************************\ 
+(XXS) Smaller Phone
+\**************************************************/
+@media screen and (max-width:390px) {
+    .mainModule i {
+        display: block;
+        margin: auto;
+        margin-bottom: 5px;
+    }
+
+    .mainModule .sidebar-heading > span {
+        border-left: 0px;
+        padding-left: 0px;
+    }
+}

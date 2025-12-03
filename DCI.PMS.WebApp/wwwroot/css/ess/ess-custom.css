@@ -1,0 +1,1188 @@
+﻿/*----------------------*/
+/*---- ACCOUNT PAGE ----*/
+/*----------------------*/
+.btnChangePassword {
+	font-size: 12px;
+	background: #5789ec;
+	color: white;
+	padding: 10px 20px;
+	border-radius: 10px;
+	float: right;
+	position: absolute;
+	right: 20px;
+	top: 9%;
+}
+
+	.btnChangePassword:hover,
+	.btnChangePassword:focus {
+		color: white;
+		background: #4179e8;
+	}
+
+
+.profileStatusDiv {
+	text-align: center;
+}
+
+	.profileStatusDiv div.icon i {
+		font-size: 80px;
+		margin-bottom: 15px;
+	}
+
+		.profileStatusDiv div.icon i.responseSuccess {
+			color: #1cc88a;
+		}
+
+		.profileStatusDiv div.icon i.responseError {
+			color: #f6c23e;
+		}
+
+	.profileStatusDiv label {
+		font-size: 25px;
+		font-weight: 600;
+		color: black;
+	}
+
+	.profileStatusDiv p {
+		font-size: 14px;
+	}
+
+.btnBack {
+	background: #5789ec;
+	padding: 10px 20px;
+	font-size: 12px;
+	color: white;
+}
+
+	.btnBack:hover, .btnBack:focus {
+		background: #4179e8;
+		color: white;
+	}
+
+.prependBtn {
+	background: white;
+	color: #7d7d7d;
+	padding: 10px 15px;
+	border-radius: 0px 10px 10px 0px !important;
+	border: 1px solid #d1d3e2;
+	border-left: none;
+}
+
+	.prependBtn i {
+		color: #000000;
+	}
+
+#frmFilter {
+	border: 1px solid #e3e6f0;
+	padding: 20px 5px 0px 5px;
+	background: #f8f9fc;
+}
+
+
+.dataTable th > span {
+	font-size: 12px !important;
+	color: #323232;
+}
+
+#dataTable td,
+.dataTable td {
+	font-size: 12px;
+	color: #323232;
+	vertical-align: inherit;
+}
+
+input:disabled {
+	background: #ccc;
+}
+
+
+.userRoleDiv {
+	text-align: center;
+}
+
+	.userRoleDiv i.roleIcon {
+		font-size: 80px;
+		display: block;
+		margin-bottom: 10px;
+		color: #b1b1b1;
+	}
+
+	.userRoleDiv label.title {
+		font-size: 20px;
+		font-weight: 600;
+		color: black;
+	}
+
+	.userRoleDiv ul.descList {
+		padding-left: 0px;
+	}
+
+		.userRoleDiv ul.descList li {
+			display: inline-block;
+		}
+
+			.userRoleDiv ul.descList li + li:before {
+				padding: 3px;
+				color: #c9c9c9;
+				content: "|";
+			}
+
+			.userRoleDiv ul.descList li label {
+				font-size: 12px;
+				color: black;
+			}
+
+			.userRoleDiv ul.descList li span {
+				font-weight: 600;
+			}
+
+
+.ulPermission, .ulPermissionView {
+	padding-left: 0px;
+	border-bottom: 1px dashed #bdbdbd;
+}
+
+	.ulPermission > li, .ulPermissionView > li {
+		display: inline-block;
+		margin-right: 10px;
+	}
+
+		.ulPermissionView > li label {
+			background: black;
+			color: white;
+			padding: 5px 15px;
+			font-size: 10px;
+			border-radius: 10px;
+			margin-bottom: 10px;
+		}
+
+
+label.subLabel {
+	font-size: 14px;
+	font-weight: 600;
+	color: #323232;
+	margin-bottom: 15px;
+}
+
+.ulPermission > li > label {
+	font-size: 14px;
+	color: #323232;
+}
+
+.btnShowHide {
+	font-size: 20px;
+	color: black;
+}
+
+	.btnShowHide:hover, .btnShowHide:focus {
+		color: black;
+	}
+
+tr.unread {
+	background: #f1f1f1;
+	font-weight: 600;
+}
+
+.preWrap {
+	white-space: pre-wrap;
+}
+
+.messageSender {
+	margin-bottom: 0px;
+	font-size: 12px;
+	font-weight: 600;
+	color: #000000;
+}
+
+	.messageSender i {
+		font-size: 15px;
+	}
+
+	.messageSender span {
+		border-left: 1px solid #cecece;
+		padding-left: 5px;
+		margin-left: 5px;
+	}
+
+.messageTimestamp {
+	margin-bottom: 0px;
+	float: right;
+	font-size: 12px;
+	margin-top: 5px;
+}
+
+.messageContent {
+	background: #f1f1f1;
+	padding: 15px 10px;
+	font-size: 12px;
+	color: black;
+	border-radius: 10px;
+}
+
+.messageBottom label {
+	display: block;
+	font-size: 12px;
+	color: black;
+	margin-bottom: 0px;
+}
+
+	.messageBottom label span {
+		font-weight: 600;
+	}
+
+
+/*---------------------------------*/
+/*---- CONTENT MANAGEMENT PAGE ----*/
+/*---------------------------------*/
+.catTitle {
+	font-size: 12px;
+	font-weight: 600;
+	color: black;
+}
+
+.viewContentTitle {
+	font-size: 20px;
+	font-weight: 600;
+	margin-top: 15px;
+	display: block;
+	font-family: arial, sans-serif;
+	color: black;
+}
+
+.viewContentDesc {
+	font-size: 12px;
+}
+
+	.viewContentDesc ul,
+	.viewContentDesc ol {
+		padding-left: 15px;
+	}
+
+	.viewContentDesc li {
+		margin-bottom: 10px;
+		color: black;
+	}
+
+.filesDiv {
+	border-radius: 10px;
+	height: 100%;
+	text-align: center;
+	padding: 20px 5px;
+	border-right: 1px solid #dbdbdb;
+	border-left: 1px solid #dbdbdb;
+}
+
+	.filesDiv > i {
+		font-size: 50px;
+		color: #a7a7a7;
+		margin-bottom: 10px;
+	}
+
+	.filesDiv > label {
+		display: block;
+		font-size: 10px;
+		color: black;
+		font-weight: 600;
+	}
+
+
+.frmInputFile {
+	font-size: 12px !important;
+	background: #ffffff !important;
+	margin-bottom: 10px;
+	height: 38px;
+}
+
+
+/*---------------------------------*/
+/*----------- JOB POSTING ---------*/
+/*---------------------------------*/
+.jobDiv {
+	border-radius: 10px;
+	padding: 10px 10px 5px 10px;
+	background: white;
+}
+
+	.jobDiv div.published {
+		background: #c1f4c5;
+	}
+
+	.jobDiv div.delisted {
+		background: #ffd3d3;
+	}
+
+	.jobDiv .jobDivBody {
+		text-align: center;
+		padding-top: 20px;
+		background: white;
+		padding-bottom: 20px;
+		border-radius: 5px;
+	}
+
+.jobDivBody:hover {
+	transform: scale(0.99);
+	-webkit-transition: all .5s;
+	-moz-transition: all .5s;
+	-o-transition: all .5s;
+	transition: all .5s;
+}
+
+.jobDivBody .jobCategory {
+	display: block;
+	font-size: 12px;
+	color: black;
+	cursor: pointer !important;
+}
+
+.jobDivBody .jobPosition {
+	color: black;
+	font-weight: 600;
+	font-size: 14px;
+	margin-bottom: 0px;
+	cursor: pointer !important;
+}
+
+.jobDiv .countDiv {
+	margin-top: 30px;
+}
+
+	.jobDiv .countDiv label {
+		display: block;
+		font-size: 12px;
+		cursor: pointer !important;
+	}
+
+	.jobDiv .countDiv div.numbers {
+		font-size: 50px;
+		display: inline-block;
+		background: #ffffff;
+		color: #525252;
+		width: 100px;
+		height: 100px;
+		border-radius: 50%;
+		padding-top: 10px;
+		margin-bottom: 10px;
+	}
+
+	.jobDiv .countDiv a.numbers:hover,
+	.jobDiv .countDiv a.numbers:focus {
+		color: black
+	}
+
+.jobDiv .location {
+	font-size: 12px;
+	font-weight: 600;
+	color: black;
+	cursor: pointer !important;
+}
+
+.jobDiv .employement {
+	font-size: 12px;
+	border-left: 1px solid #898989;
+	padding-left: 5px;
+	font-weight: 600;
+	color: black;
+	cursor: pointer !important;
+}
+
+
+.jobDiv .jobDivFooter {
+	padding: 5px;
+	background: white;
+}
+
+	.jobDiv .jobDivFooter .statusDiv {
+		margin-top: -5px;
+		float: left;
+	}
+
+		.jobDiv .jobDivFooter .statusDiv label {
+			font-size: 12px;
+			margin-top: 10px;
+			font-weight: 600;
+		}
+
+			.jobDiv .jobDivFooter .statusDiv label i.published {
+				color: #4edf52;
+			}
+
+			.jobDiv .jobDivFooter .statusDiv label i.delisted {
+				color: #df4e4e;
+			}
+
+	.jobDiv .jobDivFooter .menu {
+		text-align: right;
+	}
+
+.btnAction {
+	background: none;
+	border: none;
+	color: #848484;
+}
+
+	.btnAction:hover, .btnAction:focus {
+		color: black;
+	}
+
+.actionMenu {
+	padding: 5px;
+}
+
+	.actionMenu a {
+		padding: 5px;
+		color: gray;
+		font-size: 12px;
+		cursor: pointer;
+	}
+
+.inputGroupIcon {
+	background: #f1f1f1;
+	color: black;
+	min-width: 50px;
+	text-align: center;
+}
+
+	.inputGroupIcon i {
+		margin: auto;
+	}
+
+.btnAttachedFile {
+	background: #3c3c3c;
+	color: white;
+	padding: 0px 10px;
+	display: inline-block;
+	border-radius: 5px;
+}
+
+	.btnAttachedFile:hover,
+	.btnAttachedFile:focus {
+		background: black;
+		color: white;
+	}
+
+.uploadedFile {
+	font-size: 12px;
+	padding: 2px 10px;
+	background: #163159;
+	color: white;
+	border-radius: 5px;
+}
+
+	.uploadedFile:hover,
+	.uploadedFile:focus {
+		background: #1e447c;
+		color: white;
+	}
+
+label.fileRequirements {
+	font-size: 12px;
+	color: #000000;
+	margin-bottom: 0px;
+	display: block;
+}
+
+.materialsDiv {
+	padding: 10px;
+	background: #ffffff;
+	border: 1px solid #c5c5c5;
+	border-radius: 10px;
+}
+
+	.materialsDiv label.description {
+		font-size: 12px;
+		font-weight: 600;
+		color: black;
+		padding-bottom: 10px;
+	}
+
+button.btnAddMaterial {
+	font-size: 12px;
+	background: black;
+	color: white;
+	border: none;
+	float: right;
+}
+
+
+	button.btnAddMaterial:hover,
+	button.btnAddMaterial:focus {
+		background: #1a1a1a;
+	}
+
+button.btnRemoveMaterial {
+	background: white;
+	width: 100%;
+	color: #f76868;
+	margin-top: 30px;
+	height: 40px;
+	border: 1px solid #d1d3e2;
+}
+
+	button.btnRemoveMaterial:hover,
+	button.btnRemoveMaterial:focus {
+		color: red;
+	}
+
+.radioBtn {
+	margin-top: 10px;
+}
+
+.attachmentLabel {
+	font-size: 12px;
+	margin-bottom: 0px;
+	margin-top: 10px;
+	font-weight: 600;
+	color: black;
+}
+
+.tblMaterials .tblSpan {
+	font-size: 12px;
+	line-height: 2.5;
+	background: #eff8ff;
+}
+
+.sticky-col {
+	position: -webkit-sticky !important;
+	position: sticky !important;
+	background: white !important;
+	z-index: 10;
+	font-weight: 600;
+	border: 1px solid #e3e6f0 !important;
+}
+
+.first-col {
+	min-width: 100px;
+	left: 0px;
+}
+
+.last-col {
+	min-width: 50px;
+	right: 0px;
+}
+
+#invitationModal .modal-body {
+	background: #f1f1f1;
+}
+
+.dropdown-menu {
+	min-width: 180px !important;
+}
+
+	.dropdown-menu li {
+		font-size: 12px;
+	}
+
+		.dropdown-menu li:hover,
+		.dropdown-menu li:focus {
+			background: #f1f1f1;
+		}
+
+		.dropdown-menu li a {
+			width: 100%;
+			display: block;
+			padding: 5px 10px;
+		}
+
+	.dropdown-menu .divider {
+		padding: 0px;
+		height: 1px;
+		margin: 9px 0;
+		overflow: hidden;
+		background-color: #e5e5e5;
+	}
+
+#responseMessage .responseSuccess {
+	background: #cfffd5;
+	color: black;
+	font-size: 12px;
+	margin-top: 10px;
+	border-radius: 5px;
+	padding: 8px 10px;
+	border: 1px solid #cfcfcf;
+}
+
+#responseMessage .responseError {
+	background: #ffdddd;
+	color: black;
+	font-size: 12px;
+	margin-top: 10px;
+	border-radius: 5px;
+	padding: 8px 10px;
+	border: 1px solid #cfcfcf;
+}
+
+.applicationStatus {
+	padding: 5px 10px;
+	font-size: 10px;
+	border-radius: 30px;
+}
+
+.applicationLogs {
+	padding-left: 0px;
+	max-height: 150px;
+	overflow: hidden;
+	overflow-y: auto;
+}
+
+	.applicationLogs li {
+		list-style: none;
+		border-bottom: 1px solid #f1f1f1;
+		margin-bottom: 5px;
+	}
+
+		.applicationLogs li label {
+			font-size: 12px;
+			color: #000000;
+		}
+
+			.applicationLogs li label span.date {
+				font-weight: 600;
+				color: #26b026;
+				border-right: 1px solid #e5e5e5;
+				padding-right: 5px;
+			}
+
+.btnAddMore {
+	background: white;
+	font-size: 12px;
+	color: black;
+	border: 1px solid #ececec;
+	padding: 5px 10px;
+	margin-left: 5px;
+}
+
+	.btnAddMore:hover, .btnAddMore:focus {
+		background: black;
+		color: white;
+	}
+
+.btnRemove {
+	background: #ff7a7a;
+	color: white;
+	width: 100%;
+}
+
+	.btnRemove:hover, .btnRemove:focus {
+		background: #e33f3f;
+		color: white;
+	}
+
+.topLabelText {
+	font-size: 14px;
+	color: black;
+	font-weight: 600;
+	margin-bottom: 0px;
+	margin-top: 10px;
+	padding-bottom: 5px;
+	border-bottom: 1px solid #e5e5e5;
+	width: 100%;
+}
+
+.bottomLabelText {
+	font-size: 10px;
+	width: 100%;
+	text-align: center;
+	margin-bottom: 0px;
+	display: block;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.borderDashed {
+	border: 1px dashed #dfe0e2;
+	margin-top: 1rem;
+	margin-bottom: 1rem;
+}
+
+.dashboardHeader {
+	padding: 40px 25px;
+	height: 200px;
+	background: #e1f1fb;
+	margin-top: -1.5rem !important;
+	color: black;
+}
+
+	.dashboardHeader label {
+		margin-bottom: 5px;
+		font-size: 22px;
+		font-weight: 600;
+	}
+
+	.dashboardHeader p {
+		font-size: 14px;
+	}
+
+
+.employeeProfile {
+	text-align: center;
+}
+
+	.employeeProfile .status {
+		width: 10px;
+		height: 10px;
+		display: inline-block;
+		margin-right: 5px;
+		border-radius: 50%;
+	}
+
+	.employeeProfile i {
+		font-size: 60px;
+		margin-bottom: 20px;
+		margin-top: 20px;
+		color: #bfbfbf;
+		-webkit-transition: all .5s;
+		-moz-transition: all .5s;
+		-o-transition: all .5s;
+		transition: all .5s;
+	}
+
+		.employeeProfile i:hover,
+		.employeeProfile i:focus {
+			color: #6e6e6e;
+		}
+
+	.employeeProfile img {
+		width: 150px;
+		height: 150px;
+		display: block;
+		margin: auto;
+		margin-bottom: 10px;
+		border-radius: 50%;
+		border: 1px solid #ebebeb;
+		-webkit-transition: all .5s;
+		-moz-transition: all .5s;
+		-o-transition: all .5s;
+		transition: all .5s;
+	}
+
+		.employeeProfile img:hover,
+		.employeeProfile img:focus {
+			padding: 5px;
+		}
+
+	.employeeProfile .id {
+		margin-bottom: 0px;
+		font-size: 12px;
+		font-weight: 600;
+		background: #000000;
+		color: white;
+		padding: 3px 10px;
+		margin-left: -10px;
+		border-radius: 0px 5px 5px 0px;
+		box-shadow: 2px 2px 10px 0px #707070;
+	}
+
+	.employeeProfile .name {
+		font-size: 16px;
+		margin-bottom: 5px;
+		display: block;
+		font-weight: 600;
+		padding: 0px 10px;
+	}
+
+	.employeeProfile .position {
+		font-size: 12px;
+		color: black;
+		margin-bottom: 0px;
+		display: block;
+		font-weight: 600;
+	}
+
+	.employeeProfile .department {
+		font-size: 12px;
+		color: #b3b3b3;
+	}
+
+
+.announcementDiv {
+	background: white;
+	color: black;
+	padding: 10px;
+	border-radius: 10px;
+	margin: -60px 0px 20px 0px;
+}
+
+.announcementInfo {
+	text-align: left;
+	background: #f1f1f1;
+	padding: 20px;
+	border-radius: 10px;
+}
+
+.announcementDiv .date {
+	font-size: 10px;
+	background: black;
+	padding: 5px 10px;
+	color: white;
+	border-radius: 5px;
+	margin-bottom: 5px;
+	font-weight: 600;
+}
+
+.announcementDiv .title {
+	display: block;
+	color: #2d4598;
+	font-size: 22px;
+	margin-bottom: 5px;
+	font-weight: 600;
+}
+
+.announcementDiv .desc {
+	font-size: 12px;
+	color: #252525;
+	margin-bottom: 0px;
+	height: 100px;
+	overflow-y: auto;
+}
+
+
+.announcementInfo .noAnnouncement {
+}
+
+	.announcementInfo .noAnnouncement .title {
+	}
+
+	.announcementInfo .noAnnouncement .desc {
+	}
+
+
+.announcementDiv img {
+	width: 250px;
+}
+
+
+.bdayList {
+	margin-bottom: 0px;
+	margin-top: 10px;
+	overflow-y: auto;
+	height: 280px;
+	background: #f1f1f1;
+	padding: 10px;
+	border-radius: 10px;
+}
+
+	.bdayList li {
+		list-style: none;
+		display: block;
+		background: white;
+		color: black;
+		padding: 10px;
+		font-weight: 600;
+		border-radius: 5px;
+		text-align: left;
+		margin-bottom: 5px;
+	}
+
+		.bdayList li .date {
+			margin-bottom: 0px;
+			margin-right: 5px;
+			background: linear-gradient(0deg, #0c9d69, #26eca5);
+			padding: 2px 10px;
+			border-radius: 10px;
+			color: white;
+			font-size: 10px;
+		}
+
+		.bdayList li .name {
+			margin-bottom: 0px;
+			font-size: 12px;
+		}
+
+.timeAttendance {
+	text-align: center;
+}
+
+	.timeAttendance .timeDiv {
+		background: #f1f1f1;
+		padding: 10px;
+		border-radius: 10px;
+	}
+
+	.timeAttendance .time {
+		display: block;
+		font-size: 25px;
+		font-weight: 600;
+		color: black;
+		margin-bottom: 0px;
+	}
+
+	.timeAttendance .title {
+		font-size: 12px;
+		font-weight: 600;
+		color: #4e4e4e;
+	}
+
+.EMProfileDiv {
+	text-align: center;
+}
+
+	.EMProfileDiv .employeeType {
+		position: absolute;
+		top: 0;
+		left: 0;
+		background: #000000;
+		font-size: 10px;
+		color: white;
+		padding: 5px 10px;
+		border-radius: 5px 0px;
+	}
+
+	.EMProfileDiv img.profilePic {
+		width: 150px;
+		border-radius: 50%;
+		background: white;
+		display: block;
+		margin: auto;
+		margin-bottom: 10px;
+		border: 1px solid #f1f1f1;
+	}
+
+	.EMProfileDiv button.editPhotoBtn {
+		background: white;
+		border: 1px solid #e7eced;
+		border-radius: 50%;
+		font-size: 12px;
+		color: black;
+		width: 40px;
+		height: 40px;
+		position: absolute;
+		margin-top: 100px;
+		right: 60px;
+		-webkit-transition: all .5s;
+		-moz-transition: all .5s;
+		-o-transition: all .5s;
+		transition: all .5s;
+	}
+
+
+		.EMProfileDiv button.editPhotoBtn:hover,
+		.EMProfileDiv button.editPhotoBtn:focus {
+			box-shadow: 0px 0px 10px 0px #2a56e6;
+		}
+
+
+	.EMProfileDiv label.employeeNo {
+		font-size: 22px;
+		font-weight: 600;
+		color: #213884;
+		margin-bottom: 10px;
+	}
+
+	.EMProfileDiv label.employeeName {
+		font-size: 14px;
+		font-weight: 600;
+		color: #1c1c1c;
+		margin-bottom: 0px;
+		display: block;
+	}
+
+	.EMProfileDiv label.employeePosition {
+		font-size: 14px;
+		color: #adaaaa;
+		margin-bottom: 0px;
+	}
+
+
+	.EMProfileDiv .ULBasicInfo {
+		text-align: left;
+		padding-left: 0px;
+	}
+
+		.EMProfileDiv .ULBasicInfo li {
+			list-style: none;
+			margin-bottom: 15px;
+		}
+
+			.EMProfileDiv .ULBasicInfo li label:first-child {
+				margin-bottom: 0px;
+				font-size: 12px;
+			}
+
+			.EMProfileDiv .ULBasicInfo li label:nth-of-type(2n) {
+				font-size: 12px;
+				color: black;
+				display: block;
+			}
+
+
+.noDataDiv {
+	text-align: center;
+	color: #4a4a4a;
+}
+
+
+	.noDataDiv img {
+		width: 150px;
+		display: block;
+		margin: auto;
+		margin-bottom: 20px;
+	}
+
+	.noDataDiv label {
+		font-size: 30px;
+		font-weight: 600;
+	}
+
+	.noDataDiv p {
+		font-size: 14px;
+		margin-bottom: 0px;
+	}
+
+.carouselIndicators {
+	position: relative;
+	float: right;
+	margin: auto;
+	bottom: 10px;
+}
+
+	.carouselIndicators li {
+		height: 10px;
+		width: 10px;
+		border-radius: 50%;
+		background-color: white;
+		border: 1px solid black;
+	}
+
+	.carouselIndicators .active {
+		background-color: #536dfe;
+	}
+
+
+.viewDetailsTbl {
+	font-size: 12px;
+	color: black;
+}
+
+.viewDetailsTblWFH th {
+	font-size: 12px;
+	color: black;
+	width: 150px; /* fixed width for labels */
+	text-align: left;
+	vertical-align: top;
+	white-space: nowrap;
+}
+
+.viewDetailsTblWFH td {
+	font-size: 12px;
+	color: black;
+	vertical-align: top;
+}
+
+
+.deptDiv {
+	text-align: center;
+}
+
+	.deptDiv i.deptIcon {
+		font-size: 60px;
+		margin-bottom: 20px;
+		margin-top: 20px;
+		display: block;
+		color: #bfbfbf;
+		-webkit-transition: all .5s;
+		-moz-transition: all .5s;
+		-o-transition: all .5s;
+		transition: all .5s;
+	}
+
+
+	.deptDiv label.title {
+		font-size: 18px;
+		font-weight: 600;
+		color: #213884;
+		margin-bottom: 0px;
+	}
+
+	.deptDiv label.desc {
+		font-size: 12px;
+		color: #1c1c1c;
+		margin-bottom: 0px;
+		display: block;
+	}
+
+	.deptDiv .ULBasicInfo {
+		text-align: left;
+		padding-left: 0px;
+	}
+
+		.deptDiv .ULBasicInfo li {
+			list-style: none;
+			margin-bottom: 15px;
+		}
+
+			.deptDiv .ULBasicInfo li label button {
+				padding: 2px 5px;
+				border-radius: 10px;
+				font-size: 10px;
+				font-weight: 100;
+				margin-left: 5px;
+			}
+
+			.deptDiv .ULBasicInfo li label:first-child {
+				margin-bottom: 0px;
+				font-size: 14px;
+			}
+
+			.deptDiv .ULBasicInfo li label:nth-of-type(2n) {
+				font-size: 14px;
+				color: black;
+				display: block;
+				font-weight: 600;
+			}
+
+.notificationDiv .title {
+	color: #323232;
+	font-weight: 600;
+	font-size: 18px;
+}
+
+.notificationDiv .message {
+	font-size: 12px;
+	color: #323232;
+}
+
+.notificationDiv .senderDiv {
+	margin-top: 50px;
+	padding: 15px 0px;
+	font-size: 12px;
+	color: #323232;
+	border-top: 1px solid #dedfe2;
+}
+
+	.notificationDiv .senderDiv label {
+		display: block;
+	}
+
+.headerNotifDiv {
+	overflow: auto;
+	max-height: 400px;
+}
+
+.divTimeClock {
+	text-align: center;
+	margin-bottom: 30px;
+}
+
+	.divTimeClock i {
+		display: block;
+		margin: auto;
+		font-size: 80px;
+		margin-bottom: 20px;
+		color: #4e73df;
+	}
+
+	.divTimeClock label {
+		font-size: 14px;
+		color: black;
+		font-weight: 600;
+	}
+
+	.divTimeClock #clock {
+		text-align: center;
+		font-size: 30px;
+		font-weight: 600;
+		background: #f1f1f1;
+		color: black;
+		border-radius: 50px;
+		padding: 10px;
+	}

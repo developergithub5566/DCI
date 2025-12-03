@@ -1,0 +1,67 @@
+﻿<link href="~/css/login-custom.css" rel="stylesheet" />
+
+@{
+	ViewData["Title"] = "Login";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<body>
+
+
+	<div class="loginBG">
+		<div class="gap gap-lg"></div>
+		<div class="container">
+			<div class="row">
+				<div class="offset-xl-4 offset-lg-3 offset-md-2 offset-1 col-xl-4 col-lg-6 col-md-8 col-10">				
+					<div class="companyLogo">
+						<div>
+							<img src="~/icon/dci_logo_ultra_pro.png" />
+						</div>
+					</div>
+					<div class="loginDiv">
+						<label class="title">Welcome!</label>
+						<p class="desc">Please sign in to your account to continue.</p>
+
+						<form asp-action="Login" method="post" id="LoginAccess" onsubmit="showLoading()">
+							<div class="form-group">
+								<input type="text" class="form-control inputLogin" id="email" name="email" placeholder="Email" required>
+							</div>
+							<br />
+							<div class="form-group">
+								<input type="password" class="form-control inputLogin" id="password" name="password" placeholder="Password" required>
+							</div>
+
+							<a asp-controller="Account" asp-action="ForgotPassword"> Forgot Password? </a>
+							<div class="text-center mt-3">
+								<button type="submit" id="LoginBtn" class="btn btn-primary btn-block w-100">Sign in</button>
+
+								<button type="submit" id="LoginLoading" class="btn btn-primary btn-block w-100 d-none" disabled>
+									<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+									<span>Signing in...</span>
+								</button>
+							</div>
+
+						</form>
+
+						@if (ViewBag.Message != null)
+						{
+							<span style="color:red;">@ViewBag.Message.ToString()</span>
+						}				
+
+					</div>
+					<div class="copyrights">
+						<label>&copy; @DateTime.Now.Year DBP Data Center Inc.</label>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>
+
+
+<script>
+	function showLoading() {
+		document.getElementById('LoginBtn').classList.add('d-none');
+		document.getElementById('LoginLoading').classList.remove('d-none');
+	}
+</script>							
