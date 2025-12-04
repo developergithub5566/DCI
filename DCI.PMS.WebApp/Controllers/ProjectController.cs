@@ -8,5 +8,20 @@ namespace DCI.PMS.WebApp.Controllers
         {
             return View();
         }
+
+        public IActionResult CreateEdit()
+        {
+            return View();
+        }
+
+        public IActionResult Milestone()
+        {
+            return View();
+        }
+
+        public IActionResult Deliverables()
+        {
+            return View();
+        }
     }
 }
