@@ -888,6 +888,45 @@ button.btnRemoveMaterial {
 			font-size: 12px;
 		}
 
+
+.officeOrderList {
+	margin-bottom: 0px;
+	margin-top: 10px;
+	overflow-y: auto;
+	height: 100px;
+	background: #f1f1f1;
+	padding: 10px;
+	border-radius: 10px;
+}
+
+	.officeOrderList li {
+		list-style: none;
+		display: block;
+		background: white;
+		color: black;
+		padding: 10px;
+		font-weight: 600;
+		border-radius: 5px;
+		text-align: left;
+		margin-bottom: 5px;
+	}
+
+		.officeOrderList li .date {
+			margin-bottom: 0px;
+			margin-right: 5px;
+			background: linear-gradient(0deg,#0c159d, #26eca5);
+			padding: 2px 10px;
+			border-radius: 10px;
+			color: white;
+			font-size: 8px;
+		}
+
+		.officeOrderList li .name {
+			margin-bottom: 0px;
+			font-size: 12px;
+		}
+
+
 .timeAttendance {
 	text-align: center;
 }
