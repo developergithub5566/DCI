@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using DCI.Repositories.Interface;
 using DCI.API.Service;
 using System.Configuration;
+using System.Data;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -54,6 +55,7 @@ builder.Services.AddScoped<IHolidayRepository, HolidayRepository>();
 builder.Services.AddScoped<IUndertimeRepository, UndertimeRepository>();
 builder.Services.AddScoped<IPositionRepository, PositionRepository>();
 builder.Services.AddScoped<ILateRepository, LateRepository>();
+builder.Services.AddScoped<IOfficeOrderRepository, OfficeOrderRepository>();
 
 builder.Services.Configure<SMTPModel>(builder.Configuration.GetSection("SmtpSettings"));
 builder.Services.AddSingleton<AuthenticationModel>();
@@ -73,7 +75,6 @@ var app = builder.Build();
 
 //app.UseUserContext();
 //app.UseMiddleware<UserContextMiddleware>();
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

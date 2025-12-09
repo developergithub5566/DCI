@@ -54,7 +54,8 @@ namespace DCI.Core.Common
         DTRCorrection = 23,
         Late = 24,
         TriggerLeaveCreditProcess = 25,
-        LeaveManagement = 26
+        LeaveManagement = 26,
+        OfficeOrder = 27
     }
 
     public enum EnumRole

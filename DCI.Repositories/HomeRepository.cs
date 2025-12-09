@@ -33,8 +33,8 @@ namespace DCI.Repositories
             {
                // DashboardViewModel model = new DashboardViewModel();                             
 
-                model.AnnouncementList = (from announce in _dbContext.Announcement
-                                          join usr in _dbContext.User on announce.CreatedBy equals usr.UserId 
+                model.AnnouncementList = (from announce in _dbContext.Announcement.AsNoTracking()
+                                          join usr in _dbContext.User.AsNoTracking() on announce.CreatedBy equals usr.UserId 
                                           where announce.IsActive == true && announce.Status == (int)EnumStatus.Active
                                           select new AnnouncementViewModel
                                           {
@@ -50,6 +50,19 @@ namespace DCI.Repositories
                                               IsActive = announce.IsActive,
                                               CreatedName = usr.Fullname, // .Firstname + " " + usr.Lastname
                                           }).ToList();
+
+                model.OfficeOrderList = (from oo in _dbContext.OfficeOrder.AsNoTracking()                      
+                                          where oo.IsActive == true
+                                          select new OfficeOrderViewModel
+                                          {
+                                              OfficeOrderId = oo.OfficeOrderId,
+                                              OrderName = oo.OrderName,
+                                              OrderDate = oo.OrderDate,
+                                              Description = oo.Description,
+                                              Filename = oo.Filename,
+                                              FilePath = oo.FilePath,                                       
+                                          }).ToList();
+
 
                 int _currentMonth = DateTime.Now.Month;
 

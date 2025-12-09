@@ -52,6 +52,7 @@ namespace DCI.Data
         public DbSet<LateDetail> LateDetail { get; set; }
         public DbSet<WorkLocation> WorkLocation { get; set; }
         public DbSet<LeaveCredits> LeaveCredits { get; set; }
+        public DbSet<OfficeOrder> OfficeOrder { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

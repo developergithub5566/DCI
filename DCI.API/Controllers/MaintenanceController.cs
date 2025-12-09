@@ -28,11 +28,12 @@ namespace DCI.API.Controllers
         IEmployeeRepository _employeeRepository;
         IHolidayRepository _holidayRepository;
         IPositionRepository _positionRepository;
+        IOfficeOrderRepository _officeOrderRepository;
 
         public MaintenanceController(IModulePageRepository modulePageRepository, IModuleInRoleRepository moduleInRoleRepository,
             IRoleRepository roleRepository, IUserRepository userRepository, IDepartmentRepository DepartmentRepository, IEmploymentTypeRepository employmentTypeRepository,
             IUserRoleRepository userRoleRepository, IAuditLogRepository auditLogRepository, IAnnouncementRepository announcementRepository,IEmailRepository emailRepository,
-            IEmployeeRepository employeeRepository, IHolidayRepository holidayRepository, IPositionRepository positionRepository)
+            IEmployeeRepository employeeRepository, IHolidayRepository holidayRepository, IPositionRepository positionRepository, IOfficeOrderRepository officeOrderRepository)
         {
             this._userRepository = userRepository;
             this._moduleInRoleRepository = moduleInRoleRepository;
@@ -48,6 +49,7 @@ namespace DCI.API.Controllers
             this._employeeRepository = employeeRepository;
             _holidayRepository = holidayRepository;
             _positionRepository = positionRepository;
+            _officeOrderRepository = officeOrderRepository;
         }
 
 
@@ -493,6 +495,44 @@ namespace DCI.API.Controllers
         public async Task<IActionResult> DeletePosition([FromBody] PositionViewModel model)
         {
             var result = await _positionRepository.Delete(model);
+            return StatusCode(result.statuscode, result.message);
+        }
+        #endregion
+
+
+        #region OfficeOrder
+
+        [HttpGet]
+        [Route("GetAllOfficeOrder")]
+        public async Task<IActionResult> GetAllOfficeOrder()
+        {
+            return Ok(await _officeOrderRepository.GetAllOfficeOrder());
+        }
+
+        [HttpPost]
+        [Route("GetOfficeOrderById")]
+        public async Task<IActionResult> GetOfficeOrderById([FromBody] OfficeOrderViewModel model)
+        {
+            return Ok(await _officeOrderRepository.GetOfficeOrderById(model.OfficeOrderId));
+        }
+
+        [HttpPost]
+        [Route("SaveOfficeOrder")]
+        public async Task<IActionResult> SaveOfficeOrder([FromBody] OfficeOrderViewModel model)
+        {
+            if (await _officeOrderRepository.IsExistsOfficeOrder(model.OfficeOrderId) && model.OfficeOrderId == 0)
+            {
+                return NotFound("Office order already exists");
+            }
+
+            var result = await _officeOrderRepository.Save(model);
+            return StatusCode(result.statuscode, result.message);
+        }
+        [HttpPost]
+        [Route("DeleteOfficeOrder")]
+        public async Task<IActionResult> DeleteOfficeOrder([FromBody] OfficeOrderViewModel model)
+        {
+            var result = await _officeOrderRepository.Delete(model);
             return StatusCode(result.statuscode, result.message);
         }
         #endregion

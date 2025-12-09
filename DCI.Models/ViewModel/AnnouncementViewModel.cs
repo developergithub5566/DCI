@@ -39,5 +39,6 @@
         public string LAST_OUT { get; set; } = string.Empty;
         public List<AnnouncementViewModel> AnnouncementList { get; set; } = new();
         public List<BirthdayViewModel> BirthdayList { get; set; } = new();
+        public List<OfficeOrderViewModel> OfficeOrderList { get; set; } = new();
     }
 }
