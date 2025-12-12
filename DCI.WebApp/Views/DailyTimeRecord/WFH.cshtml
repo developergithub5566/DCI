@@ -964,7 +964,7 @@
                         }
 
 
-                                            function realTime() {
+                function realTime() {
 
                     var date = new Date();
                     var hour = date.getHours();
@@ -990,7 +990,18 @@
 
 
                                     function submitTimeClock(e) {
-                                                  
+                                             
+                                                   
+                                                   // navigator.geolocation.getCurrentPosition(function(pos) {
+                                                   //    var geo  = {
+                                                   //        Latitude: pos.coords.latitude,
+                                                   //        Longitude: pos.coords.longitude
+                                                   //    };     
+                                                     
+                                                     
+                                                   //   // console.log(geo.Latitude , geo.Longitude)
+                                                   // });
+
 
                                                     var formData = $(this).serialize();
 
@@ -1031,7 +1042,7 @@
                                                                 icon: "error"
                                                             });
                                                         }
-                                                    });
+                                                    }); 
                                   }
 
 

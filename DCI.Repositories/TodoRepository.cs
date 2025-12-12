@@ -488,32 +488,59 @@ namespace DCI.Repositories
                 await _dbContext.SaveChangesAsync();
 
                 var _user = _dbContext.User.AsNoTracking().Where(x => x.UserId == param.CreatedBy).FirstOrDefault();
+                var contextHdr = _dbContext.DTRCorrection.Where(x => x.DtrId == param.TransactionId).FirstOrDefault();
 
-                var contextHdr = _dbContext.DTRCorrection.AsNoTracking().Where(x => x.DtrId == param.TransactionId).FirstOrDefault();
+                var empwrk = _dbContext.EmployeeWorkDetails.Where(x => x.EmployeeId == contextHdr.EmployeeId).FirstOrDefault();
+
+                var emp = _dbContext.Employee.Where(x => x.EmployeeId == contextHdr.EmployeeId).FirstOrDefault();
+
+                if (empwrk != null && empwrk.WorkLocation == (int)EnumWorkLocation.MO)
+                {
+                    tbl_raw_logs raw_logs = new tbl_raw_logs();
+
+                    var totalCount = await _dbContext.tbl_raw_logs
+                                                        .AsNoTracking()
+                                                        .CountAsync();
+
+                    raw_logs.ID = totalCount + 1;
+                    raw_logs.EMPLOYEE_ID = emp.EmployeeNo;
+                    raw_logs.FULL_NAME = emp.Firstname + " " + emp.Lastname;
+                    raw_logs.DATE_TIME = contextHdr.DtrDateTime;
+                    raw_logs.CREATED_DATE = DateTime.Now;
+                    raw_logs.CREATED_BY = Constants.SYSAD;
+                    raw_logs.STATUS = (int)EnumStatus.Raw;
+                    await _dbContext.tbl_raw_logs.AddAsync(raw_logs);
+                    await _dbContext.SaveChangesAsync();
+
+                    contextHdr.Status = param.Status;
+                    contextHdr.RawLogsId = raw_logs.ID;
+                    _dbContext.DTRCorrection.Entry(contextHdr).State = EntityState.Modified;
+                    _dbContext.SaveChanges();
+                }
+                else
+                {   
+                    tbl_wfh_logs wfh_logs = new tbl_wfh_logs();
+                    var totalCount = await _dbContext.tbl_wfh_logs.AsNoTracking().CountAsync();
+
+                  //  wfh_logs.ID = totalCount + 1;
+                    wfh_logs.EMPLOYEE_ID = emp.EmployeeNo;
+                    wfh_logs.FULL_NAME = emp.Firstname + " " + emp.Lastname;
+                    wfh_logs.DATE_TIME = contextHdr.DtrDateTime;
+                    wfh_logs.CREATED_DATE = DateTime.Now;
+                    wfh_logs.CREATED_BY = Constants.SYSAD;
+                    wfh_logs.STATUS = (int)EnumStatus.Draft;
+                    await _dbContext.tbl_wfh_logs.AddAsync(wfh_logs);
+                    await _dbContext.SaveChangesAsync();
+
+                    contextHdr.Status = param.Status;
+                    contextHdr.RawLogsId = wfh_logs.ID;
+                    _dbContext.DTRCorrection.Entry(contextHdr).State = EntityState.Modified;
+                    _dbContext.SaveChanges();
+                }
 
 
-                var totalCount = await _dbContext.tbl_raw_logs
-                                                    .AsNoTracking()
-                                                    .CountAsync();
 
-                tbl_raw_logs raw_logs = new tbl_raw_logs();
-                raw_logs.ID = totalCount + 1;
-                raw_logs.EMPLOYEE_ID = _user.EmployeeNo;
-                raw_logs.FULL_NAME = _user.Fullname;
-                raw_logs.DATE_TIME = contextHdr.DtrDateTime;
-                raw_logs.CREATED_DATE = DateTime.Now;
-                raw_logs.CREATED_BY = Constants.SYSAD;
-                raw_logs.STATUS = (int)EnumStatus.Raw;
-                await _dbContext.tbl_raw_logs.AddAsync(raw_logs);
-                await _dbContext.SaveChangesAsync();
-
-
-                contextHdr.Status = param.Status;
-                contextHdr.RawLogsId = raw_logs.ID;
-                _dbContext.DTRCorrection.Entry(contextHdr).State = EntityState.Modified;
-                _dbContext.SaveChanges();
-
-                var entitiesToViewModel = await _dtrRepository.DTRCorrectionByDtrId(contextHdr.DtrId);
+                    var entitiesToViewModel = await _dtrRepository.DTRCorrectionByDtrId(contextHdr.DtrId);
 
                 //Send Email Notification to Requestor
                 await _emailRepository.SendToRequestorDTRAdjustment(entitiesToViewModel);

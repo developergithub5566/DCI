@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCI.PMS.Repository", "DCI.P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCI.PMS.WebApp", "DCI.PMS.WebApp\DCI.PMS.WebApp.csproj", "{475B0689-0D59-4613-963F-1FB0927A9582}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCI.PMS.Models", "DCI.PMS.Models\DCI.PMS.Models.csproj", "{16D52825-16D7-4AB8-B46B-5E4D7A722231}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,10 @@ Global
 		{475B0689-0D59-4613-963F-1FB0927A9582}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{475B0689-0D59-4613-963F-1FB0927A9582}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{475B0689-0D59-4613-963F-1FB0927A9582}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16D52825-16D7-4AB8-B46B-5E4D7A722231}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16D52825-16D7-4AB8-B46B-5E4D7A722231}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16D52825-16D7-4AB8-B46B-5E4D7A722231}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16D52825-16D7-4AB8-B46B-5E4D7A722231}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

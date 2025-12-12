@@ -334,5 +334,12 @@ namespace DCI.API.Controllers
             return Ok(await _leaveRepository.GetAllLeaveMangementByEmpId(model));
         }
 
+        [HttpPost]
+        [Route("GetAllLeaveReportForProbitionaryContractual")]
+        public async Task<IActionResult> GetAllLeaveReportForProbitionaryContractual([FromBody] DailyTimeRecordViewModel param)
+        {
+            return Ok(await _leaveRepository.GetAllLeaveReportForProbitionaryContractual(param));
+        }
+       
     }
 }

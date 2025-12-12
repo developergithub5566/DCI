@@ -25,11 +25,11 @@ namespace DCI.WebApp.Controllers
             this._userSessionHelper = userSessionHelper;
             this._documentService = documentService;
         }
-   
+
 
         public async Task<IActionResult> Index(DocumentViewModel param)
         {
-         
+
             ReportGraphsDataViewModel model = new ReportGraphsDataViewModel();
 
             using (var _httpclient = new HttpClient())
@@ -408,7 +408,7 @@ namespace DCI.WebApp.Controllers
                     if (response.IsSuccessStatusCode == true)
                     {
                         model = JsonConvert.DeserializeObject<List<DailyTimeRecordViewModel>>(responseBody)!;
-                    }                
+                    }
                     ViewBag.Fullname = currentUser?.Fullname;
                 }
 
@@ -467,7 +467,7 @@ namespace DCI.WebApp.Controllers
             {
                 Form201ViewModel vm = new Form201ViewModel();
                 using (var _httpclient = new HttpClient())
-                {             
+                {
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Employee/GetEmployeeById");
@@ -530,7 +530,7 @@ namespace DCI.WebApp.Controllers
             {
                 using (var _httpclient = new HttpClient())
                 {
-                    DTRCorrectionViewModel model = new DTRCorrectionViewModel();          
+                    DTRCorrectionViewModel model = new DTRCorrectionViewModel();
 
                     var currentUser = _userSessionHelper.GetCurrentUser();
                     if (currentUser == null)
@@ -574,7 +574,7 @@ namespace DCI.WebApp.Controllers
             try
             {
                 using (var _httpclient = new HttpClient())
-                {      
+                {
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/DTRCorrectionById");
                     request.Content = stringContent;
@@ -702,7 +702,7 @@ namespace DCI.WebApp.Controllers
                     return RedirectToAction("Logout", "Account");
 
                 using (var _httpclient = new HttpClient())
-                {           
+                {
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetOvertimeSummaryAsync");
                     request.Content = stringContent;
@@ -724,7 +724,7 @@ namespace DCI.WebApp.Controllers
                         ViewBag.Fullname = name != null ? $"{name.Firstname} {name.Lastname}" : string.Empty;
                     }
                 }
-               
+
                 return View(model);
             }
             catch (Exception ex)
@@ -822,7 +822,7 @@ namespace DCI.WebApp.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> LeaveDropdown(int filteryear,int employeeId)
+        public async Task<IActionResult> LeaveDropdown(int filteryear, int employeeId)
         {
             LeaveViewModel model = new LeaveViewModel();
             try
@@ -904,7 +904,7 @@ namespace DCI.WebApp.Controllers
         }
 
 
-        public async Task<IActionResult> LateByEmpNo(LateHeaderViewModel param) 
+        public async Task<IActionResult> LateByEmpNo(LateHeaderViewModel param)
         {
             List<LateDetailViewModel> model = new List<LateDetailViewModel>();
 
@@ -913,8 +913,8 @@ namespace DCI.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
-                      if (currentUser == null)
-                    return RedirectToAction("Logout", "Account");
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
                     // param.CurrentUserId = 1;//currentUser.UserId;
 
 
@@ -934,6 +934,43 @@ namespace DCI.WebApp.Controllers
                 }
 
                 return Json(new { success = false, message = "", data = model });
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return View(model);
+        }
+        public async Task<IActionResult> NonRegularLeaveReport(DailyTimeRecordViewModel param)
+        {
+            List<LeaveRequestHeaderViewModel> model = new List<LeaveRequestHeaderViewModel>();
+
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+     
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllLeaveReportForProbitionaryContractual");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode == true)
+                    {
+                        model = JsonConvert.DeserializeObject<List<LeaveRequestHeaderViewModel>>(responseBody)!;
+                    }         
+                    return View(model);
+                }            
 
             }
             catch (Exception ex)

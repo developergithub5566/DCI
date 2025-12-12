@@ -1,4 +1,5 @@
 ﻿using DCI.Models.Configuration;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DCI.Models.Entities
 {
@@ -11,5 +12,9 @@ namespace DCI.Models.Entities
         public DateTime CREATED_DATE {  get; set; }
         public string CREATED_BY { get; set; }
         public int STATUS { get; set; }
+        [Column(TypeName = "decimal(18,10)")]
+        public decimal LATITUDE { get; set; }
+        [Column(TypeName = "decimal(18,10)")]
+        public decimal LONGITUDE { get; set; }
     }
 }

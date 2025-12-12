@@ -80,6 +80,9 @@ namespace DCI.Models.ViewModel
         public string ApproverHead { get; set; } = string.Empty;
         public string EmployeeNo { get; set; } = string.Empty;
         public string ProcessedBy { get; set; } = string.Empty;
+
+        public string EmployeeStatus { get; set; } = string.Empty;
+        public DateTime LeaveDate { get; set; }
     }
 
     public class LeaveRequestDetailViewModel

@@ -10,4 +10,10 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DCI.Models\DCI.Models.csproj" />
+    <ProjectReference Include="..\DCI.PMS.Models\DCI.PMS.Models.csproj" />
+    <ProjectReference Include="..\DCI.PMS.Repository\DCI.PMS.Repository.csproj" />
+  </ItemGroup>
+
 </Project>

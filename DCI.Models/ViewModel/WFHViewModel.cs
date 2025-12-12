@@ -14,8 +14,8 @@
         public int ScopeTypeEmp { get; set; } = 0;
         public string TIME_IN { get; set; } = string.Empty;
         public string DATE { get; set; } = string.Empty;
-        public string Latitude { get; set; } = string.Empty;
-        public string Longitude { get; set; } = string.Empty;
+        public double Latitude { get; set; } = 0;
+        public double Longitude { get; set; } = 0;
     }
 
     public class WfhLogModel

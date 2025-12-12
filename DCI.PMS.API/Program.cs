@@ -1,11 +1,26 @@
+using DCI.Data;
+using DCI.Models.Configuration;
+using DCI.PMS.Repository;
+using DCI.PMS.Repository.Interface;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddDbContext<PMSdbContext>(Options => Options.UseSqlServer(builder.Configuration.GetConnectionString("DCIConnection")));
+
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+
+//builder.Services.Configure<SMTPModel>(builder.Configuration.GetSection("SmtpSettings"));
+//builder.Services.AddSingleton<AuthenticationModel>();
+//builder.Services.Configure<AuthenticationModel>(builder.Configuration.GetSection("Authentication"));
+//builder.Services.Configure<FileModel>(builder.Configuration.GetSection("DocumentStorage"));
+
 
 var app = builder.Build();
 
@@ -21,5 +36,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseDeveloperExceptionPage();
 
 app.Run();

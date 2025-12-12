@@ -234,7 +234,7 @@
                                     <input type="hidden" name="DTR_DATE">
                                     <div class="col-lg-12">
                                         <div class="form-group">
-                                            <label class="frmText"><span class="required">*</span>DTR Date & Time</label>
+                                            <label class="frmText"><span class="required">*</span>DTR Date</label>
                                             <div class="input-group">
                                                 <input type="text" name="dateCovered" id="dateCovered" class="form-control frmField" autocomplete="off" required>
                                                         <div class="input-group-prepend prependBtn" id="calendarIconId">
@@ -244,6 +244,20 @@
                                             <label for="dateCovered" generated="true" class="error"></label>
                                         </div>                                 
                                     </div>
+
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label class="frmText"><span class="required">*</span>DTR Time</label>
+                                        <div class="input-group clockpicker" data-autoclose="true">
+                                            <input type="text" name="dtrTime" id="dtrTime" class="form-control frmField" autocomplete="off" readonly placeholder="24-Hour Format">
+                                            <div class="input-group-prepend prependBtn" id="calendarIconOTTo">
+                                                <i class="fa fa-calendar"></i>
+                                            </div>
+                                        </div>
+                                 
+                                        <label for="dtrTime" generated="true" class="error"></label>
+                                    </div>
+                                </div>
                             
                                     <div class="col-lg-6">
                                         <div class="form-group">
@@ -304,7 +318,8 @@
 
 @section scripts {
 
-
+                <link href="~/js/clockpicker/src/clockpicker.css" rel="stylesheet" />
+                <script src="~/js/clockpicker/src/clockpicker.js"></script>
           
                 <script type="text/javascript">
                         var js = jQuery.noConflict(true);
@@ -317,16 +332,19 @@
 
 
                         $(document).ready(function () {
+                             js('.clockpicker').clockpicker();
+
+                             
 
                                    $('#calendarIconId').on('click', function () {
                                       $('#dateCovered').trigger('click');
                                     });
                                                      $('#calendarIconFrom').on('click', function () {
-                               $('#minDate').trigger('click');
-                    });
-                      $('#calendarIconTo').on('click', function () {
-                               $('#maxDate').trigger('click');
-                    });
+                                                                   $('#minDate').trigger('click');
+                                                        });
+                                      $('#calendarIconTo').on('click', function () {
+                                               $('#maxDate').trigger('click');
+                                    });
 
 
                                             flatpickr("#minDate", {
@@ -432,8 +450,8 @@
 
 
                                      flatpickr("#dateCovered", {
-                                        enableTime: true,
-                                       dateFormat: "Y-m-d H:i",                                     
+                                        enableTime: false,
+                                       dateFormat: "Y-m-d",                                     
                                              time_24hr: true,
                                                  maxDate: new Date().setHours(23, 59, 59, 999), // end of today
                                                onChange: function(selectedDates, dateStr, instance) {
@@ -443,13 +461,39 @@
 
                                     $('#createForm').submit(function (event) {
                                                     event.preventDefault();
-                                                                                                        
+
+                                                    // var _dtrDate = $('#DtrType').val().replace(/\//g, '-');
+                                                    // var _dtrTime = $('#dtrTime').val();
+
+                                                    //              if (_dtrTime.length === 5) {
+                                                    //                 _dtrTime += ":00";
+                                                    //             }
+                                                           
+                                                    //        var dateParts = _dtrDate.split('-');      // ["2025","12","09"]
+                                                    //         var timeParts = _dtrTime.split(':');      // ["13","10"]
+
+                                                    //         var _dateTime = new Date(
+                                                    //             parseInt(dateParts[0]),          // year
+                                                    //             parseInt(dateParts[1]) - 1,      // month index
+                                                    //             parseInt(dateParts[2]),          // day
+                                                    //             parseInt(timeParts[0]),          // hour
+                                                    //             parseInt(timeParts[1]),          // minute
+                                                    //             0                                // seconds
+                                                    //         );
+
                                                         const formData = new FormData();
                                                       formData.append('DtrType', $('#DtrType').val());
                                                        formData.append('DtrDateTime', $('#dateCovered').val());
+                                                      formData.append('TimeIn', $('#dtrTime').val());
                                                         formData.append('Reason', $('#Reason').val());
 
-                                                        console.log(formData)
+
+
+                                                        // console.log($('#dateCovered').val())
+
+                                                        // console.log($('#dtrTime').val())
+
+                                                        // console.log(_dateTime)
 
                                                                Swal.fire({
                                                                    text: "Are you sure you want to submit this record?",
@@ -506,6 +550,8 @@
                                              const my_fp = document.querySelector("#dateCovered")._flatpickr;
                                                  my_fp.clear();
                                                    $('#Reason').val('');
+                                                                    $('#dtrTime').val("");
+
                                                     document.getElementById('deptHeadName').textContent = @Html.Raw(JsonConvert.SerializeObject(ViewBag.ApproverHead));                                                       
                                                        document.getElementById('ApproverLabel').textContent = 'For Approval of:';
                                            

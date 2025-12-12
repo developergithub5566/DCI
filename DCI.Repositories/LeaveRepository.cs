@@ -1078,5 +1078,47 @@ namespace DCI.Repositories
             return model;
         }
 
+        public async Task<IList<LeaveRequestHeaderViewModel>> GetAllLeaveReportForProbitionaryContractual(DailyTimeRecordViewModel param)
+        {
+            var data = (from lheader in _dbContext.LeaveRequestHeader.AsNoTracking()
+                       // join lheader in _dbContext.LeaveRequestHeader.AsNoTracking() on details.LeaveRequestHeaderId equals lheader.LeaveRequestHeaderId
+                        join stat in _dbContext.Status.AsNoTracking() on lheader.Status equals stat.StatusId
+                        join emp in _dbContext.Employee.AsNoTracking() on lheader.EmployeeId equals emp.EmployeeId
+                        join empdtls in _dbContext.EmployeeWorkDetails.AsNoTracking() on emp.EmployeeId equals empdtls.EmployeeId
+                        join empStat in _dbContext.EmployeeStatus.AsNoTracking() on empdtls.EmployeeStatusId equals empStat.EmployeeStatusId                    
+                        join lvtype in _dbContext.LeaveType.AsNoTracking() on lheader.LeaveTypeId equals lvtype.LeaveTypeId
+
+                        where lheader.IsActive 
+                        && empdtls.EmployeeStatusId != (int)EnumEmploymentType.Regular
+                        && empdtls.EmployeeStatusId != (int)EnumEmploymentType.Resigned
+                        && lvtype.LeaveTypeId != (int)EnumLeaveType.OB
+                        && lvtype.LeaveTypeId != (int)EnumLeaveType.HDOB
+                        && lvtype.LeaveTypeId != (int)EnumLeaveType.SPL
+                        && lvtype.LeaveTypeId != (int)EnumLeaveType.VLMon
+                        && lvtype.LeaveTypeId != (int)EnumLeaveType.SLMon
+                        select new LeaveRequestHeaderViewModel
+                        {
+                            LeaveRequestHeaderId = lheader.LeaveRequestHeaderId,
+                            
+                            EmployeeId = lheader.EmployeeId,
+                            RequestNo = lheader.RequestNo,
+                            EmployeeNo = emp.EmployeeNo,
+                            EmployeeName = emp.Firstname + " " + emp.Lastname,
+                            EmployeeStatus = empStat.EmployeeStatusName,
+                            DateFiled = lheader.DateFiled,
+                            LeaveTypeId = lheader.LeaveTypeId,
+                            NoofDays = lheader.NoOfDays,
+                            LeaveName = lvtype.Description,
+                            Status = lheader.Status,
+                            StatusName = stat.StatusName,
+                            Reason = lheader.Reason,
+                            DateModified = lheader.DateModified,
+                            ModifiedBy = lheader.ModifiedBy,
+                            IsActive = lheader.IsActive     
+                        }).OrderByDescending(x => x.LeaveRequestHeaderId).ToList();   
+
+            return data;
+        }
+
     }
 }

@@ -239,4 +239,11 @@ namespace DCI.Core.Common
         HR = 1,
         Admin = 2
     }
+
+    public enum EnumWorkLocation
+    {
+        MO = 1,
+        DBP = 2,
+        HIS = 3
+    }
 }

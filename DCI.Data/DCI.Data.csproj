@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DCI.Models\DCI.Models.csproj" />
+    <ProjectReference Include="..\DCI.PMS.Models\DCI.PMS.Models.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,543 @@
+﻿@model IEnumerable<DCI.Models.ViewModel.LeaveRequestHeaderViewModel>
+@using Newtonsoft.Json;
+@using DCI.Core.Common;
+@using DCI.Models.ViewModel;
+
+<link href="~/css/dcicustom.css" rel="stylesheet" />
+
+
+
+@{
+    var modulePageAccess = Context.Session.GetString("ModulePageAccess");
+    var canView = false;
+    var canAdd = false;
+    var canEdit = false;
+    var canDelete = false;
+
+    if (modulePageAccess == null)
+    {
+        <script>
+            $.ajax({
+            type: 'POST',
+            url: '@Url.Action("Logout", "Account")',
+            success: function (response) {
+
+            Swal.fire({
+            text: "Your session has timed out. Please log in again.",
+            icon: "info",
+            confirmButtonText: "Ok"
+            }).then((result) => {
+            window.location.href = '/Account/Logout';
+            });
+            },
+            error: function () {
+            Swal.fire({
+            text: "An error occurred. Please try again.",
+            icon: "error"
+            });
+            }
+            })
+        </script>
+    }
+    else
+    {
+        var module = JsonConvert.DeserializeObject<List<ModuleInRoleViewModel>>(modulePageAccess)?
+                    .FirstOrDefault(x => x.ModulePageId == (int)EnumModulePage.Reports);
+        canView = module?.View ?? false;
+        canAdd = module?.Add ?? false;
+        canEdit = module?.Update ?? false;
+        canDelete = module?.Delete ?? false;
+    }
+}
+
+<div class="container-fluid">
+    <div class="spinner-overlay">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <div class="d-sm-flex align-items-center justify-content-between mb-3">
+        <h6 class="m-0 font-weight-bold text-gray-800">Non-Regular Leave Report</h6>
+
+    </div>
+    <div class="col-12 p0">
+        <ul class="breadcrumb">
+            <li><a href="~/Home/Index">Dashboard</a></li>
+            <li><a href="~/Report/Index">Reports</a></li>
+            <li><a href="#">Non-Regular Leave Report</a></li>
+        </ul>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header">
+            <label class="mb0">Data</label>
+        </div>
+        <div class="card-body">
+
+            <div id="accordion">
+                <form id="frmFilter" class="row">
+                    <div class="form-group col-3">
+                        <label class="frmText">Date Covered From: </label>
+                        <div class="input-group">
+
+                            <input type="text" name="minDate" id="minDate" class="form-control frmField" autocomplete="off">
+                            <div class="input-group-prepend prependBtn">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            <label for="minDate" generated="true" class="error"></label>
+                        </div>
+                    </div>
+                    <div class="form-group col-3">
+                        <label class="frmText">Date Covered To: </label>
+                        <div class="input-group">
+
+
+                            <input type="text" name="maxDate" id="maxDate" class="form-control frmField" autocomplete="off">
+                            <div class="input-group-prepend prependBtn">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            <label for="maxDate" generated="true" class="error"></label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-responsive mt20">
+                <table class="table table-bordered" id="tblDTR">
+                    <thead>
+                        <tr>
+
+
+                            <th>
+                                <label>Request No</label>
+                            </th>
+
+                            <th>
+                                <label>Employee</label>
+                            </th>
+                            <th>
+                                <label>Employee Status</label>
+                            </th>
+                            <th>
+                                <label>Date Filed</label>
+                            </th>
+                            <th>
+                                <label>Leave Type</label>
+                            </th>
+                            <th>
+                                <label>No. of Days</label>
+                            </th>
+
+                            <th>
+                                <label>Leave Status</label>
+                            </th>
+                            <th>
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+
+                            string statusClass = item.Status switch
+                            {
+                                (int)EnumStatus.Approved => "btn-primary",
+                                (int)EnumStatus.ForApproval => "btn-success",
+                                (int)EnumStatus.Rejected => "btn-danger",
+                                (int)EnumStatus.Cancelled => "btn-secondary",
+                                (int)EnumStatus.VLDeducted
+                                or (int)EnumStatus.PayrollDeducted => "btn-warning",
+                                _ => "btn-info"
+                            };
+
+
+                            <tr>
+                                <td>
+                                    @item.RequestNo
+
+                                </td>
+
+                                <td>
+                                    @item.EmployeeName
+                                </td>
+
+                                <td>
+                                    @item.EmployeeStatus
+                                   
+                                </td>
+                                <td>
+                                    @item.DateFiled.ToString("MM/dd/yyyy")
+                                </td>
+                                <td>
+                                  @item.LeaveName
+                                </td>
+                                <td>
+                                    @item.NoofDays.ToString()
+                                </td>
+                                <td class="text-center">
+                                    <strong>
+                                        <span class="@statusClass applicationStatus">@item.StatusName</span>
+                                    </strong>
+                                </td>
+                                <td class="text-center">
+                                    <a href="javascript:void(0)" onclick="editForm(@item.LeaveRequestHeaderId)" title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>                                  
+                                </td>
+                             
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+</<div>
+</div>
+
+
+            <div class="modal fade" id="createmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Leave Request</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="createForm">
+                            <div class="modal-body">
+
+                                <input type="hidden" id="SelectedDatesJson" name="SelectedDates" />
+                                <input type="hidden" id="dateSelected" name="dateSelected" />
+
+                                <input type="hidden" id="SelectedLeaveTypeAmount" name="SelectedLeaveTypeAmount" value="0" />
+                                <input type="hidden" id="preloadedDates" />
+                                <input type="hidden" id="isMultiple" name="isMultiple" value="1">
+
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="frmText"><span class="required">*</span> Type</label>
+                                        <select id="leaveTypeSelect" class="form-select" required onchange="GetLeaveTypeAmount()" required>
+                                            <option value="">select type</option>
+                                        </select>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="frmText"><span class="required">*</span> No. of Days</label>                                       
+                                        <input type="text" id="NoOfDays" name="NoOfDays" class="form-control frmField" autocomplete="off" onkeypress="return isNumericDecimalKey(event, this)" oninput="checkingNumber(this)" />
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12">
+                                    <div class="form-group" id="datepickerDate">
+                                        <label class="frmText"><span class="required">*</span> Period Covered: </label>
+                                        <div class="input-group">
+                                            <input type="text" name="COVERED_DATE" id="dateCovered" class="form-control frmField" autocomplete="off" required>
+                                            <div class="input-group-prepend prependBtn">
+                                                <i class="fa fa-calendar"></i>
+                                            </div>
+                                        </div>
+                                        <label for="dateCovered" generated="true" class="error"></label>
+                                    </div>
+
+                                    <div class="form-group" id="datepickerLabel">
+                                        <label class="frmText"><span class="required">*</span> Period Covered: </label>
+                                        <div class="input-group">                                           
+                                            <div id="dateContainer"></div>
+                                        </div>
+                                        <label for="dateCovered" generated="true" class="error"></label>
+                                    </div>
+
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label class="frmText"><span class="required">*</span> Reason:</label>
+                                        <textarea class="form-control frmField" name="Reason" id="Reason" required></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <hr>
+                                    <div class="form-group">
+                                        <label class="frmText" id="ApproverLabel"> </label><br>
+                                        <label class="font-weight-bold mb0 text-danger" id="deptHeadName"></label>
+                                        <label class="d-block mt0 text-left text-xs" id="ApprovalDate"></label>
+                                        <label class="d-block mt0 text-left text-xs" id="ApprovalRemarks"></label>
+                                      
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="modal-footer pt0">
+                                <div id="btnSubmit">
+                                    <button class="btn btnPrimary btn-icon-split d-block" type="submit" onclick="save()">
+                                        <span class="icon text-white-50">
+                                            <i class="fa-regular fa-file-lines text-xs"></i>
+                                        </span>
+                                        <span class="text text-white"><small>Submit </small></span>
+                                    </button>
+                                </div>
+                                <div id="btnCancel">
+                                    <button class="btn btnDanger btn-icon-split d-block" type="button" onclick="cancel()">
+                                        <span class="icon text-white">
+                                            <i class="fa-regular fa-file-lines text-xs"></i>
+                                        </span>
+                                        <span class="text text-white"><small>Cancel Request</small></span>
+                                    </button>
+                                </div>
+                                <button class="btn btnSecondary btn-icon-split d-block" data-dismiss="modal">
+                                    <span class="icon text-white">
+                                        <i class="fa-solid fa-xmark text-xs"></i>
+                                    </span>
+                                    <span class="text text-white"><small>Close </small></span>
+                                </button>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+@section scripts {
+
+
+                <script type="text/javascript">
+                        var js = jQuery.noConflict(true);
+
+                                $('.spinner-overlay').show();
+
+                    setTimeout(() => {
+                        $('.spinner-overlay').hide();
+                    }, 200);
+
+
+                        $(document).ready(function () {
+                              // let firstDayOfMonth = new Date();
+                                  // firstDayOfMonth.setDate(1);
+                                  flatpickr("#minDate", {
+                                   dateFormat: "Y-m-d",
+                                     defaultDate: (function () {
+                                    let d = new Date();
+                                    d.setMonth(d.getMonth() - 1);
+                                    return d;
+                                     })()
+                                });
+
+                                  flatpickr("#maxDate", {
+                                   dateFormat: "Y-m-d",
+                                   defaultDate: new Date()
+                                });
+
+                                  let min = null;   // e.g. "2025-09-01"
+                                    let max = null;   // e.g. "2025-09-10"
+                                    js.fn.dataTable.ext.search.push(function (settings, data) {
+                                     min = $('#minDate').val();   // e.g. "2025-09-01"
+                                     max = $('#maxDate').val();   // e.g. "2025-09-10"
+                                    let rawDateTime = (data[3] || '').trim(); // adjust index to your date column
+                                    // rawDateTime = "2025-09-09 15:45"
+
+                                    if (!rawDateTime) return false;
+
+                                    // Parse row datetime
+                                    let rowDate = new Date(rawDateTime.replace(' ', 'T'));
+                         
+
+                                    // Parse min/max (flatpickr gives YYYY-MM-DD)
+                                    let minDate = min ? new Date(min + "T00:00:00") : null;
+                                    let maxDate = max ? new Date(max + "T23:59:59") : null;
+
+                                    if (minDate && rowDate < minDate) return false;
+                                    if (maxDate && rowDate > maxDate) return false;
+
+                                    return true;
+                                });
+
+
+                               let table = js('#tblDTR').DataTable({
+                                      dom: '<"d-flex flex-column"<"d-flex justify-content-between align-items-center mb-2"B><"d-flex justify-content-between align-items-center"l<f>>>rtip',
+                         buttons: [
+                             {
+                                 extend: 'excel',
+                                   text: 'Export to Excel',
+                                 title: 'Non-Regular Leave Report',
+                                 exportOptions: {
+                                     columns: ':not(:last-child)' // Excludes the last column
+                                 }
+                             },
+                             {
+                                 extend: 'pdf',
+                                    text: 'Export to PDF',
+                                 title: 'Non-Regular Leave Report',
+                                 exportOptions: {
+                                     columns: ':not(:last-child)' // Excludes the last column
+                                 },
+                             customize: function (doc) {
+                                                                     doc.content.splice(1, 0, {
+                                                                        text: 'Period: ' + min + " to " + max,
+                                                                        alignment: 'center',
+                                                                        margin: [0, 0, 0, 12], // left, top, right, bottom
+                                                                        fontSize: 10,
+                                                                        italics: true
+                                                                    });
+                                                                // Add "Date Printed" at bottom-right
+                                                                var now = new Date();
+                                                                var jsDate = now.toLocaleString(); // e.g. 9/21/2025, 3:25:10 PM
+
+                                                                doc['footer'] = function (currentPage, pageCount) {
+                                                                    return {
+                                                                        columns: [
+                                                                            { text: 'Date Printed: ' + jsDate, alignment: 'left', margin: [20, 0] },
+                                                                            { text: 'Page ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', margin: [0, 0, 20, 0] }
+                                                                        ],
+                                                                        margin: [20, 0]
+                                                                    };
+                                                                };
+                                                            }
+                                                        }
+                                                    ],
+                         lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ], // Entries per page
+                         pageLength: 10 ,// Default entries per page
+                                 order: [[1, 'desc']]
+                            });
+                               // Event listener for date inputs
+                        $('#minDate, #maxDate').on('change', function () {
+                            table.draw();
+                        });
+
+
+                        });//end document
+
+
+                             function editForm(leaveHdrId) {
+                                  $('#datepickerDate').hide();
+                                     $('#datepickerLabel').show();
+                                  const my_fp = document.querySelector("#dateCovered")._flatpickr;
+                                           if (typeof my_fp !== "undefined") {
+                                            my_fp.clear();
+                                           }
+
+                                   let nodays = 0.0000;
+                                   $('#NoOfDays').val(nodays.toFixed(4));
+                                   $('#Reason').val('');
+
+                                     const formData = new FormData();
+                                   formData.append('LeaveRequestHeaderId', leaveHdrId);
+
+
+                          $.ajax({
+                              type: 'POST',
+                              url: '@Url.Action("RequestLeave", "DailyTimeRecord")',
+                              data: formData,
+                              processData: false,
+                              contentType: false,
+                              success: function (response) {
+                                  if (response.success) {
+
+                                  var $select = $('#leaveTypeSelect');
+                                      $select.empty();
+                                      $select.append('<option value="">Select type</option>');
+
+                                      $.each(response.data.optionsLeaveType, function (index, item) {
+                                  if (item.value == response.data.leaveRequestHeader.leaveTypeId) {
+                                          $select.append('<option value="' + item.value + '" selected="selected">' + item.text + '</option>');
+                                      } else {
+                                          $select.append('<option value="' + item.value + '">' + item.text + '</option>');
+                                      }
+                                  });
+
+                                     console.log(response);
+
+                                    var container = $('#dateContainer'); // Make sure you have this container in your HTML
+                                       container.empty(); // Clear previous spans
+
+                                           
+                                                   response.data.leaveDateList.forEach(function (date) {
+                                                   var span = `<span class='d-inline-block mb-1 border applicationStatus bg-light text-dark text-xs'>${date}</span>`;
+                                                   container.append(span);
+                                               });
+                                  
+                                           $('#NoOfDays').val(response.data.leaveRequestHeader.noofDays);
+                                                  $('#Reason').val(response.data.leaveRequestHeader.reason);
+
+                                              $('#btnCancel').hide();
+
+                                                 document.getElementById('ApproverLabel').textContent = '';
+                                                               document.getElementById('ApprovalDate').textContent = '';
+                                        document.getElementById('ApprovalRemarks').textContent = '';
+                                          document.getElementById('deptHeadName').textContent = '';
+
+                                    if(response.data.leaveRequestHeader.status == @((int)EnumStatus.ForApproval)){  //forapproval
+                                                 $('#btnCancel').show();
+                                                  $('#btnSubmit').hide();
+                                                      document.getElementById('deptHeadName').textContent = response.data.approverHead;
+                                                        document.getElementById('ApproverLabel').textContent = 'For Approval of:';
+                                               }
+                                 else if(response.data.leaveRequestHeader.status == @((int)EnumStatus.Approved)){     //approved
+                                                $('#btnSubmit').hide();
+                                                    $('#btnCancel').hide();
+                                                          document.getElementById('deptHeadName').textContent = response.data.approverHead;
+                                                             document.getElementById('ApproverLabel').textContent = 'Approved By:';
+                                                        document.getElementById('ApprovalDate').textContent = 'Approved Date and Time: ' + response.data.leaveRequestHeader.dateApprovedDisapproved;
+                                     }
+                                          else if(response.data.leaveRequestHeader.status == @((int)EnumStatus.Rejected)){     //Rejected
+                                                 $('#btnSubmit').hide();
+                                                     $('#btnCancel').hide();
+                                                           document.getElementById('deptHeadName').textContent = response.data.approverHead;
+                                                             document.getElementById('ApproverLabel').textContent = 'Rejected By:';
+                                             document.getElementById('ApprovalRemarks').textContent = 'Remarks: ' + response.data.leaveRequestHeader.approvalRemarks;
+                                                        document.getElementById('ApprovalDate').textContent = 'Rejected Date and Time: ' + response.data.leaveRequestHeader.dateApprovedDisapproved;
+                                      }
+                                        else if(response.data.leaveRequestHeader.status == @((int)EnumStatus.VLDeducted) || response.data.leaveRequestHeader.status == @((int)EnumStatus.PayrollDeducted)){     //Deducted
+                                                 $('#btnSubmit').hide();
+                                                     $('#btnCancel').hide();
+                                                           document.getElementById('deptHeadName').textContent = 'HR Processed Undertime Deduction';
+                                                             document.getElementById('ApproverLabel').textContent = 'Deducted By:';
+
+
+                                      }
+                                        else if(response.data.leaveRequestHeader.status == @((int)EnumStatus.Cancelled)  && response.data.leaveRequestHeader.dateModified != null){     //canclled
+                                                 $('#btnSubmit').hide();
+                                                     $('#btnCancel').hide();
+                                                                       let iso =  response.data.leaveRequestHeader.dateModified;
+                                                        let formatted = iso.split(".")[0].replace("T", " ").slice(0, 16);
+                                                       document.getElementById('ApprovalDate').textContent = 'Cancelled Date: ' + formatted;
+                                      }
+
+                           let preloaded = response.data.selectedDateJson;   
+
+                                    let fp = flatpickr("#dateCovered", {
+                                           mode: "multiple",
+                                            dateFormat: "Y-m-d"
+                                         });
+
+
+                              
+                                        console.log(preloaded);
+                                        fp.setDate(preloaded);
+                                             $('#createForm').find('input, select, textarea').prop('disabled', true);
+                                      js('#createmodal').modal('show');
+                                  } else {
+                                      Swal.fire({
+                                          text: response.message,
+                                          icon: "error"
+                                      });
+                                  }
+                                  $('.spinner-overlay').hide();
+
+                              },
+                              error: function () {
+                                  $('.spinner-overlay').hide();
+                                  Swal.fire({
+                                      text: "An error occurred. Please try again.",
+                                      icon: "error"
+                                  });
+                              }
+                          });
+
+                     js('#createmodal').modal('show');
+
+                    }
+
+                </script>
+}

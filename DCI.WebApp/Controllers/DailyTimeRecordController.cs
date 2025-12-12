@@ -501,6 +501,13 @@ namespace DCI.WebApp.Controllers
                     model.EmployeeId = currentUser.EmployeeId;
                     model.ApproverId = currentUser.ApproverId;
 
+                    DateTime dateOnly = model.DtrDateTime.Date;
+
+                    TimeSpan timeOnly = TimeSpan.Parse(model.TimeIn);
+
+                    model.DtrDateTime = dateOnly.Add(timeOnly);
+
+
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/SaveDTRCorrection");
                     request.Content = stringContent;
@@ -732,26 +739,17 @@ namespace DCI.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
+        public class GeoModel
+        {
+            public string Latitude { get; set; }
+            public string Longitude { get; set; }
+        }
+
         public async Task<IActionResult> WFHTimeIn(WFHViewModel param)
         {
-            //  List<DailyTimeRecordViewModel> model = new List<DailyTimeRecordViewModel>();
+
             try
             {
-                //using (var client = new HttpClient())
-                //{
-                //    LoginViewModel loginvm = new LoginViewModel();
-                //    loginvm.Email = currentUser.Email;
-                //    loginvm.Password = param.Password;
-                //    var stringContentPassword = new StringContent(JsonConvert.SerializeObject(loginvm), Encoding.UTF8, "application/json");
-                //    var requestPassword = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Account/Login");
-                //    requestPassword.Content = stringContentPassword;
-                //    var responsePassword = client.Send(requestPassword); //await Task.FromResult(_httpclient.Send(requestPassword));
-                //    //  string responseBodyPassword = await responsePassword.Content.ReadAsStringAsync();
-                //    if (!responsePassword.IsSuccessStatusCode)
-                //    {
-                //        return Json(new { success = false, message = "Invalid password!" });
-                //    }
-                //}              
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
@@ -767,9 +765,6 @@ namespace DCI.WebApp.Controllers
                     var response = await _httpclient.SendAsync(request);
                     var responseBody = await response.Content.ReadAsStringAsync();
 
-                    //string emp_name = string.Empty;
-                    //string emp_no = string.Empty;
-                    //string emp_info = string.Empty;
                     if (response.IsSuccessStatusCode)
                     {
                         return Json(new { success = true, message = responseBody });
@@ -1080,7 +1075,7 @@ namespace DCI.WebApp.Controllers
                         model = JsonConvert.DeserializeObject<OvertimeViewModel>(responseBody)!;
 
                         model.ApprovedBy = model.OTHeaderId == 0 ? currentUser.ApproverHead : model.ApprovedBy;
-                        model.StatusName = model.OTHeaderId == 0 ? "Draft" : model.StatusName;                 
+                        model.StatusName = model.OTHeaderId == 0 ? "Draft" : model.StatusName;
                         model.Total = model.otDetails?.Sum(x => x.TotalMinutes) ?? 0;
                         model.TotalString = TimeHelper.ConvertMinutesToHHMM(model.Total);
                         return View(model);
@@ -1674,7 +1669,7 @@ namespace DCI.WebApp.Controllers
 
                     model.CurrentUserId = currentUser.UserId;
                     model.EmployeeId = currentUser.EmployeeId;
-                    
+
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllLeaveMangement");
                     request.Content = stringContent;
@@ -1717,7 +1712,7 @@ namespace DCI.WebApp.Controllers
                     model.EmployeeId = currentUser.EmployeeId;
                     model.ApproverId = currentUser.ApproverId;
                     model.RequestFiledBy = (int)EnumRequestFiledBy.HR;
-                 
+
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/RequestLeave");
@@ -1776,7 +1771,7 @@ namespace DCI.WebApp.Controllers
                     if (currentUser == null)
                         return RedirectToAction("Logout", "Account");
 
-                   
+
                     model.EmployeeId = model.EmployeeId; //selected Employee
                     model.ApproverId = currentUser.UserId;  //PreparedBy
                     model.CurrentUserId = currentUser.UserId;//PreparedBy
@@ -1810,7 +1805,7 @@ namespace DCI.WebApp.Controllers
         }
 
         public async Task<IActionResult> GetAllLeaveMangementByEmpId(LeaveViewModel param)
-        {          
+        {
             try
             {
                 LeaveViewModel model = new LeaveViewModel();
@@ -1837,7 +1832,7 @@ namespace DCI.WebApp.Controllers
                     ViewBag.Fullname = currentUser?.Fullname;
 
                     return Json(new { success = true, data = model });
-                }             
+                }
 
             }
             catch (Exception ex)
@@ -1848,7 +1843,7 @@ namespace DCI.WebApp.Controllers
             finally
             {
                 Log.CloseAndFlush();
-            }           
+            }
         }
 
         public async Task<IActionResult> OnSite(DailyTimeRecordViewModel param)

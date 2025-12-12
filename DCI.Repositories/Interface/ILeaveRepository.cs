@@ -14,5 +14,6 @@ namespace DCI.Repositories.Interface
         Task ExcessLeaveDeduction(LeaveFormViewModel param);
         Task<LeaveViewModel> GetAllLeaveMangement(LeaveViewModel param);
         Task<LeaveViewModel> GetAllLeaveMangementByEmpId(LeaveViewModel param);
+        Task<IList<LeaveRequestHeaderViewModel>> GetAllLeaveReportForProbitionaryContractual(DailyTimeRecordViewModel param);
     }
 }

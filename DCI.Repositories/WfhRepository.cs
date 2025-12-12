@@ -80,6 +80,8 @@ namespace DCI.Repositories
                 entity.CREATED_DATE = DateTime.Now;
                 entity.CREATED_BY = model.CREATED_BY;
                 entity.STATUS = (int)EnumStatus.Draft;
+                //entity.LATITUDE = (decimal)model.Latitude;
+                //entity.LONGITUDE = (decimal)model.Longitude;
                 await _dbContext.tbl_wfh_logs.AddAsync(entity);
                 await _dbContext.SaveChangesAsync();
 
