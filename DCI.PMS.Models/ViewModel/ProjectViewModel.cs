@@ -2,28 +2,31 @@
 {
     public class ProjectViewModel
     {
-        public int ProjectCreationId { get; set; }
+        public int ProjectCreationId { get; set; } = 0;
 
-        public int ClientId { get; set; }   // FK to Client
+        public int ClientId { get; set; }   = 0;
 
-        public string? ProjectNo { get; set; }
+        public string? ProjectNo { get; set; } = string.Empty;
 
         public string ProjectName { get; set; } = string.Empty;
 
-        public DateTime NOADate { get; set; }
-        public DateTime NTPDate { get; set; }
-        public DateTime MOADate { get; set; }
+        public DateTime NOADate { get; set; } = new DateTime();
+        public DateTime NTPDate { get; set; } = new DateTime();
+        public DateTime MOADate { get; set; } = new DateTime();
 
-        public int ProjectDuration { get; set; }
-        public int ModeOfPayment { get; set; }
+        public int ProjectDuration { get; set; } = 0;
+        public decimal ProjectCost { get; set; } = 0;
+        public int ModeOfPayment { get; set; } = 0;
 
-        public DateTime DateCreated { get; set; }
-        public int CreatedBy { get; set; }
+        public DateTime DateCreated { get; set; } = new DateTime();
+        public int CreatedBy { get; set; } = 0;
 
-        public DateTime? DateModified { get; set; }
-        public int? ModifiedBy { get; set; }
+        public DateTime? DateModified { get; set; } = new DateTime();
+        public int? ModifiedBy { get; set; } = 0;
 
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
+
+        public string? CreatedName { get; set; } = string.Empty;
 
     }
 }

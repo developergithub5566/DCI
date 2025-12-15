@@ -1,4 +1,4 @@
-﻿@model IEnumerable<DCI.Models.ViewModel.DailyTimeRecordViewModel>
+﻿@model IEnumerable<DCI.PMS.Models.ViewModel.ProjectViewModel>
 @using Newtonsoft.Json;
 @using DCI.Core.Common;
 @using DCI.Models.ViewModel;
@@ -139,32 +139,30 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @* 
+                        
                         @foreach (var item in Model)
                         {
 
                             <tr>                      
                                 <td>
-                                  
+                                  @item.ProjectNo
                                 </td>
                                 <td>
-                                 
+                                 @item.ProjectName
                                 </td>
                                 <td>
-                                 
+                                    @item.ClientId
                                 </td>
                                 <td>
-                                 
+                                    @item.ProjectCost
                                 </td>
                                 <td>
-                                 
+                                    @item.MOADate.ToShortDateString()
                                 </td>
                                 <td>
-                                
+                                    @item.NTPDate.ToShortDateString()
                                 </td>
-                                <td class="text-center">
-                         
-                                </td>
+                          
                         
                                 <td class="text-center">
                                     <a href="javascript:void(0)"  title="View" class="btn btn-primary"><i class="fas fa-search"></i></a>
@@ -172,7 +170,7 @@
                                     <a href="javascript:void(0)"  title="biometric logs" class="btn btn-secondary"><i class="fas fa-history"></i></a>
                                 </td>
                             </tr>
-                        } *@
+                        }
                     </tbody>
                 </table>
             </div>

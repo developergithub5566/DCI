@@ -1,14 +1,16 @@
-﻿using System.Net.Mail;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Net.Mail;
 
 namespace DCI.PMS.Models.Entities
 {
     public class Project
     {
+        [Key]
         public int ProjectCreationId { get; set; }
 
         public int ClientId { get; set; }   // FK to Client
 
-        public string? ProjectNo { get; set; }
+        public string? ProjectNo { get; set; } = string.Empty;
 
         public string ProjectName { get; set; } = string.Empty;
 
@@ -17,6 +19,8 @@ namespace DCI.PMS.Models.Entities
         public DateTime MOADate { get; set; }
 
         public int ProjectDuration { get; set; }
+
+        public decimal ProjectCost { get; set; }
         public int ModeOfPayment { get; set; }
 
         public DateTime DateCreated { get; set; }

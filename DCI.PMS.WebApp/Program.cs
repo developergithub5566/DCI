@@ -9,7 +9,7 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false);
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<UserManager>();
 
-builder.Services.Configure<APIConfigModel>(builder.Configuration.GetSection("WebAPI"));
+builder.Services.Configure<APIConfigModel>(builder.Configuration.GetSection("ServiceUrls"));
 
 //builder.Services.AddAuthentication(options =>
 //{

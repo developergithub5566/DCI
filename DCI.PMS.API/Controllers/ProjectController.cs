@@ -1,4 +1,6 @@
-﻿using DCI.PMS.Repository.Interface;
+﻿using DCI.Models.ViewModel;
+using DCI.PMS.Models.ViewModel;
+using DCI.PMS.Repository.Interface;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DCI.PMS.API.Controllers
@@ -14,12 +16,11 @@ namespace DCI.PMS.API.Controllers
             _projectRepository = projectRepository;
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("GetAllProject")]
-        public async Task<IActionResult> GetAllProject()
+        public async Task<IActionResult> GetAllProject([FromBody] ProjectViewModel model)
         {
-            var result = await _projectRepository.GetAllProject();
-            return Ok(result);
+            return Ok(await _projectRepository.GetAllProject());
         }
     }
 }

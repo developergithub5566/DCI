@@ -67,7 +67,7 @@ namespace DCI.PMS.WebApp.Controllers
                 using (var clienthttp = new HttpClient())
                 {
                     var stringContent = new StringContent(JsonConvert.SerializeObject(loginvm), Encoding.UTF8, "application/json");
-                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Account/Login");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiESS + "api/Account/Login");
 
                     request.Content = stringContent;
                     var response = await Task.FromResult(clienthttp.Send(request));

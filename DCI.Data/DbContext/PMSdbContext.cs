@@ -4,7 +4,7 @@ using DCI.Models.ViewModel;
 using DCI.PMS.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-
+using Newtonsoft.Json;
 
 namespace DCI.Data 
 {
@@ -19,6 +19,13 @@ namespace DCI.Data
         public DbSet<Milestone> Milestone { get; set; }
         public DbSet<Deliverable> Deliverable { get; set; }
          public DbSet<Attachment> Attachment { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<AuditLog>().Property(ae => ae.Changes).HasConversion(
+                value => JsonConvert.SerializeObject(value),
+                serializedValue => JsonConvert.DeserializeObject<Dictionary<string, object>>(serializedValue));       
+        }
 
         public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
         {

@@ -12,7 +12,8 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<PMSdbContext>(Options => Options.UseSqlServer(builder.Configuration.GetConnectionString("DCIConnection")));
+builder.Services.AddDbContext<PMSdbContext>(Options => Options.UseSqlServer(builder.Configuration.GetConnectionString("DCIConnectionPMS")));
+builder.Services.AddDbContext<DCIdbContext>(Options => Options.UseSqlServer(builder.Configuration.GetConnectionString("DCIConnectionESS")));
 
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 
@@ -20,7 +21,7 @@ builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 //builder.Services.AddSingleton<AuthenticationModel>();
 //builder.Services.Configure<AuthenticationModel>(builder.Configuration.GetSection("Authentication"));
 //builder.Services.Configure<FileModel>(builder.Configuration.GetSection("DocumentStorage"));
-
+builder.Services.Configure<APIConfigModel>(builder.Configuration.GetSection("ServiceUrls"));
 
 var app = builder.Build();
 

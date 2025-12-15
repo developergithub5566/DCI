@@ -646,6 +646,11 @@ namespace DCI.Repositories
                     .Where(x => empNos.Contains(x.EMPLOYEE_ID) && dates.Contains(x.DATE_TIME.Date))
                     .ToListAsync();
 
+                if (param.Status == (int)EnumStatus.Rejected) //2025.12.15
+                {
+                    param.Status = (int)EnumStatus.Draft;
+                }
+
                 foreach (var log in wfhLogs)
                 {
                     log.STATUS = param.Status;

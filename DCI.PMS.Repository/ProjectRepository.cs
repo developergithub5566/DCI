@@ -21,8 +21,8 @@ namespace DCI.PMS.Repository
         }
         public void Dispose()
         {
-            _dbContext.Dispose();
-        }     
+            _pmsdbContext.Dispose();
+        }
 
         public async Task<ProjectViewModel> GetProjectId(int projectId)
         {
@@ -53,18 +53,54 @@ namespace DCI.PMS.Repository
         {
 
             try
-            {               
-                var query = from proj in _pmsdbContext.Project.AsNoTracking()
-                         //   join user in _dbContext.User.AsNoTracking() on hol.CreatedBy equals user.UserId
-                            where proj.IsActive == true
-                            select new ProjectViewModel
-                            {
-                                ProjectCreationId = proj.ProjectCreationId,
-                                ProjectName = proj.ProjectName,
-               
-                            };
+            {
+                var users = await _dbContext.User
+                                        .AsNoTracking()
+                                        .Where(p => p.IsActive)
+                                        .Select(u => new
+                                        {
+                                            u.UserId,
+                                            u.Fullname
+                                        })
+                                        .ToListAsync();
 
-                return query.ToList();
+                var projects = await _pmsdbContext.Project
+                                        .AsNoTracking()
+                                        .Where(p => p.IsActive)
+                                        .Select(p => new
+                                        {
+                                            p.ProjectCreationId,
+                                            p.ProjectNo,
+                                            p.ProjectName,
+                                            p.NOADate,
+                                            p.NTPDate,
+                                            p.MOADate,
+                                            p.ProjectDuration, 
+                                            p.ProjectCost,
+                                            p.ModeOfPayment,
+                                            p.CreatedBy,
+                                            p.IsActive
+                                        })
+                                        .ToListAsync(); 
+
+                var result =  from p in projects
+                                        join u in users on p.CreatedBy equals u.UserId
+                                        select new ProjectViewModel
+                                        {
+                                            ProjectCreationId = p.ProjectCreationId,  
+                                            ProjectNo = p.ProjectNo,
+                                            ProjectName = p.ProjectName,
+                                            NOADate = p.NOADate,
+                                            NTPDate = p.NTPDate,
+                                            MOADate = p.MOADate,
+                                            ProjectDuration = p.ProjectDuration,
+                                            ProjectCost = p.ProjectCost,
+                                            ModeOfPayment = p.ModeOfPayment,
+                                            IsActive = p.IsActive,
+                                            CreatedName = u.Fullname
+                                        };
+
+                return result.ToList();
             }
             catch (Exception ex)
             {
@@ -82,88 +118,93 @@ namespace DCI.PMS.Repository
             return await _pmsdbContext.Project.AnyAsync(x => x.ProjectCreationId == projectId && x.IsActive == true);
         }
 
-        //public async Task<(int statuscode, string message)> Save(ProjectViewModel model)
-        //{
-        //    try
-        //    {
-        //        if (model.ProjectCreationId == 0)
-        //        {
-        //            Project entity = new Project();
-        //            entity.ProjectCreationId = model.ProjectCreationId;
-        //            entity.ClientId = model.ClientId;
-        //            entity.ProjectNo = model.ProjectNo;
-        //            entity.ProjectName = model.ProjectName;
-        //            entity.NOADate = model.NOADate;
-        //            entity.NTPDate = model.NTPDate;
-        //            entity.MOADate = model.MOADate;
-        //            entity.ProjectDuration = model.ProjectDuration;
-        //            entity.ModeOfPayment = model.ModeOfPayment;
-        //            entity.CreatedBy = model.CreatedBy;
-        //            entity.DateCreated = DateTime.Now;
-        //            entity.ModifiedBy = null;
-        //            entity.DateModified = null;
-        //            entity.IsActive = true;
-        //            await _pmsdbContext.Project.AddAsync(entity);
-        //            await _pmsdbContext.SaveChangesAsync();
-        //            return (StatusCodes.Status200OK, "Successfully saved");
-        //        }
-        //        else
-        //        {
-        //            var entity = await _pmsdbContext.Holiday.FirstOrDefaultAsync(x => x.HolidayId == model.HolidayId);
-        //            entity.HolidayId = model.HolidayId;
-        //            entity.HolidayDate = model.HolidayDate;
-        //            entity.HolidayName = model.HolidayName;
-        //            entity.Description = model.Description;
-        //            entity.HolidayType = model.HolidayType;
-        //            entity.DateCreated = entity.DateCreated;
-        //            entity.CreatedBy = entity.CreatedBy;
-        //            entity.DateModified = DateTime.Now;
-        //            entity.ModifiedBy = model.ModifiedBy;
-        //            entity.IsActive = true;
+        public async Task<(int statuscode, string message)> Save(ProjectViewModel model)
+        {
+            try
+            {
+                if (model.ProjectCreationId == 0)
+                {
+                    Project entity = new Project();
+                    entity.ProjectCreationId = model.ProjectCreationId;
+                    entity.ClientId = model.ClientId;
+                    entity.ProjectNo = model.ProjectNo;
+                    entity.ProjectName = model.ProjectName;
+                    entity.NOADate = model.NOADate;
+                    entity.NTPDate = model.NTPDate;
+                    entity.MOADate = model.MOADate;
+                    entity.ProjectDuration = model.ProjectDuration;
+                    entity.ProjectCost = model.ProjectCost;
+                    entity.ModeOfPayment = model.ModeOfPayment;
+                    entity.CreatedBy = model.CreatedBy;
+                    entity.DateCreated = DateTime.Now;
+                    entity.ModifiedBy = null;
+                    entity.DateModified = null;
+                    entity.IsActive = true;
+                    await _pmsdbContext.Project.AddAsync(entity);
+                    await _pmsdbContext.SaveChangesAsync();
+                    return (StatusCodes.Status200OK, "Successfully saved");
+                }
+                else
+                {
+                    var entity = await _pmsdbContext.Project.FirstOrDefaultAsync(x => x.ProjectCreationId == model.ProjectCreationId);
+                    entity.ProjectCreationId = model.ProjectCreationId;
+                    entity.ClientId = model.ClientId;
+                    entity.ProjectNo = model.ProjectNo;
+                    entity.ProjectName = model.ProjectName;
+                    entity.NOADate = model.NOADate;
+                    entity.MOADate = model.MOADate;
+                    entity.ProjectDuration = model.ProjectDuration;
+                    entity.ProjectCost = model.ProjectCost;
+                    entity.ModeOfPayment = model.ModeOfPayment;
+                    entity.DateCreated = entity.DateCreated;
+                    entity.CreatedBy = entity.CreatedBy;
+                    entity.DateModified = DateTime.Now;
+                    entity.ModifiedBy = model.ModifiedBy;
+                    entity.IsActive = true;
 
-        //            _dbContext.Holiday.Entry(entity).State = EntityState.Modified;
-        //            await _pmsdbContext.SaveChangesAsync();
-        //            return (StatusCodes.Status200OK, "Successfully updated");
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Log.Error(ex.ToString());
-        //        return (StatusCodes.Status406NotAcceptable, ex.ToString());
-        //    }
-        //    finally
-        //    {
-        //        Log.CloseAndFlush();
-        //    }
-        //}
+                    _pmsdbContext.Project.Entry(entity).State = EntityState.Modified;
+                    await _pmsdbContext.SaveChangesAsync();
+                    return (StatusCodes.Status200OK, "Successfully updated");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return (StatusCodes.Status406NotAcceptable, ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
 
-        //public async Task<(int statuscode, string message)> Delete(HolidayViewModel model)
-        //{
-        //    try
-        //    {
-        //        var entity = await _pmsdbContext.Holiday.FirstOrDefaultAsync(x => x.HolidayId == model.HolidayId && x.IsActive == true);
-        //        if (entity == null)
-        //        {
-        //            return (StatusCodes.Status406NotAcceptable, "Invalid Holiday Id");
-        //        }
+        public async Task<(int statuscode, string message)> Delete(ProjectViewModel model)
+        {
+            try
+            {
+                var entity = await _pmsdbContext.Project.FirstOrDefaultAsync(x => x.ProjectCreationId == model.ProjectCreationId && x.IsActive == true);
+                if (entity == null)
+                {
+                    return (StatusCodes.Status406NotAcceptable, "Invalid Project Id");
+                }
 
-        //        entity.IsActive = false;
-        //        entity.ModifiedBy = model.ModifiedBy;
-        //        entity.DateModified = DateTime.Now;
-        //        _pmsdbContext.Holiday.Entry(entity).State = EntityState.Modified;
-        //        await _pmsdbContext.SaveChangesAsync();
-        //        return (StatusCodes.Status200OK, "Successfully deleted");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Log.Error(ex.ToString());
-        //        return (StatusCodes.Status400BadRequest, ex.ToString());
-        //    }
-        //    finally
-        //    {
-        //        Log.CloseAndFlush();
-        //    }
-        //}
+                entity.IsActive = false;
+                entity.ModifiedBy = model.ModifiedBy;
+                entity.DateModified = DateTime.Now;
+                _pmsdbContext.Project.Entry(entity).State = EntityState.Modified;
+                await _pmsdbContext.SaveChangesAsync();
+                return (StatusCodes.Status200OK, "Successfully deleted");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return (StatusCodes.Status400BadRequest, ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
 
 
 
