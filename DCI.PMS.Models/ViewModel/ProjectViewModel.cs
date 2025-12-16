@@ -1,4 +1,6 @@
-﻿namespace DCI.PMS.Models.ViewModel
+﻿using Microsoft.AspNetCore.Http;
+
+namespace DCI.PMS.Models.ViewModel
 {
     public class ProjectViewModel
     {
@@ -27,6 +29,10 @@
         public bool IsActive { get; set; } = true;
 
         public string? CreatedName { get; set; } = string.Empty;
+
+        public IFormFile NOADateUploadFile { get; set; } 
+        public IFormFile NTPDateUploadFile { get; set; } 
+        public IFormFile MOADateUploadFile { get; set; } 
 
     }
 }

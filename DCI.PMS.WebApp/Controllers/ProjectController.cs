@@ -19,12 +19,14 @@ namespace DCI.PMS.WebApp.Controllers
             this._apiconfig = apiconfig;
             this._userSessionHelper = userSessionHelper;
         }
+      
         public IActionResult CreateEdit()
         {
             return View();
         }
 
-        public IActionResult Milestone()
+      
+        public IActionResult Milestone(ProjectViewModel model)
         {
             return View();
         }

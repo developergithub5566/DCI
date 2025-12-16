@@ -1,4 +1,4 @@
-﻿@model IEnumerable<DCI.Models.ViewModel.DailyTimeRecordViewModel>
+﻿@model IEnumerable<DCI.PMS.Models.ViewModel.ProjectViewModel>
 @using Newtonsoft.Json;
 @using DCI.Core.Common;
 @using DCI.Models.ViewModel;
@@ -56,7 +56,7 @@
     </div>
     <div class="d-sm-flex align-items-center justify-content-between mb-3">
         <h6 class="m-0 font-weight-bold text-gray-800">Project</h6>
-     
+
     </div>
     <div class="col-12 p0">
         <ul class="breadcrumb">
@@ -72,120 +72,127 @@
         </div>
         <div class="card-body">
 
-        
-
-                        <form id="createForm">
-                            <div class="modal-body">
-
-                                <div class="project-dates">
-                                    <div id="step1">
-                                        <div class="row">
-                                            <label for="inputEmail3" class="col-sm-2 col-form-label">Project Name</label>
-                                            <div class="col-sm-8">
-                                                <input type="text" class="form-control" id="inputProject" placeholder="Project Name">
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <label for="inputEmail3" class="col-sm-2 col-form-label">Client Name</label>
-                                            <div class="col-sm-8">
-                                                <input type="text" class="form-control" id="inputClient" placeholder="Client Name">
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <label for="inputEmail3" class="col-sm-2 col-form-label">Project Cost</label>
-                                            <div class="col-sm-8">
-                                                <input type="text" class="form-control" id="inputProjectCost" placeholder="Project Cost">
-                                            </div>
-                                        </div>
-
-                                        <!-- NOA -->
-                                        <div class="row">
-                                            <label class="col-sm-2 col-form-label">NOA Date</label>
-
-                                            <div class="col-sm-6">
-                                                <div class="input-group w-100">
-                                                    <input type="date" class="form-control">
-                                                    <span class="input-group-text"><i class="fa fa-calendar"></i></span>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-4">
-                                                <button class="btn btn-primary btn-sm ms-2">Upload File</button>
-                                            </div>
-                                        </div>
-
-                                        <!-- NTP -->
-                                        <div class="row">
-                                            <label class="col-sm-2 col-form-label">NTP Date</label>
-
-                                            <div class="col-md-6">
-                                                <div class="input-group w-100">
-                                                    <input type="date" class="form-control">
-                                                    <span class="input-group-text"><i class="fa fa-calendar"></i></span>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-4">
-                                                <button class="btn btn-primary btn-sm ms-2">Upload File</button>
-                                            </div>
-                                        </div>
-
-                                        <!-- MOA -->
-                                        <div class="row">
-                                            <label class="col-sm-2 col-form-label">MOA Date</label>
-
-                                            <div class="col-md-6">
-                                                <div class="input-group w-100">
-                                                    <input type="date" class="form-control">
-                                                    <span class="input-group-text"><i class="fa fa-calendar"></i></span>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-4">
-                                                <button class="btn btn-primary btn-sm ms-2">Upload File</button>
-                                            </div>
-                                        </div>
 
 
-                                        <div class="row">
-                                            <label for="inputEmail3" class="col-sm-2 col-form-label">Project Duration</label>
-                                            <div class="col-sm-8">
-                                                <input type="text" class="form-control" id="inputEmail3" placeholder="Project Duration">
-                                            </div>
-                                        </div>
+            <form id="createForm" asp-controller="Project" asp-action="Milestone" method="post" enctype="multipart/form-data">
+                <div class="modal-body">
 
-                                        <div class="row">
-                                            <label for="inputEmail3" class="col-sm-2 col-form-label">Mode of Payment</label>
-                                            <div class="col-sm-8">
-                                                <input type="text" class="form-control" id="inputEmail3" placeholder="Mode of Payment">
-                                            </div>
-                                        </div>
+                    <div class="project-dates">
+                        <div id="step1">
+                            <div class="row">
+                                <label for="ProjectName" class="col-sm-2 col-form-label">Project Name</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" id="ProjectName" name="ProjectName"  placeholder="Project Name">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label for="ClientName" class="col-sm-2 col-form-label">Client Name</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" id="ClientName" name="ClientName" placeholder="Client Name">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label for="inputEmail3" class="col-sm-2 col-form-label">Project Cost</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" id="ProjectCost" name="ProjectCost" placeholder="Project Cost">
+                                </div>
+                            </div>
+
+                            <!-- NOA -->
+                            <div class="row">
+                                <label class="col-sm-2 col-form-label">NOA Date</label>
+
+                                <div class="col-sm-4">
+                                    <div class="input-group w-100">
+                                        <input type="date" id="NOADate" name="NOADate" class="form-control">
+                                        <span class="input-group-text"><i class="fa fa-calendar"></i></span>
                                     </div>
-                                    <div id="step2" style="display:none;">
-                                        <h6>Project Dates & Files</h6>
-
-                                        <div class="mb-2">
-                                            <label>NOA Date</label>
-                                            <input type="date" class="form-control">
-                                        </div>
-
-                                        @* <button class="btn btn-secondary" onclick="prevStep()">Back</button>
-                                            <button class="btn btn-success float-end">Submit</button> *@
-                                    </div>
-
-
                                 </div>
 
-                                <div class="modal-footer">
-                                    <div class="col-sm-18">
-                                        @* <button type="submit" class="btn btn-primary">Next</button> *@
-                                        @*   <div id="step1">
+                                <div class="col-md-4">
+
+                                    <input type="file" class="form-control" id="NOADateUploadFile" name="NOADateUploadFile" />
+                                          
+                                           
+                                 @*    <button class="btn btn-primary btn-sm ms-2">Upload File</button> *@
+                                </div>
+                            </div>
+
+                            <!-- NTP -->
+                            <div class="row">
+                                <label class="col-sm-2 col-form-label">NTP Date</label>
+
+                                <div class="col-sm-4">
+                                    <div class="input-group w-100">
+                                        <input type="date" id="NTPDate" name="NTPDate" class="form-control">
+                                        <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <input type="file" class="form-control" id="NTPDateUploadFile" name="NTPDateUploadFile" />
+                                </div>
+                            </div>
+
+                            <!-- MOA -->
+                            <div class="row">
+                                <label class="col-sm-2 col-form-label">MOA Date</label>
+
+                                <div class="col-sm-4">
+                                    <div class="input-group w-100">
+                                        <input type="date" id="MOADate" name="MOADate" class="form-control">
+                                        <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <input type="file" id="MOADateUploadFile" name="MOADateUploadFile" class="form-control">
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                                <label for="inputEmail3" class="col-sm-2 col-form-label">Project Duration</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control frmField" name="ProjectDuration" id="ProjectDuration" required>
+                                        <option value="" disabled selected>Select</option>
+                                        <option value="1" class="TIME_IN">1 month</option>
+                                        <option value="2" class="TIME_OUT">6 months</option>
+                                        <option value="3" class="TIME_OUT">1 year</option>
+                                        <option value="4" class="TIME_OUT">2 years</option>
+                                        <option value="5" class="TIME_OUT">5 years</option>
+                                    </select>
+                                    @* <input type="text" class="form-control" id="ProjectDuration" name="ProjectDuration" placeholder="Project Duration"> *@
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <label for="inputEmail3" class="col-sm-2 col-form-label">Mode of Payment</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control frmField" name="ModeOfPayment" id="ModeOfPayment" required>
+                                        <option value="" disabled selected>Select</option>
+                                        <option value="1">Milestone Based</option>
+                                        <option value="2">Transacational Based</option>                                      
+                                    </select>
+                                  @*   <input type="text" class="form-control" id="ModeOfPayment" name="ModeOfPayment" placeholder="Mode of Payment"> *@
+                                </div>
+                            </div>
+                        </div>
+                       
+
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <div class="col-sm-18">
+                            @* <button type="submit" class="btn btn-primary">Next</button> *@
+                            @*   <div id="step1">
                                             <h6>Project Info</h6>
                                             <input type="text" class="form-control mb-2" placeholder="Project Name">
                                             <input type="text" class="form-control mb-2" placeholder="Client Name">
                                             <button class="btn btn-primary float-end" onclick="nextStep()">Next</button>
                                         </div> *@
-                                    @*     <div id="stepButton1">
+                            @*     <div id="stepButton1">
                                             <button class="btn btn-primary float-end" onclick="nextStep()">Next</button>
                                         </div>
                                         <div id="stepButton2" style="display:none;">
@@ -193,95 +200,99 @@
                                             <span> </span>
                                             <button class="btn btn-primary float-end">Submit</button>
                                         </div> *@
-                            <a asp-controller="Project" asp-action="Milestone" class="btn btn-primary">
-                                            <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
-                                            <span class="text text-white"><small>Add Milestone</small></span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
+                          @*   <a asp-controller="Project" asp-action="Milestone" class="btn btn-primary">
+                                <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
+                                <span class="text text-white"><small>Add Milestone</small></span>
+                            </a> *@
 
-
-
+                            <button type="submit" class="btn btn-primary">
+                                Add Milestone
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </form>
+
+
+
         </div>
+    </div>
+</div>
 
-        <style>
-            /* Override conflicting CSS only inside this section */
-            .project-dates .row {
-                display: flex !important;
-                align-items: center !important;
-                flex-wrap: nowrap !important;
-                margin-bottom: 10px;
-            }
+<style>
+    /* Override conflicting CSS only inside this section */
+    .project-dates .row {
+        display: flex !important;
+        align-items: center !important;
+        flex-wrap: nowrap !important;
+        margin-bottom: 10px;
+    }
 
-            .project-dates label {
-                white-space: nowrap;
-                margin-right: 10px;
-            }
+    .project-dates label {
+        white-space: nowrap;
+        margin-right: 10px;
+    }
 
-            .project-dates .col-md-3,
-            .project-dates .col-md-4,
-            .project-dates .col-md-5 {
-                display: flex;
-                align-items: center;
-            }
+    .project-dates .col-md-3,
+    .project-dates .col-md-4,
+    .project-dates .col-md-5 {
+        display: flex;
+        align-items: center;
+    }
 
-                .project-dates .col-md-5 .input-group {
-                    width: 100%;
-                }
+        .project-dates .col-md-5 .input-group {
+            width: 100%;
+        }
 
-            .project-dates button {
-                white-space: nowrap;
-            }
-        </style>
+    .project-dates button {
+        white-space: nowrap;
+    }
+</style>
 
 
 @section scripts {
-            <script src="~/js/dci-validation.js"></script>
+    <script src="~/js/dci-validation.js"></script>
 
 
-            <script type="text/javascript">
-                    var js = jQuery.noConflict(true);
-                    let _datefrom;
-                    let _dateto;
-                            $('.spinner-overlay').show();
+    <script type="text/javascript">
+            var js = jQuery.noConflict(true);
+            let _datefrom;
+            let _dateto;
+                    $('.spinner-overlay').show();
 
-                setTimeout(() => {
-                    $('.spinner-overlay').hide();
-                }, 200);
-
-
-                    $(document).ready(function () {
+        setTimeout(() => {
+            $('.spinner-overlay').hide();
+        }, 200);
 
 
-
-                    }); //end docu
-
-
-                    function newForm(dtr) {
-
-                            js('#projectModal').modal('show');
-                    }
+            $(document).ready(function () {
 
 
-                                    function nextStep(){
-                    document.getElementById("step1").style.display = "none";
-                    document.getElementById("step2").style.display = "block";
-                     document.getElementById("stepButton1").style.display = "none";
-                      document.getElementById("stepButton2").style.display = "block";
 
-                }
-
-                function prevStep(){
-                    document.getElementById("step1").style.display = "block";
-                    document.getElementById("step2").style.display = "none";
-                    document.getElementById("stepButton1").style.display = "block";
-                    document.getElementById("stepButton2").style.display = "none";
-                }
+            }); //end docu
 
 
-            </script>
+            function newForm(dtr) {
+
+                    js('#projectModal').modal('show');
+            }
+
+
+                            function nextStep(){
+            document.getElementById("step1").style.display = "none";
+            document.getElementById("step2").style.display = "block";
+             document.getElementById("stepButton1").style.display = "none";
+              document.getElementById("stepButton2").style.display = "block";
+
+        }
+
+        function prevStep(){
+            document.getElementById("step1").style.display = "block";
+            document.getElementById("step2").style.display = "none";
+            document.getElementById("stepButton1").style.display = "block";
+            document.getElementById("stepButton2").style.display = "none";
+        }
+
+
+    </script>
 }
