@@ -587,5 +587,106 @@ namespace DCI.Repositories
             return attendance.ToList();
         }
 
+
+        public async Task<IList<DailyTimeRecordViewModel>> GetAllDTRExternalEmployee(DailyTimeRecordViewModel model)
+        {  
+            var wfhlogs = await (from dtr in _dbContext.vw_AttendanceSummary_WFH.AsNoTracking()
+                                 join emp in _dbContext.Employee.AsNoTracking() on dtr.EMPLOYEE_NO equals emp.EmployeeNo
+                                 join empdtls in _dbContext.EmployeeWorkDetails.AsNoTracking() on emp.EmployeeId equals empdtls.EmployeeId
+                                 join loc in _dbContext.WorkLocation.AsNoTracking() on empdtls.WorkLocation equals loc.WorkLocationId
+                                 where dtr.STATUS == (int)EnumStatus.Approved && loc.WorkLocationId != (int)EnumWorkLocation.MO
+                                 orderby dtr.DATE descending
+                                 select new DailyTimeRecordViewModel
+                                 {
+                                     ID = dtr.ID,
+                                     EMPLOYEE_NO = dtr.EMPLOYEE_NO,
+                                     NAME = emp.Firstname + " " + emp.Lastname,
+                                     DATE = dtr.DATE,
+                                     FIRST_IN = dtr.FIRST_IN,
+                                     LAST_OUT = dtr.LAST_OUT,
+                                     LATE = dtr.LATE,
+                                     CLOCK_OUT = dtr.CLOCK_OUT,
+                                     UNDER_TIME = dtr.UNDER_TIME,
+                                     OVERTIME = dtr.OVERTIME,
+                                     TOTAL_HOURS = dtr.TOTAL_HOURS,
+                                     TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS,
+                                     SOURCE = Constants.Source_Remote,
+                                     WORKLOCATION = loc.Location,
+                                 }).ToListAsync();
+
+            var holiday = await (from hol in _dbContext.Holiday.AsNoTracking()
+                                 where hol.IsActive == true
+                                 select new DailyTimeRecordViewModel
+                                 {
+                                     ID = 0,
+                                     EMPLOYEE_NO = string.Empty,
+                                     NAME = hol.HolidayName,
+                                     DATE = hol.HolidayDate.Date,
+                                     FIRST_IN = "00:00:00",
+                                     LAST_OUT = "00:00:00",
+                                     LATE = "00:00:00",
+                                     CLOCK_OUT = "00:00:00",
+                                     UNDER_TIME = "00:00:00",
+                                     OVERTIME = "00:00:00",
+                                     TOTAL_HOURS = "00:00:00",
+                                     TOTAL_WORKING_HOURS = "00:00:00",
+                                     SOURCE = hol.HolidayType == (int)EnumHoliday.Suspension ? Constants.Source_Suspension : Constants.Source_Holiday
+                                 }).ToListAsync();
+
+            var filterDate = new DateTime(2025, 10, 1); //migration start Oct28
+
+           
+
+            var officialBusiness = await (from dtl in _dbContext.LeaveRequestDetails.AsNoTracking()
+                                          join ob in _dbContext.LeaveRequestHeader.AsNoTracking() on dtl.LeaveRequestHeaderId equals ob.LeaveRequestHeaderId
+                                          join emp in _dbContext.Employee.AsNoTracking() on ob.EmployeeId equals emp.EmployeeId
+                                          join empdtls in _dbContext.EmployeeWorkDetails.AsNoTracking() on emp.EmployeeId equals empdtls.EmployeeId
+                                          join loc in _dbContext.WorkLocation.AsNoTracking() on empdtls.WorkLocation equals loc.WorkLocationId
+                                          join stat in _dbContext.Status.AsNoTracking() on ob.Status equals stat.StatusId
+                                          where
+                                          ob.IsActive == true
+                                          && (ob.LeaveTypeId != (int)EnumLeaveType.SLMon && ob.LeaveTypeId != (int)EnumLeaveType.VLMon)                           
+                                          && dtl.LeaveDate >= filterDate
+                                           && loc.WorkLocationId != (int)EnumWorkLocation.MO
+                                          select new DailyTimeRecordViewModel
+                                          {
+                                              ID = 0,
+                                              EMPLOYEE_NO = emp.EmployeeNo,
+                                              NAME = emp.Firstname + " " + emp.Lastname,
+                                              DATE = dtl.LeaveDate.Date,
+                                              FIRST_IN = "00:00:00",
+                                              LAST_OUT = "00:00:00",
+                                              LATE = "00:00:00",
+                                              CLOCK_OUT = "00:00:00",
+                                              UNDER_TIME = "00:00:00",
+                                              OVERTIME = "00:00:00",
+                                              TOTAL_HOURS = "00:00:00",
+                                              TOTAL_WORKING_HOURS = "00:00:00",                                             
+                                              STATUSNAME = stat.StatusName,
+                                              RequestNo = ob.RequestNo,
+                                              SOURCE =
+                                                    (ob.LeaveTypeId == (int)EnumLeaveType.OB || ob.LeaveTypeId == (int)EnumLeaveType.HDOB) ? Constants.Source_OfficialBusiness
+                                                        : (ob.LeaveTypeId == (int)EnumLeaveType.VL || ob.LeaveTypeId == (int)EnumLeaveType.HDVL) ? Constants.Source_VacationLeave
+                                                        : (ob.LeaveTypeId == (int)EnumLeaveType.SL || ob.LeaveTypeId == (int)EnumLeaveType.HDSL) ? Constants.Source_SickLeave
+                                                        : ob.LeaveTypeId == (int)EnumLeaveType.SPL ? Constants.Source_SpecialLeave
+                                                        : ob.LeaveTypeId == (int)EnumLeaveType.ML ? Constants.Source_MaternityLeave
+                                                        : ob.LeaveTypeId == (int)EnumLeaveType.PL ? Constants.Source_PaternityLeave
+                                                        : "Leave",
+                                              WORKLOCATION = loc.Location,
+                                          }).ToListAsync();
+
+
+            var attendance = wfhlogs.Concat(officialBusiness).ToList();
+
+            //if ((int)EnumEmployeeScope.PerHospital == model.ScopeTypeEmp)
+            //{
+            //    var usr = _dbContext.User.Where(x => x.UserId == model.CurrentUserId).FirstOrDefault();
+            //    var emp = _dbContext.Employee.Where(x => x.EmployeeId == usr.EmployeeId).FirstOrDefault();
+            //    if (emp != null)
+            //        attendance = attendance.Where(x => x.EMPLOYEE_NO == emp.EmployeeNo).ToList();
+            //}
+
+            return attendance.Concat(holiday).ToList();
+        }
     }
 }

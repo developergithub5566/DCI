@@ -340,6 +340,14 @@ namespace DCI.API.Controllers
         {
             return Ok(await _leaveRepository.GetAllLeaveReportForProbitionaryContractual(param));
         }
-       
+
+
+        [HttpPost]
+        [Route("GetAllDTRExternalEmployee")]
+        public async Task<IActionResult> GetAllDTRExternalEmployee(DailyTimeRecordViewModel model)
+        {
+            var result = await _dtrRepository.GetAllDTRExternalEmployee(model);
+            return Ok(result);
+        }
     }
 }

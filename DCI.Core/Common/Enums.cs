@@ -185,6 +185,7 @@ namespace DCI.Core.Common
     {
         ALL = 0,
         PerEmployee = 1,
+        PerHospital = 2
     }
 
     public enum EnumOvertime

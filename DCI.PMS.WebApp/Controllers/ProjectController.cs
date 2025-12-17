@@ -5,6 +5,7 @@ using DCI.PMS.WebApp.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Serilog;
 using System.Text;
 
 namespace DCI.PMS.WebApp.Controllers
@@ -26,9 +27,40 @@ namespace DCI.PMS.WebApp.Controllers
         }
 
       
-        public IActionResult Milestone(ProjectViewModel model)
+        public async Task <IActionResult> Milestone(ProjectViewModel model)
         {
-            return View();
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+                   // model.CurrentUserId = currentUser.UserId;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/SaveProject");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return View();
+                    }
+                    return Json(new { success = false, message = responseBody });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
         public IActionResult Deliverables()
@@ -58,7 +90,7 @@ namespace DCI.PMS.WebApp.Controllers
             }
             catch (Exception ex)
             {
-               // Log.Error(ex.ToString());
+                Log.Error(ex.ToString());
                 return Json(new { success = false, message = ex.Message });
             }
             finally

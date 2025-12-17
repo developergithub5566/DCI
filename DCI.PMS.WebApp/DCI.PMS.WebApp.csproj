@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\DCI.Core\DCI.Core.csproj" />
     <ProjectReference Include="..\DCI.Models\DCI.Models.csproj" />
     <ProjectReference Include="..\DCI.PMS.Models\DCI.PMS.Models.csproj" />

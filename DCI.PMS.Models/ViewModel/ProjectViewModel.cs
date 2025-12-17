@@ -30,9 +30,9 @@ namespace DCI.PMS.Models.ViewModel
 
         public string? CreatedName { get; set; } = string.Empty;
 
-        public IFormFile NOADateUploadFile { get; set; } 
-        public IFormFile NTPDateUploadFile { get; set; } 
-        public IFormFile MOADateUploadFile { get; set; } 
+        public IFormFile? NOADateUploadFile { get; set; } 
+        public IFormFile? NTPDateUploadFile { get; set; } 
+        public IFormFile? MOADateUploadFile { get; set; } 
 
     }
 }

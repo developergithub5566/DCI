@@ -53,8 +53,7 @@ namespace DCI.Models.ViewModel
         public string TOTAL_WORKING_HOURS_WFH { get; set; } = string.Empty;
 
         public int ScopeTypeJobRecurring { get; set; } = 0;
-        //   public string DayType { get; set; } = string.Empty;
-        //  public DateTime DateFilter { get; set; } = DateTime.Now;         
+        public string WORKLOCATION { get; set; } = string.Empty;
     }
 
     public class DTRCorrectionViewModel
