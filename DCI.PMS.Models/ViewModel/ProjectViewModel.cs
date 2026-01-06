@@ -19,7 +19,7 @@ namespace DCI.PMS.Models.ViewModel
         public int ProjectDuration { get; set; } = 0;
         public decimal ProjectCost { get; set; } = 0;
         public int ModeOfPayment { get; set; } = 0;
-
+        public int Status { get; set; } = 0;
         public DateTime DateCreated { get; set; } = new DateTime();
         public int CreatedBy { get; set; } = 0;
 

@@ -34,7 +34,7 @@ namespace DCI.Trigger
         }
 
         public async Task AttendanceConfirmationProcessor()
-        {
+         {
 
             List<DailyTimeRecordViewModel> attendance = new List<DailyTimeRecordViewModel>();
 
@@ -154,12 +154,7 @@ namespace DCI.Trigger
                 Log.Information("Total Records: " + attendance?.Count().ToString());
                 Log.Information("Attendance confirmation process completed successfully.");
             }
-
-
-
-
         }
-
 
         public async Task AttendanceConfirmationProcessorMonthly()
         {
@@ -183,7 +178,7 @@ namespace DCI.Trigger
                 {
 
                     param.DATE = DateTime.Now;
-                   // param.DATE = DateTime.Parse("2025-11-30");
+                   // param.DATE = DateTime.Parse("2025-12-30");
                     param.ScopeTypeJobRecurring = (int)EnumScopeTypeJobRecurring.MONTHLY;
 
 
@@ -191,7 +186,6 @@ namespace DCI.Trigger
                     //{
                     //    param.DATE = DateTime.Now.AddMonths(-1);
                     //}
-
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(param), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/DailyTimeRecord/GetAllDTRByDate");
@@ -206,14 +200,16 @@ namespace DCI.Trigger
                 }
                 Log.Information("Attendance records retrieved successfully from Biometrics API.");
 
-                var userlist = _destDb.User.Where(x => x.IsActive && x.EmailAttendanceConfirmation == true).ToList();
+                var userlist = _destDb.User.Where(x => x.IsActive && x.EmailAttendanceConfirmation == true).ToList();              
+                
+                Log.Information("Total Records: " + attendance.Count().ToString());
 
                 foreach (var emp in userlist)
-                {
+                {           
+
                     var result = GenerateAttendanceTable(attendance, emp.EmployeeNo, param.DATE.Year, param.DATE.Month);
 
                     string attendanceTable = BuildAttendanceHtmlTable(result, emp.EmployeeNo, emp.Fullname, param.DATE.Year, param.DATE.Month);
-
 
                     BiometricViewModel viewModel = new BiometricViewModel();
                     viewModel.UserId = emp.UserId;
@@ -225,8 +221,6 @@ namespace DCI.Trigger
                     viewModel.DATE = param.DATE.ToString("MMMM yyyy");
                     await _emailRepository.SendEmailAttendanceConfirmationNotificationMonthly(viewModel);
                 }
-
-
             }
             catch (HttpRequestException httpEx)
             {
@@ -272,9 +266,10 @@ namespace DCI.Trigger
             {
                 var currentDate = new DateTime(year, month, day);
                 var record = biometrics.FirstOrDefault(a => a.DATE.Date == currentDate.Date && a.EMPLOYEE_NO == employeeNo);
-
+         
                 if (currentDate.DayOfWeek == DayOfWeek.Saturday || currentDate.DayOfWeek == DayOfWeek.Sunday)
                 {
+                  
                     result.Add(new AttendanceDisplay
                     {
                         Date = currentDate,
@@ -285,23 +280,52 @@ namespace DCI.Trigger
                 }
                 else if (record == null)
                 {
-                    result.Add(new AttendanceDisplay
+                    var holiday = biometrics.FirstOrDefault(a => a.DATE.Date == currentDate.Date && (a.SOURCE == "HOLIDAY" || a.SOURCE.Contains("SUSPENSION")));
+                    if(holiday != null)
                     {
-                        Date = currentDate,
-                        DayType = "No attendance",
-                        FIRST_IN = "-",
-                        LAST_OUT = "-"
-                    });
+                        result.Add(new AttendanceDisplay
+                        {
+                            Date = currentDate,
+                            DayType = "HOLIDAY|SUSPENSION",
+                            FIRST_IN = "-",
+                            LAST_OUT = "-"
+                        });                  
+                    }
+                    else
+                    {                      
+                        result.Add(new AttendanceDisplay
+                            {
+                                Date = currentDate,
+                                DayType = "No attendance",
+                                FIRST_IN = "-",
+                                LAST_OUT = "-"
+                            });   
+                    }                      
                 }
                 else
                 {
-                    result.Add(new AttendanceDisplay
+                    var leave = biometrics.FirstOrDefault(a => a.DATE.Date == currentDate.Date && a.EMPLOYEE_NO == employeeNo && (a.SOURCE.Contains("LEAVE") ||  a.SOURCE.Contains("OFFICIAL")));
+                    if (leave != null)
                     {
-                        Date = currentDate,
-                        DayType = record.SOURCE,
-                        FIRST_IN = record.FIRST_IN?.ToString(),
-                        LAST_OUT = record.LAST_OUT?.ToString()
-                    });
+                        result.Add(new AttendanceDisplay
+                        {
+                            Date = currentDate,
+                            DayType = record.SOURCE + "|" + " " + leave.SOURCE,
+                            FIRST_IN = record.FIRST_IN?.ToString(),
+                            LAST_OUT = record.LAST_OUT?.ToString()
+                        });
+                    }
+                    else
+                    {
+                        result.Add(new AttendanceDisplay
+                        {
+                            Date = currentDate,
+                            DayType = record.SOURCE,
+                            FIRST_IN = record.FIRST_IN?.ToString(),
+                            LAST_OUT = record.LAST_OUT?.ToString()
+                        });
+                    }
+                      
                 }
             }
 

@@ -22,6 +22,7 @@ namespace DCI.PMS.Models.Entities
 
         public decimal ProjectCost { get; set; }
         public int ModeOfPayment { get; set; }
+        public int Status { get; set; }
 
         public DateTime DateCreated { get; set; }
         public int CreatedBy { get; set; }

@@ -449,9 +449,12 @@ namespace DCI.Repositories
         //Job Trigger. Everyday Email Attendance Confirmation
         //Source Code from DCI.Trigger.API/AttendanceProcessor.cs
         public async Task<IList<DailyTimeRecordViewModel>> GetAllDTRByDate(DailyTimeRecordViewModel model) 
-        {  
+        {
+            var twoMonthsAgo = DateTime.Today.AddMonths(-2);  //2026.01.06
+
             var biometriclogs = await (from dtr in _dbContext.vw_AttendanceSummary.AsNoTracking()
-                                       join emp in _dbContext.Employee.AsNoTracking() on dtr.EMPLOYEE_NO equals emp.EmployeeNo                                       
+                                       join emp in _dbContext.Employee.AsNoTracking() on dtr.EMPLOYEE_NO equals emp.EmployeeNo
+                                       where dtr.DATE >= twoMonthsAgo //2026.01.06
                                        orderby dtr.DATE descending
                                        select new DailyTimeRecordViewModel
                                        {
@@ -481,7 +484,9 @@ namespace DCI.Repositories
 
                 var wfhlogs = await (from dtr in _dbContext.vw_AttendanceSummary_WFH.AsNoTracking()
                                      join emp in _dbContext.Employee.AsNoTracking() on dtr.EMPLOYEE_NO equals emp.EmployeeNo
-                                     where dtr.STATUS == (int)EnumStatus.Approved // && dtr.DATE.Date == model.DATE.Date
+                                     join stat in _dbContext.Status.AsNoTracking() on dtr.STATUS equals stat.StatusId
+                                     //  where dtr.STATUS == (int)EnumStatus.Approved //2026.01.06 removed
+                                     where dtr.DATE >= twoMonthsAgo //2026.01.06
                                      orderby dtr.DATE descending
                                      select new DailyTimeRecordViewModel
                                      {
@@ -497,7 +502,7 @@ namespace DCI.Repositories
                                          OVERTIME = dtr.OVERTIME,
                                          TOTAL_HOURS = dtr.TOTAL_HOURS,
                                          TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS,
-                                         SOURCE = Constants.Source_Remote
+                                         SOURCE = Constants.Source_Remote + "(" + stat.StatusName + ")"
                                      }).ToListAsync();
 
 
@@ -517,8 +522,8 @@ namespace DCI.Repositories
                                           join lvtype in _dbContext.LeaveType.AsNoTracking() on ob.LeaveTypeId equals lvtype.LeaveTypeId
                                           join stat in _dbContext.Status.AsNoTracking() on ob.Status equals stat.StatusId
                                           where ob.IsActive == true                                       
-                                          && (ob.LeaveTypeId != (int)EnumLeaveType.SLMon || ob.LeaveTypeId != (int)EnumLeaveType.VLMon) 
-                                        //  && ob.Status == (int)EnumStatus.Approved                                        
+                                          && (ob.LeaveTypeId != (int)EnumLeaveType.SLMon || ob.LeaveTypeId != (int)EnumLeaveType.VLMon)
+                                          && dtl.LeaveDate >= twoMonthsAgo //2026.01.06                                    
                                           select new DailyTimeRecordViewModel
                                           {
                                               ID = 0,
@@ -541,7 +546,7 @@ namespace DCI.Repositories
                                                         : ob.LeaveTypeId == (int)EnumLeaveType.SPL ? Constants.Source_SpecialLeave
                                                         : ob.LeaveTypeId == (int)EnumLeaveType.ML ? Constants.Source_MaternityLeave
                                                         : ob.LeaveTypeId == (int)EnumLeaveType.PL ? Constants.Source_PaternityLeave
-                                                        : "Leave") + "|" +  stat.StatusName
+                                                        : "Leave") + "(" +  stat.StatusName + ")"
                                           }).ToListAsync();
 
             if ((int)EnumScopeTypeJobRecurring.DAILY == model.ScopeTypeJobRecurring) //DAILY
