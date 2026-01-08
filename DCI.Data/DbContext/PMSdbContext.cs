@@ -19,12 +19,19 @@ namespace DCI.Data
         public DbSet<Milestone> Milestone { get; set; }
         public DbSet<Deliverable> Deliverable { get; set; }
          public DbSet<Attachment> Attachment { get; set; }
+        public DbSet<Client> Client { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<AuditLog>().Property(ae => ae.Changes).HasConversion(
                 value => JsonConvert.SerializeObject(value),
-                serializedValue => JsonConvert.DeserializeObject<Dictionary<string, object>>(serializedValue));       
+                serializedValue => JsonConvert.DeserializeObject<Dictionary<string, object>>(serializedValue));
+
+            modelBuilder.Entity<Milestone>()
+                .HasOne(m => m.Project)
+                .WithMany(p => p.Milestones)
+                .HasForeignKey(m => m.ProjectCreationId)
+                .OnDelete(DeleteBehavior.Restrict); // or Cascade if you want
         }
 
         public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)

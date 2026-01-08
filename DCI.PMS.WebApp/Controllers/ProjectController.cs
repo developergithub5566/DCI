@@ -20,14 +20,56 @@ namespace DCI.PMS.WebApp.Controllers
             this._apiconfig = apiconfig;
             this._userSessionHelper = userSessionHelper;
         }
-      
-        public IActionResult CreateEdit()
+
+        //public IActionResult CreateEdit()
+        //{
+        //    return View();
+        //}
+
+
+        public async Task<IActionResult> CreateEdit(int id)
         {
-            return View();
+            try
+            {
+                ProjectViewModel model = new ProjectViewModel();
+                if (id != 0)
+                {
+                    using (var _httpclient = new HttpClient())
+                    {
+
+                        model.ProjectCreationId = id;
+                        var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                        var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/GetProjectById");
+                        request.Content = stringContent;
+                        var response = await _httpclient.SendAsync(request);
+                        var responseBody = await response.Content.ReadAsStringAsync();
+                        ProjectViewModel vm = JsonConvert.DeserializeObject<ProjectViewModel>(responseBody)!;
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            //return Json(new { success = true, data = vm });
+                            return View(vm);
+                        }
+                    }
+                }
+                else
+                {
+                    return View(model);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
-      
-        public async Task <IActionResult> Milestone(ProjectViewModel model)
+        public async Task<IActionResult> Milestone(ProjectViewModel model)
         {
             try
             {
@@ -36,19 +78,38 @@ namespace DCI.PMS.WebApp.Controllers
                     var currentUser = _userSessionHelper.GetCurrentUser();
                     if (currentUser == null)
                         return RedirectToAction("Logout", "Account");
-                   // model.CurrentUserId = currentUser.UserId;
+                    // model.CurrentUserId = currentUser.UserId;
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/SaveProject");
                     request.Content = stringContent;
                     var response = await _httpclient.SendAsync(request);
                     var responseBody = await response.Content.ReadAsStringAsync();
+                    //ProjectViewModel vm = JsonConvert.DeserializeObject<ProjectViewModel>(responseBody)!;
+
+                    //if (response.IsSuccessStatusCode)
+                    //{
+                    //    return View();
+                    //}
+                    //return Json(new { success = false, message = responseBody });
+                }
+
+              //  MilestoneViewModel milesModel = new MilestoneViewModel();
+
+                using (var _httpclient = new HttpClient())
+                {
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/GetMilestoneByProjectId");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    model = JsonConvert.DeserializeObject<ProjectViewModel>(responseBody)!;
 
                     if (response.IsSuccessStatusCode)
                     {
-                        return View();
+                        return View(model);
                     }
-                    return Json(new { success = false, message = responseBody });
+                    return View(model);
                 }
             }
             catch (Exception ex)
@@ -75,7 +136,7 @@ namespace DCI.PMS.WebApp.Controllers
                 List<ProjectViewModel> list = new List<ProjectViewModel>();
                 using (var _httpclient = new HttpClient())
                 {
-                    
+
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/GetAllProject");
                     request.Content = stringContent;

@@ -4,7 +4,7 @@
     {
         public int MileStoneId { get; set; }
 
-        public int? ProjectCreationId { get; set; }   // FK (nullable based on your schema)
+        public int ProjectCreationId { get; set; }   // FK (nullable based on your schema)
 
         public string MilestoneName { get; set; } = string.Empty;
 

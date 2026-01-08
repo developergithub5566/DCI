@@ -69,7 +69,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 //app.UseSession();
-app.UseMiddleware<EnsureUserSessionMiddleware>();  // 👈 here
+//app.UseMiddleware<EnsureUserSessionMiddleware>();  // 👈 here
 
 app.UseAuthentication(); // jc for testing oct7
 app.UseRouting();

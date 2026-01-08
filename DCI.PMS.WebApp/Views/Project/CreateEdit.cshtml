@@ -1,4 +1,4 @@
-﻿@model IEnumerable<DCI.PMS.Models.ViewModel.ProjectViewModel>
+﻿@model DCI.PMS.Models.ViewModel.ProjectViewModel
 @using Newtonsoft.Json;
 @using DCI.Core.Common;
 @using DCI.Models.ViewModel;
@@ -79,16 +79,19 @@
 
                     <div class="project-dates">
                         <div id="step1">
+                            <input type="hidden" id="ProjectCreationId" name="ProjectCreationId" value="@Model.ProjectCreationId">
+
+
                             <div class="row">
                                 <label for="ProjectName" class="col-sm-2 col-form-label">Project Name</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control" id="ProjectName" name="ProjectName"  placeholder="Project Name">
+                                    <input type="text" class="form-control" id="ProjectName" name="ProjectName" placeholder="Project Name" value="@Model.ProjectName">
                                 </div>
                             </div>
                             <div class="row">
                                 <label for="ClientName" class="col-sm-2 col-form-label">Client Name</label>
                                 <div class="col-sm-8">
-                                  @*   <input type="text" class="form-control" id="ClientName" name="ClientName" placeholder="Client Name"> *@
+                                    @*   <input type="text" class="form-control" id="ClientName" name="ClientName" placeholder="Client Name"> *@
                                     <select class="form-control frmField" name="ClientId" id="ClientId" required>
                                         <option value="" disabled selected>Select</option>
                                         <option value="1" class="TIME_IN">Client A</option>
@@ -102,7 +105,7 @@
                             <div class="row">
                                 <label for="inputEmail3" class="col-sm-2 col-form-label">Project Cost</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control" id="ProjectCost" name="ProjectCost" placeholder="Project Cost">
+                                    <input type="text" class="form-control" id="ProjectCost" name="ProjectCost" placeholder="Project Cost" value="@Model.ProjectCost">
                                 </div>
                             </div>
 
@@ -112,7 +115,7 @@
 
                                 <div class="col-sm-4">
                                     <div class="input-group w-100">
-                                        <input type="date" id="NOADate" name="NOADate" class="form-control">
+                                        <input type="date" id="NOADate" name="NOADate" class="form-control" value="@Model.NOADate.ToString("yyyy-MM-dd")">
                                         <span class="input-group-text"><i class="fa fa-calendar"></i></span>
                                     </div>
                                 </div>
@@ -120,9 +123,9 @@
                                 <div class="col-md-4">
 
                                     <input type="file" class="form-control" id="NOADateUploadFile" name="NOADateUploadFile" />
-                                          
-                                           
-                                 @*    <button class="btn btn-primary btn-sm ms-2">Upload File</button> *@
+
+
+                                    @*    <button class="btn btn-primary btn-sm ms-2">Upload File</button> *@
                                 </div>
                             </div>
 
@@ -132,7 +135,7 @@
 
                                 <div class="col-sm-4">
                                     <div class="input-group w-100">
-                                        <input type="date" id="NTPDate" name="NTPDate" class="form-control">
+                                        <input type="date" id="NTPDate" name="NTPDate" class="form-control" value="@Model.NTPDate.ToString("yyyy-MM-dd")">
                                         <span class="input-group-text"><i class="fa fa-calendar"></i></span>
                                     </div>
                                 </div>
@@ -148,7 +151,7 @@
 
                                 <div class="col-sm-4">
                                     <div class="input-group w-100">
-                                        <input type="date" id="MOADate" name="MOADate" class="form-control">
+                                        <input type="date" id="MOADate" name="MOADate" class="form-control" value="@Model.MOADate.ToString("yyyy-MM-dd")">
                                         <span class="input-group-text"><i class="fa fa-calendar"></i></span>
                                     </div>
                                 </div>
@@ -180,13 +183,13 @@
                                     <select class="form-control frmField" name="ModeOfPayment" id="ModeOfPayment" required>
                                         <option value="" disabled selected>Select</option>
                                         <option value="1">Milestone Based</option>
-                                        <option value="2">Transacational Based</option>                                      
+                                        <option value="2">Transacational Based</option>
                                     </select>
-                                  @*   <input type="text" class="form-control" id="ModeOfPayment" name="ModeOfPayment" placeholder="Mode of Payment"> *@
+                                    @*   <input type="text" class="form-control" id="ModeOfPayment" name="ModeOfPayment" placeholder="Mode of Payment"> *@
                                 </div>
                             </div>
                         </div>
-                       
+
 
 
                     </div>
@@ -208,7 +211,7 @@
                                             <span> </span>
                                             <button class="btn btn-primary float-end">Submit</button>
                                         </div> *@
-                          @*   <a asp-controller="Project" asp-action="Milestone" class="btn btn-primary">
+                            @*   <a asp-controller="Project" asp-action="Milestone" class="btn btn-primary">
                                 <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
                                 <span class="text text-white"><small>Add Milestone</small></span>
                             </a> *@

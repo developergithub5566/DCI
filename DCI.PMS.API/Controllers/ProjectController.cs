@@ -9,7 +9,7 @@ namespace DCI.PMS.API.Controllers
     [Route("api/[controller]")]
     public class ProjectController : Controller
     {
-        
+
         IProjectRepository _projectRepository;
         public ProjectController(IProjectRepository projectRepository)
         {
@@ -21,14 +21,31 @@ namespace DCI.PMS.API.Controllers
         public async Task<IActionResult> GetAllProject([FromForm] ProjectViewModel model)
         {
             return Ok(await _projectRepository.GetAllProject());
-        }             
+        }
+
+        [HttpPost]
+        [Route("GetProjectById")]
+        public async Task<IActionResult> GetProjectById([FromBody] ProjectViewModel model)
+        {
+            return Ok(await _projectRepository.GetProjectById(model));
+        }
+
+
 
         [HttpPost]
         [Route("SaveProject")]
         public async Task<IActionResult> SaveProject([FromBody] ProjectViewModel model)
         {
-            var result = await _projectRepository.Save(model);
+            var result = await _projectRepository.SaveProject(model);
             return StatusCode(result.statuscode, result.message);
+        }
+
+
+        [HttpPost]
+        [Route("GetMilestoneByProjectId")]
+        public async Task<IActionResult> GetMilestoneByProjectId([FromBody] ProjectViewModel model)
+        {
+            return Ok(await _projectRepository.GetMilestoneByProjectId(model));
         }
     }
 }

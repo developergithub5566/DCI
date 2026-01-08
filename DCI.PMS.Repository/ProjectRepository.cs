@@ -113,12 +113,83 @@ namespace DCI.PMS.Repository
             return null;
         }
 
+        public async Task<ProjectViewModel> GetProjectById(ProjectViewModel model)
+        {
+
+            try
+            {
+                var users = await _dbContext.User
+                                        .AsNoTracking()
+                                        .Where(p => p.IsActive)
+                                        .Select(u => new
+                                        {
+                                            u.UserId,
+                                            u.Fullname
+                                        })
+                                        .ToListAsync();
+
+                var projects = await _pmsdbContext.Project
+                                        .AsNoTracking()
+                                        .Where(p => p.IsActive)
+                                        .Select(p => new
+                                        {
+                                            p.ProjectCreationId,
+                                            p.ProjectNo,
+                                            p.ProjectName,
+                                            p.ClientId,
+                                            p.NOADate,
+                                            p.NTPDate,
+                                            p.MOADate,
+                                            p.ProjectDuration,
+                                            p.ProjectCost,
+                                            p.ModeOfPayment,
+                                            p.CreatedBy,
+                                            p.IsActive
+                                        })
+                                        .ToListAsync();
+
+                var result = (from p in projects
+                              join u in users on p.CreatedBy equals u.UserId
+                              join c in _pmsdbContext.Client on p.ClientId equals c.ClientId
+                              where p.ProjectCreationId == model.ProjectCreationId
+                              select new ProjectViewModel
+                              {
+                                  ProjectCreationId = p.ProjectCreationId,
+                                  ProjectNo = p.ProjectNo,
+                                  ProjectName = p.ProjectName,
+                                  ClientId = p.ClientId,
+                                  ClientName = c.ClientName,
+                                  NOADate = p.NOADate,
+                                  NTPDate = p.NTPDate,
+                                  MOADate = p.MOADate,
+                                  ProjectDuration = p.ProjectDuration,
+                                  ProjectCost = p.ProjectCost,
+                                  ModeOfPayment = p.ModeOfPayment,
+                                  IsActive = p.IsActive,
+                                  CreatedName = u.Fullname
+                              }).FirstOrDefault();
+
+                return result;
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return null;
+        }
+
+
         public async Task<bool> IsExistsProject(int projectId)
         {
             return await _pmsdbContext.Project.AnyAsync(x => x.ProjectCreationId == projectId && x.IsActive == true);
         }
 
-        public async Task<(int statuscode, string message)> Save(ProjectViewModel model)
+        public async Task<(int statuscode, string message)> SaveProject(ProjectViewModel model)
         {
             try
             {
@@ -156,8 +227,8 @@ namespace DCI.PMS.Repository
                     entity.ProjectDuration = model.ProjectDuration;
                     entity.ProjectCost = model.ProjectCost;
                     entity.ModeOfPayment = model.ModeOfPayment;
-                    entity.DateCreated = entity.DateCreated;
-                    entity.CreatedBy = entity.CreatedBy;
+                    //entity.DateCreated = entity.DateCreated;
+                    //entity.CreatedBy = entity.CreatedBy;
                     entity.DateModified = DateTime.Now;
                     entity.ModifiedBy = model.ModifiedBy;
                     entity.IsActive = true;
@@ -177,6 +248,79 @@ namespace DCI.PMS.Repository
                 Log.CloseAndFlush();
             }
         }
+
+        public async Task<ProjectViewModel> GetMilestoneByProjectId(ProjectViewModel model)
+        {
+
+            try
+            {
+                var users = await _dbContext.User
+                                        .AsNoTracking()
+                                        .Where(p => p.IsActive)
+                                        .Select(u => new
+                                        {
+                                            u.UserId,
+                                            u.Fullname
+                                        })
+                                        .ToListAsync();
+
+                var milestone =  _pmsdbContext.Milestone
+                                        .AsNoTracking()
+                                        .Where(p => p.IsActive).ToList();
+                //.Select(p => new MilestoneViewModel
+                //{
+                //    p.ProjectCreationId,
+                //    p.MileStoneId,
+                //    p.MilestoneName,
+                //    p.Percentage,
+                //    p.TargetCompletedDate,
+                //    p.ActualCompletionDate,
+                //    p.PaymentStatus,
+                //    p.Status,
+                //    p.DateCreated,                                  
+                //    p.CreatedBy,
+                //    p.ModifiedBy,
+                //    p.DateModified,
+                //    p.IsActive
+                //})
+                //.ToListAsync();
+
+                var result = (from m in milestone
+                              join u in users on m.CreatedBy equals u.UserId
+                              where m.ProjectCreationId == model.ProjectCreationId
+                              select new MilestoneViewModel
+                              {
+                                  MileStoneId = m.MileStoneId,
+                                  ProjectCreationId = m.ProjectCreationId,
+                                  MilestoneName = m.MilestoneName,
+                                  Percentage = m.Percentage,
+                                  TargetCompletedDate = m.TargetCompletedDate,
+                                  ActualCompletionDate = m.ActualCompletionDate,
+                                  PaymentStatus = m.PaymentStatus,
+                                  Status = m.Status,
+                                  DateCreated = m.DateCreated,
+                                  CreatedBy = m.CreatedBy,
+                                  DateModified = m.DateModified,
+                                  ModifiedBy = m.ModifiedBy,
+                                  IsActive = m.IsActive,
+                              }).ToList();
+                
+                model.MilestoneList = result;
+
+                return model;
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return null;
+        }
+
 
         public async Task<(int statuscode, string message)> Delete(ProjectViewModel model)
         {

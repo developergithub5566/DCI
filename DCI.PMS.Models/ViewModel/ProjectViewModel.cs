@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.Diagnostics.Contracts;
 
 namespace DCI.PMS.Models.ViewModel
 {
@@ -7,6 +8,8 @@ namespace DCI.PMS.Models.ViewModel
         public int ProjectCreationId { get; set; } = 0;
 
         public int ClientId { get; set; }   = 0;
+
+        public string ClientName { get; set; } = string.Empty;
 
         public string? ProjectNo { get; set; } = string.Empty;
 
@@ -30,9 +33,11 @@ namespace DCI.PMS.Models.ViewModel
 
         public string? CreatedName { get; set; } = string.Empty;
 
-        public IFormFile? NOADateUploadFile { get; set; } 
-        public IFormFile? NTPDateUploadFile { get; set; } 
-        public IFormFile? MOADateUploadFile { get; set; } 
+        //public IFormFile? NOADateUploadFile { get; set; } 
+        //public IFormFile? NTPDateUploadFile { get; set; } 
+        //public IFormFile? MOADateUploadFile { get; set; } 
 
+        public List<MilestoneViewModel>? MilestoneList { get; set; } = new();
+  
     }
 }
