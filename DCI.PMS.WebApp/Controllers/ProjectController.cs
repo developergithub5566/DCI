@@ -124,6 +124,61 @@ namespace DCI.PMS.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
+        public async Task<IActionResult> SaveMilestone(ProjectViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+                    // model.CurrentUserId = currentUser.UserId;
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/SaveProject");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    //ProjectViewModel vm = JsonConvert.DeserializeObject<ProjectViewModel>(responseBody)!;
+
+                    //if (response.IsSuccessStatusCode)
+                    //{
+                    //    return View();
+                    //}
+                    //return Json(new { success = false, message = responseBody });
+                }
+
+                //  MilestoneViewModel milesModel = new MilestoneViewModel();
+
+                using (var _httpclient = new HttpClient())
+                {
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/GetMilestoneByProjectId");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    model = JsonConvert.DeserializeObject<ProjectViewModel>(responseBody)!;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return View(model);
+                    }
+                    return View(model);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
+
         public IActionResult Deliverables()
         {
             return View();

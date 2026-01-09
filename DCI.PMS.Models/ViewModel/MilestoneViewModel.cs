@@ -8,7 +8,7 @@
 
         public string MilestoneName { get; set; } = string.Empty;
 
-        public string Percentage { get; set; } = string.Empty;
+        public double Percentage { get; set; } = 0;
 
         public DateTime? TargetCompletedDate { get; set; }
         public DateTime? ActualCompletionDate { get; set; }

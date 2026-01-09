@@ -15,7 +15,7 @@ namespace DCI.PMS.Repository
         private readonly DCIdbContext _dbContext;
         private readonly PMSdbContext _pmsdbContext;
         public ProjectRepository(DCIdbContext context, PMSdbContext pmsContext)
-        {  
+        {
             this._dbContext = context;
             this._pmsdbContext = pmsContext;
         }
@@ -75,30 +75,30 @@ namespace DCI.PMS.Repository
                                             p.NOADate,
                                             p.NTPDate,
                                             p.MOADate,
-                                            p.ProjectDuration, 
+                                            p.ProjectDuration,
                                             p.ProjectCost,
                                             p.ModeOfPayment,
                                             p.CreatedBy,
                                             p.IsActive
                                         })
-                                        .ToListAsync(); 
+                                        .ToListAsync();
 
-                var result =  from p in projects
-                                        join u in users on p.CreatedBy equals u.UserId
-                                        select new ProjectViewModel
-                                        {
-                                            ProjectCreationId = p.ProjectCreationId,  
-                                            ProjectNo = p.ProjectNo,
-                                            ProjectName = p.ProjectName,
-                                            NOADate = p.NOADate,
-                                            NTPDate = p.NTPDate,
-                                            MOADate = p.MOADate,
-                                            ProjectDuration = p.ProjectDuration,
-                                            ProjectCost = p.ProjectCost,
-                                            ModeOfPayment = p.ModeOfPayment,
-                                            IsActive = p.IsActive,
-                                            CreatedName = u.Fullname
-                                        };
+                var result = from p in projects
+                             join u in users on p.CreatedBy equals u.UserId
+                             select new ProjectViewModel
+                             {
+                                 ProjectCreationId = p.ProjectCreationId,
+                                 ProjectNo = p.ProjectNo,
+                                 ProjectName = p.ProjectName,
+                                 NOADate = p.NOADate,
+                                 NTPDate = p.NTPDate,
+                                 MOADate = p.MOADate,
+                                 ProjectDuration = p.ProjectDuration,
+                                 ProjectCost = p.ProjectCost,
+                                 ModeOfPayment = p.ModeOfPayment,
+                                 IsActive = p.IsActive,
+                                 CreatedName = u.Fullname
+                             };
 
                 return result.ToList();
             }
@@ -264,26 +264,10 @@ namespace DCI.PMS.Repository
                                         })
                                         .ToListAsync();
 
-                var milestone =  _pmsdbContext.Milestone
+                var milestone = _pmsdbContext.Milestone
                                         .AsNoTracking()
                                         .Where(p => p.IsActive).ToList();
-                //.Select(p => new MilestoneViewModel
-                //{
-                //    p.ProjectCreationId,
-                //    p.MileStoneId,
-                //    p.MilestoneName,
-                //    p.Percentage,
-                //    p.TargetCompletedDate,
-                //    p.ActualCompletionDate,
-                //    p.PaymentStatus,
-                //    p.Status,
-                //    p.DateCreated,                                  
-                //    p.CreatedBy,
-                //    p.ModifiedBy,
-                //    p.DateModified,
-                //    p.IsActive
-                //})
-                //.ToListAsync();
+
 
                 var result = (from m in milestone
                               join u in users on m.CreatedBy equals u.UserId
@@ -304,7 +288,7 @@ namespace DCI.PMS.Repository
                                   ModifiedBy = m.ModifiedBy,
                                   IsActive = m.IsActive,
                               }).ToList();
-                
+
                 model.MilestoneList = result;
 
                 return model;
@@ -319,6 +303,57 @@ namespace DCI.PMS.Repository
                 Log.CloseAndFlush();
             }
             return null;
+        }
+
+        public async Task<(int statuscode, string message)> SaveMilestone(MilestoneViewModel model)
+        {
+            try
+            {
+                if (model.ProjectCreationId == 0)
+                {
+                    Milestone entity = new Milestone();
+                    entity.MilestoneName = model.MilestoneName;
+                    entity.Percentage = model.Percentage;
+                    entity.TargetCompletedDate = model.TargetCompletedDate;
+                    entity.ActualCompletionDate = model.ActualCompletionDate;
+                    entity.PaymentStatus = model.PaymentStatus;
+                    entity.Status = model.Status;                             
+                    entity.CreatedBy = model.CreatedBy;
+                    entity.DateCreated = DateTime.Now;
+                    entity.ModifiedBy = null;
+                    entity.DateModified = null;
+                    entity.IsActive = true;
+                    await _pmsdbContext.Milestone.AddAsync(entity);
+                    await _pmsdbContext.SaveChangesAsync();
+                    return (StatusCodes.Status200OK, "Successfully saved");
+                }
+                else
+                {
+                    var entity = await _pmsdbContext.Milestone.FirstOrDefaultAsync(x => x.MileStoneId == model.MileStoneId);
+                    entity.MilestoneName = model.MilestoneName;
+                    entity.Percentage = model.Percentage;
+                    entity.TargetCompletedDate = model.TargetCompletedDate;
+                    entity.ActualCompletionDate = model.ActualCompletionDate;
+                    entity.PaymentStatus = model.PaymentStatus;
+                    entity.Status = model.Status;    
+                    entity.DateModified = DateTime.Now;
+                    entity.ModifiedBy = model.ModifiedBy;
+                    entity.IsActive = true;
+
+                    _pmsdbContext.Milestone.Entry(entity).State = EntityState.Modified;
+                    await _pmsdbContext.SaveChangesAsync();
+                    return (StatusCodes.Status200OK, "Successfully updated");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return (StatusCodes.Status406NotAcceptable, ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
 
