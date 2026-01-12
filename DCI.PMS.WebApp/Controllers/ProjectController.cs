@@ -73,13 +73,14 @@ namespace DCI.PMS.WebApp.Controllers
         {
             try
             {
+              //  ProjectViewModel model = new ProjectViewModel();
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
                     if (currentUser == null)
                         return RedirectToAction("Logout", "Account");
                     // model.CurrentUserId = currentUser.UserId;
-
+                  //  model.ProjectCreationId = ProjectCreationId;
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/SaveProject");
                     request.Content = stringContent;
@@ -124,7 +125,7 @@ namespace DCI.PMS.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
-        public async Task<IActionResult> SaveMilestone(MilestoneViewModel model)
+        public async Task<IActionResult> AddMilestone(MilestoneViewModel model)
         {
             try
             {
@@ -156,9 +157,54 @@ namespace DCI.PMS.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
-        public IActionResult Deliverables()
+        public async Task<IActionResult> Deliverables(ProjectViewModel model)
         {
-            return View();
+
+            using (var _httpclient = new HttpClient())
+            {
+                var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/GetDeliverablesByMilestoneId");
+                request.Content = stringContent;
+                var response = await _httpclient.SendAsync(request);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                model = JsonConvert.DeserializeObject<ProjectViewModel>(responseBody)!;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return View(model);
+                }
+                return View(model);
+            }
+        }
+
+        public async Task<IActionResult> AddDeliverable(DeliverableViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/SaveDeliverable");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
         public async Task<IActionResult> Index(ProjectViewModel model)

@@ -1,13 +1,13 @@
-﻿namespace DCI.PMS.Models.Entities
+﻿using System.Reflection.Metadata;
+
+namespace DCI.PMS.Models.Entities
 {
     public class Deliverable
     {
         public int DeliverableId { get; set; }
 
         public int MileStoneId { get; set; }   // FK to MileStone
-
         public string DeliverableName { get; set; } = string.Empty;
-
         public int Status { get; set; }
 
         public DateTime DateCreated { get; set; }

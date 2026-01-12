@@ -4,7 +4,7 @@
     {
         public int MileStoneId { get; set; }
 
-        public int? ProjectCreationId { get; set; }
+        public int ProjectCreationId { get; set; }
 
         public string MilestoneName { get; set; } = string.Empty;
 
@@ -23,6 +23,8 @@
         public int? ModifiedBy { get; set; }
 
         public bool IsActive { get; set; }
+
+        public List<DeliverableViewModel>? DeliverableList { get; set; } = new();
 
     }
 }

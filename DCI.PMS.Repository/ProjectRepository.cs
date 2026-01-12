@@ -309,15 +309,16 @@ namespace DCI.PMS.Repository
         {
             try
             {
-                if (model.ProjectCreationId == 0)
+                if (model.MileStoneId == 0)
                 {
                     Milestone entity = new Milestone();
+                    entity.ProjectCreationId = model.ProjectCreationId;
                     entity.MilestoneName = model.MilestoneName;
                     entity.Percentage = model.Percentage;
                     entity.TargetCompletedDate = model.TargetCompletedDate;
                     entity.ActualCompletionDate = model.ActualCompletionDate;
                     entity.PaymentStatus = model.PaymentStatus;
-                    entity.Status = model.Status;                             
+                    entity.Status = model.Status;
                     entity.CreatedBy = model.CreatedBy;
                     entity.DateCreated = DateTime.Now;
                     entity.ModifiedBy = null;
@@ -335,7 +336,7 @@ namespace DCI.PMS.Repository
                     entity.TargetCompletedDate = model.TargetCompletedDate;
                     entity.ActualCompletionDate = model.ActualCompletionDate;
                     entity.PaymentStatus = model.PaymentStatus;
-                    entity.Status = model.Status;    
+                    entity.Status = model.Status;
                     entity.DateModified = DateTime.Now;
                     entity.ModifiedBy = model.ModifiedBy;
                     entity.IsActive = true;
@@ -356,6 +357,103 @@ namespace DCI.PMS.Repository
             }
         }
 
+        public async Task<MilestoneViewModel> GetDeliverablesByMilestoneId(MilestoneViewModel model)
+        {
+
+            try
+            {
+                var users = await _dbContext.User
+                                        .AsNoTracking()
+                                        .Where(p => p.IsActive)
+                                        .Select(u => new
+                                        {
+                                            u.UserId,
+                                            u.Fullname
+                                        })
+                                        .ToListAsync();
+
+                var deliverable = _pmsdbContext.Deliverable
+                                        .AsNoTracking()
+                                        .Where(p => p.IsActive).ToList();
+
+
+                var result = (from m in deliverable
+                              join u in users on m.CreatedBy equals u.UserId
+                              where m.MileStoneId == model.MileStoneId
+                              select new DeliverableViewModel
+                              {
+                                  DeliverableId = m.DeliverableId,
+                                  MileStoneId = m.MileStoneId,
+                                  DeliverableName = m.DeliverableName,
+                                  Status = m.Status,
+                                  DateCreated = m.DateCreated,
+                                  CreatedBy = m.CreatedBy,
+                                  DateModified = m.DateModified,
+                                  ModifiedBy = m.ModifiedBy,
+                                  IsActive = m.IsActive,
+                              }).ToList();
+
+
+                model.DeliverableList = result;
+
+                return model;
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return null;
+        }
+
+        public async Task<(int statuscode, string message)> SaveDeliverable(DeliverableViewModel model)
+        {
+            try
+            {
+                if (model.MileStoneId == 0)
+                {
+                    Deliverable entity = new Deliverable();
+                    entity.DeliverableId = model.DeliverableId;
+                    entity.MileStoneId = model.MileStoneId;
+                    entity.DeliverableName = model.DeliverableName;        
+                    entity.Status = model.Status;
+                    entity.CreatedBy = model.CreatedBy;
+                    entity.DateCreated = DateTime.Now;
+                    entity.ModifiedBy = null;
+                    entity.DateModified = null;
+                    entity.IsActive = true;
+                    await _pmsdbContext.Deliverable.AddAsync(entity);
+                    await _pmsdbContext.SaveChangesAsync();
+                    return (StatusCodes.Status200OK, "Successfully saved");
+                }
+                else
+                {
+                    var entity = await _pmsdbContext.Deliverable.FirstOrDefaultAsync(x => x.MileStoneId == model.MileStoneId);
+                    entity.DeliverableName = model.DeliverableName;                   
+                    entity.Status = model.Status;
+                    entity.DateModified = DateTime.Now;
+                    entity.ModifiedBy = model.ModifiedBy;
+                    entity.IsActive = true;
+
+                    _pmsdbContext.Deliverable.Entry(entity).State = EntityState.Modified;
+                    await _pmsdbContext.SaveChangesAsync();
+                    return (StatusCodes.Status200OK, "Successfully updated");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return (StatusCodes.Status406NotAcceptable, ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
 
         public async Task<(int statuscode, string message)> Delete(ProjectViewModel model)
         {

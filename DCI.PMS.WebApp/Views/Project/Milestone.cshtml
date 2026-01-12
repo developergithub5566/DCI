@@ -33,7 +33,7 @@
 
 
 
-            <form id="createForm" asp-controller="Project" asp-action="SaveMilestone" method="post" enctype="multipart/form-data">
+            <form id="createForm" asp-controller="Project" asp-action="AddMilestone" method="post" enctype="multipart/form-data">
                 <div class="modal-body">
 
                     <div class="project-dates">
@@ -137,9 +137,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            @foreach (var x in Model.MilestoneList)
-                            {
+
+                        @foreach (var x in Model.MilestoneList)
+                        {
+                            <tr>
                                 <td>@x.MilestoneName</td>
                                 <td>@x.Percentage</td>
                                 <td>@x.TargetCompletedDate.Value.ToShortDateString() </td>
@@ -154,36 +155,9 @@
                                         Deliverables
                                     </a>
                                 </td>
-                            }
-                            @*    <td>
-                                  1
-                                </td>
-                                <td>
-                                 Milestone A
-                                </td>
-                                <td>
-                                 20%
-                                </td>
-                                <td>
-                                 2025-04-01
-                                </td>
-                                <td>
-                                2025-04-01
-                                </td>
-                                <td>
-                                On-going
-                                </td>
-                                <td>
-                                    In Progress
-                                </td>                        
-                                <td class="text-center">
-                                    <a href="javascript:void(0)" title="EDIT">EDIT</a> |
-                                    <a href="javascript:void(0)" title="REMOVE">REMOVE</a> |                              
-                                    <a asp-controller="Project" asp-action="Deliverables">
-                                        Deliverables
-                                    </a>                                    
-                                </td> *@
-                        </tr>
+                            </tr>
+                        }
+
                     </tbody>
                 </table>
             </div>
