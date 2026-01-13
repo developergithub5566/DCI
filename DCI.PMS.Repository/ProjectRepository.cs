@@ -117,7 +117,7 @@ namespace DCI.PMS.Repository
         {
 
             try
-            {
+            {       
                 var users = await _dbContext.User
                                         .AsNoTracking()
                                         .Where(p => p.IsActive)
@@ -127,6 +127,22 @@ namespace DCI.PMS.Repository
                                             u.Fullname
                                         })
                                         .ToListAsync();
+
+                var _clientList = await _pmsdbContext.Client
+                                    .AsNoTracking()
+                                    .Where(c => c.IsActive)
+                                    .Select(c => new ClientViewModel
+                                    {
+                                        ClientId = c.ClientId,
+                                        ClientName = c.ClientName,
+                                        Description = c.Description,
+                                        DateCreated = c.DateCreated,
+                                        CreatedBy = c.CreatedBy,
+                                        IsActive = c.IsActive
+                                    })
+                                    .ToListAsync();
+
+
 
                 var projects = await _pmsdbContext.Project
                                         .AsNoTracking()
@@ -168,6 +184,13 @@ namespace DCI.PMS.Repository
                                   IsActive = p.IsActive,
                                   CreatedName = u.Fullname
                               }).FirstOrDefault();
+
+                if(result == null)
+                {
+                    result = new ProjectViewModel();
+                }
+
+                result.ClientList = _clientList;
 
                 return result;
 
@@ -414,7 +437,7 @@ namespace DCI.PMS.Repository
         {
             try
             {
-                if (model.MileStoneId == 0)
+                if (model.DeliverableId == 0)
                 {
                     Deliverable entity = new Deliverable();
                     entity.DeliverableId = model.DeliverableId;

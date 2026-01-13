@@ -1,4 +1,4 @@
-﻿@model DCI.PMS.Models.ViewModel.ProjectViewModel
+﻿@model DCI.PMS.Models.ViewModel.MilestoneViewModel
 @using Newtonsoft.Json;
 @using DCI.Core.Common;
 @using DCI.Models.ViewModel;
@@ -76,33 +76,30 @@
 
 
 
-            <form id="createForm">
+            <form id="createForm" asp-controller="Project" asp-action="AddDeliverable" method="post" enctype="multipart/form-data">
                 <div class="modal-body">
 
                     <div class="project-dates">
+                        <input type="hidden" id="MileStoneId" name="MileStoneId" value="@Model.MileStoneId">
                         <div id="step1">
                             <div class="row">
                                 <label for="inputEmail3" class="col-sm-2 col-form-label">Deliverable Name</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control" id="inputProject" placeholder="Deliverable Name">
+                                    <input type="text" class="form-control" id="DeliverableName" name="DeliverableName" placeholder="Deliverable Name">
                                 </div>
                             </div>
                             <div class="row">
                                 <label for="inputEmail3" class="col-sm-2 col-form-label">Status</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control" id="inputClient" placeholder="Status">
+                                    <input type="text" class="form-control" id="Status" name="Status" placeholder="Status">
                                 </div>
                             </div>
 
-                          
-
-                      
-
                             <div class="row">
-                                <label for="inputEmail3" class="col-sm-2 col-form-label">Date Created</label>
+                       @*          <label for="inputEmail3" class="col-sm-2 col-form-label">Date Created</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control" id="inputEmail3" placeholder="Date Created">
-                                </div>
+                                    <input type="text" class="form-control" id="DateCreated" name="DateCreated" placeholder="Date Created">
+                                </div> *@
                             </div>
                             <div class="row">
 
@@ -110,7 +107,7 @@
                                     <button class="btn btn-primary float-end" onclick="nextStep()">Add to list</button>
                                 </div>
                             </div>
-                            
+
 
                         </div>
 
@@ -124,9 +121,6 @@
                         <tr>
 
                             <th>
-                                <label>Id</label>
-                            </th>
-                            <th>
                                 <label>Deliverable</label>
                             </th>
                             <th>
@@ -135,7 +129,7 @@
                             <th>
                                 <label>Date Created</label>
                             </th>
-                          
+
                             <th class="text-center">
                                 <label>Actions</label>
                             </th>
@@ -143,27 +137,26 @@
                     </thead>
                     <tbody>
 
+                        @foreach (var item in Model.DeliverableList)
+                        {
+                            <tr>
+                                <td>
+                                    @item.DeliverableName
+                                </td>
+                                <td>
+                                    @item.Status
+                                </td>
 
-                        <tr>
-                            <td>
-                                1
-                            </td>
-                            <td>
-                                Deliverable A
-                            </td>
-                          
-                            <td>
-                                On-going
-                            </td>
-                            <td>
-                             2025-12-05
-                            </td>
-                            <td class="text-center">
-                                <a href="javascript:void(0)" title="EDIT">EDIT</a> |                      
-                                <a href="javascript:void(0)" title="REMOVE">REMOVE</a>          
-                            </td>
-                        </tr>
+                                <td>
+                                    @item.DateCreated.ToString("yyyy-MM-dd")
+                                </td>
 
+                                <td class="text-center">
+                                    <a href="javascript:void(0)" title="EDIT">EDIT</a> |
+                                    <a href="javascript:void(0)" title="REMOVE">REMOVE</a>
+                                </td>
+                            </tr>
+                        }
 
                     </tbody>
                 </table>

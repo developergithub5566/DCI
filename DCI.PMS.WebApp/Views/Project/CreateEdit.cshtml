@@ -74,7 +74,7 @@
 
 
 
-            <form id="createForm" asp-controller="Project" asp-action="Milestone" method="post" enctype="multipart/form-data">
+            <form id="createForm" asp-controller="Project" asp-action="SaveProjectMilestone" method="post" enctype="multipart/form-data">
                 <div class="modal-body">
 
                     <div class="project-dates">
@@ -92,14 +92,15 @@
                                 <label for="ClientName" class="col-sm-2 col-form-label">Client Name</label>
                                 <div class="col-sm-8">
                                     @*   <input type="text" class="form-control" id="ClientName" name="ClientName" placeholder="Client Name"> *@
-                                    <select class="form-control frmField" name="ClientId" id="ClientId" required>
+                            @*         <select class="form-control frmField" name="ClientId" id="ClientId" required>
                                         <option value="" disabled selected>Select</option>
                                         <option value="1" class="TIME_IN">Client A</option>
                                         <option value="2" class="TIME_OUT">Client B</option>
                                         <option value="3" class="TIME_OUT">Client C</option>
                                         <option value="4" class="TIME_OUT">Client D</option>
                                         <option value="5" class="TIME_OUT">Client E</option>
-                                    </select>
+                                    </select> *@
+                                    @Html.DropDownListFor(m => m.ClientId, new SelectList(Model.ClientList, "ClientId", "ClientName"), "Select", new { @class = "form-control frmField", required = "required" })
                                 </div>
                             </div>
                             <div class="row">
@@ -115,15 +116,13 @@
 
                                 <div class="col-sm-4">
                                     <div class="input-group w-100">
-                                        <input type="date" id="NOADate" name="NOADate" class="form-control" value="@Model.NOADate.ToString("yyyy-MM-dd")">
+                                        <input type="date" id="NOADate" name="NOADate" class="form-control" value="@Model.NOADate.ToString("MM-dd-yyyy")">
                                         <span class="input-group-text"><i class="fa fa-calendar"></i></span>
                                     </div>
                                 </div>
 
-                                <div class="col-md-4">
-
-                                    <input type="file" class="form-control" id="NOADateUploadFile" name="NOADateUploadFile" />
-
+                                <div class="col-md-4">                        
+                                    <input type="file" class="form-control" id="NOAFile" name="NOAFile" accept="application/pdf" onchange="" />
 
                                     @*    <button class="btn btn-primary btn-sm ms-2">Upload File</button> *@
                                 </div>
@@ -135,13 +134,13 @@
 
                                 <div class="col-sm-4">
                                     <div class="input-group w-100">
-                                        <input type="date" id="NTPDate" name="NTPDate" class="form-control" value="@Model.NTPDate.ToString("yyyy-MM-dd")">
+                                        <input type="date" id="NTPDate" name="NTPDate" class="form-control" value="@Model.NTPDate.ToString("MM-dd-yyyy")">
                                         <span class="input-group-text"><i class="fa fa-calendar"></i></span>
                                     </div>
                                 </div>
 
                                 <div class="col-md-4">
-                                    <input type="file" class="form-control" id="NTPDateUploadFile" name="NTPDateUploadFile" />
+                                    <input type="file" class="form-control" id="NTPFile" name="NTPFile" accept="application/pdf" onchange="" />
                                 </div>
                             </div>
 
@@ -151,13 +150,13 @@
 
                                 <div class="col-sm-4">
                                     <div class="input-group w-100">
-                                        <input type="date" id="MOADate" name="MOADate" class="form-control" value="@Model.MOADate.ToString("yyyy-MM-dd")">
+                                        <input type="date" id="MOADate" name="MOADate" class="form-control" value="@Model.MOADate.ToString("MM-dd-yyyy")">
                                         <span class="input-group-text"><i class="fa fa-calendar"></i></span>
                                     </div>
                                 </div>
 
                                 <div class="col-md-4">
-                                    <input type="file" id="MOADateUploadFile" name="MOADateUploadFile" class="form-control">
+                                    <input type="file" id="MOAFile" name="MOAFile" class="form-control" accept="application/pdf" onchange="">
                                 </div>
                             </div>
 
@@ -165,27 +164,50 @@
                             <div class="row">
                                 <label for="inputEmail3" class="col-sm-2 col-form-label">Project Duration</label>
                                 <div class="col-sm-8">
-                                    <select class="form-control frmField" name="ProjectDuration" id="ProjectDuration" required>
-                                        <option value="" disabled selected>Select</option>
-                                        <option value="1" class="TIME_IN">1 month</option>
-                                        <option value="2" class="TIME_OUT">6 months</option>
-                                        <option value="3" class="TIME_OUT">1 year</option>
-                                        <option value="4" class="TIME_OUT">2 years</option>
-                                        <option value="5" class="TIME_OUT">5 years</option>
-                                    </select>
+                                  @*   <select class="form-control frmField" name="ProjectDuration" id="ProjectDuration" required>
+                                        <option value="">Select</option>                                     
+                                        <option value="1" @(Model.ProjectDuration == 1 ? "selected" : "")>1 month</option>
+                                        <option value="2" @(Model.ProjectDuration == 2 ? "selected" : "")>6 months</option>
+                                        <option value="3" @(Model.ProjectDuration == 3 ? "selected" : "")>1 year</option>
+                                        <option value="4" @(Model.ProjectDuration == 4 ? "selected" : "")>2 years</option>
+                                        <option value="5" @(Model.ProjectDuration == 5 ? "selected" : "")>5 years</option>
+                                    </select> *@
                                     @* <input type="text" class="form-control" id="ProjectDuration" name="ProjectDuration" placeholder="Project Duration"> *@
+                                                            @Html.DropDownListFor(
+                                                            m => m.ProjectDuration,
+                                                                        new List<SelectListItem>
+                                                                        {
+                                                                        new SelectListItem { Value = "1", Text = "1 month" },
+                                                                        new SelectListItem { Value = "2", Text = "6 months" },
+                                                                        new SelectListItem { Value = "3", Text = "1 year" },
+                                                                        new SelectListItem { Value = "4", Text = "2 years" },
+                                                                        new SelectListItem { Value = "5", Text = "5 years" }
+                                                                        },
+                                                                        "Select",
+                                                                        new { @class = "form-control frmField", required = "required" }
+                                                                        )
                                 </div>
                             </div>
 
                             <div class="row">
                                 <label for="inputEmail3" class="col-sm-2 col-form-label">Mode of Payment</label>
                                 <div class="col-sm-8">
-                                    <select class="form-control frmField" name="ModeOfPayment" id="ModeOfPayment" required>
+                                   @*  <select class="form-control frmField" name="ModeOfPayment" id="ModeOfPayment" required>
                                         <option value="" disabled selected>Select</option>
                                         <option value="1">Milestone Based</option>
                                         <option value="2">Transacational Based</option>
-                                    </select>
+                                    </select> *@
                                     @*   <input type="text" class="form-control" id="ModeOfPayment" name="ModeOfPayment" placeholder="Mode of Payment"> *@
+                                    @Html.DropDownListFor(
+                                                                        m => m.ModeOfPayment,
+                                                                        new List<SelectListItem>
+                                                                        {
+                                                                        new SelectListItem { Value = "1", Text = "Milestone Based" },
+                                                                        new SelectListItem { Value = "2", Text = "Transacational Based" }                                                                     
+                                                                        },
+                                                                        "Select",
+                                                                        new { @class = "form-control frmField", required = "required" }
+                                                                        )
                                 </div>
                             </div>
                         </div>
@@ -278,7 +300,19 @@
 
             $(document).ready(function () {
 
+                         flatpickr("#NOADate", {
+                                       dateFormat: "m/d/Y",
+                                    });
 
+
+                         flatpickr("#NTPDate", {
+                                       dateFormat: "m/d/Y",
+                                    });
+
+
+                         flatpickr("#MOADate", {
+                                       dateFormat: "m/d/Y",
+                                    });
 
             }); //end docu
 

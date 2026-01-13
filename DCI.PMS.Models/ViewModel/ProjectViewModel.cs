@@ -33,11 +33,11 @@ namespace DCI.PMS.Models.ViewModel
 
         public string? CreatedName { get; set; } = string.Empty;
 
-        //public IFormFile? NOADateUploadFile { get; set; } 
-        //public IFormFile? NTPDateUploadFile { get; set; } 
-        //public IFormFile? MOADateUploadFile { get; set; } 
-
+        public IFormFile? NOAFile { get; set; }
+        public IFormFile? NTPFile { get; set; }
+        public IFormFile? MOAFile { get; set; }
         public List<MilestoneViewModel>? MilestoneList { get; set; } = new();
-  
+        public List<ClientViewModel>? ClientList { get; set; } = new();
+
     }
 }
