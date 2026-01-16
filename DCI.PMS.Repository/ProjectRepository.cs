@@ -1,4 +1,7 @@
-﻿using DCI.Data;
+﻿using DCI.Core.Common;
+using DCI.Core.Helpers;
+using DCI.Data;
+using DCI.Models.Configuration;
 using DCI.Models.Entities;
 using DCI.Models.ViewModel;
 using DCI.PMS.Models.Entities;
@@ -6,18 +9,21 @@ using DCI.PMS.Models.ViewModel;
 using DCI.PMS.Repository.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace DCI.PMS.Repository
 {
     public class ProjectRepository : IProjectRepository, IDisposable
     {
+        private readonly IOptions<DCI.Models.ViewModel.FileModel> _fileconfig;
         private readonly DCIdbContext _dbContext;
         private readonly PMSdbContext _pmsdbContext;
-        public ProjectRepository(DCIdbContext context, PMSdbContext pmsContext)
+        public ProjectRepository(DCIdbContext context, PMSdbContext pmsContext, IOptions<DCI.Models.ViewModel.FileModel> fileconfig)
         {
             this._dbContext = context;
             this._pmsdbContext = pmsContext;
+            this._fileconfig = fileconfig;
         }
         public void Dispose()
         {
@@ -221,7 +227,7 @@ namespace DCI.PMS.Repository
                     Project entity = new Project();
                     entity.ProjectCreationId = model.ProjectCreationId;
                     entity.ClientId = model.ClientId;
-                    entity.ProjectNo = model.ProjectNo;
+                    entity.ProjectNo =  await GenereteRequestNo();
                     entity.ProjectName = model.ProjectName;
                     entity.NOADate = model.NOADate;
                     entity.NTPDate = model.NTPDate;
@@ -236,6 +242,8 @@ namespace DCI.PMS.Repository
                     entity.IsActive = true;
                     await _pmsdbContext.Project.AddAsync(entity);
                     await _pmsdbContext.SaveChangesAsync();
+
+                    await SaveFile(model);
                     return (StatusCodes.Status200OK, "Successfully saved");
                 }
                 else
@@ -255,16 +263,106 @@ namespace DCI.PMS.Repository
                     entity.DateModified = DateTime.Now;
                     entity.ModifiedBy = model.ModifiedBy;
                     entity.IsActive = true;
-
                     _pmsdbContext.Project.Entry(entity).State = EntityState.Modified;
                     await _pmsdbContext.SaveChangesAsync();
+
+                    await SaveFile(model);
                     return (StatusCodes.Status200OK, "Successfully updated");
                 }
+
+
             }
             catch (Exception ex)
             {
                 Log.Error(ex.ToString());
                 return (StatusCodes.Status406NotAcceptable, ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        private async Task SaveFile(ProjectViewModel model)
+        {
+            try
+            {
+            
+                //string _filelocation = _fileconfig.Value.FileLocation;
+                string fileloc = @"C:\\DCI App\\PMS\\" + model.ProjectCreationId.ToString() + @"\";                   
+
+                if (!Directory.Exists(fileloc))
+                    Directory.CreateDirectory(fileloc);       
+          
+
+                if(model.NOAFile.Length > 0)
+                {
+                    string noa_filename = model.NOAFile.FileName;
+                    string noa_filenameLocation = Path.Combine(fileloc, noa_filename);
+                    using (var stream = new FileStream(noa_filenameLocation, FileMode.Create, FileAccess.Write))
+                    {
+                        model.NOAFile.CopyTo(stream);
+                    }
+                    Attachment noa_entity = new Attachment();
+                    noa_entity.ProjectCreationId = model.ProjectCreationId;
+                    noa_entity.AttachmentType = (int)EnumAttachmentType.NOA;
+                    noa_entity.Filename = noa_filename;
+                    noa_entity.FileLocation = model.ProjectName;
+                    noa_entity.CreatedBy = model.CreatedBy;
+                    noa_entity.DateCreated = DateTime.Now;
+                    noa_entity.IsActive = true;
+                    await _pmsdbContext.Attachment.AddAsync(noa_entity);
+                    await _pmsdbContext.SaveChangesAsync();
+                }
+
+                if (model.NTPFile.Length > 0)
+                {
+                    string ntp_filename = model.NTPFile.FileName;
+                    string ntp_filenameLocation = Path.Combine(fileloc, ntp_filename);
+
+                    using (var stream = new FileStream(ntp_filenameLocation, FileMode.Create, FileAccess.Write))
+                    {
+                        model.NTPFile.CopyTo(stream);
+                    }
+
+                    Attachment ntp_entity = new Attachment();
+                    ntp_entity.ProjectCreationId = model.ProjectCreationId;
+                    ntp_entity.AttachmentType = (int)EnumAttachmentType.NTP;
+                    ntp_entity.Filename = ntp_filenameLocation;
+                    ntp_entity.FileLocation = model.ProjectName;
+                    ntp_entity.CreatedBy = model.CreatedBy;
+                    ntp_entity.DateCreated = DateTime.Now;
+                    ntp_entity.IsActive = true;
+                    await _pmsdbContext.Attachment.AddAsync(ntp_entity);
+                    await _pmsdbContext.SaveChangesAsync();
+                }
+
+                if (model.MOAFile.Length > 0)
+                {
+                    string moa_filename = model.MOAFile.FileName;
+                    string moa_filenameLocation = Path.Combine(fileloc, moa_filename);
+
+                    using (var stream = new FileStream(moa_filenameLocation, FileMode.Create, FileAccess.Write))
+                    {
+                        model.MOAFile.CopyTo(stream);
+                    }
+
+                    Attachment moa_entity = new Attachment();
+                    moa_entity.ProjectCreationId = model.ProjectCreationId;
+                    moa_entity.AttachmentType = (int)EnumAttachmentType.MOA;
+                    moa_entity.Filename = moa_filenameLocation;
+                    moa_entity.FileLocation = model.ProjectName;
+                    moa_entity.CreatedBy = model.CreatedBy;
+                    moa_entity.DateCreated = DateTime.Now;
+                    moa_entity.IsActive = true;
+                    await _pmsdbContext.Attachment.AddAsync(moa_entity);
+                    await _pmsdbContext.SaveChangesAsync();
+                }   
+                
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());                
             }
             finally
             {
@@ -507,7 +605,36 @@ namespace DCI.PMS.Repository
         }
 
 
+        private async Task<string> GenereteRequestNo()
+        {
 
+            try
+            {
+                int _currentYear = DateTime.Now.Year;
+                int _currentMonth = DateTime.Now.Month;
+                var _leaveContext = await _pmsdbContext.Project
+                                                .Where(x => x.IsActive == true && x.DateCreated.Date.Year == _currentYear && x.DateCreated.Date.Month == _currentMonth)
+                                                .AsNoTracking()
+                                                .ToListAsync();
+
+
+                int totalrecords = _leaveContext.Count() + 1;
+                string finalSetRecords = FormatHelper.GetFormattedRequestNo(totalrecords);
+                string yearMonth = DateTime.Now.ToString("yyyyMM");
+                string req = Constants.ModuleCode_PMS;
+
+                return $"{req}-{yearMonth}-{finalSetRecords}";
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return string.Empty;
+        }
 
     }
 }

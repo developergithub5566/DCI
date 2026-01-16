@@ -94,7 +94,7 @@ namespace DCI.Trigger
                 string emailBody = $@"
                                 <html>
                                   <body style='font-family: Arial, sans-serif; font-size: 14px; color: #333;'>
-                                    <p>Hi {model.Fullname},</p>
+                                    <p>Hi {model.Fullname.ToUpper()},</p>
     
                                     <p>This is an automated message from the <strong>ESS System</strong>.</p>
 
@@ -161,7 +161,7 @@ namespace DCI.Trigger
                 string emailBody = $@"
                                 <html>
                                   <body style='font-family: Arial, sans-serif; font-size: 14px; color: #333;'>
-                                    <p>Hi {model.Fullname},</p>
+                                    <p>Hi {model.Fullname.ToUpper()},</p>
     
                                     <p>This is an automated message from the <strong>ESS System</strong>.</p>
 
@@ -238,7 +238,7 @@ namespace DCI.Trigger
                 string emailBody = $@"
                                 <html>
                                   <body style='font-family: Arial, sans-serif; font-size: 14px; color: #333;'>
-                                    <p>Hi {model.Fullname},</p>
+                                    <p>Hi {model.Fullname.ToUpper()},</p>
     
                                     <p>This is an automated message from the <strong>ESS System</strong>.</p>
 

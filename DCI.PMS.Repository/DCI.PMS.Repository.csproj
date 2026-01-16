@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DCI.Core\DCI.Core.csproj" />
     <ProjectReference Include="..\DCI.Data\DCI.Data.csproj" />
   </ItemGroup>
 

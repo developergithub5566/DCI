@@ -22,6 +22,7 @@ builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 //builder.Services.Configure<AuthenticationModel>(builder.Configuration.GetSection("Authentication"));
 //builder.Services.Configure<FileModel>(builder.Configuration.GetSection("DocumentStorage"));
 builder.Services.Configure<APIConfigModel>(builder.Configuration.GetSection("ServiceUrls"));
+builder.Services.Configure<FileModel>(builder.Configuration.GetSection("FileStorage"));
 
 var app = builder.Build();
 

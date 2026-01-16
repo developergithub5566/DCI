@@ -247,4 +247,15 @@ namespace DCI.Core.Common
         DBP = 2,
         HIS = 3
     }
+
+
+
+    /* PMS Enum */
+    public enum EnumAttachmentType
+    {
+        OTHER = 0,
+        NOA = 1,
+        NTP = 2,
+        MOA = 3
+    }
 }

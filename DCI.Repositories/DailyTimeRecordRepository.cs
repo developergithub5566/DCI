@@ -60,7 +60,8 @@ namespace DCI.Repositories
 
             var wfhlogs = await (from dtr in _dbContext.vw_AttendanceSummary_WFH.AsNoTracking()
                                  join emp in _dbContext.Employee.AsNoTracking() on dtr.EMPLOYEE_NO equals emp.EmployeeNo
-                                 where dtr.STATUS == (int)EnumStatus.Approved
+                                 join stat in _dbContext.Status.AsNoTracking() on dtr.STATUS equals stat.StatusId
+                                 where (dtr.STATUS == (int)EnumStatus.Approved || dtr.STATUS == (int)EnumStatus.ForApproval)
                                  orderby dtr.DATE descending
                                  select new DailyTimeRecordViewModel
                                  {
@@ -76,8 +77,10 @@ namespace DCI.Repositories
                                      OVERTIME = dtr.OVERTIME,
                                      TOTAL_HOURS = dtr.TOTAL_HOURS,
                                      TOTAL_WORKING_HOURS = dtr.TOTAL_WORKING_HOURS,
+                                     STATUSNAME = stat.StatusName,
                                      SOURCE = Constants.Source_Remote
                                  }).ToListAsync();
+
 
             var holiday = await (from hol in _dbContext.Holiday.AsNoTracking()
                                  where hol.IsActive == true

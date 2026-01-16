@@ -615,7 +615,7 @@
                                         </tr>
                                         <tr>  
                                             <th>Date Filed:</th>
-                                            <td class="tblDate"><label id="lblDate"></label></td>
+                                            <td class="tblDate"><label id="lblDateWFHDetails"></label></td>
                                         </tr>                               
                                         <tr>
                                             <th>Status:</th>
@@ -627,7 +627,7 @@
                                             <th>Remarks:</th>
                                             <td class="tblRemarks">
                    
-                                           <label id="Remarks"></label
+                                           <label id="lblWFHDetailsRemarks"></label
                                             </td>
                                         </tr>
                             
@@ -636,7 +636,7 @@
                              <div class="col-12">
                                  <div class="form-group">
                                     <label class="frmText" id="ApproverLabel" name="ApproverLabel"> </label><br>
-                                    <label class="font-weight-bold mb0 text-danger" id="deptHeadName" name="deptHeadName"></label>
+                                    <label class="font-weight-bold mb0 text-danger" id="deptHeadNameWFHDetails" name="deptHeadNameWFHDetails"></label>
                                     <label class="d-block mt0 text-left text-xs" id="ApprovalDate" name="ApprovalDate"></label>
                                     <label class="d-block mt0 text-left text-xs" id="ApprovalRemarks" name="ApprovalRemarks"></label>                            
                                   </div>
@@ -1455,27 +1455,27 @@
                                                   console.log(response.data);
                                                    document.getElementById('lblRequestNo').textContent = response.data.header.requestNo;
                                                       document.getElementById('lblStatus').textContent = response.data.header.statusName;
-                                                         document.getElementById('lblDate').textContent = response.data.header.dateCreatedString;
-                                                          document.getElementById('Remarks').textContent = response.data.header.remarks
+                                                         document.getElementById('lblDateWFHDetails').textContent = response.data.header.dateCreatedString;
+                                                          document.getElementById('lblWFHDetailsRemarks').textContent = response.data.header.remarks
 
                                              document.getElementById('ApproverLabel').textContent = '';
                                                 document.getElementById('ApprovalDate').textContent = '';
                                                document.getElementById('ApprovalRemarks').textContent = '';
-                                                 document.getElementById('deptHeadName').textContent = '';
+                                                 document.getElementById('deptHeadNameWFHDetails').textContent = '';
 
                                             if (response.data.header.statusId == @((int)EnumStatus.ForApproval)) { // for approval
-                                                 document.getElementById('deptHeadName').textContent = response.data.header.approver;
+                                                 document.getElementById('deptHeadNameWFHDetails').textContent = response.data.header.approver;
                                                    document.getElementById('ApproverLabel').textContent = 'For Approval of:';
                                           }
 
                                          else  if(response.data.header.statusId == @((int)EnumStatus.Approved)) {  //approved
 
-                                                   document.getElementById('deptHeadName').textContent = response.data.header.approver;
+                                                   document.getElementById('deptHeadNameWFHDetails').textContent = response.data.header.approver;
                                                   document.getElementById('ApproverLabel').textContent = "Approved By: ";
                                                    document.getElementById('ApprovalDate').textContent = 'Approved Date and Time: ' + response.data.header.dateApprovedDisapproved;
                                           }
                                                 else if(response.data.header.statusId == @((int)EnumStatus.Rejected)){     //Rejected
-                                                      document.getElementById('deptHeadName').textContent = response.data.header.approver;
+                                                      document.getElementById('deptHeadNameWFHDetails').textContent = response.data.header.approver;
                                                         document.getElementById('ApproverLabel').textContent = 'Rejected By:';
                                                document.getElementById('ApprovalRemarks').textContent = 'Remarks: ' + response.data.headerapprovalRemarks;
                                                    document.getElementById('ApprovalDate').textContent = 'Rejected Date and Time:: ' + response.data.header.dateApprovedDisapproved;

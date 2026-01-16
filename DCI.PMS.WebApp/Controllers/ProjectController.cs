@@ -65,7 +65,7 @@ namespace DCI.PMS.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
-        public async Task<IActionResult> SaveProjectMilestone(ProjectViewModel model)
+        public async Task<IActionResult> Milestone(ProjectViewModel model)
         {
             try
             {       
@@ -75,14 +75,50 @@ namespace DCI.PMS.WebApp.Controllers
                     if (currentUser == null)
                         return RedirectToAction("Logout", "Account");
                     // model.CurrentUserId = currentUser.UserId;
-                  //  model.ProjectCreationId = ProjectCreationId;
+                    //  model.ProjectCreationId = ProjectCreationId;
 
-                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/SaveProject");
-                    request.Content = stringContent;
-                    var response = await _httpclient.SendAsync(request);
+                    var data = new MultipartFormDataContent();
+                    data.Add(new StringContent(model.ProjectCreationId.ToString() ?? ""), "ProjectCreationId");
+                    data.Add(new StringContent(model.ClientId.ToString() ?? ""), "ClientId");
+
+                    data.Add(new StringContent(model.ProjectNo.ToString() ?? ""), "ProjectNo");
+                    data.Add(new StringContent(model.ProjectName.ToString() ?? ""), "ProjectName");
+                    data.Add(new StringContent(model.NOADate.ToString() ?? ""), "NOADate");
+                    data.Add(new StringContent(model.NTPDate.ToString() ?? ""), "NTPDate");        
+                    data.Add(new StringContent(model.MOADate.ToString() ?? ""), "MOADate");
+                    data.Add(new StringContent(model.ProjectDuration.ToString() ?? ""), "ProjectDuration");
+                    data.Add(new StringContent(model.ProjectCost.ToString() ?? ""), "ProjectCost");
+                    data.Add(new StringContent(model.ModeOfPayment.ToString() ?? ""), "ModeOfPayment");
+                    data.Add(new StringContent(model.Status.ToString() ?? ""), "Status");
+                    data.Add(new StringContent(model.CreatedName.ToString() ?? ""), "CreatedName");
+                    //data.Add(new StringContent(model.DateCreated.ToString() ?? ""), "DateCreated");
+                    //data.Add(new StringContent(model.CreatedBy.ToString() ?? ""), "CreatedBy");
+                    //data.Add(new StringContent(model.ModifiedBy.ToString() ?? ""), "ModifiedBy");
+                    //data.Add(new StringContent(model.DateModified.ToString() ?? ""), "DateModified");
+                    data.Add(new StringContent(model.IsActive.ToString() ?? ""), "IsActive");
+
+                    if (model.NOAFile != null)
+                    {
+                        var fileContent = new StreamContent(model.NOAFile!.OpenReadStream());
+                        data.Add(fileContent, "NOAFile", model.NOAFile.FileName);
+                    }
+                    if (model.NTPFile != null)
+                    {
+                        var fileContent = new StreamContent(model.NTPFile!.OpenReadStream());
+                        data.Add(fileContent, "NTPFile", model.NTPFile.FileName);
+                    }
+
+                    if (model.MOAFile is not null)
+                    {
+                        var fileContent = new StreamContent(model.MOAFile!.OpenReadStream());
+                        data.Add(fileContent, "MOAFile", model.MOAFile.FileName);
+                    }           
+
+
+                    var response = await _httpclient.PostAsync(_apiconfig.Value.apiPMS + "api/Project/SaveProject", data);
                     var responseBody = await response.Content.ReadAsStringAsync();
-           
+               
+
                 }
 
 

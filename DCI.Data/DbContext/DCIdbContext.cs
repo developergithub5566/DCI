@@ -53,6 +53,7 @@ namespace DCI.Data
         public DbSet<WorkLocation> WorkLocation { get; set; }
         public DbSet<LeaveCredits> LeaveCredits { get; set; }
         public DbSet<OfficeOrder> OfficeOrder { get; set; }
+        public DbSet<WfhApplication> WfhApplication { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

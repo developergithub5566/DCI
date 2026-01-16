@@ -54,7 +54,8 @@
 
         public const string Msg_NoOfficialBusinessRecord  = "No Official Business record was found for the selected date. Please file and secure approval for Official Business before submitting an overtime request.";
 
-    
+        /*PMS*/
+        public const string ModuleCode_PMS = "PMS";
 
     }
 }

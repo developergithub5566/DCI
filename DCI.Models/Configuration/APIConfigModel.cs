@@ -10,6 +10,6 @@ namespace DCI.Models.Configuration
         public string webAppESS { get; set; }
         public string apiESSTrigger { get; set; }
         public string apiPMS { get; set; }
-        public string webAppPMS { get; set; }
+        public string webAppPMS { get; set; }   
     }
 }
