@@ -32,6 +32,12 @@ namespace DCI.Data
                 .WithMany(p => p.Milestones)
                 .HasForeignKey(m => m.ProjectCreationId)
                 .OnDelete(DeleteBehavior.Restrict); // or Cascade if you want
+
+            modelBuilder.Entity<Attachment>()
+                    .HasOne(a => a.Project)
+                    .WithMany(p => p.Attachments)
+                    .HasForeignKey(a => a.ProjectCreationId)
+                    .OnDelete(DeleteBehavior.Restrict);
         }
 
         public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)

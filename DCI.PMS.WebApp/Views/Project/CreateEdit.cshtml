@@ -110,6 +110,39 @@
                                 </div>
                             </div>
 
+                            <style>
+                                .file-icon {
+                                    position: relative;
+                                    display: inline-block;
+                                    font-size: 32px;
+                                }
+
+                                .pdf-icon {
+                                    color: #dc3545; /* red PDF icon */
+                                }
+
+                                .delete-btn {
+                                    position: absolute;
+                                    top: -6px;
+                                    right: -6px;
+                                    width: 18px;
+                                    height: 18px;
+                                    background: #000;
+                                    color: #fff;
+                                    border-radius: 50%;
+                                    font-size: 12px;
+                                    font-weight: bold;
+                                    text-align: center;
+                                    line-height: 18px;
+                                    cursor: pointer;
+                                }
+
+                                    .delete-btn:hover {
+                                        background: #dc3545;
+                                    }
+
+                            </style>
+
                             <!-- NOA -->
                             <div class="row">
                                 <label class="col-sm-2 col-form-label">NOA Date</label>
@@ -121,10 +154,24 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-4">                        
+                                <div class="col-md-4">
                                     <input type="file" class="form-control" id="NOAFile" name="NOAFile" accept="application/pdf" onchange="" />
 
-                                    @*    <button class="btn btn-primary btn-sm ms-2">Upload File</button> *@
+                                    @if(Model.IsNOAFile == true)
+                                    {
+                                        <script>
+                                            $('#NOAFile').hide();
+                                        </script>
+
+                                        <div id="NOAIcon" name="NOAIcon" class="file-icon">
+                                            <a href="javascript:void(0)">
+                                                <i class="fas fa-file-pdf pdf-icon"></i>
+                                            </a>
+                                            <span class="delete-btn" title="remove" onclick="removeNoa()">&times;</span>
+                                        </div>
+                                    }
+                                  
+                                                                               
                                 </div>
                             </div>
 
@@ -140,7 +187,24 @@
                                 </div>
 
                                 <div class="col-md-4">
+                         
+
                                     <input type="file" class="form-control" id="NTPFile" name="NTPFile" accept="application/pdf" onchange="" />
+                                    @if (Model.IsNTPFile == true)
+                                    {
+                                        <script>
+                                              $('#NTPFile').hide();
+                                        </script>
+
+                                        <div id="NTPIcon" name="NTPIcon" class="file-icon">
+                                            <a href="javascript:void(0)"> <i class="fas fa-file-pdf pdf-icon"></i>                                    
+                                        </a>
+                                            <span class="delete-btn" title="remove" onclick="removeNtp()">&times;</span>
+                                        </div>
+                                        
+                                    }
+                                  
+                                   
                                 </div>
                             </div>
 
@@ -148,7 +212,7 @@
                             <div class="row">
                                 <label class="col-sm-2 col-form-label">MOA Date</label>
 
-                                <div class="col-sm-4">
+                                <div  class="col-sm-4">
                                     <div class="input-group w-100">
                                         <input type="date" id="MOADate" name="MOADate" class="form-control" value="@Model.MOADate.ToString("MM-dd-yyyy")">
                                         <span class="input-group-text"><i class="fa fa-calendar"></i></span>
@@ -157,6 +221,19 @@
 
                                 <div class="col-md-4">
                                     <input type="file" id="MOAFile" name="MOAFile" class="form-control" accept="application/pdf" onchange="">
+                                    @if (Model.IsMOAFile == true)
+                                    {
+                                        <script>
+                                            $('#MOAFile').hide();
+                                        </script>
+                                        <div id="MOAIcon" name="MOAIcon"  class="file-icon">
+                                            <a href="javascript:void(0)">
+                                                <i class="fas fa-file-pdf pdf-icon"></i>
+                                            </a>
+                                            <span class="delete-btn" title="remove" onclick="removeMoa()">&times;</span>
+                                        </div>
+                                    }
+                                   
                                 </div>
                             </div>
 
@@ -317,26 +394,41 @@
             }); //end docu
 
 
-            function newForm(dtr) {
+            // function newForm(dtr) {
 
-                    js('#projectModal').modal('show');
-            }
+            //         js('#projectModal').modal('show');
+            // }
 
 
-                            function nextStep(){
-            document.getElementById("step1").style.display = "none";
-            document.getElementById("step2").style.display = "block";
-             document.getElementById("stepButton1").style.display = "none";
-              document.getElementById("stepButton2").style.display = "block";
+        //                     function nextStep(){
+        //     document.getElementById("step1").style.display = "none";
+        //     document.getElementById("step2").style.display = "block";
+        //      document.getElementById("stepButton1").style.display = "none";
+        //       document.getElementById("stepButton2").style.display = "block";
 
+        // }
+
+        // function prevStep(){
+        //     document.getElementById("step1").style.display = "block";
+        //     document.getElementById("step2").style.display = "none";
+        //     document.getElementById("stepButton1").style.display = "block";
+        //     document.getElementById("stepButton2").style.display = "none";
+        // }
+
+       function removeNoa(){
+            $('#NOAFile').show();
+              $('#NOAIcon').hide();
+       }
+
+        function removeNtp(){
+             $('#NTPFile').show();
+               $('#NTPIcon').hide();
         }
 
-        function prevStep(){
-            document.getElementById("step1").style.display = "block";
-            document.getElementById("step2").style.display = "none";
-            document.getElementById("stepButton1").style.display = "block";
-            document.getElementById("stepButton2").style.display = "none";
-        }
+          function removeMoa(){
+              $('#MOAFile').show();
+                 $('#MOAIcon').hide();
+         }
 
 
     </script>

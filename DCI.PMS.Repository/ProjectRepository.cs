@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Serilog;
+using System.Net.Mail;
 
 namespace DCI.PMS.Repository
 {
@@ -191,12 +192,35 @@ namespace DCI.PMS.Repository
                                   CreatedName = u.Fullname
                               }).FirstOrDefault();
 
-                if(result == null)
+
+                var attachList = await _pmsdbContext.Attachment
+                                        .AsNoTracking()
+                                        .Where(p => p.IsActive && p.ProjectCreationId == model.ProjectCreationId)
+                                        .OrderByDescending(p => p.AttachmentId)
+                                        .Select(p => new AttachmentViewModel
+                                        {
+                                            AttachmentId = p.AttachmentId,
+                                            ProjectCreationId = p.ProjectCreationId,
+                                            AttachmentType = p.AttachmentType,
+                                            Filename = p.Filename,
+                                            FileLocation = p.FileLocation,
+                                            CreatedBy = p.CreatedBy,
+                                            IsActive = p.IsActive
+                                        })
+                                        .ToListAsync();
+
+
+                if (result == null)
                 {
                     result = new ProjectViewModel();
                 }
 
                 result.ClientList = _clientList;
+                result.AttachmentList = attachList;
+
+                result.IsNOAFile = attachList.Any(x => x.AttachmentType == (int)EnumAttachmentType.NOA && x.IsActive);
+                result.IsNTPFile = attachList.Any(x => x.AttachmentType == (int)EnumAttachmentType.NTP && x.IsActive);
+                result.IsMOAFile = attachList.Any(x => x.AttachmentType == (int)EnumAttachmentType.MOA && x.IsActive);
 
                 return result;
 
@@ -295,7 +319,7 @@ namespace DCI.PMS.Repository
                     Directory.CreateDirectory(fileloc);       
           
 
-                if(model.NOAFile.Length > 0)
+                if(model.NOAFile != null &&  model.NOAFile.Length > 0)
                 {
                     string noa_filename = model.NOAFile.FileName;
                     string noa_filenameLocation = Path.Combine(fileloc, noa_filename);
@@ -303,11 +327,11 @@ namespace DCI.PMS.Repository
                     {
                         model.NOAFile.CopyTo(stream);
                     }
-                    Attachment noa_entity = new Attachment();
+                    DCI.PMS.Models.Entities.Attachment noa_entity = new DCI.PMS.Models.Entities.Attachment();
                     noa_entity.ProjectCreationId = model.ProjectCreationId;
                     noa_entity.AttachmentType = (int)EnumAttachmentType.NOA;
                     noa_entity.Filename = noa_filename;
-                    noa_entity.FileLocation = model.ProjectName;
+                    noa_entity.FileLocation = noa_filenameLocation;
                     noa_entity.CreatedBy = model.CreatedBy;
                     noa_entity.DateCreated = DateTime.Now;
                     noa_entity.IsActive = true;
@@ -315,7 +339,7 @@ namespace DCI.PMS.Repository
                     await _pmsdbContext.SaveChangesAsync();
                 }
 
-                if (model.NTPFile.Length > 0)
+                if (model.NTPFile != null && model.NTPFile.Length > 0)
                 {
                     string ntp_filename = model.NTPFile.FileName;
                     string ntp_filenameLocation = Path.Combine(fileloc, ntp_filename);
@@ -325,7 +349,7 @@ namespace DCI.PMS.Repository
                         model.NTPFile.CopyTo(stream);
                     }
 
-                    Attachment ntp_entity = new Attachment();
+                    DCI.PMS.Models.Entities.Attachment ntp_entity = new DCI.PMS.Models.Entities.Attachment();
                     ntp_entity.ProjectCreationId = model.ProjectCreationId;
                     ntp_entity.AttachmentType = (int)EnumAttachmentType.NTP;
                     ntp_entity.Filename = ntp_filenameLocation;
@@ -337,7 +361,7 @@ namespace DCI.PMS.Repository
                     await _pmsdbContext.SaveChangesAsync();
                 }
 
-                if (model.MOAFile.Length > 0)
+                if (model.MOAFile != null &&  model.MOAFile.Length > 0)
                 {
                     string moa_filename = model.MOAFile.FileName;
                     string moa_filenameLocation = Path.Combine(fileloc, moa_filename);
@@ -347,7 +371,7 @@ namespace DCI.PMS.Repository
                         model.MOAFile.CopyTo(stream);
                     }
 
-                    Attachment moa_entity = new Attachment();
+                    DCI.PMS.Models.Entities.Attachment moa_entity = new DCI.PMS.Models.Entities.Attachment();
                     moa_entity.ProjectCreationId = model.ProjectCreationId;
                     moa_entity.AttachmentType = (int)EnumAttachmentType.MOA;
                     moa_entity.Filename = moa_filenameLocation;

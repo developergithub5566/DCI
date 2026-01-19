@@ -1,7 +1,10 @@
-﻿namespace DCI.PMS.Models.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace DCI.PMS.Models.Entities
 {
     public class Attachment
     {
+        [Key]
         public int AttachmentId { get; set; }
 
         public int ProjectCreationId { get; set; }   // FK to ProjectCreation

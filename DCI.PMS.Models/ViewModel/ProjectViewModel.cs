@@ -38,6 +38,11 @@ namespace DCI.PMS.Models.ViewModel
         public IFormFile? MOAFile { get; set; }
         public List<MilestoneViewModel>? MilestoneList { get; set; } = new();
         public List<ClientViewModel>? ClientList { get; set; } = new();
+        public List<AttachmentViewModel>? AttachmentList { get; set; } = new();
 
+
+        public bool? IsNOAFile { get; set; } = false;
+        public bool? IsNTPFile { get; set; } = false;
+        public bool? IsMOAFile { get; set; } = false;
     }
 }

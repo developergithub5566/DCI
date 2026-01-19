@@ -45,8 +45,7 @@ namespace DCI.PMS.WebApp.Controllers
                         ProjectViewModel vm = JsonConvert.DeserializeObject<ProjectViewModel>(responseBody)!;
 
                         if (response.IsSuccessStatusCode)
-                        {
-                            //return Json(new { success = true, data = vm });
+                        {                          
                             return View(vm);
                         }
                     return View(vm);
