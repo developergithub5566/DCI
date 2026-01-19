@@ -229,7 +229,7 @@ namespace DCI.PMS.Repository
             {
                 Log.Error(ex.ToString());
             }
-            finally
+            finally 
             {
                 Log.CloseAndFlush();
             }
@@ -242,7 +242,7 @@ namespace DCI.PMS.Repository
             return await _pmsdbContext.Project.AnyAsync(x => x.ProjectCreationId == projectId && x.IsActive == true);
         }
 
-        public async Task<(int statuscode, string message)> SaveProject(ProjectViewModel model)
+        public async Task SaveProject(ProjectViewModel model)
         {
             try
             {
@@ -268,7 +268,7 @@ namespace DCI.PMS.Repository
                     await _pmsdbContext.SaveChangesAsync();
 
                     await SaveFile(model);
-                    return (StatusCodes.Status200OK, "Successfully saved");
+                   // return (StatusCodes.Status200OK, "Successfully saved");
                 }
                 else
                 {
@@ -291,7 +291,7 @@ namespace DCI.PMS.Repository
                     await _pmsdbContext.SaveChangesAsync();
 
                     await SaveFile(model);
-                    return (StatusCodes.Status200OK, "Successfully updated");
+                    //return (StatusCodes.Status200OK, "Successfully updated");
                 }
 
 
@@ -299,7 +299,7 @@ namespace DCI.PMS.Repository
             catch (Exception ex)
             {
                 Log.Error(ex.ToString());
-                return (StatusCodes.Status406NotAcceptable, ex.ToString());
+                //return (StatusCodes.Status406NotAcceptable, ex.ToString());
             }
             finally
             {
@@ -321,7 +321,9 @@ namespace DCI.PMS.Repository
 
                 if(model.NOAFile != null &&  model.NOAFile.Length > 0)
                 {
-                    string noa_filename = model.NOAFile.FileName;
+     
+
+                    string noa_filename = Constants.Attachment_Type_NOA + DateTime.Now.ToString("yyyyMMddHHmmss") + Core.Common.Constants.Filetype_Pdf; //model.NOAFile.FileName;
                     string noa_filenameLocation = Path.Combine(fileloc, noa_filename);
                     using (var stream = new FileStream(noa_filenameLocation, FileMode.Create, FileAccess.Write))
                     {
@@ -341,7 +343,7 @@ namespace DCI.PMS.Repository
 
                 if (model.NTPFile != null && model.NTPFile.Length > 0)
                 {
-                    string ntp_filename = model.NTPFile.FileName;
+                    string ntp_filename = Constants.Attachment_Type_NTP + DateTime.Now.ToString("yyyyMMddHHmmss") + Core.Common.Constants.Filetype_Pdf;// model.NTPFile.FileName;
                     string ntp_filenameLocation = Path.Combine(fileloc, ntp_filename);
 
                     using (var stream = new FileStream(ntp_filenameLocation, FileMode.Create, FileAccess.Write))
@@ -352,8 +354,8 @@ namespace DCI.PMS.Repository
                     DCI.PMS.Models.Entities.Attachment ntp_entity = new DCI.PMS.Models.Entities.Attachment();
                     ntp_entity.ProjectCreationId = model.ProjectCreationId;
                     ntp_entity.AttachmentType = (int)EnumAttachmentType.NTP;
-                    ntp_entity.Filename = ntp_filenameLocation;
-                    ntp_entity.FileLocation = model.ProjectName;
+                    ntp_entity.Filename = ntp_filename;
+                    ntp_entity.FileLocation = ntp_filenameLocation;
                     ntp_entity.CreatedBy = model.CreatedBy;
                     ntp_entity.DateCreated = DateTime.Now;
                     ntp_entity.IsActive = true;
@@ -363,7 +365,7 @@ namespace DCI.PMS.Repository
 
                 if (model.MOAFile != null &&  model.MOAFile.Length > 0)
                 {
-                    string moa_filename = model.MOAFile.FileName;
+                    string moa_filename = Constants.Attachment_Type_MOA + DateTime.Now.ToString("yyyyMMddHHmmss") + Core.Common.Constants.Filetype_Pdf;// model.MOAFile.FileName;
                     string moa_filenameLocation = Path.Combine(fileloc, moa_filename);
 
                     using (var stream = new FileStream(moa_filenameLocation, FileMode.Create, FileAccess.Write))
@@ -374,8 +376,8 @@ namespace DCI.PMS.Repository
                     DCI.PMS.Models.Entities.Attachment moa_entity = new DCI.PMS.Models.Entities.Attachment();
                     moa_entity.ProjectCreationId = model.ProjectCreationId;
                     moa_entity.AttachmentType = (int)EnumAttachmentType.MOA;
-                    moa_entity.Filename = moa_filenameLocation;
-                    moa_entity.FileLocation = model.ProjectName;
+                    moa_entity.Filename = moa_filename;
+                    moa_entity.FileLocation = moa_filenameLocation;
                     moa_entity.CreatedBy = model.CreatedBy;
                     moa_entity.DateCreated = DateTime.Now;
                     moa_entity.IsActive = true;

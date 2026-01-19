@@ -57,5 +57,10 @@
         /*PMS*/
         public const string ModuleCode_PMS = "PMS";
 
+        public const string Filetype_Pdf = ".pdf";
+
+        public const string Attachment_Type_NOA = "NOA";
+        public const string Attachment_Type_NTP = "NTP";
+        public const string Attachment_Type_MOA = "MOA";
     }
 }

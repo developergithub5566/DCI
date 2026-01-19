@@ -149,7 +149,7 @@
 
                                 <div class="col-sm-4">
                                     <div class="input-group w-100">
-                                        <input type="date" id="NOADate" name="NOADate" class="form-control" value="@Model.NOADate.ToString("MM-dd-yyyy")">
+                                        <input type="date" id="NOADate" name="NOADate" class="form-control" value="@Model.NOADate.ToString("yyyy-MM-dd")">
                                         <span class="input-group-text"><i class="fa fa-calendar"></i></span>
                                     </div>
                                 </div>
@@ -181,7 +181,7 @@
 
                                 <div class="col-sm-4">
                                     <div class="input-group w-100">
-                                        <input type="date" id="NTPDate" name="NTPDate" class="form-control" value="@Model.NTPDate.ToString("MM-dd-yyyy")">
+                                        <input type="date" id="NTPDate" name="NTPDate" class="form-control" value="@Model.NTPDate.ToString("yyyy-MM-dd")">
                                         <span class="input-group-text"><i class="fa fa-calendar"></i></span>
                                     </div>
                                 </div>
@@ -241,15 +241,7 @@
                             <div class="row">
                                 <label for="inputEmail3" class="col-sm-2 col-form-label">Project Duration</label>
                                 <div class="col-sm-8">
-                                  @*   <select class="form-control frmField" name="ProjectDuration" id="ProjectDuration" required>
-                                        <option value="">Select</option>                                     
-                                        <option value="1" @(Model.ProjectDuration == 1 ? "selected" : "")>1 month</option>
-                                        <option value="2" @(Model.ProjectDuration == 2 ? "selected" : "")>6 months</option>
-                                        <option value="3" @(Model.ProjectDuration == 3 ? "selected" : "")>1 year</option>
-                                        <option value="4" @(Model.ProjectDuration == 4 ? "selected" : "")>2 years</option>
-                                        <option value="5" @(Model.ProjectDuration == 5 ? "selected" : "")>5 years</option>
-                                    </select> *@
-                                    @* <input type="text" class="form-control" id="ProjectDuration" name="ProjectDuration" placeholder="Project Duration"> *@
+                              
                                                             @Html.DropDownListFor(
                                                             m => m.ProjectDuration,
                                                                         new List<SelectListItem>
@@ -269,12 +261,7 @@
                             <div class="row">
                                 <label for="inputEmail3" class="col-sm-2 col-form-label">Mode of Payment</label>
                                 <div class="col-sm-8">
-                                   @*  <select class="form-control frmField" name="ModeOfPayment" id="ModeOfPayment" required>
-                                        <option value="" disabled selected>Select</option>
-                                        <option value="1">Milestone Based</option>
-                                        <option value="2">Transacational Based</option>
-                                    </select> *@
-                                    @*   <input type="text" class="form-control" id="ModeOfPayment" name="ModeOfPayment" placeholder="Mode of Payment"> *@
+                             
                                     @Html.DropDownListFor(
                                                                         m => m.ModeOfPayment,
                                                                         new List<SelectListItem>
@@ -295,25 +282,7 @@
 
                     <div class="modal-footer">
                         <div class="col-sm-18">
-                            @* <button type="submit" class="btn btn-primary">Next</button> *@
-                            @*   <div id="step1">
-                                            <h6>Project Info</h6>
-                                            <input type="text" class="form-control mb-2" placeholder="Project Name">
-                                            <input type="text" class="form-control mb-2" placeholder="Client Name">
-                                            <button class="btn btn-primary float-end" onclick="nextStep()">Next</button>
-                                        </div> *@
-                            @*     <div id="stepButton1">
-                                            <button class="btn btn-primary float-end" onclick="nextStep()">Next</button>
-                                        </div>
-                                        <div id="stepButton2" style="display:none;">
-                                            <button class="btn btn-secondary" onclick="prevStep()">Back</button>
-                                            <span> </span>
-                                            <button class="btn btn-primary float-end">Submit</button>
-                                        </div> *@
-                            @*   <a asp-controller="Project" asp-action="Milestone" class="btn btn-primary">
-                                <span class="icon text-white"><i class="fa-solid fa-plus text-xs"></i></span>
-                                <span class="text text-white"><small>Add Milestone</small></span>
-                            </a> *@
+                      
 
                             <button type="submit" class="btn btn-primary">
                                 Save Draft & Add Milestone
@@ -361,7 +330,7 @@
 
 
 @section scripts {
-    <script src="~/js/dci-validation.js"></script>
+
 
 
     <script type="text/javascript">
@@ -379,6 +348,7 @@
 
                          flatpickr("#NOADate", {
                                        dateFormat: "m/d/Y",
+                                         defaultDate: "@Model.NOADate.ToString("MM/dd/yyyy")
                                     });
 
 
@@ -394,26 +364,6 @@
             }); //end docu
 
 
-            // function newForm(dtr) {
-
-            //         js('#projectModal').modal('show');
-            // }
-
-
-        //                     function nextStep(){
-        //     document.getElementById("step1").style.display = "none";
-        //     document.getElementById("step2").style.display = "block";
-        //      document.getElementById("stepButton1").style.display = "none";
-        //       document.getElementById("stepButton2").style.display = "block";
-
-        // }
-
-        // function prevStep(){
-        //     document.getElementById("step1").style.display = "block";
-        //     document.getElementById("step2").style.display = "none";
-        //     document.getElementById("stepButton1").style.display = "block";
-        //     document.getElementById("stepButton2").style.display = "none";
-        // }
 
        function removeNoa(){
             $('#NOAFile').show();

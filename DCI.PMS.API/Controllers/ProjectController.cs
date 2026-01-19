@@ -37,8 +37,10 @@ namespace DCI.PMS.API.Controllers
         //public async Task<IActionResult> SaveProject([FromBody] ProjectViewModel model)
         public async Task<IActionResult> SaveProject(ProjectViewModel model)
         {
-            var result = await _projectRepository.SaveProject(model);
-            return StatusCode(result.statuscode, result.message);
+            //var result = await _projectRepository.SaveProject(model);
+            //return StatusCode(result.statuscode, result.message);
+          
+            return Ok( _projectRepository.SaveProject(model));
         }
 
 

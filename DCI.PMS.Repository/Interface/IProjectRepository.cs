@@ -6,7 +6,8 @@ namespace DCI.PMS.Repository.Interface
     {
         Task<ProjectViewModel> GetProjectId(int projectId);
         Task<IList<ProjectViewModel>> GetAllProject();
-        Task<(int statuscode, string message)> SaveProject(ProjectViewModel model);
+        // Task<(int statuscode, string message)> SaveProject(ProjectViewModel model);
+        Task SaveProject(ProjectViewModel model);
         Task<ProjectViewModel> GetProjectById(ProjectViewModel model);
         Task<ProjectViewModel> GetMilestoneByProjectId(ProjectViewModel model);
         Task<(int statuscode, string message)> Delete(ProjectViewModel model);
