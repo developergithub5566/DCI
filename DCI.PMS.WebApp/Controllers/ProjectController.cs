@@ -64,10 +64,97 @@ namespace DCI.PMS.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
-        public async Task<IActionResult> Milestone(ProjectViewModel model)
+        //public async Task<IActionResult> Milestone(ProjectViewModel model)
+        //{
+        //    try
+        //    {       
+        //        using (var _httpclient = new HttpClient())
+        //        {
+        //            var currentUser = _userSessionHelper.GetCurrentUser();
+        //            if (currentUser == null)
+        //                return RedirectToAction("Logout", "Account");
+        //            // model.CurrentUserId = currentUser.UserId;
+        //            //  model.ProjectCreationId = ProjectCreationId;
+
+        //            var data = new MultipartFormDataContent();
+        //            data.Add(new StringContent(model.ProjectCreationId.ToString() ?? ""), "ProjectCreationId");
+        //            data.Add(new StringContent(model.ClientId.ToString() ?? ""), "ClientId");
+
+        //            data.Add(new StringContent(model.ProjectNo.ToString() ?? ""), "ProjectNo");
+        //            data.Add(new StringContent(model.ProjectName.ToString() ?? ""), "ProjectName");
+        //            data.Add(new StringContent(model.NOADate.ToString() ?? ""), "NOADate");
+        //            data.Add(new StringContent(model.NTPDate.ToString() ?? ""), "NTPDate");        
+        //            data.Add(new StringContent(model.MOADate.ToString() ?? ""), "MOADate");
+        //            data.Add(new StringContent(model.ProjectDuration.ToString() ?? ""), "ProjectDuration");
+        //            data.Add(new StringContent(model.ProjectCost.ToString() ?? ""), "ProjectCost");
+        //            data.Add(new StringContent(model.ModeOfPayment.ToString() ?? ""), "ModeOfPayment");
+        //            data.Add(new StringContent(model.Status.ToString() ?? ""), "Status");
+        //            data.Add(new StringContent(model.CreatedName.ToString() ?? ""), "CreatedName");
+        //            //data.Add(new StringContent(model.DateCreated.ToString() ?? ""), "DateCreated");
+        //            //data.Add(new StringContent(model.CreatedBy.ToString() ?? ""), "CreatedBy");
+        //            //data.Add(new StringContent(model.ModifiedBy.ToString() ?? ""), "ModifiedBy");
+        //            //data.Add(new StringContent(model.DateModified.ToString() ?? ""), "DateModified");
+        //            data.Add(new StringContent(model.IsActive.ToString() ?? ""), "IsActive");
+
+        //            if (model.NOAFile != null)
+        //            {
+        //                var fileContent = new StreamContent(model.NOAFile!.OpenReadStream());
+        //                data.Add(fileContent, "NOAFile", model.NOAFile.FileName);
+        //            }
+        //            if (model.NTPFile != null)
+        //            {
+        //                var fileContent = new StreamContent(model.NTPFile!.OpenReadStream());
+        //                data.Add(fileContent, "NTPFile", model.NTPFile.FileName);
+        //            }
+
+        //            if (model.MOAFile is not null)
+        //            {
+        //                var fileContent = new StreamContent(model.MOAFile!.OpenReadStream());
+        //                data.Add(fileContent, "MOAFile", model.MOAFile.FileName);
+        //            }           
+
+
+        //            var response = await _httpclient.PostAsync(_apiconfig.Value.apiPMS + "api/Project/SaveProject", data);
+        //            var responseBody = await response.Content.ReadAsStringAsync();
+
+
+        //        }
+
+
+
+        //        using (var _httpclient = new HttpClient())
+        //        {
+        //            var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+        //            var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/GetMilestoneByProjectId");
+        //            request.Content = stringContent;
+        //            var response = await _httpclient.SendAsync(request);
+        //            var responseBody = await response.Content.ReadAsStringAsync();
+        //            model = JsonConvert.DeserializeObject<ProjectViewModel>(responseBody)!;
+
+        //            if (response.IsSuccessStatusCode)
+        //            {
+        //                return View(model);
+        //            }
+        //            return View(model);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log.Error(ex.ToString());
+        //        return Json(new { success = false, message = ex.Message });
+        //    }
+        //    finally
+        //    {
+        //        Log.CloseAndFlush();
+        //    }
+        //    return Json(new { success = false, message = "An error occurred. Please try again." });
+        //}
+
+
+        public async Task<IActionResult> SaveProject(ProjectViewModel model)
         {
             try
-            {       
+            {
                 using (var _httpclient = new HttpClient())
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
@@ -83,7 +170,7 @@ namespace DCI.PMS.WebApp.Controllers
                     data.Add(new StringContent(model.ProjectNo.ToString() ?? ""), "ProjectNo");
                     data.Add(new StringContent(model.ProjectName.ToString() ?? ""), "ProjectName");
                     data.Add(new StringContent(model.NOADate.ToString() ?? ""), "NOADate");
-                    data.Add(new StringContent(model.NTPDate.ToString() ?? ""), "NTPDate");        
+                    data.Add(new StringContent(model.NTPDate.ToString() ?? ""), "NTPDate");
                     data.Add(new StringContent(model.MOADate.ToString() ?? ""), "MOADate");
                     data.Add(new StringContent(model.ProjectDuration.ToString() ?? ""), "ProjectDuration");
                     data.Add(new StringContent(model.ProjectCost.ToString() ?? ""), "ProjectCost");
@@ -111,32 +198,18 @@ namespace DCI.PMS.WebApp.Controllers
                     {
                         var fileContent = new StreamContent(model.MOAFile!.OpenReadStream());
                         data.Add(fileContent, "MOAFile", model.MOAFile.FileName);
-                    }           
+                    }
 
 
                     var response = await _httpclient.PostAsync(_apiconfig.Value.apiPMS + "api/Project/SaveProject", data);
                     var responseBody = await response.Content.ReadAsStringAsync();
-               
+
 
                 }
 
+                return RedirectToAction("Milestone", new { projectCreationId = model.ProjectCreationId });
+         
 
-
-                using (var _httpclient = new HttpClient())
-                {
-                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/GetMilestoneByProjectId");
-                    request.Content = stringContent;
-                    var response = await _httpclient.SendAsync(request);
-                    var responseBody = await response.Content.ReadAsStringAsync();
-                    model = JsonConvert.DeserializeObject<ProjectViewModel>(responseBody)!;
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        return View(model);
-                    }
-                    return View(model);
-                }
             }
             catch (Exception ex)
             {
@@ -150,6 +223,42 @@ namespace DCI.PMS.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
+        public async Task<IActionResult> Milestone(int projectCreationId)
+        {
+            try
+            {
+
+                ProjectViewModel model = new ProjectViewModel();
+                model.ProjectCreationId = projectCreationId;
+
+                using (var _httpclient = new HttpClient())
+                {
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/GetMilestoneByProjectId");
+                    request.Content = stringContent;
+                    var response =  await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    model = JsonConvert.DeserializeObject<ProjectViewModel>(responseBody)!;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return View(model);
+                    }
+                    //return View(model);
+                }
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
+        }
         public async Task<IActionResult> AddMilestone(MilestoneViewModel model)
         {
             try

@@ -43,6 +43,7 @@
                                 <label for="MilestoneName" class="col-sm-2 col-form-label">Milestone</label>
                                 <div class="col-sm-8">
                                     <input type="text" class="form-control" id="MilestoneName" name="MilestoneName" placeholder="Milestone">
+                                  
                                 </div>
                             </div>
                             <div class="row">
@@ -58,10 +59,11 @@
 
                                 <div class="col-sm-6">
                                     <div class="input-group w-100">
-                                        <input type="date" class="form-control" id="TargetCompletedDate" name="TargetCompletedDate">
+                                        <input type="date" class="form-control" id="TargetCompletedDate" name="TargetCompletedDate" value="">
                                         <span class="input-group-text"><i class="fa fa-calendar"></i></span>
                                     </div>
                                 </div>
+
                             </div>
 
                             <!-- NTP -->
@@ -70,27 +72,30 @@
 
                                 <div class="col-md-6">
                                     <div class="input-group w-100">
-                                        <input type="date" class="form-control" id="ActualCompletionDate" name="ActualCompletionDate">
+                                        <input type="date" class="form-control" id="ActualCompletionDate" name="ActualCompletionDate" value="">
                                         <span class="input-group-text"><i class="fa fa-calendar"></i></span>
                                     </div>
                                 </div>
+
                             </div>
 
                             <div class="row">
                                 <label for="inputEmail3" class="col-sm-2 col-form-label">Payment Status</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control" id="PaymentStatus" name="PaymentStatus" placeholder="Payment Status">
+                                  @*   <input type="text" class="form-control" id="PaymentStatus" name="PaymentStatus" placeholder="Payment Status"> *@
+                                    @Html.DropDownListFor(m => m.Milestone.PaymentStatus, new SelectList(Model.StatusList, "StatusId", "StatusName"), "Select", new { @class = "form-control frmField", required = "required", id = "PaymentStatus" })
                                 </div>
                             </div>
 
                             <div class="row">
                                 <label for="inputEmail3" class="col-sm-2 col-form-label">Milestone Status</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control" id="Status" name="Status" placeholder="Milestone Status">
+                                    @* <input type="text" class="form-control" id="Status" name="Status" placeholder="Milestone Status"> *@
+                                    @Html.DropDownListFor(m => m.Milestone.Status, new SelectList(Model.StatusList, "StatusId", "StatusName"), "Select", new { @class = "form-control frmField", required = "required", id = "Status" })
                                 </div>
                             </div>
 
-                            <div class="row">
+                            <div class="row">                                          
 
                                 <div class="col-sm-8">
                                     <button class="btn btn-primary float-end" onclick="nextStep()">Add to list</button>
@@ -143,13 +148,24 @@
                             <tr>
                                 <td>@x.MilestoneName</td>
                                 <td>@x.Percentage</td>
-                                <td>@x.TargetCompletedDate.Value.ToShortDateString() </td>
-                                <td>@x.ActualCompletionDate.Value.ToShortDateString() </td>
+                                <td>@x.TargetCompletedDate.Value.ToString("MM/dd/yyyy") </td>
+                                <td>@x.ActualCompletionDate.Value.ToString("MM/dd/yyyy") </td>
 
                                 <td>@x.PaymentStatus</td>
                                 <td>@x.Status</td>
                                 <td class="text-center">
-                                    <a href="javascript:void(0)" title="EDIT">EDIT</a> |
+                                 @*    <a href="javascript:void(0)" title="EDIT">EDIT</a> | *@
+                                    <a href="javascript:void(0)" onclick='editForm({
+                                                                            projectCreationId:"@x.ProjectCreationId",
+                                                                            mileStoneId : "@x.MileStoneId",
+                                                                            milestoneName:"@x.MilestoneName",
+                                                                            percentage:"@x.Percentage",
+                                                                            targetCompletedDate :"@x.TargetCompletedDateString" ,
+                                                                            actualCompletionDate : "@x.ActualCompletionDateString",
+                                                                            paymentStatus:"@x.PaymentStatus",
+                                                                            status : "@x.Status"
+                                                                                })' title="EDIT" class="btn btn-primary"><i class="fas fa-edit"></i></a>
+
                                     <a href="javascript:void(0)" title="REMOVE">REMOVE</a> |
                                     <a asp-controller="Project" asp-action="Deliverables" asp-route-MileStoneId="@x.MileStoneId">
                                         Deliverables
@@ -215,11 +231,33 @@
 
             $(document).ready(function () {
 
+                    flatpickr("#ActualCompletionDate", {
+                                          dateFormat: "m/d/Y",
+                                         defaultDate: new Date(),
+                                    });
+
+
+                         flatpickr("#TargetCompletedDate", {
+                                      dateFormat: "m/d/Y",
+                                       defaultDate: new Date(),
+                                    });
 
 
             }); //end docu
 
 
+            function editForm(dataMile){
+            
+                console.log(dataMile);
+                                  $('#ProjectCreationId').val(dataMile.projectCreationId);
+                                $('#ProjectCreationId').val(dataMile.mileStoneId);
+                               $('#MilestoneName').val(dataMile.milestoneName);
+                                       $('#Percentage').val(dataMile.percentage);
+                                $('#TargetCompletedDate').val(dataMile.targetCompletedDate);
+                                  $('#ActualCompletionDate').val(dataMile.actualCompletionDate);
+                                  $('#PaymentStatus').val(dataMile.paymentStatus);
+                                   $('#Status').val(dataMile.status);
+            }
 
 
 

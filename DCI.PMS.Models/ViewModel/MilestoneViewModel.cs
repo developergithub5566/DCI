@@ -26,5 +26,9 @@
 
         public List<DeliverableViewModel>? DeliverableList { get; set; } = new();
 
+
+        public string TargetCompletedDateString { get; set; } = string.Empty;
+        public string ActualCompletionDateString { get; set; } = string.Empty;
+
     }
 }

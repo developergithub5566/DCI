@@ -74,7 +74,7 @@
 
 
 
-            <form id="createForm" asp-controller="Project" asp-action="Milestone" method="post" enctype="multipart/form-data">
+            <form id="createForm" asp-controller="Project" asp-action="SaveProject" method="post" enctype="multipart/form-data">
                 <div class="modal-body">
 
                     <div class="project-dates">
@@ -187,8 +187,6 @@
                                 </div>
 
                                 <div class="col-md-4">
-                         
-
                                     <input type="file" class="form-control" id="NTPFile" name="NTPFile" accept="application/pdf" onchange="" />
                                     @if (Model.IsNTPFile == true)
                                     {
@@ -200,11 +198,8 @@
                                             <a href="javascript:void(0)"> <i class="fas fa-file-pdf pdf-icon"></i>                                    
                                         </a>
                                             <span class="delete-btn" title="remove" onclick="removeNtp()">&times;</span>
-                                        </div>
-                                        
-                                    }
-                                  
-                                   
+                                        </div>                                        
+                                    }        
                                 </div>
                             </div>
 
@@ -214,7 +209,7 @@
 
                                 <div  class="col-sm-4">
                                     <div class="input-group w-100">
-                                        <input type="date" id="MOADate" name="MOADate" class="form-control" value="@Model.MOADate.ToString("MM-dd-yyyy")">
+                                        <input type="date" id="MOADate" name="MOADate" class="form-control" value="@Model.MOADate.ToString("yyyy-MM-dd")">
                                         <span class="input-group-text"><i class="fa fa-calendar"></i></span>
                                     </div>
                                 </div>
@@ -347,18 +342,21 @@
             $(document).ready(function () {
 
                          flatpickr("#NOADate", {
-                                       dateFormat: "m/d/Y",
-                                         defaultDate: "@Model.NOADate.ToString("MM/dd/yyyy")
+                                       // dateFormat: "m/d/Y",
+                                      // defaultDate: "@Model.NOADate.ToString("MM/dd/yyyy")
+                                        defaultDate: new Date(),
                                     });
 
 
                          flatpickr("#NTPDate", {
-                                       dateFormat: "m/d/Y",
+                                       //dateFormat: "m/d/Y",
+                                         defaultDate: new Date(),
                                     });
 
 
                          flatpickr("#MOADate", {
-                                       dateFormat: "m/d/Y",
+                                     //  dateFormat: "m/d/Y",
+                                       defaultDate: new Date(),
                                     });
 
             }); //end docu

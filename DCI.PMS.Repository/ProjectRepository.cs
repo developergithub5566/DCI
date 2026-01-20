@@ -203,7 +203,7 @@ namespace DCI.PMS.Repository
                                             ProjectCreationId = p.ProjectCreationId,
                                             AttachmentType = p.AttachmentType,
                                             Filename = p.Filename,
-                                            FileLocation = p.FileLocation,
+                                            FileLocation = p.FileLocation, 
                                             CreatedBy = p.CreatedBy,
                                             IsActive = p.IsActive
                                         })
@@ -273,15 +273,16 @@ namespace DCI.PMS.Repository
                 else
                 {
                     var entity = await _pmsdbContext.Project.FirstOrDefaultAsync(x => x.ProjectCreationId == model.ProjectCreationId);
-                    entity.ProjectCreationId = model.ProjectCreationId;
+                    //entity.ProjectCreationId = model.ProjectCreationId;
                     entity.ClientId = model.ClientId;
-                    entity.ProjectNo = model.ProjectNo;
+                  //  entity.ProjectNo = model.ProjectNo;
                     entity.ProjectName = model.ProjectName;
                     entity.NOADate = model.NOADate;
+                    entity.NTPDate = model.NTPDate;
                     entity.MOADate = model.MOADate;
                     entity.ProjectDuration = model.ProjectDuration;
                     entity.ProjectCost = model.ProjectCost;
-                    entity.ModeOfPayment = model.ModeOfPayment;
+                    entity.ModeOfPayment = model.ModeOfPayment;            
                     //entity.DateCreated = entity.DateCreated;
                     //entity.CreatedBy = entity.CreatedBy;
                     entity.DateModified = DateTime.Now;
@@ -411,6 +412,16 @@ namespace DCI.PMS.Repository
                                         })
                                         .ToListAsync();
 
+                var statusList = await _dbContext.Status
+                             .AsNoTracking()
+                             .Where(p => p.IsActive)
+                             .Select(u => new StatusViewModel
+                             {
+                                StatusId =  u.StatusId,
+                                StatusName= u.StatusName
+                             })
+                             .ToListAsync();
+
                 var milestone = _pmsdbContext.Milestone
                                         .AsNoTracking()
                                         .Where(p => p.IsActive).ToList();
@@ -428,15 +439,19 @@ namespace DCI.PMS.Repository
                                   TargetCompletedDate = m.TargetCompletedDate,
                                   ActualCompletionDate = m.ActualCompletionDate,
                                   PaymentStatus = m.PaymentStatus,
+                                  TargetCompletedDateString = m.TargetCompletedDate.Value.ToString("MM/dd/yyyy"),
+                                  ActualCompletionDateString =  m.ActualCompletionDate.Value.ToString("MM/dd/yyyy") ,
                                   Status = m.Status,
                                   DateCreated = m.DateCreated,
                                   CreatedBy = m.CreatedBy,
                                   DateModified = m.DateModified,
                                   ModifiedBy = m.ModifiedBy,
-                                  IsActive = m.IsActive,
+                                  IsActive = m.IsActive
+                                  
                               }).ToList();
 
                 model.MilestoneList = result;
+                model.StatusList = statusList;
 
                 return model;
 
