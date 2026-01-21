@@ -11,8 +11,8 @@ namespace DCI.PMS.Repository.Interface
         Task<ProjectViewModel> GetProjectById(ProjectViewModel model);
         Task<ProjectViewModel> GetMilestoneByProjectId(ProjectViewModel model);
         Task<(int statuscode, string message)> Delete(ProjectViewModel model);
-        Task<(int statuscode, string message)> SaveMilestone(MilestoneViewModel model);
+        Task SaveMilestone(MilestoneViewModel model);
         Task<MilestoneViewModel> GetDeliverablesByMilestoneId(MilestoneViewModel model);
-        Task<(int statuscode, string message)> SaveDeliverable(DeliverableViewModel model);
+        Task SaveDeliverable(DeliverableViewModel model);
     }
 }

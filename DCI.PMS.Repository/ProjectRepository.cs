@@ -218,9 +218,9 @@ namespace DCI.PMS.Repository
                 result.ClientList = _clientList;
                 result.AttachmentList = attachList;
 
-                result.IsNOAFile = attachList.Any(x => x.AttachmentType == (int)EnumAttachmentType.NOA && x.IsActive);
-                result.IsNTPFile = attachList.Any(x => x.AttachmentType == (int)EnumAttachmentType.NTP && x.IsActive);
-                result.IsMOAFile = attachList.Any(x => x.AttachmentType == (int)EnumAttachmentType.MOA && x.IsActive);
+                result.IsNOAFile = attachList.Any(x => x.AttachmentType == (int)EnumAttachmentType.NOA && x.MileStoneId == 0 && x.DeliverableId == 0 && x.IsActive);
+                result.IsNTPFile = attachList.Any(x => x.AttachmentType == (int)EnumAttachmentType.NTP && x.MileStoneId == 0 && x.DeliverableId == 0 && x.IsActive);
+                result.IsMOAFile = attachList.Any(x => x.AttachmentType == (int)EnumAttachmentType.MOA && x.MileStoneId == 0 && x.DeliverableId == 0 && x.IsActive);
 
                 return result;
 
@@ -322,9 +322,9 @@ namespace DCI.PMS.Repository
 
                 if(model.NOAFile != null &&  model.NOAFile.Length > 0)
                 {
-     
 
-                    string noa_filename = Constants.Attachment_Type_NOA + DateTime.Now.ToString("yyyyMMddHHmmss") + Core.Common.Constants.Filetype_Pdf; //model.NOAFile.FileName;
+
+                    string noa_filename = model.NOAFile.FileName;//Constants.Attachment_Type_NOA + DateTime.Now.ToString("yyyyMMddHHmmss") + Core.Common.Constants.Filetype_Pdf; //model.NOAFile.FileName;
                     string noa_filenameLocation = Path.Combine(fileloc, noa_filename);
                     using (var stream = new FileStream(noa_filenameLocation, FileMode.Create, FileAccess.Write))
                     {
@@ -332,6 +332,8 @@ namespace DCI.PMS.Repository
                     }
                     DCI.PMS.Models.Entities.Attachment noa_entity = new DCI.PMS.Models.Entities.Attachment();
                     noa_entity.ProjectCreationId = model.ProjectCreationId;
+                    noa_entity.MileStoneId = 0;
+                    noa_entity.DeliverableId = 0;
                     noa_entity.AttachmentType = (int)EnumAttachmentType.NOA;
                     noa_entity.Filename = noa_filename;
                     noa_entity.FileLocation = noa_filenameLocation;
@@ -354,6 +356,8 @@ namespace DCI.PMS.Repository
 
                     DCI.PMS.Models.Entities.Attachment ntp_entity = new DCI.PMS.Models.Entities.Attachment();
                     ntp_entity.ProjectCreationId = model.ProjectCreationId;
+                    ntp_entity.MileStoneId = 0;
+                    ntp_entity.DeliverableId = 0;
                     ntp_entity.AttachmentType = (int)EnumAttachmentType.NTP;
                     ntp_entity.Filename = ntp_filename;
                     ntp_entity.FileLocation = ntp_filenameLocation;
@@ -376,6 +380,8 @@ namespace DCI.PMS.Repository
 
                     DCI.PMS.Models.Entities.Attachment moa_entity = new DCI.PMS.Models.Entities.Attachment();
                     moa_entity.ProjectCreationId = model.ProjectCreationId;
+                    moa_entity.MileStoneId = 0;
+                    moa_entity.DeliverableId = 0;
                     moa_entity.AttachmentType = (int)EnumAttachmentType.MOA;
                     moa_entity.Filename = moa_filename;
                     moa_entity.FileLocation = moa_filenameLocation;
@@ -429,6 +435,8 @@ namespace DCI.PMS.Repository
 
                 var result = (from m in milestone
                               join u in users on m.CreatedBy equals u.UserId
+                              join s in _dbContext.Status.AsNoTracking() on m.Status equals s.StatusId
+                              join paystat in _dbContext.Status.AsNoTracking() on m.PaymentStatus equals paystat.StatusId
                               where m.ProjectCreationId == model.ProjectCreationId
                               select new MilestoneViewModel
                               {
@@ -442,6 +450,8 @@ namespace DCI.PMS.Repository
                                   TargetCompletedDateString = m.TargetCompletedDate.Value.ToString("MM/dd/yyyy"),
                                   ActualCompletionDateString =  m.ActualCompletionDate.Value.ToString("MM/dd/yyyy") ,
                                   Status = m.Status,
+                                  StatusName = s.StatusName,
+                                  PaymentStatusName = paystat.StatusName,
                                   DateCreated = m.DateCreated,
                                   CreatedBy = m.CreatedBy,
                                   DateModified = m.DateModified,
@@ -467,7 +477,7 @@ namespace DCI.PMS.Repository
             return null;
         }
 
-        public async Task<(int statuscode, string message)> SaveMilestone(MilestoneViewModel model)
+        public async Task SaveMilestone(MilestoneViewModel model)
         {
             try
             {
@@ -488,7 +498,11 @@ namespace DCI.PMS.Repository
                     entity.IsActive = true;
                     await _pmsdbContext.Milestone.AddAsync(entity);
                     await _pmsdbContext.SaveChangesAsync();
-                    return (StatusCodes.Status200OK, "Successfully saved");
+
+                    ProjectViewModel projModel = new ProjectViewModel();
+                    projModel.ProjectCreationId = model.ProjectCreationId;
+                    await GetMilestoneByProjectId(projModel);
+                   // return (StatusCodes.Status200OK, "Successfully saved");
                 }
                 else
                 {
@@ -505,13 +519,17 @@ namespace DCI.PMS.Repository
 
                     _pmsdbContext.Milestone.Entry(entity).State = EntityState.Modified;
                     await _pmsdbContext.SaveChangesAsync();
-                    return (StatusCodes.Status200OK, "Successfully updated");
+
+                    ProjectViewModel projModel = new ProjectViewModel();
+                    projModel.ProjectCreationId = model.ProjectCreationId;
+                    await GetMilestoneByProjectId(projModel);
+                    // return (StatusCodes.Status200OK, "Successfully updated");
                 }
             }
             catch (Exception ex)
             {
                 Log.Error(ex.ToString());
-                return (StatusCodes.Status406NotAcceptable, ex.ToString());
+              //  return (StatusCodes.Status406NotAcceptable, ex.ToString());
             }
             finally
             {
@@ -536,11 +554,21 @@ namespace DCI.PMS.Repository
 
                 var deliverable = _pmsdbContext.Deliverable
                                         .AsNoTracking()
-                                        .Where(p => p.IsActive).ToList();
+                                        .Where(p => p.IsActive).ToList();              
 
+                var statusList = await _dbContext.Status
+                  .AsNoTracking()
+                  .Where(p => p.IsActive)
+                  .Select(u => new StatusViewModel
+                  {
+                      StatusId = u.StatusId,
+                      StatusName = u.StatusName
+                  })
+                  .ToListAsync();
 
                 var result = (from m in deliverable
                               join u in users on m.CreatedBy equals u.UserId
+                              join s in _dbContext.Status.AsNoTracking() on m.Status equals s.StatusId
                               where m.MileStoneId == model.MileStoneId
                               select new DeliverableViewModel
                               {
@@ -548,6 +576,7 @@ namespace DCI.PMS.Repository
                                   MileStoneId = m.MileStoneId,
                                   DeliverableName = m.DeliverableName,
                                   Status = m.Status,
+                                  StatusName = s.StatusName,
                                   DateCreated = m.DateCreated,
                                   CreatedBy = m.CreatedBy,
                                   DateModified = m.DateModified,
@@ -557,6 +586,7 @@ namespace DCI.PMS.Repository
 
 
                 model.DeliverableList = result;
+                model.StatusList = statusList;
 
                 return model;
 
@@ -572,7 +602,7 @@ namespace DCI.PMS.Repository
             return null;
         }
 
-        public async Task<(int statuscode, string message)> SaveDeliverable(DeliverableViewModel model)
+        public async Task SaveDeliverable(DeliverableViewModel model)
         {
             try
             {
@@ -590,7 +620,11 @@ namespace DCI.PMS.Repository
                     entity.IsActive = true;
                     await _pmsdbContext.Deliverable.AddAsync(entity);
                     await _pmsdbContext.SaveChangesAsync();
-                    return (StatusCodes.Status200OK, "Successfully saved");
+                    //  return (StatusCodes.Status200OK, "Successfully saved");
+
+                    MilestoneViewModel miles = new MilestoneViewModel();
+                    miles.MileStoneId = model.MileStoneId;
+                    await GetDeliverablesByMilestoneId(miles);
                 }
                 else
                 {
@@ -603,13 +637,16 @@ namespace DCI.PMS.Repository
 
                     _pmsdbContext.Deliverable.Entry(entity).State = EntityState.Modified;
                     await _pmsdbContext.SaveChangesAsync();
-                    return (StatusCodes.Status200OK, "Successfully updated");
+                    //  return (StatusCodes.Status200OK, "Successfully updated");
+                    MilestoneViewModel miles = new MilestoneViewModel();
+                    miles.MileStoneId = model.MileStoneId;
+                    await GetDeliverablesByMilestoneId(miles);
                 }
             }
             catch (Exception ex)
             {
                 Log.Error(ex.ToString());
-                return (StatusCodes.Status406NotAcceptable, ex.ToString());
+               // return (StatusCodes.Status406NotAcceptable, ex.ToString());
             }
             finally
             {

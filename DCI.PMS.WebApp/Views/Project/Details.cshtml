@@ -1,0 +1,289 @@
+﻿@model DCI.PMS.Models.ViewModel.ProjectViewModel
+@using Newtonsoft.Json;
+@using DCI.Core.Common;
+@using DCI.Models.ViewModel;
+
+<link href="~/css/dcicustom.css" rel="stylesheet" />
+
+
+<div class="container-fluid">
+    <div class="spinner-overlay">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <div class="d-sm-flex align-items-center justify-content-between mb-3">
+        <h6 class="m-0 font-weight-bold text-gray-800">Project Overview</h6>
+
+    </div>
+    <div class="col-12 p0">
+        <ul class="breadcrumb">
+            <li><a href="~/Home/Index">Dashboard</a></li>
+            <li><a href="~/Project/Index">Project</a></li>
+            <li><a href="~/Project/CreateEdit">Overview</a></li>
+
+        </ul>
+    </div>
+
+    <div class="card shadow mb-4">
+    
+            <div class="bg-white border rounded shadow-sm p-4">
+
+                    <!-- PROJECT HEADER -->
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+
+                            <h3 class="fw-bold mb-1">Project Management System</h3>
+                            <div class="text-muted mb-3">Client: ABC Corporation</div>
+
+                            <div class="row small">
+                                <div class="col-md-3"><strong>Project No:</strong> PROJ-0001</div>
+                                <div class="col-md-3"><strong>NOA Date:</strong> Jan 15, 2026 <i class="fa-solid fa-paperclip me-1" title="download noa"></i></div>
+                                <div class="col-md-3"><strong>NTP Date:</strong> Jan 20, 2026 <i class="fa-solid fa-paperclip me-1" title="download ntp"></i></div>
+                                <div class="col-md-3"><strong>MOA Date:</strong> Jan 20, 2026 <i class="fa-solid fa-paperclip me-1" title="download moa"></i></div>
+                                <div class="col-md-3"><strong>Payment Mode:</strong> Bank Transfer</div>
+                                <div class="col-md-3"><strong>Project Duration:</strong> Milestone Based</div>
+                                <div class="col-md-3">
+                                    <strong>Status:</strong>
+                                    <span class="badge bg-primary">Ongoing</span>
+                                </div>
+                            </div>
+
+                          <hr>
+                            <!-- PROJECT ATTACHMENTS -->
+                            <div class="mb-4">
+                             <strong>Project Attachments</strong>
+                                <ul class="list-unstyled small mb-0">
+                                    <li>
+                                        <i class="fa-solid fa-paperclip me-1"></i>
+                                        <a href="#" class="text-decoration-none">
+                                            Contract Agreement.pdf
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <i class="fa-solid fa-paperclip me-1"></i>
+                                        <a href="#" class="text-decoration-none">
+                                            Approved Proposal.pdf
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                         
+                        </div>
+                
+                    </div>
+               
+
+
+                    <!-- MILESTONES -->
+                    <div class="card shadow-sm">
+                        <div class="card-header fw-bold">
+                            Project Milestones
+                        </div>
+
+                        <div class="card-body">
+
+                            <!-- MILESTONE ITEM -->
+                            <div class="mb-4 border-start border-4 ps-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="fw-bold mb-1">
+                                            Milestone 1 – System Design
+                                            <span class="badge bg-info ms-2">100%</span>
+                                        </h6>
+                                        <div class="small text-muted">
+                                            Target Date: Feb 10, 2026
+                                        </div>
+                                        <div class="small text-muted">
+                                            Actual Completion Date: Feb 10, 2026
+                                        </div>
+                                    </div>
+                                      <span class="badge bg-success">Paid</span>
+                                </div>
+                                <!-- MILESTONE ATTACHMENTS -->
+                                <div class="mt-2">
+                          @*           <div class="small fw-semibold">Milestone Attachments</div> *@
+                                    <ul class="list-unstyled small mb-2">
+                                        <li>
+                                            <i class="fa-solid fa-paperclip me-1"></i>
+                                            <a href="#" class="text-decoration-none">
+                                                Design Documents.pdf
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <i class="fa-solid fa-paperclip me-1"></i>
+                                            <a href="#" class="text-decoration-none">
+                                                ERD Diagram.pdf
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!-- DELIVERABLES -->
+                                <ul class="mt-2 mb-0 small">
+                                    <li>
+                                        Requirement Specification
+                                        <span class="badge bg-success ms-2">Approved</span>
+                                        <!-- DELIVERABLE ATTACHMENTS -->
+                                @* <div class="small fw-semibold">Deliverables Attachments</div> *@
+                                        <ul class="list-unstyled small mt-1">
+                                            <li>
+                                                <i class="fa-solid fa-paperclip me-1"></i>
+                                                <a href="#">Requirements_v1.pdf</a>
+                                            </li>
+                                            <li>
+                                                <i class="fa-solid fa-paperclip me-1"></i>
+                                                <a href="#">Client_Signoff.pdf</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                        
+                                    <li>
+                                        Database ERD
+                                        <span class="badge bg-secondary ms-2">Pending</span>
+                                    </li>
+                                    <li>
+                                        UI Wireframes
+                                        <span class="badge bg-primary ms-2">Submitted</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- MILESTONE ITEM -->
+                            <div class="mb-4 border-start border-4 ps-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="fw-bold mb-1">
+                                            Milestone 2 – Development Phase
+                                            <span class="badge bg-info ms-2">40%</span>
+                                        </h6>
+                                        <div class="small text-muted">
+                                            Target Date: Mar 25, 2026
+                                        </div>
+                                        <div class="small text-muted">
+                                            Actual Completion Date: Feb 10, 2026
+                                        </div>
+                                    </div>
+                               
+                                        <span class="badge bg-warning text-dark">Unpaid</span>
+                                </div>
+
+                                <ul class="mt-2 mb-0 small">
+                                    <li>
+                                        Backend APIs
+                                        <span class="badge bg-success ms-2">Approved</span>
+                                    </li>
+                                    <li>
+                                        Frontend Implementation
+                                        <span class="badge bg-warning text-dark ms-2">In Progress</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                    <!-- MILESTONE ITEM -->
+                    <div class="mb-4 border-start border-4 ps-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="fw-bold mb-1">
+                                    Milestone 3 – Production 
+                                    <span class="badge bg-info ms-2">0%</span>
+                                </h6>
+                                <div class="small text-muted">
+                                    Target Date: Mar 25, 2026
+                                </div>
+                                <div class="small text-muted">
+                                    Actual Completion Date: Feb 10, 2026
+                                </div>
+                            </div>
+
+                            <span class="badge bg-warning text-dark">Unpaid</span>
+                        </div>
+
+                        <ul class="mt-2 mb-0 small">
+                            <li>
+                              Deployment
+                                <span class="badge bg-warning text-dark ms-2">In Progress</span>
+                            </li>
+                            <li>
+                               Support Ticket
+                                <span class="badge bg-warning text-dark ms-2">In Progress</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                        </div>
+                    </div>
+
+                    <!-- ACTIONS -->
+                    <div class="text-end mt-4">
+                        <button class="btn btn-outline-secondary">Edit</button>
+                     
+                    </div>
+
+                </div>
+
+      
+
+
+        </div>
+    </div>
+
+
+<style>
+    .custom-shadow {
+        box-shadow: 0 6px 20px rgba(0,0,0,.06);
+    }
+</style>
+
+
+@section scripts {
+    <script src="~/js/dci-validation.js"></script>
+
+
+    <script type="text/javascript">
+            var js = jQuery.noConflict(true);
+            let _datefrom;
+            let _dateto;
+                    $('.spinner-overlay').show();
+
+        setTimeout(() => {
+            $('.spinner-overlay').hide();
+        }, 200);
+
+
+            $(document).ready(function () {
+
+                    flatpickr("#ActualCompletionDate", {
+                                          dateFormat: "m/d/Y",
+                                         defaultDate: new Date(),
+                                    });
+
+
+                         flatpickr("#TargetCompletedDate", {
+                                      dateFormat: "m/d/Y",
+                                       defaultDate: new Date(),
+                                    });
+
+
+            }); //end docu
+
+
+            function editForm(dataMile){
+
+                console.log(dataMile);
+
+                                  $('#ProjectCreationId').val(dataMile.projectCreationId);
+                                $('#MileStoneId').val(dataMile.mileStoneId);
+                               $('#MilestoneName').val(dataMile.milestoneName);
+                                       $('#Percentage').val(dataMile.percentage);
+                                $('#TargetCompletedDate').val(dataMile.targetCompletedDate);
+                                  $('#ActualCompletionDate').val(dataMile.actualCompletionDate);
+                                  $('#PaymentStatus').val(dataMile.paymentStatus);
+                                   $('#Status').val(dataMile.status);
+            }
+
+
+
+    </script>
+}

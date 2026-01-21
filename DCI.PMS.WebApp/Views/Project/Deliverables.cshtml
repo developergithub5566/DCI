@@ -81,6 +81,7 @@
 
                     <div class="project-dates">
                         <input type="hidden" id="MileStoneId" name="MileStoneId" value="@Model.MileStoneId">
+                        <input type="hidden" id="DeliverableId" name="DeliverableId" value="@Model.Deliverable.DeliverableId">
                         <div id="step1">
                             <div class="row">
                                 <label for="inputEmail3" class="col-sm-2 col-form-label">Deliverable Name</label>
@@ -91,7 +92,8 @@
                             <div class="row">
                                 <label for="inputEmail3" class="col-sm-2 col-form-label">Status</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control" id="Status" name="Status" placeholder="Status">
+                                   @*  <input type="text" class="form-control" id="Status" name="Status" placeholder="Status"> *@
+                                    @Html.DropDownListFor(m => m.Status, new SelectList(Model.StatusList, "StatusId", "StatusName"), "Select", new { @class = "form-control frmField", required = "required", id = "Status" })
                                 </div>
                             </div>
 
@@ -144,7 +146,7 @@
                                     @item.DeliverableName
                                 </td>
                                 <td>
-                                    @item.Status
+                                    @item.StatusName
                                 </td>
 
                                 <td>
@@ -152,8 +154,15 @@
                                 </td>
 
                                 <td class="text-center">
-                                    <a href="javascript:void(0)" title="EDIT">EDIT</a> |
-                                    <a href="javascript:void(0)" title="REMOVE">REMOVE</a>
+                                    <a href="javascript:void(0)" onclick='editForm({
+                                                                                            mileStoneId:"@item.MileStoneId",
+                                                                                            deliverableId : "@item.DeliverableId",
+                                                                                            deliverableName:"@item.DeliverableName",
+                                                                                            status:"@item.Status"
+                                                                                    })' title="Edit" class="btn btn-primary"><i class="fas fa-edit"></i></a>
+
+                                    <a href="javascript:void(0)" title="Delete" class="btn btn-danger"><i class="fas fa-trash"></i></a>
+
                                 </td>
                             </tr>
                         }
@@ -221,7 +230,15 @@
 
 
 
+             function editForm(dataMile){
 
+                console.log(dataMile);
+                  $('#DeliverableId').val(dataMile.deliverableId);
+                  $('#MileStoneId').val(dataMile.mileStoneId);
+                  $('#DeliverableName').val(dataMile.deliverableName);
+                   $('#DeliverableName').val(dataMile.deliverableName);
+                     $('#Status').val(dataMile.status);
+            }
 
     </script>
 }

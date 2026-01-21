@@ -63,16 +63,18 @@ namespace DCI.PMS.API.Controllers
         [Route("SaveMilestone")]
         public async Task<IActionResult> SaveMilestone([FromBody] MilestoneViewModel model)
         {
-            var result = await _projectRepository.SaveMilestone(model);
-            return StatusCode(result.statuscode, result.message);
+            await _projectRepository.SaveMilestone(model);
+            return Ok();
+           // return StatusCode(result.statuscode, result.message);
         }
 
         [HttpPost]
         [Route("SaveDeliverable")]
         public async Task<IActionResult> SaveDeliverable([FromBody] DeliverableViewModel model)
         {
-            var result = await _projectRepository.SaveDeliverable(model);
-            return StatusCode(result.statuscode, result.message);
+            await _projectRepository.SaveDeliverable(model);
+            return Ok();
+            // return StatusCode(result.statuscode, result.message);
         }
     }
 }

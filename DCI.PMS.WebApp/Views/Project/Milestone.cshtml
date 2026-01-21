@@ -38,6 +38,7 @@
 
                     <div class="project-dates">
                         <input type="hidden" id="ProjectCreationId" name="ProjectCreationId" value="@Model.ProjectCreationId">
+                        <input type="hidden" id="MileStoneId" name="MileStoneId" value="@Model.Milestone.MileStoneId">
                         <div id="step1">
                             <div class="row">
                                 <label for="MilestoneName" class="col-sm-2 col-form-label">Milestone</label>
@@ -83,7 +84,7 @@
                                 <label for="inputEmail3" class="col-sm-2 col-form-label">Payment Status</label>
                                 <div class="col-sm-8">
                                   @*   <input type="text" class="form-control" id="PaymentStatus" name="PaymentStatus" placeholder="Payment Status"> *@
-                                    @Html.DropDownListFor(m => m.Milestone.PaymentStatus, new SelectList(Model.StatusList, "StatusId", "StatusName"), "Select", new { @class = "form-control frmField", required = "required", id = "PaymentStatus" })
+                                    @Html.DropDownListFor(m => m.PaymentStatus, new SelectList(Model.StatusList, "StatusId", "StatusName"), "Select", new { @class = "form-control frmField", required = "required", id = "PaymentStatus"}) 
                                 </div>
                             </div>
 
@@ -91,7 +92,7 @@
                                 <label for="inputEmail3" class="col-sm-2 col-form-label">Milestone Status</label>
                                 <div class="col-sm-8">
                                     @* <input type="text" class="form-control" id="Status" name="Status" placeholder="Milestone Status"> *@
-                                    @Html.DropDownListFor(m => m.Milestone.Status, new SelectList(Model.StatusList, "StatusId", "StatusName"), "Select", new { @class = "form-control frmField", required = "required", id = "Status" })
+                                    @Html.DropDownListFor(m => m.Status, new SelectList(Model.StatusList, "StatusId", "StatusName"), "Select", new { @class = "form-control frmField", required = "required", id = "Status" }) 
                                 </div>
                             </div>
 
@@ -151,10 +152,13 @@
                                 <td>@x.TargetCompletedDate.Value.ToString("MM/dd/yyyy") </td>
                                 <td>@x.ActualCompletionDate.Value.ToString("MM/dd/yyyy") </td>
 
-                                <td>@x.PaymentStatus</td>
-                                <td>@x.Status</td>
+                                <td>@x.PaymentStatusName</td>
+                                <td>@x.StatusName</td>
                                 <td class="text-center">
                                  @*    <a href="javascript:void(0)" title="EDIT">EDIT</a> | *@
+                                    <a asp-controller="Project" asp-action="Deliverables" asp-route-MileStoneId="@x.MileStoneId" class="btn btn-primary" title="View">
+                                        <i class="fas fa-search"></i>
+                                    </a>
                                     <a href="javascript:void(0)" onclick='editForm({
                                                                             projectCreationId:"@x.ProjectCreationId",
                                                                             mileStoneId : "@x.MileStoneId",
@@ -164,11 +168,11 @@
                                                                             actualCompletionDate : "@x.ActualCompletionDateString",
                                                                             paymentStatus:"@x.PaymentStatus",
                                                                             status : "@x.Status"
-                                                                                })' title="EDIT" class="btn btn-primary"><i class="fas fa-edit"></i></a>
+                                                                                    })' title="Edit" class="btn btn-primary"><i class="fas fa-edit"></i></a>
 
-                                    <a href="javascript:void(0)" title="REMOVE">REMOVE</a> |
-                                    <a asp-controller="Project" asp-action="Deliverables" asp-route-MileStoneId="@x.MileStoneId">
-                                        Deliverables
+                                    <a href="javascript:void(0)" title="Delete" class="btn btn-danger"><i class="fas fa-trash"></i></a>
+                                    <a asp-controller="Project" asp-action="Deliverables" asp-route-MileStoneId="@x.MileStoneId" class="btn btn-secondary" title="Deliverables">
+                                        <i class="fas fa-truck"></i>
                                     </a>
                                 </td>
                             </tr>
@@ -249,8 +253,9 @@
             function editForm(dataMile){
             
                 console.log(dataMile);
+                               
                                   $('#ProjectCreationId').val(dataMile.projectCreationId);
-                                $('#ProjectCreationId').val(dataMile.mileStoneId);
+                                $('#MileStoneId').val(dataMile.mileStoneId);
                                $('#MilestoneName').val(dataMile.milestoneName);
                                        $('#Percentage').val(dataMile.percentage);
                                 $('#TargetCompletedDate').val(dataMile.targetCompletedDate);

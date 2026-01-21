@@ -15,6 +15,8 @@
 
         public int PaymentStatus { get; set; }
         public int Status { get; set; }
+        public string StatusName { get; set; } = string.Empty;
+        public string PaymentStatusName { get; set; } = string.Empty;
 
         public DateTime DateCreated { get; set; }
         public int CreatedBy { get; set; }
@@ -25,7 +27,8 @@
         public bool IsActive { get; set; }
 
         public List<DeliverableViewModel>? DeliverableList { get; set; } = new();
-
+        public List<StatusViewModel>? StatusList { get; set; } = new();
+        public DeliverableViewModel Deliverable { get; set; } = new();
 
         public string TargetCompletedDateString { get; set; } = string.Empty;
         public string ActualCompletionDateString { get; set; } = string.Empty;

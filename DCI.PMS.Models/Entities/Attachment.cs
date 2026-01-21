@@ -7,7 +7,9 @@ namespace DCI.PMS.Models.Entities
         [Key]
         public int AttachmentId { get; set; }
 
-        public int ProjectCreationId { get; set; }   // FK to ProjectCreation
+        public int ProjectCreationId { get; set; }   
+        public int MileStoneId { get; set; }    
+        public int DeliverableId { get; set; }
 
         public int AttachmentType { get; set; }
 

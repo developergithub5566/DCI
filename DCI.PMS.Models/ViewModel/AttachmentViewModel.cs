@@ -5,6 +5,8 @@
         public int AttachmentId { get; set; } = 0;
 
         public int ProjectCreationId { get; set; } = 0;
+        public int MileStoneId { get; set; } = 0;
+        public int DeliverableId { get; set; } = 0;
 
         public int AttachmentType { get; set; } = 0;
 

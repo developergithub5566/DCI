@@ -26,7 +26,10 @@ namespace DCI.PMS.WebApp.Controllers
         //    return View();
         //}
 
-
+        public async Task<IActionResult> Details()
+        {
+            return View();
+        }
         public async Task<IActionResult> CreateEdit(int id)
         {
             try
@@ -162,6 +165,8 @@ namespace DCI.PMS.WebApp.Controllers
                         return RedirectToAction("Logout", "Account");
                     // model.CurrentUserId = currentUser.UserId;
                     //  model.ProjectCreationId = ProjectCreationId;
+                    model.CreatedBy = 1;
+
 
                     var data = new MultipartFormDataContent();
                     data.Add(new StringContent(model.ProjectCreationId.ToString() ?? ""), "ProjectCreationId");
@@ -178,7 +183,7 @@ namespace DCI.PMS.WebApp.Controllers
                     data.Add(new StringContent(model.Status.ToString() ?? ""), "Status");
                     data.Add(new StringContent(model.CreatedName.ToString() ?? ""), "CreatedName");
                     //data.Add(new StringContent(model.DateCreated.ToString() ?? ""), "DateCreated");
-                    //data.Add(new StringContent(model.CreatedBy.ToString() ?? ""), "CreatedBy");
+                    data.Add(new StringContent(model.CreatedBy.ToString() ?? ""), "CreatedBy");
                     //data.Add(new StringContent(model.ModifiedBy.ToString() ?? ""), "ModifiedBy");
                     //data.Add(new StringContent(model.DateModified.ToString() ?? ""), "DateModified");
                     data.Add(new StringContent(model.IsActive.ToString() ?? ""), "IsActive");
@@ -242,7 +247,7 @@ namespace DCI.PMS.WebApp.Controllers
 
                     if (response.IsSuccessStatusCode)
                     {
-                        return View(model);
+                       return View(model);
                     }
                     //return View(model);
                 }
@@ -268,16 +273,17 @@ namespace DCI.PMS.WebApp.Controllers
                     var currentUser = _userSessionHelper.GetCurrentUser();
                     if (currentUser == null)
                         return RedirectToAction("Logout", "Account");
-                  
 
+                    model.CreatedBy = 1;
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/SaveMilestone");
                     request.Content = stringContent;
                     var response = await _httpclient.SendAsync(request);
                     var responseBody = await response.Content.ReadAsStringAsync();
-                
-                }
 
+                    return RedirectToAction("Milestone", new { projectCreationId = model.ProjectCreationId });
+                }
+               
             }
             catch (Exception ex)
             {
@@ -321,12 +327,16 @@ namespace DCI.PMS.WebApp.Controllers
                     if (currentUser == null)
                         return RedirectToAction("Logout", "Account");
 
-
+                    model.CreatedBy = 1;
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/SaveDeliverable");
                     request.Content = stringContent;
                     var response = await _httpclient.SendAsync(request);
                     var responseBody = await response.Content.ReadAsStringAsync();
+
+                    MilestoneViewModel miles = new MilestoneViewModel();
+                    miles.MileStoneId = 3;
+                    return RedirectToAction("Deliverables", new { MileStoneId = miles.MileStoneId });
                 }
             }
             catch (Exception ex)
