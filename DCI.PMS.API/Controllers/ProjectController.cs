@@ -76,5 +76,31 @@ namespace DCI.PMS.API.Controllers
             return Ok();
             // return StatusCode(result.statuscode, result.message);
         }
+
+        [HttpPost]
+        [Route("DeleteProject")]
+        public async Task<IActionResult> DeleteProject([FromBody] ProjectViewModel model)
+        {
+            await _projectRepository.DeleteProject(model);
+            return Ok(); 
+        }
+
+        [HttpPost]
+        [Route("DeleteMilestone")]
+        public async Task<IActionResult> DeleteMilestone([FromBody] MilestoneViewModel model)
+        {
+            //await _projectRepository.DeleteMilestone(model);
+            //return Ok();
+            var result = await _projectRepository.DeleteMilestone(model);
+            return StatusCode(result.statuscode, result.message);
+        }
+
+        [HttpPost]
+        [Route("DeleteDeliverable")]
+        public async Task<IActionResult> DeleteDeliverable([FromBody] DeliverableViewModel model)
+        {
+            await _projectRepository.DeleteDeliverable(model);
+            return Ok();
+        }
     }
 }

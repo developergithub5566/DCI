@@ -456,8 +456,8 @@ namespace DCI.PMS.Repository
                                   CreatedBy = m.CreatedBy,
                                   DateModified = m.DateModified,
                                   ModifiedBy = m.ModifiedBy,
-                                  IsActive = m.IsActive
-                                  
+                                  IsActive = m.IsActive,
+                                  Remarks = m.Remarks
                               }).ToList();
 
                 model.MilestoneList = result;
@@ -496,6 +496,7 @@ namespace DCI.PMS.Repository
                     entity.ModifiedBy = null;
                     entity.DateModified = null;
                     entity.IsActive = true;
+                    entity.Remarks = model.Remarks;
                     await _pmsdbContext.Milestone.AddAsync(entity);
                     await _pmsdbContext.SaveChangesAsync();
 
@@ -516,7 +517,7 @@ namespace DCI.PMS.Repository
                     entity.DateModified = DateTime.Now;
                     entity.ModifiedBy = model.ModifiedBy;
                     entity.IsActive = true;
-
+                    entity.Remarks = model.Remarks;
                     _pmsdbContext.Milestone.Entry(entity).State = EntityState.Modified;
                     await _pmsdbContext.SaveChangesAsync();
 
@@ -654,7 +655,7 @@ namespace DCI.PMS.Repository
             }
         }
 
-        public async Task<(int statuscode, string message)> Delete(ProjectViewModel model)
+        public async Task<(int statuscode, string message)> DeleteProject(ProjectViewModel model)
         {
             try
             {
@@ -668,6 +669,61 @@ namespace DCI.PMS.Repository
                 entity.ModifiedBy = model.ModifiedBy;
                 entity.DateModified = DateTime.Now;
                 _pmsdbContext.Project.Entry(entity).State = EntityState.Modified;
+                await _pmsdbContext.SaveChangesAsync();
+                return (StatusCodes.Status200OK, "Successfully deleted");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return (StatusCodes.Status400BadRequest, ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();                                                                                         
+            }
+        }
+
+        public async Task<(int statuscode, string message)> DeleteMilestone(MilestoneViewModel model)
+        {
+            try
+            {
+                var entity = await _pmsdbContext.Milestone.FirstOrDefaultAsync(x => x.MileStoneId == model.MileStoneId && x.IsActive == true);
+                if (entity == null)
+                {
+                    return (StatusCodes.Status406NotAcceptable, "Invalid Milestone Id");
+                }
+
+                entity.IsActive = false;
+                entity.ModifiedBy = model.ModifiedBy;
+                entity.DateModified = DateTime.Now;
+                _pmsdbContext.Milestone.Entry(entity).State = EntityState.Modified;
+                await _pmsdbContext.SaveChangesAsync();
+                return (StatusCodes.Status200OK, "Successfully deleted");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return (StatusCodes.Status400BadRequest, ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+        public async Task<(int statuscode, string message)> DeleteDeliverable(DeliverableViewModel model)
+        {
+            try
+            {
+                var entity = await _pmsdbContext.Deliverable.FirstOrDefaultAsync(x => x.DeliverableId == model.DeliverableId && x.IsActive == true);
+                if (entity == null)
+                {
+                    return (StatusCodes.Status406NotAcceptable, "Invalid Deliverable Id");
+                }
+
+                entity.IsActive = false;
+                entity.ModifiedBy = model.ModifiedBy;
+                entity.DateModified = DateTime.Now;
+                _pmsdbContext.Deliverable.Entry(entity).State = EntityState.Modified;
                 await _pmsdbContext.SaveChangesAsync();
                 return (StatusCodes.Status200OK, "Successfully deleted");
             }

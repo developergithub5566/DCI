@@ -382,5 +382,115 @@ namespace DCI.PMS.WebApp.Controllers
             }
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
+
+        public async Task<IActionResult> DeleteProject(ProjectViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+                    model.CreatedBy = currentUser.UserId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/DeleteProject");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = responseBody });
+                    }
+                    return Json(new { success = false, message = responseBody });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        public async Task<IActionResult> DeleteMilestone(MilestoneViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+                    model.CreatedBy = currentUser.UserId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/DeleteMilestone");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = responseBody });
+                    }
+                    return Json(new { success = false, message = responseBody });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        public async Task<IActionResult> DeleteDeliverable(DeliverableViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+                    model.CreatedBy = currentUser.UserId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/DeleteDeliverable");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = responseBody });
+                    }
+                    return Json(new { success = false, message = responseBody });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+
     }
 }

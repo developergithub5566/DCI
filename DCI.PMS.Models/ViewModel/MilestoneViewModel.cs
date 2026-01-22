@@ -25,6 +25,7 @@
         public int? ModifiedBy { get; set; }
 
         public bool IsActive { get; set; }
+        public string Remarks { get; set; } = string.Empty;
 
         public List<DeliverableViewModel>? DeliverableList { get; set; } = new();
         public List<StatusViewModel>? StatusList { get; set; } = new();

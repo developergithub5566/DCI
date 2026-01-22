@@ -697,7 +697,7 @@ namespace DCI.Repositories
                         contextHdr.DeductionType = (int)EnumDeductionType.Payroll;
                     }
 
-                    contextHdr.Status = param.Status;
+                    contextHdr.Status = param.Status == 0 ? (int)EnumStatus.Approved : param.Status; //param.Status 2026.01.22
                     contextHdr.ModifiedBy = param.ApproverId;
                     contextHdr.DateModified = DateTime.Now;
                     _dbContext.LeaveRequestHeader.Entry(contextHdr).State = EntityState.Modified;

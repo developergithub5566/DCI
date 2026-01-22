@@ -24,6 +24,8 @@
 
         public bool IsActive { get; set; }
 
+        public string Remarks { get; set; }
+
         // Navigation Properties
         public Project? Project { get; set; }
         public ICollection<Deliverable>? Deliverables { get; set; }
