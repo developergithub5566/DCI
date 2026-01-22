@@ -365,3 +365,5 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 DCI.API/DCI.API.csproj.user
+DCI.API/Properties/PublishProfiles/FolderProfile.pubxml
+DCI.API/Properties/PublishProfiles/FolderProfile.pubxml.user
