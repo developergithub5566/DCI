@@ -248,48 +248,98 @@ namespace DCI.PMS.Repository
             {
                 if (model.ProjectCreationId == 0)
                 {
-                    Project entity = new Project();
-                    entity.ProjectCreationId = model.ProjectCreationId;
-                    entity.ClientId = model.ClientId;
-                    entity.ProjectNo =  await GenereteRequestNo();
-                    entity.ProjectName = model.ProjectName;
-                    entity.NOADate = model.NOADate;
-                    entity.NTPDate = model.NTPDate;
-                    entity.MOADate = model.MOADate;
-                    entity.ProjectDuration = model.ProjectDuration;
-                    entity.ProjectCost = model.ProjectCost;
-                    entity.ModeOfPayment = model.ModeOfPayment;
-                    entity.CreatedBy = model.CreatedBy;
-                    entity.DateCreated = DateTime.Now;
-                    entity.ModifiedBy = null;
-                    entity.DateModified = null;
-                    entity.IsActive = true;
-                    await _pmsdbContext.Project.AddAsync(entity);
-                    await _pmsdbContext.SaveChangesAsync();
+                    //Project entity = new Project();
+                    //entity.ProjectCreationId = model.ProjectCreationId;
+                    //entity.ClientId = model.ClientId;
+                    //entity.ProjectNo =  await GenereteRequestNo();
+                    //entity.ProjectName = model.ProjectName;
+                    //entity.NOADate = model.NOADate;
+                    //entity.NTPDate = model.NTPDate;
+                    //entity.MOADate = model.MOADate;
+                    //entity.ProjectDuration = model.ProjectDuration;
+                    //entity.ProjectCost = model.ProjectCost;
+                    //entity.ModeOfPayment = model.ModeOfPayment;
+                    //entity.CreatedBy = model.CreatedBy;
+                    //entity.DateCreated = DateTime.Now;
+                    //entity.ModifiedBy = null;
+                    //entity.DateModified = null;
+                    //entity.IsActive = true;
+                    //await _pmsdbContext.Project.AddAsync(entity);
+                    //await _pmsdbContext.SaveChangesAsync();
+                    await _pmsdbContext.Database.ExecuteSqlInterpolatedAsync($@"
+                                INSERT INTO dbo.Project
+                                (
+                                    ProjectCreationId,
+                                    ClientId,
+                                    ProjectNo,
+                                    ProjectName,
+                                    NOADate,
+                                    NTPDate,
+                                    MOADate,
+                                    ProjectDuration,
+                                    ProjectCost,
+                                    ModeOfPayment,
+                                    CreatedBy,
+                                    DateCreated,
+                                    IsActive
+                                )
+                                VALUES
+                                (
+                                    {model.ProjectCreationId},
+                                    {model.ClientId},
+                                    {model.ProjectNo},
+                                    {model.ProjectName},
+                                    {model.NOADate},
+                                    {model.NTPDate},
+                                    {model.MOADate},
+                                    {model.ProjectDuration},
+                                    {model.ProjectCost},
+                                    {model.ModeOfPayment},
+                                    {model.CreatedBy},
+                                    {DateTime.Now},
+                                    1
+                                )
+                            ");
 
                     await SaveFile(model);
                    // return (StatusCodes.Status200OK, "Successfully saved");
                 }
                 else
                 {
-                    var entity = await _pmsdbContext.Project.FirstOrDefaultAsync(x => x.ProjectCreationId == model.ProjectCreationId);
+                    //var entity = await _pmsdbContext.Project.FirstOrDefaultAsync(x => x.ProjectCreationId == model.ProjectCreationId);
                     //entity.ProjectCreationId = model.ProjectCreationId;
-                    entity.ClientId = model.ClientId;
-                  //  entity.ProjectNo = model.ProjectNo;
-                    entity.ProjectName = model.ProjectName;
-                    entity.NOADate = model.NOADate;
-                    entity.NTPDate = model.NTPDate;
-                    entity.MOADate = model.MOADate;
-                    entity.ProjectDuration = model.ProjectDuration;
-                    entity.ProjectCost = model.ProjectCost;
-                    entity.ModeOfPayment = model.ModeOfPayment;            
+                    //entity.ClientId = model.ClientId;
+                    //entity.ProjectNo = model.ProjectNo;
+                    //entity.ProjectName = model.ProjectName;
+                    //entity.NOADate = model.NOADate;
+                    //entity.NTPDate = model.NTPDate;
+                    //entity.MOADate = model.MOADate;
+                    //entity.ProjectDuration = model.ProjectDuration;
+                    //entity.ProjectCost = model.ProjectCost;
+                    //entity.ModeOfPayment = model.ModeOfPayment;
                     //entity.DateCreated = entity.DateCreated;
                     //entity.CreatedBy = entity.CreatedBy;
-                    entity.DateModified = DateTime.Now;
-                    entity.ModifiedBy = model.ModifiedBy;
-                    entity.IsActive = true;
-                    _pmsdbContext.Project.Entry(entity).State = EntityState.Modified;
-                    await _pmsdbContext.SaveChangesAsync();
+                    //entity.DateModified = DateTime.Now;
+                    //entity.ModifiedBy = model.ModifiedBy;
+                    //entity.IsActive = true;
+                    //_pmsdbContext.Project.Entry(entity).State = EntityState.Modified;
+                    //await _pmsdbContext.SaveChangesAsync();
+
+                    await _pmsdbContext.Database.ExecuteSqlInterpolatedAsync($@"
+                        UPDATE dbo.Project
+                        SET
+                            ClientId        = {model.ClientId},
+                            ProjectName     = {model.ProjectName},
+                            NOADate         = {model.NOADate},
+                            NTPDate         = {model.NTPDate},
+                            MOADate         = {model.MOADate},
+                            ProjectDuration= {model.ProjectDuration},
+                            ProjectCost     = {model.ProjectCost},
+                            ModeOfPayment  = {model.ModeOfPayment},
+                            ModifiedBy     = {model.ModifiedBy},
+                            DateModified   = {DateTime.Now}
+                        WHERE ProjectCreationId = {model.ProjectCreationId}
+                    ");
 
                     await SaveFile(model);
                     //return (StatusCodes.Status200OK, "Successfully updated");

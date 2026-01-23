@@ -31,7 +31,7 @@ namespace DCI.Data
                 .HasOne(m => m.Project)
                 .WithMany(p => p.Milestones)
                 .HasForeignKey(m => m.ProjectCreationId)
-                .OnDelete(DeleteBehavior.Restrict); 
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Attachment>()
                     .HasOne(a => a.Project)

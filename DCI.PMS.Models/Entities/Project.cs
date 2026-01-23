@@ -33,7 +33,7 @@ namespace DCI.PMS.Models.Entities
         public bool IsActive { get; set; }
 
         // Optional: Navigation Properties (EF Core)
-       // public Client? Client { get; set; }
+        // public Client? Client { get; set; }
         public ICollection<Milestone>? Milestones { get; set; }
         public ICollection<Attachment>? Attachments { get; set; }
     }
