@@ -2,10 +2,12 @@
 using DCI.Models.ViewModel;
 using DCI.PMS.Models.ViewModel;
 using DCI.PMS.WebApp.Configuration;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Serilog;
+using System.Net.Http;
 using System.Text;
 
 namespace DCI.PMS.WebApp.Controllers
@@ -35,25 +37,25 @@ namespace DCI.PMS.WebApp.Controllers
             try
             {
                 ProjectViewModel model = new ProjectViewModel();
-               
-                    using (var _httpclient = new HttpClient())
+
+                using (var _httpclient = new HttpClient())
+                {
+
+                    model.ProjectCreationId = id;
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/GetProjectById");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    ProjectViewModel vm = JsonConvert.DeserializeObject<ProjectViewModel>(responseBody)!;
+
+                    if (response.IsSuccessStatusCode)
                     {
-
-                        model.ProjectCreationId = id;
-                        var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-                        var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/GetProjectById");
-                        request.Content = stringContent;
-                        var response = await _httpclient.SendAsync(request);
-                        var responseBody = await response.Content.ReadAsStringAsync();
-                        ProjectViewModel vm = JsonConvert.DeserializeObject<ProjectViewModel>(responseBody)!;
-
-                        if (response.IsSuccessStatusCode)
-                        {                          
-                            return View(vm);
-                        }
+                        return View(vm);
+                    }
                     return View(vm);
                 }
-              
+
             }
             catch (Exception ex)
             {
@@ -205,15 +207,70 @@ namespace DCI.PMS.WebApp.Controllers
                         data.Add(fileContent, "MOAFile", model.MOAFile.FileName);
                     }
 
+                    //if (model.OtherAttachment is not null)
+                    //{
+                    //    var fileContent = new StreamContent(model.OtherAttachment!.OpenReadStream());
+                    //    data.Add(fileContent, "OtherAttachment", model.OtherAttachment.FileName);
+                    //}
 
+                    if (model.OtherAttachment != null && model.OtherAttachment.Any())
+                    {
+                        //foreach (var file in model.OtherAttachment)
+                        //{
+                        //    if (file == null || file.Length == 0)
+                        //        continue;
+
+                        //    var fileContent = new StreamContent(file.OpenReadStream());
+                        //    fileContent.Headers.ContentType =
+                        //        new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
+
+                        //    data.Add(fileContent, "OtherAttachment", file.FileName);
+                        //}
+
+                        //foreach (var file in model.OtherAttachment)
+                        //{
+                        //    using var ms = new MemoryStream();
+                        //    await file.CopyToAsync(ms);
+
+                        //    var content = new ByteArrayContent(ms.ToArray());
+                        //    content.Headers.ContentType =
+                        //        new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
+
+                        //    data.Add(content, "OtherAttachment", file.FileName);
+                        //}
+
+                        foreach (var file in model.OtherAttachment)
+                        {
+                            byte[] fileBytes;
+                            using (var ms = new MemoryStream())
+                            {
+                                await file.CopyToAsync(ms);
+                                fileBytes = ms.ToArray();
+                            }
+
+                           string fileloc = @"C:\\DCI App\\PMS\\" + model.ProjectCreationId.ToString() + @"\";
+
+                            var fileName =  DateTime.Now.ToString("yyyyMMddHHmmss") + Core.Common.Constants.Filetype_Pdf;  
+                            var filePath = Path.Combine(fileloc, fileName);
+                            await System.IO.File.WriteAllBytesAsync(filePath, fileBytes);
+
+                          
+                            var content = new ByteArrayContent(fileBytes);
+                            content.Headers.ContentType =
+                                new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
+
+                            data.Add(content, "OtherAttachment", fileName);
+                        }
+
+                    }
                     var response = await _httpclient.PostAsync(_apiconfig.Value.apiPMS + "api/Project/SaveProject", data);
                     var responseBody = await response.Content.ReadAsStringAsync();
 
 
                 }
 
-                return RedirectToAction("Milestone", new { projectCreationId = model.ProjectCreationId });
-         
+                return RedirectToAction("Milestone", new { id = model.ProjectCreationId });
+
 
             }
             catch (Exception ex)
@@ -228,26 +285,26 @@ namespace DCI.PMS.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
-        public async Task<IActionResult> Milestone(int projectCreationId)
+        public async Task<IActionResult> Milestone(int id)
         {
             try
             {
 
                 ProjectViewModel model = new ProjectViewModel();
-                model.ProjectCreationId = projectCreationId;
+                model.ProjectCreationId = id;
 
                 using (var _httpclient = new HttpClient())
                 {
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/GetMilestoneByProjectId");
                     request.Content = stringContent;
-                    var response =  await _httpclient.SendAsync(request);
+                    var response = await _httpclient.SendAsync(request);
                     var responseBody = await response.Content.ReadAsStringAsync();
                     model = JsonConvert.DeserializeObject<ProjectViewModel>(responseBody)!;
 
                     if (response.IsSuccessStatusCode)
                     {
-                       return View(model);
+                        return View(model);
                     }
                     //return View(model);
                 }
@@ -283,7 +340,7 @@ namespace DCI.PMS.WebApp.Controllers
 
                     return RedirectToAction("Milestone", new { projectCreationId = model.ProjectCreationId });
                 }
-               
+
             }
             catch (Exception ex)
             {
@@ -299,7 +356,7 @@ namespace DCI.PMS.WebApp.Controllers
 
         public async Task<IActionResult> Deliverables(MilestoneViewModel model)
         {
-         
+
             using (var _httpclient = new HttpClient())
             {
                 var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -471,6 +528,42 @@ namespace DCI.PMS.WebApp.Controllers
 
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/DeleteDeliverable");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = responseBody });
+                    }
+                    return Json(new { success = false, message = responseBody });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        public async Task<IActionResult> DeleteAttachment(AttachmentViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+                    model.CreatedBy = currentUser.UserId;
+
+
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/DeleteAttachment");
 
                     request.Content = stringContent;
                     var response = await _httpclient.SendAsync(request);

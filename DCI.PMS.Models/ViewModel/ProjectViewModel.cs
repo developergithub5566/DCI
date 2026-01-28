@@ -45,7 +45,12 @@ namespace DCI.PMS.Models.ViewModel
 
         public List<StatusViewModel>? StatusList { get; set; } = new();
         public bool? IsNOAFile { get; set; } = false;
+        public int NOAFileId { get; set; } = 0;
         public bool? IsNTPFile { get; set; } = false;
+        public int NTPFileId { get; set; } = 0;
         public bool? IsMOAFile { get; set; } = false;
+        public int MOAFileId { get; set; } = 0;
+
+        public List<IFormFile> OtherAttachment { get; set; } = new();
     }
 }

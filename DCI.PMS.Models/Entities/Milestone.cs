@@ -1,6 +1,8 @@
-﻿namespace DCI.PMS.Models.Entities
+﻿using DCI.Models.Configuration;
+
+namespace DCI.PMS.Models.Entities
 {
-    public class Milestone
+    public class Milestone : IAuditable
     {
         public int MileStoneId { get; set; }
 
@@ -27,8 +29,8 @@
         public string Remarks { get; set; }
 
         // Navigation Properties
-        public Project? Project { get; set; }
-        public ICollection<Deliverable>? Deliverables { get; set; }
+        //public Project? Project { get; set; }
+        //public ICollection<Deliverable>? Deliverables { get; set; }
     }
 
 }

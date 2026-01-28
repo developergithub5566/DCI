@@ -1,6 +1,8 @@
-﻿namespace DCI.PMS.Models.Entities
+﻿using DCI.Models.Configuration;
+
+namespace DCI.PMS.Models.Entities
 {
-    public class Client
+    public class Client : IAuditable
     {
         public int ClientId { get; set; }
 
@@ -16,6 +18,6 @@
         public bool IsActive { get; set; }
 
         // Navigation Property
-        public ICollection<Project>? Projects { get; set; }
+        //public ICollection<Project>? Projects { get; set; }
     }
 }

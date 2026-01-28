@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using DCI.Models.Configuration;
+using System.ComponentModel.DataAnnotations;
 
 namespace DCI.PMS.Models.Entities
 {
-    public class Attachment
+    public class Attachment : IAuditable
     {
         [Key]
         public int AttachmentId { get; set; }
@@ -22,7 +23,7 @@ namespace DCI.PMS.Models.Entities
         public bool IsActive { get; set; }
 
         // Navigation Property
-        public Project? Project { get; set; }
+        //public Project? Project { get; set; }
     }
 
 }

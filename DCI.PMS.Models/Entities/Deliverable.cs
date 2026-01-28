@@ -1,8 +1,9 @@
-﻿using System.Reflection.Metadata;
+﻿using DCI.Models.Configuration;
+using System.Reflection.Metadata;
 
-namespace DCI.PMS.Models.Entities
+namespace DCI.PMS.Models.Entities 
 {
-    public class Deliverable
+    public class Deliverable : IAuditable
     {
         public int DeliverableId { get; set; }
 
@@ -19,7 +20,7 @@ namespace DCI.PMS.Models.Entities
         public bool IsActive { get; set; }
 
         // Navigation Property
-        public Milestone? Milestone { get; set; }
+        //public Milestone? Milestone { get; set; }
     }
 
 }

@@ -167,7 +167,7 @@
                                             <a href="javascript:void(0)">
                                                 <i class="fas fa-file-pdf pdf-icon"></i>
                                             </a>
-                                            <span class="delete-btn" title="remove" onclick="removeNoa()">&times;</span>
+                                            <span class="delete-btn" title="remove" onclick="removeAttachment(@Model.NOAFileId,1)">&times;</span>
                                         </div>
                                     }
                                   
@@ -197,7 +197,7 @@
                                         <div id="NTPIcon" name="NTPIcon" class="file-icon">
                                             <a href="javascript:void(0)"> <i class="fas fa-file-pdf pdf-icon"></i>                                    
                                         </a>
-                                            <span class="delete-btn" title="remove" onclick="removeNtp()">&times;</span>
+                                            <span class="delete-btn" title="remove" onclick="removeAttachment(@Model.NTPFileId,2)">&times;</span>
                                         </div>                                        
                                     }        
                                 </div>
@@ -225,7 +225,7 @@
                                             <a href="javascript:void(0)">
                                                 <i class="fas fa-file-pdf pdf-icon"></i>
                                             </a>
-                                            <span class="delete-btn" title="remove" onclick="removeMoa()">&times;</span>
+                                            <span class="delete-btn" title="remove" onclick="removeAttachment(@Model.MOAFileId,3)">&times;</span>
                                         </div>
                                     }
                                    
@@ -267,6 +267,77 @@
                                                                         "Select",
                                                                         new { @class = "form-control frmField", required = "required" }
                                                                         )
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <label for="attach" class="col-sm-2 col-form-label">Attachment</label>
+                                <div class="col-sm-8">
+                                    <input type="file" id="OtherAttachment" name="OtherAttachment" class="form-control" accept="application/pdf" multiple onchange="">
+                                </div>
+                            </div>
+                            <style>
+                                .attachment-icons {
+                                    display: flex; /* align children in a row */
+                                    gap: 10px; /* spacing between icons */
+                                    flex-wrap: wrap; /* wrap to next line if too many */
+                                }
+
+                                .file-icon {
+                                    position: relative;
+                                    width: 50px; /* adjust size */
+                                    height: 50px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    border: 1px solid #ccc;
+                                    border-radius: 5px;
+                                }
+
+                                .delete-btn {
+                                    position: absolute;
+                                    top: -5px;
+                                    right: -5px;
+                                    cursor: pointer;
+                                    color: red;
+                                    font-weight: bold;
+                                }
+
+                                .download-btn {
+                                    position: absolute;
+                                    top: -5px;
+                                    left: -5px;
+                                    cursor: pointer;
+                                    color: green;
+                                    font-weight: bold;
+                                    background: white;
+                                    border-radius: 50%;
+                                    width: 18px;
+                                    height: 18px;
+                                    text-align: center;
+                                    line-height: 16px;
+                                    font-size: 24px;
+                                }
+                            </style>
+                            <div class="row">
+                               
+                                  @*   <script>
+                                        $('#OtherIcon').hide();
+                                    </script> *@
+                                <label for="inputEmail3" class="col-sm-2 col-form-label"></label>
+                                <div class="attachment-icons">
+                                    @foreach (var x in Model.AttachmentList)
+                                    {
+
+                                    
+                                        <div class="file-icon">
+                                            <span class="download-btn" title="Download" onclick="downloadAttachment('@x.FileLocation')"> &#8681; </span>
+                                            <a href="javascript:void(0)" title="@x.Filename">
+                                                <i class="fas fa-file-pdf pdf-icon"></i>
+                                            </a>
+                                            <span class="delete-btn" title="remove" onclick="removeAttachment(@x.AttachmentId,0)">&times;</span>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -363,21 +434,184 @@
 
 
 
-       function removeNoa(){
-            $('#NOAFile').show();
-              $('#NOAIcon').hide();
+        function removeAttachment(attachId,attachtypeId){
+              Swal.fire({
+                                       text: "Are you sure you want to delete this attachment?",
+                                       icon: "warning",
+                                       showCancelButton: true,
+                                       confirmButtonText: "Yes, delete it!"
+                                   }).then((result) => {
+                                       if (result.isConfirmed) {
+                                           $.ajax({
+                                               type: 'POST',
+                                                url: '@Url.Action("DeleteAttachment", "Project")',
+                                                   data: { AttachmentId: attachId },
+                                               success: function (response) {
+                                                   if (response.success) {
+                                                       Swal.fire({
+                                                           text: response.message,
+                                                           icon: "success",
+                                                           confirmButtonText: "Ok"
+                                                       }).then((result) => {
+                                                           location.reload();
+                                                       });
+                                                   } else {
+                                                       Swal.fire({
+                                                           text: response.message,
+                                                           icon: "error"
+                                                       });
+                                                   }
+                                               },
+                                               error: function () {
+                                                   Swal.fire({
+                                                       text: "An error occurred. Please try again.",
+                                                       icon: "error"
+                                                   });
+                                               }
+                                           });
+                                       }
+                                   });
+
+                                    if(attachtypeId == 1){
+                                          $('#NOAFile').show();
+                                           $('#NOAIcon').hide();
+                                     }else if(attachtypeId == 2){
+                                           $('#NTPFile').show();
+                                          $('#NTPIcon').hide();
+                                      }else if(attachtypeId == 3){
+                                         $('#MOAFile').show();
+                                           $('#MOAIcon').hide();
+                                      }
+
+           
        }
 
-        function removeNtp(){
+         function removeNtp(attachId){
+               Swal.fire({
+                                       text: "Are you sure you want to delete this attachment?",
+                                       icon: "warning",
+                                       showCancelButton: true,
+                                       confirmButtonText: "Yes, delete it!"
+                                   }).then((result) => {
+                                       if (result.isConfirmed) {
+                                           $.ajax({
+                                               type: 'POST',
+                                                url: '@Url.Action("DeleteAttachment", "Project")',
+                                                   data: { AttachmentId: attachId },
+                                               success: function (response) {
+                                                   if (response.success) {
+                                                       Swal.fire({
+                                                           text: response.message,
+                                                           icon: "success",
+                                                           confirmButtonText: "Ok"
+                                                       }).then((result) => {
+                                                           location.reload();
+                                                       });
+                                                   } else {
+                                                       Swal.fire({
+                                                           text: response.message,
+                                                           icon: "error"
+                                                       });
+                                                   }
+                                               },
+                                               error: function () {
+                                                   Swal.fire({
+                                                       text: "An error occurred. Please try again.",
+                                                       icon: "error"
+                                                   });
+                                               }
+                                           });
+                                       }
+                                   });
              $('#NTPFile').show();
                $('#NTPIcon').hide();
         }
 
-          function removeMoa(){
+           function removeMoa(attachId){
+                  Swal.fire({
+                                      text: "Are you sure you want to delete this attachment?",
+                                      icon: "warning",
+                                      showCancelButton: true,
+                                      confirmButtonText: "Yes, delete it!"
+                                  }).then((result) => {
+                                      if (result.isConfirmed) {
+                                          $.ajax({
+                                              type: 'POST',
+                                               url: '@Url.Action("DeleteAttachment", "Project")',
+                                                  data: { AttachmentId: attachId },
+                                              success: function (response) {
+                                                  if (response.success) {
+                                                      Swal.fire({
+                                                          text: response.message,
+                                                          icon: "success",
+                                                          confirmButtonText: "Ok"
+                                                      }).then((result) => {
+                                                          location.reload();
+                                                      });
+                                                  } else {
+                                                      Swal.fire({
+                                                          text: response.message,
+                                                          icon: "error"
+                                                      });
+                                                  }
+                                              },
+                                              error: function () {
+                                                  Swal.fire({
+                                                      text: "An error occurred. Please try again.",
+                                                      icon: "error"
+                                                  });
+                                              }
+                                          });
+                                      }
+                                  });
               $('#MOAFile').show();
                  $('#MOAIcon').hide();
          }
 
+            function removeOther(attachId){
+                  //var projectId =  $('#ProjectCreationId').val();
+
+                  Swal.fire({
+                                     text: "Are you sure you want to delete this attachment?",
+                                     icon: "warning",
+                                     showCancelButton: true,
+                                     confirmButtonText: "Yes, delete it!"
+                                 }).then((result) => {
+                                     if (result.isConfirmed) {
+                                         $.ajax({
+                                             type: 'POST',
+                                              url: '@Url.Action("DeleteAttachment", "Project")',
+                                                 data: { AttachmentId: attachId },
+                                             success: function (response) {
+                                                 if (response.success) {
+                                                     Swal.fire({
+                                                         text: response.message,
+                                                         icon: "success",
+                                                         confirmButtonText: "Ok"
+                                                     }).then((result) => {
+                                                         location.reload();
+                                                     });
+                                                 } else {
+                                                     Swal.fire({
+                                                         text: response.message,
+                                                         icon: "error"
+                                                     });
+                                                 }
+                                             },
+                                             error: function () {
+                                                 Swal.fire({
+                                                     text: "An error occurred. Please try again.",
+                                                     icon: "error"
+                                                 });
+                                             }
+                                         });
+                                     }
+                                 });
+             
+                   // $('#OtherFile').show();
+                   // $('#OtherIcon').hide();
+          }
+          
 
     </script>
 }

@@ -16,5 +16,6 @@ namespace DCI.PMS.Repository.Interface
         Task SaveMilestone(MilestoneViewModel model);
         Task<MilestoneViewModel> GetDeliverablesByMilestoneId(MilestoneViewModel model);
         Task SaveDeliverable(DeliverableViewModel model);
+        Task<(int statuscode, string message)> DeleteAttachment(AttachmentViewModel model);
     }
 }

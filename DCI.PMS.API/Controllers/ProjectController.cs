@@ -102,5 +102,13 @@ namespace DCI.PMS.API.Controllers
             await _projectRepository.DeleteDeliverable(model);
             return Ok();
         }
+
+        [HttpPost]
+        [Route("DeleteAttachment")]
+        public async Task<IActionResult> DeleteAttachment([FromBody] AttachmentViewModel model)
+        {            
+            var result = await _projectRepository.DeleteAttachment(model);
+            return StatusCode(result.statuscode, result.message);
+        }
     }
 }

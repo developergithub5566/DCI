@@ -1,4 +1,5 @@
-﻿using DCI.Core.Common;
+﻿using Dapper;
+using DCI.Core.Common;
 using DCI.Core.Helpers;
 using DCI.Data;
 using DCI.Models.Configuration;
@@ -8,26 +9,40 @@ using DCI.PMS.Models.Entities;
 using DCI.PMS.Models.ViewModel;
 using DCI.PMS.Repository.Interface;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Serilog;
+using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Net.Mail;
+using System.Net.Sockets;
 
 namespace DCI.PMS.Repository
 {
-    public class ProjectRepository : IProjectRepository, IDisposable
+    public class ProjectRepository : IProjectRepository , IDisposable
     {
         private readonly IOptions<DCI.Models.ViewModel.FileModel> _fileconfig;
         private readonly DCIdbContext _dbContext;
         private readonly PMSdbContext _pmsdbContext;
-        public ProjectRepository(DCIdbContext context, PMSdbContext pmsContext, IOptions<DCI.Models.ViewModel.FileModel> fileconfig)
+        private readonly IDbConnection _connection;
+        public ProjectRepository(DCIdbContext context, PMSdbContext pmsContext, IOptions<DCI.Models.ViewModel.FileModel> fileconfig, IConfiguration configuration)
         {
             this._dbContext = context;
             this._pmsdbContext = pmsContext;
             this._fileconfig = fileconfig;
+            // this._connection = connection;
+
+            var connStr = configuration.GetConnectionString("DCIConnectionPMS") ?? throw new InvalidOperationException("Connection string not found.");
+            _connection = new SqlConnection(connStr);
+
+
         }
         public void Dispose()
         {
+            _dbContext.Dispose();
             _pmsdbContext.Dispose();
         }
 
@@ -124,7 +139,7 @@ namespace DCI.PMS.Repository
         {
 
             try
-            {       
+            {
                 var users = await _dbContext.User
                                         .AsNoTracking()
                                         .Where(p => p.IsActive)
@@ -203,7 +218,7 @@ namespace DCI.PMS.Repository
                                             ProjectCreationId = p.ProjectCreationId,
                                             AttachmentType = p.AttachmentType,
                                             Filename = p.Filename,
-                                            FileLocation = p.FileLocation, 
+                                            FileLocation = p.FileLocation,
                                             CreatedBy = p.CreatedBy,
                                             IsActive = p.IsActive
                                         })
@@ -214,13 +229,21 @@ namespace DCI.PMS.Repository
                 {
                     result = new ProjectViewModel();
                 }
-
+          
                 result.ClientList = _clientList;
-                result.AttachmentList = attachList;
+                result.AttachmentList = attachList.Where(x => x.MileStoneId == 0 && x.DeliverableId == 0 && x.AttachmentType == (int)EnumAttachmentType.OTHER).ToList();
 
-                result.IsNOAFile = attachList.Any(x => x.AttachmentType == (int)EnumAttachmentType.NOA && x.MileStoneId == 0 && x.DeliverableId == 0 && x.IsActive);
-                result.IsNTPFile = attachList.Any(x => x.AttachmentType == (int)EnumAttachmentType.NTP && x.MileStoneId == 0 && x.DeliverableId == 0 && x.IsActive);
-                result.IsMOAFile = attachList.Any(x => x.AttachmentType == (int)EnumAttachmentType.MOA && x.MileStoneId == 0 && x.DeliverableId == 0 && x.IsActive);
+                var noa =  attachList.FirstOrDefault(x => x.AttachmentType == (int)EnumAttachmentType.NOA && x.MileStoneId == 0 && x.DeliverableId == 0 && x.IsActive);
+                result.IsNOAFile = noa is not null;
+                result.NOAFileId = noa?.AttachmentId ?? 0;
+
+                var ntp = attachList.FirstOrDefault(x => x.AttachmentType == (int)EnumAttachmentType.NTP && x.MileStoneId == 0 && x.DeliverableId == 0 && x.IsActive);
+                result.IsNTPFile = ntp is not null;
+                result.NTPFileId = ntp?.AttachmentId ?? 0;
+
+                var moa = attachList.FirstOrDefault(x => x.AttachmentType == (int)EnumAttachmentType.MOA && x.MileStoneId == 0 && x.DeliverableId == 0 && x.IsActive);
+                result.IsMOAFile = moa is not null;
+                result.MOAFileId = moa?.AttachmentId ?? 0;
 
                 return result;
 
@@ -229,7 +252,7 @@ namespace DCI.PMS.Repository
             {
                 Log.Error(ex.ToString());
             }
-            finally 
+            finally
             {
                 Log.CloseAndFlush();
             }
@@ -302,7 +325,7 @@ namespace DCI.PMS.Repository
                             ");
 
                     await SaveFile(model);
-                   // return (StatusCodes.Status200OK, "Successfully saved");
+                    // return (StatusCodes.Status200OK, "Successfully saved");
                 }
                 else
                 {
@@ -362,36 +385,31 @@ namespace DCI.PMS.Repository
         {
             try
             {
-            
-                //string _filelocation = _fileconfig.Value.FileLocation;
-                string fileloc = @"C:\\DCI App\\PMS\\" + model.ProjectCreationId.ToString() + @"\";                   
+                string fileloc = @"C:\\DCI App\\PMS\\" + model.ProjectCreationId.ToString() + @"\";
 
                 if (!Directory.Exists(fileloc))
-                    Directory.CreateDirectory(fileloc);       
-          
+                    Directory.CreateDirectory(fileloc);
 
-                if(model.NOAFile != null &&  model.NOAFile.Length > 0)
+
+                if (model.NOAFile != null && model.NOAFile.Length > 0)
                 {
-
-
                     string noa_filename = model.NOAFile.FileName;//Constants.Attachment_Type_NOA + DateTime.Now.ToString("yyyyMMddHHmmss") + Core.Common.Constants.Filetype_Pdf; //model.NOAFile.FileName;
                     string noa_filenameLocation = Path.Combine(fileloc, noa_filename);
                     using (var stream = new FileStream(noa_filenameLocation, FileMode.Create, FileAccess.Write))
                     {
                         model.NOAFile.CopyTo(stream);
                     }
-                    DCI.PMS.Models.Entities.Attachment noa_entity = new DCI.PMS.Models.Entities.Attachment();
-                    noa_entity.ProjectCreationId = model.ProjectCreationId;
-                    noa_entity.MileStoneId = 0;
-                    noa_entity.DeliverableId = 0;
-                    noa_entity.AttachmentType = (int)EnumAttachmentType.NOA;
-                    noa_entity.Filename = noa_filename;
-                    noa_entity.FileLocation = noa_filenameLocation;
-                    noa_entity.CreatedBy = model.CreatedBy;
-                    noa_entity.DateCreated = DateTime.Now;
-                    noa_entity.IsActive = true;
-                    await _pmsdbContext.Attachment.AddAsync(noa_entity);
-                    await _pmsdbContext.SaveChangesAsync();
+
+                    await SaveAttachment(new AttachmentViewModel
+                    {
+                        ProjectCreationId = model.ProjectCreationId,
+                        MileStoneId = 0,
+                        DeliverableId = 0,
+                        AttachmentType = (int)EnumAttachmentType.NOA,
+                        Filename = noa_filename,
+                        FileLocation = noa_filenameLocation,
+                        CreatedBy = model.CreatedBy
+                    });
                 }
 
                 if (model.NTPFile != null && model.NTPFile.Length > 0)
@@ -404,21 +422,20 @@ namespace DCI.PMS.Repository
                         model.NTPFile.CopyTo(stream);
                     }
 
-                    DCI.PMS.Models.Entities.Attachment ntp_entity = new DCI.PMS.Models.Entities.Attachment();
-                    ntp_entity.ProjectCreationId = model.ProjectCreationId;
-                    ntp_entity.MileStoneId = 0;
-                    ntp_entity.DeliverableId = 0;
-                    ntp_entity.AttachmentType = (int)EnumAttachmentType.NTP;
-                    ntp_entity.Filename = ntp_filename;
-                    ntp_entity.FileLocation = ntp_filenameLocation;
-                    ntp_entity.CreatedBy = model.CreatedBy;
-                    ntp_entity.DateCreated = DateTime.Now;
-                    ntp_entity.IsActive = true;
-                    await _pmsdbContext.Attachment.AddAsync(ntp_entity);
-                    await _pmsdbContext.SaveChangesAsync();
+                    await SaveAttachment(new AttachmentViewModel
+                    {
+                        ProjectCreationId = model.ProjectCreationId,
+                        MileStoneId = 0,
+                        DeliverableId = 0,
+                        AttachmentType = (int)EnumAttachmentType.NTP,
+                        Filename = ntp_filename,
+                        FileLocation = ntp_filenameLocation,
+                        CreatedBy = model.CreatedBy
+                    });
+
                 }
 
-                if (model.MOAFile != null &&  model.MOAFile.Length > 0)
+                if (model.MOAFile != null && model.MOAFile.Length > 0)
                 {
                     string moa_filename = Constants.Attachment_Type_MOA + DateTime.Now.ToString("yyyyMMddHHmmss") + Core.Common.Constants.Filetype_Pdf;// model.MOAFile.FileName;
                     string moa_filenameLocation = Path.Combine(fileloc, moa_filename);
@@ -428,24 +445,43 @@ namespace DCI.PMS.Repository
                         model.MOAFile.CopyTo(stream);
                     }
 
-                    DCI.PMS.Models.Entities.Attachment moa_entity = new DCI.PMS.Models.Entities.Attachment();
-                    moa_entity.ProjectCreationId = model.ProjectCreationId;
-                    moa_entity.MileStoneId = 0;
-                    moa_entity.DeliverableId = 0;
-                    moa_entity.AttachmentType = (int)EnumAttachmentType.MOA;
-                    moa_entity.Filename = moa_filename;
-                    moa_entity.FileLocation = moa_filenameLocation;
-                    moa_entity.CreatedBy = model.CreatedBy;
-                    moa_entity.DateCreated = DateTime.Now;
-                    moa_entity.IsActive = true;
-                    await _pmsdbContext.Attachment.AddAsync(moa_entity);
-                    await _pmsdbContext.SaveChangesAsync();
-                }   
-                
+                    await SaveAttachment(new AttachmentViewModel
+                    {
+                        ProjectCreationId = model.ProjectCreationId,
+                        MileStoneId = 0,
+                        DeliverableId = 0,
+                        AttachmentType = (int)EnumAttachmentType.MOA,
+                        Filename = moa_filename,
+                        FileLocation = moa_filenameLocation,
+                        CreatedBy = model.CreatedBy
+                    });
+                }
+
+
+                if (model.OtherAttachment != null && model.OtherAttachment.Any())
+                {
+                    foreach (var file in model.OtherAttachment)
+                    {
+                        string _fileloc = fileloc + file.FileName;
+
+                        await SaveAttachment(new AttachmentViewModel
+                        {
+                            ProjectCreationId = model.ProjectCreationId,                            
+                            MileStoneId = 0,
+                            DeliverableId = 0,
+                            AttachmentType = (int)EnumAttachmentType.OTHER,
+                            Filename = file.FileName,
+                            FileLocation = _fileloc,
+                            CreatedBy = model.CreatedBy
+                        });
+                    }
+                }
+
+
             }
             catch (Exception ex)
             {
-                Log.Error(ex.ToString());                
+                Log.Error(ex.ToString());
             }
             finally
             {
@@ -473,8 +509,8 @@ namespace DCI.PMS.Repository
                              .Where(p => p.IsActive)
                              .Select(u => new StatusViewModel
                              {
-                                StatusId =  u.StatusId,
-                                StatusName= u.StatusName
+                                 StatusId = u.StatusId,
+                                 StatusName = u.StatusName
                              })
                              .ToListAsync();
 
@@ -498,7 +534,7 @@ namespace DCI.PMS.Repository
                                   ActualCompletionDate = m.ActualCompletionDate,
                                   PaymentStatus = m.PaymentStatus,
                                   TargetCompletedDateString = m.TargetCompletedDate.Value.ToString("MM/dd/yyyy"),
-                                  ActualCompletionDateString =  m.ActualCompletionDate.Value.ToString("MM/dd/yyyy") ,
+                                  ActualCompletionDateString = m.ActualCompletionDate.Value.ToString("MM/dd/yyyy"),
                                   Status = m.Status,
                                   StatusName = s.StatusName,
                                   PaymentStatusName = paystat.StatusName,
@@ -553,7 +589,7 @@ namespace DCI.PMS.Repository
                     ProjectViewModel projModel = new ProjectViewModel();
                     projModel.ProjectCreationId = model.ProjectCreationId;
                     await GetMilestoneByProjectId(projModel);
-                   // return (StatusCodes.Status200OK, "Successfully saved");
+                    // return (StatusCodes.Status200OK, "Successfully saved");
                 }
                 else
                 {
@@ -580,7 +616,7 @@ namespace DCI.PMS.Repository
             catch (Exception ex)
             {
                 Log.Error(ex.ToString());
-              //  return (StatusCodes.Status406NotAcceptable, ex.ToString());
+                //  return (StatusCodes.Status406NotAcceptable, ex.ToString());
             }
             finally
             {
@@ -605,7 +641,7 @@ namespace DCI.PMS.Repository
 
                 var deliverable = _pmsdbContext.Deliverable
                                         .AsNoTracking()
-                                        .Where(p => p.IsActive).ToList();              
+                                        .Where(p => p.IsActive).ToList();
 
                 var statusList = await _dbContext.Status
                   .AsNoTracking()
@@ -662,7 +698,7 @@ namespace DCI.PMS.Repository
                     Deliverable entity = new Deliverable();
                     entity.DeliverableId = model.DeliverableId;
                     entity.MileStoneId = model.MileStoneId;
-                    entity.DeliverableName = model.DeliverableName;        
+                    entity.DeliverableName = model.DeliverableName;
                     entity.Status = model.Status;
                     entity.CreatedBy = model.CreatedBy;
                     entity.DateCreated = DateTime.Now;
@@ -680,7 +716,7 @@ namespace DCI.PMS.Repository
                 else
                 {
                     var entity = await _pmsdbContext.Deliverable.FirstOrDefaultAsync(x => x.MileStoneId == model.MileStoneId);
-                    entity.DeliverableName = model.DeliverableName;                   
+                    entity.DeliverableName = model.DeliverableName;
                     entity.Status = model.Status;
                     entity.DateModified = DateTime.Now;
                     entity.ModifiedBy = model.ModifiedBy;
@@ -697,7 +733,7 @@ namespace DCI.PMS.Repository
             catch (Exception ex)
             {
                 Log.Error(ex.ToString());
-               // return (StatusCodes.Status406NotAcceptable, ex.ToString());
+                // return (StatusCodes.Status406NotAcceptable, ex.ToString());
             }
             finally
             {
@@ -729,7 +765,7 @@ namespace DCI.PMS.Repository
             }
             finally
             {
-                Log.CloseAndFlush();                                                                                         
+                Log.CloseAndFlush();
             }
         }
 
@@ -820,5 +856,74 @@ namespace DCI.PMS.Repository
             return string.Empty;
         }
 
+        public async Task<(int statuscode, string message)> DeleteAttachment(AttachmentViewModel model)
+        {
+            try
+            {
+                var entity = await _pmsdbContext.Attachment.FirstOrDefaultAsync(x => x.AttachmentId == model.AttachmentId);
+                if (entity == null)
+                {
+                    return (StatusCodes.Status406NotAcceptable, "Invalid Attachment Id");
+                }
+
+                entity.IsActive = false;               
+                _pmsdbContext.Attachment.Entry(entity).State = EntityState.Modified;
+                await _pmsdbContext.SaveChangesAsync();
+                return (StatusCodes.Status200OK, "Successfully deleted");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return (StatusCodes.Status400BadRequest, ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+
+        private async Task SaveAttachment(AttachmentViewModel model)
+        {
+            var sql = @"
+                    INSERT INTO dbo.Attachment
+                    (
+                        ProjectCreationId,
+                        MileStoneId,
+                        DeliverableId,
+                        AttachmentType,
+                        Filename,
+                        FileLocation,
+                        DateCreated,
+                        CreatedBy,
+                        IsActive
+                    )
+                    VALUES
+                    (
+                        @ProjectCreationId,
+                        @MileStoneId,
+                        @DeliverableId,
+                        @AttachmentType,
+                        @Filename,
+                        @FileLocation,
+                        @DateCreated,
+                        @CreatedBy,
+                        1
+                    )";
+
+            await _connection.ExecuteAsync(sql, new
+            {
+                model.ProjectCreationId,
+                model.MileStoneId,
+                model.DeliverableId,
+                model.AttachmentType,
+                model.Filename,
+                model.FileLocation,
+                DateCreated = DateTime.Now,
+                model.CreatedBy
+            });
+
+
+        }
     }
 }

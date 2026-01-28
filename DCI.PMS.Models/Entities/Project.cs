@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using DCI.Models.Configuration;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Mail;
 
 namespace DCI.PMS.Models.Entities
 {
-    public class Project
+    public class Project : IAuditable
     {
         [Key]
         public int ProjectCreationId { get; set; }
@@ -34,8 +35,8 @@ namespace DCI.PMS.Models.Entities
 
         // Optional: Navigation Properties (EF Core)
         // public Client? Client { get; set; }
-        public ICollection<Milestone>? Milestones { get; set; }
-        public ICollection<Attachment>? Attachments { get; set; }
+        //public ICollection<Milestone>? Milestones { get; set; }
+        //public ICollection<Attachment>? Attachments { get; set; }
     }
 
 }

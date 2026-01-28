@@ -1,4 +1,6 @@
-﻿namespace DCI.PMS.Models.ViewModel
+﻿using Microsoft.AspNetCore.Http;
+
+namespace DCI.PMS.Models.ViewModel
 {
     public class MilestoneViewModel
     {
@@ -33,6 +35,6 @@
 
         public string TargetCompletedDateString { get; set; } = string.Empty;
         public string ActualCompletionDateString { get; set; } = string.Empty;
-
+        public List<IFormFile> OtherAttachmentMilestone { get; set; } = new();
     }
 }
