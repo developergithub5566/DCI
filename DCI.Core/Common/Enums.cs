@@ -178,7 +178,8 @@ namespace DCI.Core.Common
         LT = 12,
         OF = 13, //For OLD ESS Migration
         WFH = 14, //For OLD ESS Migration
-        HDOB = 15
+        HDOB = 15,
+        WELL = 16
     }
 
     public enum EnumEmployeeScope
@@ -256,6 +257,8 @@ namespace DCI.Core.Common
         OTHER = 0,
         NOA = 1,
         NTP = 2,
-        MOA = 3
+        MOA = 3,
+        MILESTONE = 4,
+        DELIVERABLES = 5
     }
 }

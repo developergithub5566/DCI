@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using Serilog;
 using System.Net.Http;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DCI.PMS.WebApp.Controllers
 {
@@ -186,8 +187,7 @@ namespace DCI.PMS.WebApp.Controllers
                     data.Add(new StringContent(model.CreatedName.ToString() ?? ""), "CreatedName");
                     //data.Add(new StringContent(model.DateCreated.ToString() ?? ""), "DateCreated");
                     data.Add(new StringContent(model.CreatedBy.ToString() ?? ""), "CreatedBy");
-                    //data.Add(new StringContent(model.ModifiedBy.ToString() ?? ""), "ModifiedBy");
-                    //data.Add(new StringContent(model.DateModified.ToString() ?? ""), "DateModified");
+       
                     data.Add(new StringContent(model.IsActive.ToString() ?? ""), "IsActive");
 
                     if (model.NOAFile != null)
@@ -207,38 +207,10 @@ namespace DCI.PMS.WebApp.Controllers
                         data.Add(fileContent, "MOAFile", model.MOAFile.FileName);
                     }
 
-                    //if (model.OtherAttachment is not null)
-                    //{
-                    //    var fileContent = new StreamContent(model.OtherAttachment!.OpenReadStream());
-                    //    data.Add(fileContent, "OtherAttachment", model.OtherAttachment.FileName);
-                    //}
+                
 
                     if (model.OtherAttachment != null && model.OtherAttachment.Any())
-                    {
-                        //foreach (var file in model.OtherAttachment)
-                        //{
-                        //    if (file == null || file.Length == 0)
-                        //        continue;
-
-                        //    var fileContent = new StreamContent(file.OpenReadStream());
-                        //    fileContent.Headers.ContentType =
-                        //        new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
-
-                        //    data.Add(fileContent, "OtherAttachment", file.FileName);
-                        //}
-
-                        //foreach (var file in model.OtherAttachment)
-                        //{
-                        //    using var ms = new MemoryStream();
-                        //    await file.CopyToAsync(ms);
-
-                        //    var content = new ByteArrayContent(ms.ToArray());
-                        //    content.Headers.ContentType =
-                        //        new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
-
-                        //    data.Add(content, "OtherAttachment", file.FileName);
-                        //}
-
+                    {  
                         foreach (var file in model.OtherAttachment)
                         {
                             byte[] fileBytes;
@@ -253,7 +225,6 @@ namespace DCI.PMS.WebApp.Controllers
                             var fileName =  DateTime.Now.ToString("yyyyMMddHHmmss") + Core.Common.Constants.Filetype_Pdf;  
                             var filePath = Path.Combine(fileloc, fileName);
                             await System.IO.File.WriteAllBytesAsync(filePath, fileBytes);
-
                           
                             var content = new ByteArrayContent(fileBytes);
                             content.Headers.ContentType =
@@ -332,11 +303,65 @@ namespace DCI.PMS.WebApp.Controllers
                         return RedirectToAction("Logout", "Account");
 
                     model.CreatedBy = 1;
-                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/SaveMilestone");
-                    request.Content = stringContent;
-                    var response = await _httpclient.SendAsync(request);
+
+
+                    var data = new MultipartFormDataContent();
+                    data.Add(new StringContent(model.ProjectCreationId.ToString() ?? ""), "ProjectCreationId");
+                    data.Add(new StringContent(model.MileStoneId.ToString() ?? ""), "MileStoneId");                                                                                                                                                                                                                        
+                    data.Add(new StringContent(model.MilestoneName.ToString() ?? ""), "MilestoneName");
+                    data.Add(new StringContent(model.Percentage.ToString() ?? ""), "Percentage");
+                    data.Add(new StringContent(model.TargetCompletedDate.ToString() ?? ""), "TargetCompletedDate");
+                    data.Add(new StringContent(model.ActualCompletionDate.ToString() ?? ""), "ActualCompletionDate");
+                    data.Add(new StringContent(model.PaymentStatus.ToString() ?? ""), "PaymentStatus");
+                    data.Add(new StringContent(model.Status.ToString() ?? ""), "Status");
+              ;
+                    data.Add(new StringContent(model.DateCreated.ToString() ?? ""), "DateCreated");
+                    data.Add(new StringContent(model.CreatedBy.ToString() ?? ""), "CreatedBy");
+                    data.Add(new StringContent(model.ModifiedBy.ToString() ?? ""), "ModifiedBy");
+                    data.Add(new StringContent(model.DateModified.ToString() ?? ""), "DateModified");
+                    data.Add(new StringContent(model.Remarks.ToString() ?? ""), "Remarks");
+                    data.Add(new StringContent(model.IsActive.ToString() ?? ""), "IsActive");
+                    data.Add(new StringContent(model.TargetCompletedDateString.ToString() ?? ""), "TargetCompletedDateString");
+                    data.Add(new StringContent(model.ActualCompletionDateString.ToString() ?? ""), "ActualCompletionDateString");
+                    data.Add(new StringContent(model.StatusName.ToString() ?? ""), "StatusName");
+                    data.Add(new StringContent(model.PaymentStatusName.ToString() ?? ""), "PaymentStatusName");
+
+    
+
+                    if (model.OtherAttachmentMilestone != null && model.OtherAttachmentMilestone.Any())
+                    {
+                        foreach (var file in model.OtherAttachmentMilestone)
+                        {
+                            byte[] fileBytes;
+                            using (var ms = new MemoryStream())
+                            {
+                                await file.CopyToAsync(ms);
+                                fileBytes = ms.ToArray();
+                            }
+
+                            string fileloc = @"C:\\DCI App\\PMS\\" + model.ProjectCreationId.ToString() + @"\";
+
+                            var fileName = DateTime.Now.ToString("yyyyMMddHHmmss") + Core.Common.Constants.Filetype_Pdf;
+                            var filePath = Path.Combine(fileloc, fileName);
+                            await System.IO.File.WriteAllBytesAsync(filePath, fileBytes);
+
+                            var content = new ByteArrayContent(fileBytes);
+                            content.Headers.ContentType =
+                                new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
+
+                            data.Add(content, "OtherAttachmentMilestone", fileName);
+                        }
+
+                    }
+                    var response = await _httpclient.PostAsync(_apiconfig.Value.apiPMS + "api/Project/SaveMilestone", data);
                     var responseBody = await response.Content.ReadAsStringAsync();
+
+
+                    //var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    //var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/SaveMilestone");
+                    //request.Content = stringContent;
+                    //var response = await _httpclient.SendAsync(request);
+                    //var responseBody = await response.Content.ReadAsStringAsync();
 
                     return RedirectToAction("Milestone", new { projectCreationId = model.ProjectCreationId });
                 }

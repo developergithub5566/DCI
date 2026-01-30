@@ -61,7 +61,7 @@ namespace DCI.PMS.API.Controllers
         
         [HttpPost]
         [Route("SaveMilestone")]
-        public async Task<IActionResult> SaveMilestone([FromBody] MilestoneViewModel model)
+        public async Task<IActionResult> SaveMilestone([FromForm] MilestoneViewModel model)
         {
             await _projectRepository.SaveMilestone(model);
             return Ok();

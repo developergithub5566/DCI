@@ -574,7 +574,7 @@ namespace DCI.PMS.Repository
                     entity.MilestoneName = model.MilestoneName;
                     entity.Percentage = model.Percentage;
                     entity.TargetCompletedDate = model.TargetCompletedDate;
-                    entity.ActualCompletionDate = model.ActualCompletionDate;
+                    entity.ActualCompletionDate = model.ActualCompletionDate; 
                     entity.PaymentStatus = model.PaymentStatus;
                     entity.Status = model.Status;
                     entity.CreatedBy = model.CreatedBy;
@@ -585,6 +585,9 @@ namespace DCI.PMS.Repository
                     entity.Remarks = model.Remarks;
                     await _pmsdbContext.Milestone.AddAsync(entity);
                     await _pmsdbContext.SaveChangesAsync();
+                    model.MileStoneId = entity.MileStoneId;
+
+                    await SaveFileMilestone(model);
 
                     ProjectViewModel projModel = new ProjectViewModel();
                     projModel.ProjectCreationId = model.ProjectCreationId;
@@ -606,17 +609,61 @@ namespace DCI.PMS.Repository
                     entity.Remarks = model.Remarks;
                     _pmsdbContext.Milestone.Entry(entity).State = EntityState.Modified;
                     await _pmsdbContext.SaveChangesAsync();
+                                       
+                    await SaveFileMilestone(model);
 
                     ProjectViewModel projModel = new ProjectViewModel();
                     projModel.ProjectCreationId = model.ProjectCreationId;
                     await GetMilestoneByProjectId(projModel);
                     // return (StatusCodes.Status200OK, "Successfully updated");
                 }
+              
             }
             catch (Exception ex)
             {
                 Log.Error(ex.ToString());
                 //  return (StatusCodes.Status406NotAcceptable, ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+        private async Task SaveFileMilestone(MilestoneViewModel model)
+        {
+            try
+            {
+                string fileloc = @"C:\\DCI App\\PMS\\" + model.ProjectCreationId.ToString() + @"\";
+
+                if (!Directory.Exists(fileloc))
+                    Directory.CreateDirectory(fileloc);
+                             
+
+
+                if (model.OtherAttachmentMilestone != null && model.OtherAttachmentMilestone.Any())
+                {
+                    foreach (var file in model.OtherAttachmentMilestone)
+                    {
+                        string _fileloc = fileloc + file.FileName;
+
+                        await SaveAttachment(new AttachmentViewModel
+                        {
+                            ProjectCreationId = model.ProjectCreationId,
+                            MileStoneId = model.MileStoneId,
+                            DeliverableId = 0,
+                            AttachmentType = (int)EnumAttachmentType.MILESTONE,
+                            Filename = file.FileName,
+                            FileLocation = _fileloc,
+                            CreatedBy = model.CreatedBy
+                        });
+                    }
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
             }
             finally
             {

@@ -365,6 +365,7 @@ namespace DCI.Repositories
                             contextLeaveInfo.SPLBalance = contextLeaveInfo.SPLBalance - contextHdr.NoOfDays;
                             contextHdr.DeductionType = (int)EnumDeductionType.SpecialLeave;
                         }
+
                         _dbContext.LeaveInfo.Entry(contextLeaveInfo).State = EntityState.Modified;
                         _dbContext.SaveChanges();
 
@@ -624,9 +625,28 @@ namespace DCI.Repositories
 
                 var attendanceIds = contextDtl.Select(d => d.AttendanceId).ToList();
 
-                var attendanceList = await _dbContext.vw_AttendanceSummary_WFH
+                /**
+                 var attendanceList = await _dbContext.vw_AttendanceSummary_WFH 
                     .Where(x => attendanceIds.Contains((int)x.ID))
                     .ToListAsync();
+
+                var empNoDatePairs = attendanceList
+                    .Select(a => new { a.EMPLOYEE_NO, a.DATE })
+                    .ToList(); 2026.01.30**/
+
+                var wfhapplicationList =
+                  from wfh in _dbContext.WfhApplication.AsNoTracking()
+                  join usr in _dbContext.User.AsNoTracking() on wfh.EmployeeId equals usr.EmployeeId
+                  select new 
+                  {
+                      ID = wfh.Id,
+                      EMPLOYEE_NO = usr.EmployeeNo,
+                      DATE = wfh.Date,
+                  };
+
+                var attendanceList = await wfhapplicationList
+                  .Where(x => attendanceIds.Contains((int)x.ID))
+                  .ToListAsync();
 
                 var empNoDatePairs = attendanceList
                     .Select(a => new { a.EMPLOYEE_NO, a.DATE })
