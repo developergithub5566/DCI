@@ -12,6 +12,7 @@ namespace DCI.Models.ViewModel
         public decimal VLBalance { get; set; } = 0;
         public decimal SLBalance { get; set; } = 0;
         public decimal SPLBalance { get; set; } = 0;
+        public decimal WELLBalance { get; set; } = 0;
         public int LeaveTypeId { get; set; } = 0;
 
         public List<LeaveSummaryViewModel>? vlSummaries { get; set; } = new();
@@ -74,7 +75,7 @@ namespace DCI.Models.ViewModel
         public decimal SPLBalance { get; set; } = 0;
         public decimal SLBalance { get; set; } = 0;
         public decimal VLBalance { get; set; } = 0;
-
+         public decimal WELLBalance { get; set; } = 0;
         public string DateApprovedDisapproved { get; set; } = string.Empty;
         public string ApprovalRemarks { get; set; } = string.Empty;
         public string ApproverHead { get; set; } = string.Empty;
