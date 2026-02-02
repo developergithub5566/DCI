@@ -96,12 +96,12 @@
                         <div class="col mr-2" style="padding-left: 3px;">
                             <div class="text-xs font-weight-bold text-primary mb-1">
                                 <span class="text-uppercase"> WELLNESS LEAVE</span> <br>
-                                <small class="text-danger font-weight-bold">(Remaining Balance)</small>
+                                <small class="text-secondary">(Remaining Balance)</small>
                             </div>
                             <div class="h3 mb-0 font-weight-bold text-dark" style="padding-left: 3px;">@Model.WELLBalance</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fa-solid fa-child fa-2x text-gray-300"></i>
+                            <i class="fa-solid fa-heartbeat fa-2x text-gray-300"></i>
                         </div>
                     </div>
                 </div>
@@ -643,35 +643,9 @@
                                                                            dateFormat: "Y-m-d",     
                                                                            onChange: function(selectedDates, dateStr, instance) {
                                                                           const leaveTypeId = $('#leaveTypeSelect').val();
-                                                                           console.log("leavetype");
-                                                                          console.log(leaveTypeId);
-                                                                          if(leaveTypeId == 16){
-                                                                                    // Allow single date
-                                                                                   if (selectedDates.length < 3) return;
+                                                                         
 
-                                                                                        // Sort dates
-                                                                                        selectedDates.sort((a, b) => a - b);
-
-                                                                                        const oneDay = 24 * 60 * 60 * 1000;
-
-                                                                                        // Check for any 3 consecutive dates
-                                                                                        for (let i = 0; i < selectedDates.length - 2; i++) {
-                                                                                            const d1 = selectedDates[i];
-                                                                                            const d2 = selectedDates[i + 1];
-                                                                                            const d3 = selectedDates[i + 2];
-
-                                                                                            const diff1 = (d2 - d1) / oneDay;
-                                                                                            const diff2 = (d3 - d2) / oneDay;
-
-                                                                                            if (diff1 === 1 && diff2 === 1) {
-                                                                                                // Remove the last selected date
-                                                                                                selectedDates.pop();
-                                                                                                instance.setDate(selectedDates, false);
-                                                                                                return;
-                                                                                            }
-                                                                                        }
-                                                                          }
-
+                                                                    
 
                                                                              let nodays = selectedDates.length;
                                                                             
@@ -699,6 +673,8 @@
                                                                              //                    });
                                                                              //    }
                                                                              // }
+                                                                    
+
 
 
                                                                              $('#NoOfDays').val(formattedDays);
@@ -708,6 +684,35 @@
                                                                              );                                                                                  
 
                                                                              $('#SelectedDatesJson').val(JSON.stringify(selectedDateStrings));
+
+                                                                                      if(leaveTypeId == 16){ //wellness leave
+                                                                              
+                                                                                   if (selectedDates.length < 3) return;
+
+                                                                                        // Sort dates
+                                                                                        selectedDates.sort((a, b) => a - b);
+
+                                                                                        const oneDay = 24 * 60 * 60 * 1000;
+
+                                                                                        // Check for any 3 consecutive dates
+                                                                                        for (let i = 0; i < selectedDates.length - 2; i++) {
+                                                                                            const d1 = selectedDates[i];
+                                                                                            const d2 = selectedDates[i + 1];
+                                                                                            const d3 = selectedDates[i + 2];
+
+                                                                                            const diff1 = (d2 - d1) / oneDay;
+                                                                                            const diff2 = (d3 - d2) / oneDay;
+
+                                                                                            if (diff1 === 1 && diff2 === 1) {
+                                                                                                // Remove the last selected date
+                                                                                                selectedDates.pop();
+                                                                                                instance.setDate(selectedDates, false);
+                                                                                                return;
+                                                                                            }
+                                                                                        }
+                                                                          }
+
+
                                                                            }
                                                                          });
 
@@ -800,6 +805,8 @@
                                                                                     }
                                                                               }
 
+
+                                                                              console.log(selectedDatesJson);
                                                                               
                                                                               if(selectedDatesJson == "[]" && (leaveTypeId != 9 && leaveTypeId != 10) ){
                                                                                    
@@ -917,7 +924,7 @@
                                       }
                                   });
 
-                            // console.log(response);
+                           // console.log(response);
 
                           // $('#dateCovered').val(response.data.selectedDateJson);
                             $('#NoOfDays').val(response.data.leaveRequestHeader.noofDays);
@@ -1142,6 +1149,9 @@
                       
                       $('#NoOfDays').prop('disabled', true);
                       $('#hiddenDatePicker').show();
+
+                          fp.set("minDate", null); // no restriction
+
                      if(leave == null){
                                   _amount = 0.5000;
                        $('#SelectedLeaveTypeAmount').val(_amount);
@@ -1173,7 +1183,14 @@
                           mode = 'multiple';
                                $('#NoOfDays').prop('disabled', false);
                                        $('#hiddenDatePicker').hide();
-                    }else{
+                    }else if (leave == 16){ // WELLNESS LEAVE
+                        _amount = 1.0000;
+                       $('#SelectedLeaveTypeAmount').val(_amount);
+                       $('#isMultiple').val(1);
+                              fp.set('mode', 'multiple');
+                          mode = 'multiple';
+                            fp.set("minDate", new Date().fp_incr(5));
+                    }  else{
                         _amount = 1.0000;
                        $('#SelectedLeaveTypeAmount').val(_amount);
                        $('#isMultiple').val(1);

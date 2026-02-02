@@ -27,6 +27,8 @@
                 return "Undertime";
             else if (leavetypeid == 12)
                 return "Late";
+            else if (leavetypeid == 16)
+                return "Wellness";
             else { return "Others"; }
         }
     }

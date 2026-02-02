@@ -171,6 +171,7 @@ namespace DCI.Repositories
                                                         : ob.LeaveTypeId == (int)EnumLeaveType.SPL ? Constants.Source_SpecialLeave
                                                         : ob.LeaveTypeId == (int)EnumLeaveType.ML ? Constants.Source_MaternityLeave
                                                         : ob.LeaveTypeId == (int)EnumLeaveType.PL ? Constants.Source_PaternityLeave
+                                                        : ob.LeaveTypeId == (int)EnumLeaveType.WELL ? Constants.Source_WellnessLeave
                                                         : "Leave"
                                           }).ToListAsync();
 

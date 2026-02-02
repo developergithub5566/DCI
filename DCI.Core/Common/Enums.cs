@@ -211,7 +211,8 @@ namespace DCI.Core.Common
         Payroll = 1,
         VacationLeave = 2,
         SickLeave = 3,
-        SpecialLeave = 4
+        SpecialLeave = 4,
+        WellnessLeave = 5
     }
 
     public enum EnumSource

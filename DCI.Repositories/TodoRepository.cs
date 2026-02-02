@@ -365,6 +365,11 @@ namespace DCI.Repositories
                             contextLeaveInfo.SPLBalance = contextLeaveInfo.SPLBalance - contextHdr.NoOfDays;
                             contextHdr.DeductionType = (int)EnumDeductionType.SpecialLeave;
                         }
+                        else if (contextHdr.LeaveTypeId == (int)EnumLeaveType.WELL)
+                        {
+                            contextLeaveInfo.WELLBalance = contextLeaveInfo.WELLBalance - contextHdr.NoOfDays;
+                            contextHdr.DeductionType = (int)EnumDeductionType.WellnessLeave;
+                        }
 
                         _dbContext.LeaveInfo.Entry(contextLeaveInfo).State = EntityState.Modified;
                         _dbContext.SaveChanges();

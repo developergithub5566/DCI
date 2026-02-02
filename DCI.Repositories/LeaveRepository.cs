@@ -48,6 +48,7 @@ namespace DCI.Repositories
             model.VLBalance = leaveinfo?.VLBalance ?? 0;
             model.SLBalance = leaveinfo?.SLBalance ?? 0;
             model.SPLBalance = leaveinfo?.SPLBalance ?? 0;
+            model.WELLBalance = leaveinfo?.WELLBalance ?? 0;
 
             var leaveReqHeaderDbContext = _dbContext.LeaveRequestHeader.AsQueryable();
 
@@ -209,6 +210,7 @@ namespace DCI.Repositories
                     model.LeaveRequestHeader.SPLBalance = leaveinfo.SPLBalance;
                     model.LeaveRequestHeader.SLBalance = leaveinfo.SLBalance;
                     model.LeaveRequestHeader.VLBalance = leaveinfo.VLBalance;
+                    model.LeaveRequestHeader.WELLBalance = leaveinfo.WELLBalance;
                 }
                 else
                 {
@@ -655,6 +657,11 @@ namespace DCI.Repositories
                         {
                             contextLeaveInfo.SPLBalance = contextLeaveInfo.SPLBalance - contextHdr.NoOfDays;
                             contextHdr.DeductionType = (int)EnumDeductionType.SpecialLeave;
+                        }
+                        else if (contextHdr.LeaveTypeId == (int)EnumLeaveType.WELL)
+                        {
+                            contextLeaveInfo.WELLBalance = contextLeaveInfo.WELLBalance - contextHdr.NoOfDays;
+                            contextHdr.DeductionType = (int)EnumDeductionType.WellnessLeave;
                         }
                         _dbContext.LeaveInfo.Entry(contextLeaveInfo).State = EntityState.Modified;
                         _dbContext.SaveChanges();
