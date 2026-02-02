@@ -754,7 +754,8 @@ namespace DCI.PMS.Repository
                     entity.IsActive = true;
                     await _pmsdbContext.Deliverable.AddAsync(entity);
                     await _pmsdbContext.SaveChangesAsync();
-                    //  return (StatusCodes.Status200OK, "Successfully saved");
+
+                    await SaveFileDeliverable(model);
 
                     MilestoneViewModel miles = new MilestoneViewModel();
                     miles.MileStoneId = model.MileStoneId;
@@ -771,7 +772,9 @@ namespace DCI.PMS.Repository
 
                     _pmsdbContext.Deliverable.Entry(entity).State = EntityState.Modified;
                     await _pmsdbContext.SaveChangesAsync();
-                    //  return (StatusCodes.Status200OK, "Successfully updated");
+             
+                    await SaveFileDeliverable(model);
+
                     MilestoneViewModel miles = new MilestoneViewModel();
                     miles.MileStoneId = model.MileStoneId;
                     await GetDeliverablesByMilestoneId(miles);
@@ -781,6 +784,48 @@ namespace DCI.PMS.Repository
             {
                 Log.Error(ex.ToString());
                 // return (StatusCodes.Status406NotAcceptable, ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+        private async Task SaveFileDeliverable(DeliverableViewModel model)
+        {
+            try
+            {
+                string fileloc = @"C:\\DCI App\\PMS\\" + model.MileStoneId.ToString() + @"\";
+
+                if (!Directory.Exists(fileloc))
+                    Directory.CreateDirectory(fileloc);
+
+
+
+                if (model.OtherAttachmentDeliverable != null && model.OtherAttachmentDeliverable.Any())
+                {
+                    foreach (var file in model.OtherAttachmentDeliverable)
+                    {
+                        string _fileloc = fileloc + file.FileName;
+
+                        await SaveAttachment(new AttachmentViewModel
+                        {
+                            ProjectCreationId = model.ProjectCreationId,
+                            MileStoneId = model.MileStoneId,
+                            DeliverableId = model.DeliverableId,
+                            AttachmentType = (int)EnumAttachmentType.DELIVERABLES,
+                            Filename = file.FileName,
+                            FileLocation = _fileloc,
+                            CreatedBy = model.CreatedBy
+                        });
+                    }
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
             }
             finally
             {

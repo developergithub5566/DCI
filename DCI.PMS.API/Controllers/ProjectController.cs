@@ -70,7 +70,7 @@ namespace DCI.PMS.API.Controllers
 
         [HttpPost]
         [Route("SaveDeliverable")]
-        public async Task<IActionResult> SaveDeliverable([FromBody] DeliverableViewModel model)
+        public async Task<IActionResult> SaveDeliverable([FromForm] DeliverableViewModel model)
         {
             await _projectRepository.SaveDeliverable(model);
             return Ok();

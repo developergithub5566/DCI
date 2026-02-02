@@ -410,11 +410,50 @@ namespace DCI.PMS.WebApp.Controllers
                         return RedirectToAction("Logout", "Account");
 
                     model.CreatedBy = 1;
-                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/SaveDeliverable");
-                    request.Content = stringContent;
-                    var response = await _httpclient.SendAsync(request);
+                    //var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    //var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/SaveDeliverable");
+                    //request.Content = stringContent;
+                    //var response = await _httpclient.SendAsync(request);
+                    //var responseBody = await response.Content.ReadAsStringAsync();
+
+                    var data = new MultipartFormDataContent();
+                    data.Add(new StringContent(model.DeliverableId.ToString() ?? ""), "DeliverableId");
+                    data.Add(new StringContent(model.MileStoneId.ToString() ?? ""), "MileStoneId");
+                    data.Add(new StringContent(model.DeliverableName.ToString() ?? ""), "DeliverableName");
+                    data.Add(new StringContent(model.Status.ToString() ?? ""), "Status");
+                    data.Add(new StringContent(model.StatusName.ToString() ?? ""), "StatusName");
+                    data.Add(new StringContent(model.CreatedName.ToString() ?? ""), "CreatedName");
+                
+
+
+                    if (model.OtherAttachmentDeliverable != null && model.OtherAttachmentDeliverable.Any())
+                    {
+                        foreach (var file in model.OtherAttachmentDeliverable)
+                        {
+                            byte[] fileBytes;
+                            using (var ms = new MemoryStream())
+                            {
+                                await file.CopyToAsync(ms);
+                                fileBytes = ms.ToArray();
+                            }
+
+                            string fileloc = @"C:\\DCI App\\PMS\\" + model.DeliverableId.ToString() + @"\";
+
+                            var fileName = DateTime.Now.ToString("yyyyMMddHHmmss") + Core.Common.Constants.Filetype_Pdf;
+                            var filePath = Path.Combine(fileloc, fileName);
+                            await System.IO.File.WriteAllBytesAsync(filePath, fileBytes);
+
+                            var content = new ByteArrayContent(fileBytes);
+                            content.Headers.ContentType =
+                                new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
+
+                            data.Add(content, "OtherAttachmentDeliverable", fileName);
+                        }
+
+                    }
+                    var response = await _httpclient.PostAsync(_apiconfig.Value.apiPMS + "api/Project/SaveDeliverable", data);
                     var responseBody = await response.Content.ReadAsStringAsync();
+
 
                     MilestoneViewModel miles = new MilestoneViewModel();
                     miles.MileStoneId = 3;

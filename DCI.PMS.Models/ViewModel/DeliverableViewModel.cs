@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,12 +9,13 @@ namespace DCI.PMS.Models.ViewModel
 {
     public class DeliverableViewModel
     {
+        public int ProjectCreationId { get; set; } = 0;
         public int DeliverableId { get; set; } = 0;
 
         public int MileStoneId { get; set; } = 0;
         public string DeliverableName { get; set; } = string.Empty;
         public int Status { get; set; } = 0;
-        public string StatusName { get; set; } = string.Empty;
+        public string? StatusName { get; set; } = string.Empty;
         public DateTime DateCreated { get; set; } = new DateTime();
         public int CreatedBy { get; set; } = 0;
 
@@ -23,7 +25,8 @@ namespace DCI.PMS.Models.ViewModel
         public bool IsActive { get; set; } = true;
 
         public string? CreatedName { get; set; } = string.Empty;
-   
+        public List<IFormFile> OtherAttachmentDeliverable { get; set; } = new();
+
 
     }
 }
