@@ -113,7 +113,40 @@
                                     <button class="btn btn-primary float-end" onclick="nextStep()">Add to list</button>
                                 </div>
                             </div>
+                            <style>
+                                .attachment-icons {
+                                    display: flex; /* align children in a row */
+                                    gap: 10px; /* spacing between icons */
+                                    flex-wrap: wrap; /* wrap to next line if too many */
+                                }
 
+                                .file-icon {
+                                    position: relative;
+                                    width: 50px; /* adjust size */
+                                    height: 50px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    border: 1px solid #ccc;
+                                    border-radius: 5px;
+                                }
+
+                                .delete-btn {
+                                    position: absolute;
+                                    top: -5px;
+                                    right: -5px;
+                                    cursor: pointer;
+                                    color: red;
+                                    font-weight: bold;
+                                }
+                            </style>
+                            <div class="row">
+
+                                <div class="col-sm-8">
+                                    <div id="attachmentContainer" class="attachment-icons"></div>
+                                </div>
+                            </div>
+                           
                         </div>
 
                         <hr />
@@ -179,17 +212,19 @@
                                                                             actualCompletionDate : "@x.ActualCompletionDateString",
                                                                             paymentStatus:"@x.PaymentStatus",
                                                                             status : "@x.Status",
-                                                                            remarks : "@x.Remarks"
+                                                                            remarks : "@x.Remarks",
+                                            attachmentList: @Html.Raw(Json.Serialize(x.AttachmentListId))
+                                       
                                                                                     })' title="Edit" class="btn btn-info"><i class="fas fa-edit"></i></a>
 
                                     <a href="javascript:void(0)" title="Delete" class="btn btn-danger" id="deleteform"  onclick="deleteform(@x.MileStoneId)"><i class="fas fa-trash"></i></a>
 
                                     <a asp-controller="Project" asp-action="Deliverables" asp-route-MileStoneId="@x.MileStoneId" class="btn btn-secondary" title="Deliverables">
                                         <i class="fas fa-truck"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        }                
+                                        </a>
+                                    </td>
+                                </tr>
+                            }                
                     </tbody>
                 </table>
             </div>
@@ -275,6 +310,32 @@
                                   $('#PaymentStatus').val(dataMile.paymentStatus);
                                    $('#Status').val(dataMile.status);
                                        $('#Remarks').val(dataMile.remarks);
+
+
+                                          const container = document.getElementById("attachmentContainer");
+                                    container.innerHTML = ""; // clear previous attachments
+                                          if (!dataMile.attachmentList || dataMile.attachmentList.length === 0) {
+                                    container.innerHTML = "<small>No attachments</small>";
+                                    return;
+                                             }
+
+                                              dataMile.attachmentList.forEach(att => {
+
+                                                const html = `
+                                                    <div class="file-icon">
+                                                        <a href="/Attachment/View/${att.attachmentId}" title="${att.filename}">
+                                                            <i class="fas fa-file-pdf pdf-icon"></i>
+                                                        </a>
+                                                        <span class="delete-btn"
+                                                              title="remove"
+                                                              onclick="removeAttachment(${att.attachmentId}, 0)">
+                                                            &times;
+                                                        </span>
+                                                    </div>
+                                                `;
+
+                                                container.insertAdjacentHTML("beforeend", html);
+                                            });
             }
 
                      function deleteform(id) {

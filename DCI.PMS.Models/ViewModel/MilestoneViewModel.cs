@@ -36,5 +36,7 @@ namespace DCI.PMS.Models.ViewModel
         public string? TargetCompletedDateString { get; set; } = string.Empty;
         public string? ActualCompletionDateString { get; set; } = string.Empty;
         public List<IFormFile> OtherAttachmentMilestone { get; set; } = new();
+
+        public List<int> AttachmentListId { get; set; } = new();
     }
 }

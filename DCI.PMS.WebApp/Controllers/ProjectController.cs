@@ -437,7 +437,7 @@ namespace DCI.PMS.WebApp.Controllers
                                 fileBytes = ms.ToArray();
                             }
 
-                            string fileloc = @"C:\\DCI App\\PMS\\" + model.DeliverableId.ToString() + @"\";
+                            string fileloc = @"C:\\DCI App\\PMS\\" + model.MileStoneId.ToString() + @"\";
 
                             var fileName = DateTime.Now.ToString("yyyyMMddHHmmss") + Core.Common.Constants.Filetype_Pdf;
                             var filePath = Path.Combine(fileloc, fileName);

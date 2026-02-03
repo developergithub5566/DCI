@@ -518,6 +518,8 @@ namespace DCI.PMS.Repository
                                         .AsNoTracking()
                                         .Where(p => p.IsActive).ToList();
 
+                var attachmentIdList = await _pmsdbContext.Attachment.Where(x => x.IsActive).ToListAsync();
+
 
                 var result = (from m in milestone
                               join u in users on m.CreatedBy equals u.UserId
@@ -543,7 +545,8 @@ namespace DCI.PMS.Repository
                                   DateModified = m.DateModified,
                                   ModifiedBy = m.ModifiedBy,
                                   IsActive = m.IsActive,
-                                  Remarks = m.Remarks
+                                  Remarks = m.Remarks,
+                                  AttachmentListId =  attachmentIdList.Where(x => x.MileStoneId == m.MileStoneId).Select(x => x.AttachmentId).ToList()
                               }).ToList();
 
                 model.MilestoneList = result;
