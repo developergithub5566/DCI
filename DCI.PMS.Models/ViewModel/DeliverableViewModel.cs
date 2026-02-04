@@ -27,6 +27,8 @@ namespace DCI.PMS.Models.ViewModel
         public string? CreatedName { get; set; } = string.Empty;
         public List<IFormFile> OtherAttachmentDeliverable { get; set; } = new();
 
+        public List<int> AttachmentListId { get; set; } = new();
+        public List<AttachmentViewModel>? AttachmentList { get; set; } = new();
 
     }
 }

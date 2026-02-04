@@ -15,7 +15,7 @@
 
         public DateTime DateCreated { get; set; }
         public int CreatedBy { get; set; } = 0;
-
+        public string CreatedName { get; set; } = string.Empty;
         public bool IsActive { get; set; } = true;
     }
 }

@@ -56,7 +56,13 @@
     </div>
     <div class="d-sm-flex align-items-center justify-content-between mb-3">
         <h6 class="m-0 font-weight-bold text-gray-800">Project</h6>
-
+        <div class="upperRightDivBtn">
+            <button type="button"
+                    class="btn btn-primary"
+                    onclick="document.getElementById('createForm').submit();">
+                Save Draft & Add Milestone
+            </button>
+        </div>
     </div>
     <div class="col-12 p0">
         <ul class="breadcrumb">
@@ -91,15 +97,6 @@
                             <div class="row">
                                 <label for="ClientName" class="col-sm-2 col-form-label">Client Name</label>
                                 <div class="col-sm-8">
-                                    @*   <input type="text" class="form-control" id="ClientName" name="ClientName" placeholder="Client Name"> *@
-                            @*         <select class="form-control frmField" name="ClientId" id="ClientId" required>
-                                        <option value="" disabled selected>Select</option>
-                                        <option value="1" class="TIME_IN">Client A</option>
-                                        <option value="2" class="TIME_OUT">Client B</option>
-                                        <option value="3" class="TIME_OUT">Client C</option>
-                                        <option value="4" class="TIME_OUT">Client D</option>
-                                        <option value="5" class="TIME_OUT">Client E</option>
-                                    </select> *@
                                     @Html.DropDownListFor(m => m.ClientId, new SelectList(Model.ClientList, "ClientId", "ClientName"), "Select", new { @class = "form-control frmField", required = "required" })
                                 </div>
                             </div>
@@ -304,25 +301,60 @@
                                 }
                              
                             </style>
+                       
                             <div class="row">
-                               
-                                  @*   <script>
-                                        $('#OtherIcon').hide();
-                                    </script> *@
                                 <label for="inputEmail3" class="col-sm-2 col-form-label"></label>
-                                <div class="attachment-icons">
-                                    @foreach (var x in Model.AttachmentList)
-                                    {
+                                <div class="col-sm-8">
+                                    <table class="table table-borderless" id="tblDTR" style="font-size:small">
+                                    <thead>
+                                        <tr>
 
-                                    
-                                        <div class="file-icon">
+                                            <th>
+                                                <label>File Name</label>
+                                            </th>
+                                            <th>
+                                                <label>Date Updated</label>
+                                            </th>
+                                            <th>
+                                                <label>Upload By</label>
+                                            </th>
+                                            <th>
+                                                <label>Actions</label>
+                                            </th>
                                           
-                                            <a href="javascript:void(0)" title="@x.Filename">
-                                                <i class="fas fa-file-pdf pdf-icon"></i>
-                                            </a>
-                                            <span class="delete-btn" title="remove" onclick="removeAttachment(@x.AttachmentId,0)">&times;</span>
-                                        </div>
-                                    }
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                            @foreach (var item in Model.AttachmentList)
+                                        {
+
+                                            <tr>
+                                                <td>
+                                                    @item.Filename
+                                                </td>
+                                                <td>
+                                                    @item.DateCreated.ToString("MM/dd/yyyy HH:mm")
+                                                </td>
+                                              <td class="d-flex align-items-center gap-2">
+                                                        <img src="@("/icon/default_male.png")"
+                                                             class="rounded-circle"
+                                                             width="28"
+                                                             height="28"
+                                                             alt="user" /> @item.CreatedName
+                                                </td>                                               
+
+
+                                                <td class="text-center"> 
+                                                    <a asp-controller="Project" asp-action="Details" class="btn btn-primary"><i class="fa fa-download"></i></a>                                               
+                                                    <a href="javascript:void(0)" id="deleteAttach" onclick="removeAttachment(@item.AttachmentId,0)" title="Delete" class="btn btn-danger">
+                                                        <i class="far fa-trash-alt"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
                                 </div>
                             </div>
                         </div>
@@ -331,15 +363,13 @@
 
                     </div>
 
-                    <div class="modal-footer">
+               @*      <div class="modal-footer">
                         <div class="col-sm-18">
-                      
-
                             <button type="submit" class="btn btn-primary">
                                 Save Draft & Add Milestone
                             </button>
                         </div>
-                    </div>
+                    </div> *@
                 </div>
             </form>
 
@@ -466,11 +496,7 @@
                                                }
                                            });
                                        }
-                                   });
-
-                            
-
-           
+                                   });           
        }
 
          function removeNtp(attachId){

@@ -38,5 +38,6 @@ namespace DCI.PMS.Models.ViewModel
         public List<IFormFile> OtherAttachmentMilestone { get; set; } = new();
 
         public List<int> AttachmentListId { get; set; } = new();
+        public List<AttachmentViewModel>? AttachmentList { get; set; } = new();
     }
 }

@@ -107,46 +107,44 @@
                                     <input type="file" id="OtherAttachmentMilestone" name="OtherAttachmentMilestone" class="form-control" accept="application/pdf" multiple onchange="">
                                 </div>
                             </div>
-                            <div class="row">                                          
-
-                                <div class="col-sm-8"> 
-                                    <button class="btn btn-primary float-end" onclick="nextStep()">Add to list</button>
+                       
+                      @*       <div class="row">
+                                <label for="inputEmail3" class="col-sm-2 col-form-label"></label>
+                                    <div id="attachmentContainer" class="attachment-icons"></div>                             
+                            </div> *@
+                            
+                            <div class="row">
+                                <label for="inputEmail3" class="col-sm-2 col-form-label"></label>
+                                <div class="col-sm-8">
+                                    <table class="table table-borderless" style="font-size:small">
+                                        <thead>
+                                            <tr>
+                                               
+                                                <th>
+                                                    <label>File Name</label>
+                                                </th>
+                                                <th>
+                                                    <label>Date Updated</label>
+                                                </th>
+                                                <th>
+                                                    <label>Upload By</label>
+                                                </th>
+                                                <th>
+                                                    <label>Actions</label>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tblAttachment">
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
-                            <style>
-                                .attachment-icons {
-                                    display: flex; /* align children in a row */
-                                    gap: 10px; /* spacing between icons */
-                                    flex-wrap: wrap; /* wrap to next line if too many */
-                                }
-
-                                .file-icon {
-                                    position: relative;
-                                    width: 50px; /* adjust size */
-                                    height: 50px;
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    border: 1px solid #ccc;
-                                    border-radius: 5px;
-                                }
-
-                                .delete-btn {
-                                    position: absolute;
-                                    top: -5px;
-                                    right: -5px;
-                                    cursor: pointer;
-                                    color: red;
-                                    font-weight: bold;
-                                }
-                            </style>
                             <div class="row">
 
                                 <div class="col-sm-8">
-                                    <div id="attachmentContainer" class="attachment-icons"></div>
+                                    <button class="btn btn-primary float-end" onclick="nextStep()">Add to list</button>
                                 </div>
                             </div>
-                           
                         </div>
 
                         <hr />
@@ -213,8 +211,9 @@
                                                                             paymentStatus:"@x.PaymentStatus",
                                                                             status : "@x.Status",
                                                                             remarks : "@x.Remarks",
-                                            attachmentList: @Html.Raw(Json.Serialize(x.AttachmentListId))
-                                       
+                                            attachmentList: @Html.Raw(Json.Serialize(x.AttachmentListId)),
+                                                            attachList: @Html.Raw(Json.Serialize(x.AttachmentList))
+
                                                                                     })' title="Edit" class="btn btn-info"><i class="fas fa-edit"></i></a>
 
                                     <a href="javascript:void(0)" title="Delete" class="btn btn-danger" id="deleteform"  onclick="deleteform(@x.MileStoneId)"><i class="fas fa-trash"></i></a>
@@ -262,8 +261,55 @@
     .project-dates button {
         white-space: nowrap;
     }
-</style>
 
+    .file-icon {
+        position: relative;
+        display: inline-block;
+        font-size: 32px;
+    }
+
+    .pdf-icon {
+        color: #dc3545; /* red PDF icon */
+    }
+
+    .attachment-icons {
+        display: flex; /* align children in a row */
+        gap: 10px; /* spacing between icons */
+        flex-wrap: wrap; /* wrap to next line if too many */
+    }
+
+    .file-icon {
+        position: relative;
+        width: 50px; /* adjust size */
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .delete-btn {
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        width: 18px;
+        height: 18px;
+        background: #000;
+        color: #fff;
+        border-radius: 50%;
+        font-size: 12px;
+        font-weight: bold;
+        text-align: center;
+        line-height: 18px;
+        cursor: pointer;
+    }
+
+        .delete-btn:hover {
+            background: #dc3545;
+        }
+
+</style>
 
 @section scripts {
     <script src="~/js/dci-validation.js"></script>
@@ -312,31 +358,58 @@
                                        $('#Remarks').val(dataMile.remarks);
 
 
-                                          const container = document.getElementById("attachmentContainer");
-                                    container.innerHTML = ""; // clear previous attachments
-                                          if (!dataMile.attachmentList || dataMile.attachmentList.length === 0) {
-                                    container.innerHTML = "<small>No attachments</small>";
-                                    return;
-                                             }
+                                    //       const container = document.getElementById("attachmentContainer");
+                                    // container.innerHTML = ""; // clear previous attachments
+                                    //       if (!dataMile.attachmentList || dataMile.attachmentList.length === 0) {
+                                    // container.innerHTML = "<small>No attachments</small>";
+                                    // return;
+                                    //          }
+                                                   
+                                    //           dataMile.attachmentList.forEach(att => {
+                                    //                console.log(att);
+                                    //             const html = `
+                                    //                 <div class="file-icon">
+                                    //                     <a href="javascript:void(0)" title="${att.filename}">
+                                    //                         <i class="fas fa-file-pdf pdf-icon"></i>
+                                    //                     </a>
+                                    //                     <span class="delete-btn"
+                                    //                           title="remove"
+                                    //                           onclick="removeAttachment(${att})">
+                                    //                         &times;
+                                    //                     </span>
+                                    //                 </div>
+                                    //             `;
+                                    //             container.insertAdjacentHTML("beforeend", html);
+                                    //         });
 
-                                              dataMile.attachmentList.forEach(att => {
 
-                                                const html = `
-                                                    <div class="file-icon">
-                                                        <a href="/Attachment/View/${att.attachmentId}" title="${att.filename}">
-                                                            <i class="fas fa-file-pdf pdf-icon"></i>
-                                                        </a>
-                                                        <span class="delete-btn"
-                                                              title="remove"
-                                                              onclick="removeAttachment(${att.attachmentId}, 0)">
-                                                            &times;
-                                                        </span>
-                                                    </div>
-                                                `;
-
-                                                container.insertAdjacentHTML("beforeend", html);
-                                            });
-            }
+                                                    var tbodyAttachment = $("#tblAttachment");
+                                                    tbodyAttachment.empty();
+                                                    if (dataMile.attachList.length > 0) {
+                                                          $.each(dataMile.attachList, function(index, item) {
+                                                                            var row = `<tr> 
+                                                                           
+                                                                                    <td>${item.filename}</td>
+                                                                                    <td>${item.dateCreated}</td>
+                                                                                    <td>${item.createdName}</td>
+                                                                                     <td class="text-center">
+                                                                                        <a href="#" class="btn btn-primary" title="Download">
+                                                                                            <i class="fa fa-download"></i>
+                                                                                        </a>
+                                                                                        <a href="javascript:void(0)"
+                                                                                           class="btn btn-danger"
+                                                                                           title="Delete"
+                                                                                           onclick="removeAttachment(${item.attachmentId}, 0)">
+                                                                                            <i class="far fa-trash-alt"></i>
+                                                                                        </a>
+                                                                                    </td>
+                                                                                </tr>`;
+                                                                tbodyAttachment.append(row);
+                                                             });
+                                                      } else {
+                                                            tbodyAttachment.html(`<tr><td colspan="4" class="text-center">No attachment found.</td></tr>`);
+                                                       }
+                                            }
 
                      function deleteform(id) {
                             Swal.fire({
@@ -377,6 +450,46 @@
                             });
                     }
 
+
+                          function removeAttachment(attachId){
+                                    Swal.fire({
+                                        text: "Are you sure you want to delete this attachment?",
+                                        icon: "warning",
+                                        showCancelButton: true,
+                                        confirmButtonText: "Yes, delete it!"
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            $.ajax({
+                                                type: 'POST',
+                                                 url: '@Url.Action("DeleteAttachment", "Project")',
+                                                    data: { AttachmentId: attachId },
+                                                success: function (response) {
+                                                    if (response.success) {
+                                                        Swal.fire({
+                                                            text: response.message,
+                                                            icon: "success",
+                                                            confirmButtonText: "Ok"
+                                                        }).then((result) => {
+                                                            location.reload();
+                                                                                                                               
+                                                        });
+                                                    } else {
+                                                        Swal.fire({
+                                                            text: response.message,
+                                                            icon: "error"
+                                                        });
+                                                    }
+                                                },
+                                                error: function () {
+                                                    Swal.fire({
+                                                        text: "An error occurred. Please try again.",
+                                                        icon: "error"
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    });
+        }
 
     </script>
 }

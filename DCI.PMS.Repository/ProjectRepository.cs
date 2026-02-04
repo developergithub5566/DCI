@@ -208,21 +208,30 @@ namespace DCI.PMS.Repository
                               }).FirstOrDefault();
 
 
-                var attachList = await _pmsdbContext.Attachment
-                                        .AsNoTracking()
-                                        .Where(p => p.IsActive && p.ProjectCreationId == model.ProjectCreationId)
-                                        .OrderByDescending(p => p.AttachmentId)
-                                        .Select(p => new AttachmentViewModel
-                                        {
-                                            AttachmentId = p.AttachmentId,
-                                            ProjectCreationId = p.ProjectCreationId,
-                                            AttachmentType = p.AttachmentType,
-                                            Filename = p.Filename,
-                                            FileLocation = p.FileLocation,
-                                            CreatedBy = p.CreatedBy,
-                                            IsActive = p.IsActive
-                                        })
-                                        .ToListAsync();
+                var attachList = _pmsdbContext.Attachment
+                                .AsNoTracking()
+                                .Where(a => a.IsActive && a.ProjectCreationId == model.ProjectCreationId)
+                                .AsEnumerable() 
+                                .Join(
+                                    users,
+                                    a => a.CreatedBy,
+                                    u => u.UserId,
+                                    (a, u) => new AttachmentViewModel
+                                    {
+                                        AttachmentId = a.AttachmentId,
+                                        ProjectCreationId = a.ProjectCreationId,
+                                        AttachmentType = a.AttachmentType,
+                                        Filename = a.Filename,
+                                        FileLocation = a.FileLocation,
+                                        CreatedBy = a.CreatedBy,
+                                        CreatedName = u.Fullname,
+                                        DateCreated = a.DateCreated,
+                                        IsActive = a.IsActive
+                                    }
+                                )
+                                .OrderByDescending(x => x.AttachmentId)
+                                .ToList();
+
 
 
                 if (result == null)
@@ -521,6 +530,33 @@ namespace DCI.PMS.Repository
                 var attachmentIdList = await _pmsdbContext.Attachment.Where(x => x.IsActive).ToListAsync();
 
 
+                
+                var attachList = _pmsdbContext.Attachment
+                                .AsNoTracking()
+                                .Where(a => a.IsActive && a.ProjectCreationId == model.ProjectCreationId)
+                                .AsEnumerable() 
+                                .Join(
+                                    users,
+                                    a => a.CreatedBy,
+                                    u => u.UserId,
+                                    (a, u) => new AttachmentViewModel
+                                    {
+                                        AttachmentId = a.AttachmentId,
+                                        ProjectCreationId = a.ProjectCreationId,
+                                        MileStoneId = a.MileStoneId,
+                                        AttachmentType = a.AttachmentType,
+                                        Filename = a.Filename,
+                                        FileLocation = a.FileLocation,
+                                        CreatedBy = a.CreatedBy,
+                                        CreatedName = u.Fullname,
+                                        DateCreated = a.DateCreated,
+                                        IsActive = a.IsActive
+                                    }
+                                )
+                                .OrderByDescending(x => x.AttachmentId)
+                                .ToList();
+
+
                 var result = (from m in milestone
                               join u in users on m.CreatedBy equals u.UserId
                               join s in _dbContext.Status.AsNoTracking() on m.Status equals s.StatusId
@@ -546,7 +582,8 @@ namespace DCI.PMS.Repository
                                   ModifiedBy = m.ModifiedBy,
                                   IsActive = m.IsActive,
                                   Remarks = m.Remarks,
-                                  AttachmentListId =  attachmentIdList.Where(x => x.MileStoneId == m.MileStoneId).Select(x => x.AttachmentId).ToList()
+                                  AttachmentListId =  attachmentIdList.Where(x => x.MileStoneId == m.MileStoneId).Select(x => x.AttachmentId).ToList(),
+                                  AttachmentList = attachList.Where(x => x.MileStoneId ==  m.MileStoneId).ToList()
                               }).ToList();
 
                 model.MilestoneList = result;
@@ -693,6 +730,8 @@ namespace DCI.PMS.Repository
                                         .AsNoTracking()
                                         .Where(p => p.IsActive).ToList();
 
+                var attachmentIdList = await _pmsdbContext.Attachment.Where(x => x.IsActive).ToListAsync();
+
                 var statusList = await _dbContext.Status
                   .AsNoTracking()
                   .Where(p => p.IsActive)
@@ -702,6 +741,33 @@ namespace DCI.PMS.Repository
                       StatusName = u.StatusName
                   })
                   .ToListAsync();
+
+
+                var attachList = _pmsdbContext.Attachment
+                         .AsNoTracking()
+                         .Where(a => a.IsActive && a.MileStoneId == model.MileStoneId)
+                         .AsEnumerable()
+                         .Join(
+                             users,
+                             a => a.CreatedBy,
+                             u => u.UserId,
+                             (a, u) => new AttachmentViewModel
+                             {
+                                 AttachmentId = a.AttachmentId,
+                                 ProjectCreationId = a.ProjectCreationId,
+                                 MileStoneId = a.MileStoneId,
+                                 DeliverableId = a.DeliverableId,
+                                 AttachmentType = a.AttachmentType,
+                                 Filename = a.Filename,
+                                 FileLocation = a.FileLocation,
+                                 CreatedBy = a.CreatedBy,
+                                 CreatedName = u.Fullname,
+                                 DateCreated = a.DateCreated,
+                                 IsActive = a.IsActive
+                             }
+                         )
+                         .OrderByDescending(x => x.AttachmentId)
+                         .ToList();
 
                 var result = (from m in deliverable
                               join u in users on m.CreatedBy equals u.UserId
@@ -719,6 +785,8 @@ namespace DCI.PMS.Repository
                                   DateModified = m.DateModified,
                                   ModifiedBy = m.ModifiedBy,
                                   IsActive = m.IsActive,
+                                  AttachmentListId = attachmentIdList.Where(x => x.DeliverableId == m.DeliverableId).Select(x => x.AttachmentId).ToList(),
+                                  AttachmentList = attachList.Where(x => x.DeliverableId == m.DeliverableId).ToList()
                               }).ToList();
 
 
