@@ -161,8 +161,8 @@
                           
                         
                                 <td class="text-center">
-                                
-                                    <a asp-controller="Project" asp-action="Details" class="btn btn-primary"><i class="fa fa-search"></i></a>|
+
+                                    <a asp-controller="Project" asp-action="Details" asp-route-id="@item.ProjectCreationId" class="btn btn-primary"><i class="fa fa-search"></i></a>|
                                     <a asp-controller="Project" asp-action="CreateEdit" asp-route-id="@item.ProjectCreationId" class="btn btn-info"><i class="fa fa-edit"></i></a>|
                                     <a href="javascript:void(0)"  title="biometric logs" class="btn btn-secondary"><i class="fas fa-history"></i></a>
                                 </td>

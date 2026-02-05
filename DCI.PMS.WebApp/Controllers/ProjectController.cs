@@ -38,7 +38,7 @@ namespace DCI.PMS.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
 
-                    model.ProjectCreationId = 3;
+                    model.ProjectCreationId = id;
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/GetProjectById");
                     request.Content = stringContent;
