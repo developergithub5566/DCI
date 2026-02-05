@@ -22,8 +22,12 @@ namespace DCI.PMS.Models.ViewModel
         public int ProjectDuration { get; set; } = 0;
         public decimal ProjectCost { get; set; } = 0;
         public int ModeOfPayment { get; set; } = 0;
+        public string? ModeOfPaymentName { get; set; } = string.Empty;
         public int Status { get; set; } = 0;
         public int PaymentStatus { get; set; } = 0;
+
+        public string? StatusName { get; set; } = string.Empty;
+      //  public string? PaymentStatusName { get; set; } = string.Empty;
         public DateTime DateCreated { get; set; } = new DateTime();
         public int CreatedBy { get; set; } = 0;
 
@@ -43,6 +47,7 @@ namespace DCI.PMS.Models.ViewModel
         public List<ClientViewModel>? ClientList { get; set; } = new();
         public List<AttachmentViewModel>? AttachmentList { get; set; } = new();
 
+        //public List<DeliverableViewModel>? DeliveryList { get; set; } = new();
         public List<StatusViewModel>? StatusList { get; set; } = new();
         public bool? IsNOAFile { get; set; } = false;
         public int NOAFileId { get; set; } = 0;

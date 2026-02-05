@@ -94,19 +94,48 @@ namespace DCI.PMS.Repository
                                             p.ProjectCreationId,
                                             p.ProjectNo,
                                             p.ProjectName,
+                                            p.ClientId,
                                             p.NOADate,
                                             p.NTPDate,
                                             p.MOADate,
                                             p.ProjectDuration,
                                             p.ProjectCost,
                                             p.ModeOfPayment,
+                                            p.Status,
                                             p.CreatedBy,
                                             p.IsActive
                                         })
                                         .ToListAsync();
 
+                var status = await _pmsdbContext.Status
+                                       .AsNoTracking()
+                                       .Where(p => p.IsActive)
+                                       .Select(s => new
+                                       {
+                                           s.StatusId,
+                                           s.StatusName
+                                       })
+                                       .ToListAsync();
+
+                var _clientList = await _pmsdbContext.Client
+                      .AsNoTracking()
+                      .Where(c => c.IsActive)
+                      .Select(c => new ClientViewModel
+                      {
+                          ClientId = c.ClientId,
+                          ClientName = c.ClientName,
+                          Description = c.Description,
+                          DateCreated = c.DateCreated,
+                          CreatedBy = c.CreatedBy,
+                          IsActive = c.IsActive
+                      })
+                      .ToListAsync();
+
+
                 var result = from p in projects
                              join u in users on p.CreatedBy equals u.UserId
+                             join s in status on p.Status equals s.StatusId
+                             join c in _clientList on p.ClientId equals c.ClientId
                              select new ProjectViewModel
                              {
                                  ProjectCreationId = p.ProjectCreationId,
@@ -118,8 +147,11 @@ namespace DCI.PMS.Repository
                                  ProjectDuration = p.ProjectDuration,
                                  ProjectCost = p.ProjectCost,
                                  ModeOfPayment = p.ModeOfPayment,
+                                 ClientId = p.ClientId,
+                                 ClientName = c.ClientName,
                                  IsActive = p.IsActive,
-                                 CreatedName = u.Fullname
+                                 CreatedName = u.Fullname,
+                                 StatusName = s.StatusName
                              };
 
                 return result.ToList();
@@ -164,6 +196,15 @@ namespace DCI.PMS.Repository
                                     })
                                     .ToListAsync();
 
+                var status = await _pmsdbContext.Status
+                                      .AsNoTracking()
+                                      .Where(p => p.IsActive)
+                                      .Select(s => new
+                                      {
+                                          s.StatusId,
+                                          s.StatusName
+                                      })
+                                      .ToListAsync();
 
 
                 var projects = await _pmsdbContext.Project
@@ -181,6 +222,7 @@ namespace DCI.PMS.Repository
                                             p.ProjectDuration,
                                             p.ProjectCost,
                                             p.ModeOfPayment,
+                                            p.Status,
                                             p.CreatedBy,
                                             p.IsActive
                                         })
@@ -189,6 +231,7 @@ namespace DCI.PMS.Repository
                 var result = (from p in projects
                               join u in users on p.CreatedBy equals u.UserId
                               join c in _pmsdbContext.Client on p.ClientId equals c.ClientId
+                              join s in status on p.Status equals s.StatusId
                               where p.ProjectCreationId == model.ProjectCreationId
                               select new ProjectViewModel
                               {
@@ -204,7 +247,9 @@ namespace DCI.PMS.Repository
                                   ProjectCost = p.ProjectCost,
                                   ModeOfPayment = p.ModeOfPayment,
                                   IsActive = p.IsActive,
-                                  CreatedName = u.Fullname
+                                  CreatedName = u.Fullname,
+                                  StatusName = s.StatusName,
+                                  ModeOfPaymentName = p.ModeOfPayment == 1 ? "Milestone Based" : p.ModeOfPayment == 2 ? "Transacational Based" : "Full Payment"
                               }).FirstOrDefault();
 
 
@@ -220,6 +265,8 @@ namespace DCI.PMS.Repository
                                     {
                                         AttachmentId = a.AttachmentId,
                                         ProjectCreationId = a.ProjectCreationId,
+                                        MileStoneId = a.MileStoneId,
+                                        DeliverableId = a.DeliverableId,
                                         AttachmentType = a.AttachmentType,
                                         Filename = a.Filename,
                                         FileLocation = a.FileLocation,
@@ -232,7 +279,81 @@ namespace DCI.PMS.Repository
                                 .OrderByDescending(x => x.AttachmentId)
                                 .ToList();
 
+                var statusLookup = status.ToDictionary(x => x.StatusId, x => x.StatusName);
 
+                var milestone = _pmsdbContext.Milestone
+                                .AsNoTracking()
+                                .Where(a => a.IsActive && a.ProjectCreationId == model.ProjectCreationId)
+                                .AsEnumerable()
+                                .Join(
+                                    users,
+                                    a => a.CreatedBy,
+                                    u => u.UserId,
+                                    (a, u) => new MilestoneViewModel
+                                    {
+                                        MileStoneId = a.MileStoneId,
+                                        ProjectCreationId = a.ProjectCreationId,
+                                        MilestoneName = a.MilestoneName,
+                                        Percentage = a.Percentage,
+                                        TargetCompletedDate= a.TargetCompletedDate,
+                                        ActualCompletionDate = a.ActualCompletionDate,
+                                        PaymentStatus = a.PaymentStatus,
+                                        Status = a.Status,
+                                        StatusName  = statusLookup.TryGetValue(a.Status, out var name) ? name : "",
+                                        Remarks = a.Remarks,
+                                        CreatedBy = a.CreatedBy,
+                                        CreatedName = u.Fullname,
+                                        DateCreated = a.DateCreated,
+                                        IsActive = a.IsActive,
+                                        DeliverableList = _pmsdbContext.Deliverable
+                                               .AsNoTracking()
+                                               .Where(a => a.IsActive && a.MileStoneId == model.ProjectCreationId)
+                                               .AsEnumerable()
+                                               .Join(
+                                                   users,
+                                                   a => a.CreatedBy,
+                                                   u => u.UserId,
+                                                   (a, u) => new DeliverableViewModel
+                                                   {
+                                                       DeliverableId = a.DeliverableId,
+                                                       MileStoneId = a.MileStoneId,                                                       
+                                                       DeliverableName = a.DeliverableName,
+                                                       Status = a.Status,
+                                                       CreatedBy = a.CreatedBy,
+                                                       CreatedName = u.Fullname,
+                                                       DateCreated = a.DateCreated,
+                                                       IsActive = a.IsActive,
+                                                       StatusName = statusLookup.TryGetValue(a.Status, out var name) ? name : "",
+                                                   }
+                                               )
+                                                .ToList()}
+                                )
+                                 .ToList();
+
+                //var deliverables = _pmsdbContext.Deliverable
+                //   .AsNoTracking()
+                //   .Where(a => a.IsActive && a.MileStoneId == model.ProjectCreationId)
+                //   .AsEnumerable()
+                //   .Join(
+                //       users,
+                //       a => a.CreatedBy,
+                //       u => u.UserId,
+                //       (a, u) => new DeliverableViewModel
+                //       {
+                //           DeliverableId = a.DeliverableId,
+                //           MileStoneId = a.MileStoneId,
+                //           ProjectCreationId = a.ProjectCreationId,
+                //          // StatusName = a.MilesttaoneName,
+                        
+                //           Status = a.Status,
+            
+                //           CreatedBy = a.CreatedBy,
+                //           CreatedName = u.Fullname,
+                //           DateCreated = a.DateCreated,
+                //           IsActive = a.IsActive
+                //       }
+                //   )
+                //    .ToList();
 
                 if (result == null)
                 {
@@ -240,7 +361,7 @@ namespace DCI.PMS.Repository
                 }
           
                 result.ClientList = _clientList;
-                result.AttachmentList = attachList.Where(x => x.MileStoneId == 0 && x.DeliverableId == 0 && x.AttachmentType == (int)EnumAttachmentType.OTHER).ToList();
+                result.AttachmentList = attachList;//.Where(x => x.MileStoneId == 0 && x.DeliverableId == 0 && x.AttachmentType == (int)EnumAttachmentType.OTHER).ToList();
 
                 var noa =  attachList.FirstOrDefault(x => x.AttachmentType == (int)EnumAttachmentType.NOA && x.MileStoneId == 0 && x.DeliverableId == 0 && x.IsActive);
                 result.IsNOAFile = noa is not null;
@@ -253,6 +374,9 @@ namespace DCI.PMS.Repository
                 var moa = attachList.FirstOrDefault(x => x.AttachmentType == (int)EnumAttachmentType.MOA && x.MileStoneId == 0 && x.DeliverableId == 0 && x.IsActive);
                 result.IsMOAFile = moa is not null;
                 result.MOAFileId = moa?.AttachmentId ?? 0;
+
+                result.MilestoneList = milestone;
+               // result.DeliveryList = Deliverable;
 
                 return result;
 

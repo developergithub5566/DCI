@@ -20,7 +20,7 @@ namespace DCI.Data
         public DbSet<Deliverable> Deliverable { get; set; }
          public DbSet<Attachment> Attachment { get; set; }
         public DbSet<Client> Client { get; set; }
-
+        public DbSet<Status> Status { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<AuditLog>().Property(ae => ae.Changes).HasConversion(

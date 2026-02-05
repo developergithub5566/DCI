@@ -128,11 +128,9 @@
                                 <label>Project Cost</label>
                             </th>
                             <th>
-                                <label>MOA Signed Date</label>
+                                <label>Status</label>
                             </th>
-                            <th>
-                                <label>NTP Date</label>
-                            </th>
+                          
                             <th>
                                 Action
                             </th>
@@ -151,17 +149,15 @@
                                  @item.ProjectName
                                 </td>
                                 <td>
-                                    @item.ClientId
+                                    @item.ClientName
                                 </td>
                                 <td>
                                     @item.ProjectCost
                                 </td>
                                 <td>
-                                    @item.MOADate.ToShortDateString()
+                                    @item.StatusName
                                 </td>
-                                <td>
-                                    @item.NTPDate.ToShortDateString()
-                                </td>
+                               
                           
                         
                                 <td class="text-center">

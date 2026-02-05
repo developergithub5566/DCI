@@ -34,18 +34,18 @@
                         <div class="card-body">
 
                             <h3 class="fw-bold mb-1">Project Management System</h3>
-                            <div class="text-muted mb-3">Client: ABC Corporation</div>
+                            <div class="text-muted mb-3">@Model.ClientName</div>
 
                             <div class="row small">
-                                <div class="col-md-3"><strong>Project No:</strong> PROJ-0001</div>
-                                <div class="col-md-3"><strong>NOA Date:</strong> Jan 15, 2026 <i class="fa-solid fa-paperclip me-1" title="download noa"></i></div>
-                                <div class="col-md-3"><strong>NTP Date:</strong> Jan 20, 2026 <i class="fa-solid fa-paperclip me-1" title="download ntp"></i></div>
-                                <div class="col-md-3"><strong>MOA Date:</strong> Jan 20, 2026 <i class="fa-solid fa-paperclip me-1" title="download moa"></i></div>
-                                <div class="col-md-3"><strong>Payment Mode:</strong> Bank Transfer</div>
-                                <div class="col-md-3"><strong>Project Duration:</strong> Milestone Based</div>
+                            <div class="col-md-3"><strong>Project No:</strong> @Model.ProjectNo</div>
+                        <div class="col-md-3"><strong>NOA Date:</strong> @Model.NOADate.ToString("MMM dd yyyy") <i class="fa-solid fa-paperclip me-1" title="download noa"></i></div>
+                        <div class="col-md-3"><strong>NTP Date:</strong> @Model.NTPDate.ToString("MMM dd yyyy") <i class="fa-solid fa-paperclip me-1" title="download ntp"></i></div>
+                        <div class="col-md-3"><strong>MOA Date:</strong> @Model.MOADate.ToString("MMM dd yyyy") <i class="fa-solid fa-paperclip me-1" title="download moa"></i></div>
+                        <div class="col-md-3"><strong>Payment Mode:</strong> @Model.ModeOfPaymentName</div>
+                                <div class="col-md-3"><strong>Project Duration:</strong> @Model.ProjectDuration</div>
                                 <div class="col-md-3">
                                     <strong>Status:</strong>
-                                    <span class="badge bg-primary">Ongoing</span>
+                                    <span class="badge bg-primary">@Model.StatusName</span>
                                 </div>
                             </div>
 
@@ -54,21 +54,18 @@
                             <div class="mb-4">
                              <strong>Project Attachments</strong>
                                 <ul class="list-unstyled small mb-0">
-                                    <li>
-                                        <i class="fa-solid fa-paperclip me-1"></i>
-                                        <a href="#" class="text-decoration-none">
-                                            Contract Agreement.pdf
-                                        </a>
+                         
+                                    @foreach(var attach in Model.AttachmentList.Where(x => x.MileStoneId == 0 && x.DeliverableId == 0))
+                                    {
+                                     <li>
+                                            <i class="fa-solid fa-paperclip me-1"></i>
+                                            <a href="#" class="text-decoration-none">
+                                                attach.Filename.pdf
+                                            </a>
                                     </li>
-                                    <li>
-                                        <i class="fa-solid fa-paperclip me-1"></i>
-                                        <a href="#" class="text-decoration-none">
-                                            Approved Proposal.pdf
-                                        </a>
-                                    </li>
-                                </ul>
+                            }
+                        </ul>
                             </div>
-
                          
                         </div>
                 
@@ -84,135 +81,68 @@
 
                         <div class="card-body">
 
-                            <!-- MILESTONE ITEM -->
-                            <div class="mb-4 border-start border-4 ps-3">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <h6 class="fw-bold mb-1">
-                                            Milestone 1 – System Design
-                                            <span class="badge bg-info ms-2">100%</span>
-                                        </h6>
-                                        <div class="small text-muted">
-                                            Target Date: Feb 10, 2026
-                                        </div>
-                                        <div class="small text-muted">
-                                            Actual Completion Date: Feb 10, 2026
-                                        </div>
+                            @foreach(var x in Model.MilestoneList)
+                            {
+                        <div class="mb-4 border-start border-4 ps-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="fw-bold mb-1">
+                                     @x.MilestoneName
+                                        <span class="badge bg-info ms-2">@x.Percentage%</span>
+                                    </h6>
+                                    <div class="small text-muted">
+                                        Target Date: @x.TargetCompletedDate?.ToString("MMM dd yyyy")
                                     </div>
-                                      <span class="badge bg-success">Paid</span>
+                                    <div class="small text-muted">
+                                        Actual Completion Date: @x.ActualCompletionDate?.ToString("MMM dd yyyy")
+                                    </div>
                                 </div>
-                                <!-- MILESTONE ATTACHMENTS -->
-                                <div class="mt-2">
-                          @*           <div class="small fw-semibold">Milestone Attachments</div> *@
-                                    <ul class="list-unstyled small mb-2">
+                                <span class="badge bg-success">@x.StatusName</span>
+                            </div>
+                            <!-- MILESTONE ATTACHMENTS -->
+                            <div class="mt-2">
+                               
+                                <ul class="list-unstyled small mb-2">
+                                    @foreach (var m in Model.AttachmentList.Where(y => y.MileStoneId == x.MileStoneId))
+                                    {
                                         <li>
                                             <i class="fa-solid fa-paperclip me-1"></i>
                                             <a href="#" class="text-decoration-none">
-                                                Design Documents.pdf
+                                              @m.Filename
                                             </a>
                                         </li>
-                                        <li>
-                                            <i class="fa-solid fa-paperclip me-1"></i>
-                                            <a href="#" class="text-decoration-none">
-                                                ERD Diagram.pdf
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
+                                    }
+                                 
+                                </ul>
+                            </div>
 
-                                <!-- DELIVERABLES -->
-                                <ul class="mt-2 mb-0 small">
+                            <!-- DELIVERABLES -->
+                       
+                            <ul class="mt-2 mb-0 small">
+                                @foreach(var d in x.DeliverableList.Where(r => r.MileStoneId == x.MileStoneId).ToList())
+                                {
                                     <li>
-                                        Requirement Specification
-                                        <span class="badge bg-success ms-2">Approved</span>
+                                        @d.DeliverableName
+                                        <span class="badge bg-success ms-2">@d.StatusName</span>
                                         <!-- DELIVERABLE ATTACHMENTS -->
-                                @* <div class="small fw-semibold">Deliverables Attachments</div> *@
+
                                         <ul class="list-unstyled small mt-1">
-                                            <li>
-                                                <i class="fa-solid fa-paperclip me-1"></i>
-                                                <a href="#">Requirements_v1.pdf</a>
-                                            </li>
-                                            <li>
-                                                <i class="fa-solid fa-paperclip me-1"></i>
-                                                <a href="#">Client_Signoff.pdf</a>
-                                            </li>
+                                            @foreach (var dd in Model.AttachmentList.Where(y => y.DeliverableId == d.DeliverableId))
+                                            {
+                                                <li>
+                                                    <i class="fa-solid fa-paperclip me-1"></i>
+                                                    <a href="#">@dd.Filename </a>
+                                                </li>
+                                            }
+
                                         </ul>
                                     </li>
-                        
-                                    <li>
-                                        Database ERD
-                                        <span class="badge bg-secondary ms-2">Pending</span>
-                                    </li>
-                                    <li>
-                                        UI Wireframes
-                                        <span class="badge bg-primary ms-2">Submitted</span>
-                                    </li>
-                                </ul>
-                            </div>
+                                }
+                            </ul>
+                             
 
-                            <hr />
-
-                            <!-- MILESTONE ITEM -->
-                            <div class="mb-4 border-start border-4 ps-3">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <h6 class="fw-bold mb-1">
-                                            Milestone 2 – Development Phase
-                                            <span class="badge bg-info ms-2">40%</span>
-                                        </h6>
-                                        <div class="small text-muted">
-                                            Target Date: Mar 25, 2026
-                                        </div>
-                                        <div class="small text-muted">
-                                            Actual Completion Date: Feb 10, 2026
-                                        </div>
-                                    </div>
-                               
-                                        <span class="badge bg-warning text-dark">Unpaid</span>
-                                </div>
-
-                                <ul class="mt-2 mb-0 small">
-                                    <li>
-                                        Backend APIs
-                                        <span class="badge bg-success ms-2">Approved</span>
-                                    </li>
-                                    <li>
-                                        Frontend Implementation
-                                        <span class="badge bg-warning text-dark ms-2">In Progress</span>
-                                    </li>
-                                </ul>
-                            </div>
-                    <hr />
-                    <!-- MILESTONE ITEM -->
-                    <div class="mb-4 border-start border-4 ps-3">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h6 class="fw-bold mb-1">
-                                    Milestone 3 – Production 
-                                    <span class="badge bg-info ms-2">0%</span>
-                                </h6>
-                                <div class="small text-muted">
-                                    Target Date: Mar 25, 2026
-                                </div>
-                                <div class="small text-muted">
-                                    Actual Completion Date: Feb 10, 2026
-                                </div>
-                            </div>
-
-                            <span class="badge bg-warning text-dark">Unpaid</span>
                         </div>
-
-                        <ul class="mt-2 mb-0 small">
-                            <li>
-                              Deployment
-                                <span class="badge bg-warning text-dark ms-2">In Progress</span>
-                            </li>
-                            <li>
-                               Support Ticket
-                                <span class="badge bg-warning text-dark ms-2">In Progress</span>
-                            </li>
-                        </ul>
-                    </div>
+                    }          
 
                         </div>
                     </div>

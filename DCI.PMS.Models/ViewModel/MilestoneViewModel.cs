@@ -23,6 +23,8 @@ namespace DCI.PMS.Models.ViewModel
         public DateTime DateCreated { get; set; } = DateTime.Now;
         public int CreatedBy { get; set; } = 0;
 
+        public string CreatedName { get; set; } = string.Empty;
+
         public DateTime? DateModified { get; set; } = DateTime.Now;
         public int? ModifiedBy { get; set; } = 0;
 

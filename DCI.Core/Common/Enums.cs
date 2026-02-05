@@ -262,4 +262,18 @@ namespace DCI.Core.Common
         MILESTONE = 4,
         DELIVERABLES = 5
     }
+    public enum EnumPMSStatus
+    {           
+        Draft = 1,
+        Pending = 2,
+        NotStarted = 3,
+        InProgress = 4,
+        Completed = 5       
+    }
+    public enum EnumPMSPaymentStatus
+    {       
+        Pending = 1,
+        Paid = 2,    
+        Completed = 3
+    }
 }

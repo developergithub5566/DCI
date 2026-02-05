@@ -29,9 +29,41 @@ namespace DCI.PMS.WebApp.Controllers
         //    return View();
         //}
 
-        public async Task<IActionResult> Details()
+        public async Task<IActionResult> Details(int id)
         {
-            return View();
+            try
+            {
+                ProjectViewModel model = new ProjectViewModel();
+
+                using (var _httpclient = new HttpClient())
+                {
+
+                    model.ProjectCreationId = 3;
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/GetProjectById");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    ProjectViewModel vm = JsonConvert.DeserializeObject<ProjectViewModel>(responseBody)!;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return View(vm);
+                    }
+                    return View(vm);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            return Json(new { success = false, message = "An error occurred. Please try again." });
         }
         public async Task<IActionResult> CreateEdit(int id)
         {
