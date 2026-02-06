@@ -110,5 +110,12 @@ namespace DCI.PMS.API.Controllers
             var result = await _projectRepository.DeleteAttachment(model);
             return StatusCode(result.statuscode, result.message);
         }
+
+        [HttpPost]
+        [Route("ViewFile")]
+        public async Task<IActionResult> ViewFile([FromBody] AttachmentViewModel model)
+        {
+            return Ok(await _projectRepository.ViewFile(model));          
+        }
     }
 }

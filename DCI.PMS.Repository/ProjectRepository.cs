@@ -22,7 +22,7 @@ using System.Net.Sockets;
 
 namespace DCI.PMS.Repository
 {
-    public class ProjectRepository : IProjectRepository , IDisposable
+    public class ProjectRepository : IProjectRepository, IDisposable
     {
         private readonly IOptions<DCI.Models.ViewModel.FileModel> _fileconfig;
         private readonly DCIdbContext _dbContext;
@@ -256,7 +256,7 @@ namespace DCI.PMS.Repository
                 var attachList = _pmsdbContext.Attachment
                                 .AsNoTracking()
                                 .Where(a => a.IsActive && a.ProjectCreationId == model.ProjectCreationId)
-                                .AsEnumerable() 
+                                .AsEnumerable()
                                 .Join(
                                     users,
                                     a => a.CreatedBy,
@@ -295,11 +295,11 @@ namespace DCI.PMS.Repository
                                         ProjectCreationId = a.ProjectCreationId,
                                         MilestoneName = a.MilestoneName,
                                         Percentage = a.Percentage,
-                                        TargetCompletedDate= a.TargetCompletedDate,
+                                        TargetCompletedDate = a.TargetCompletedDate,
                                         ActualCompletionDate = a.ActualCompletionDate,
                                         PaymentStatus = a.PaymentStatus,
                                         Status = a.Status,
-                                        StatusName  = statusLookup.TryGetValue(a.Status, out var name) ? name : "",
+                                        StatusName = statusLookup.TryGetValue(a.Status, out var name) ? name : "",
                                         Remarks = a.Remarks,
                                         CreatedBy = a.CreatedBy,
                                         CreatedName = u.Fullname,
@@ -316,7 +316,7 @@ namespace DCI.PMS.Repository
                                                    (a, u) => new DeliverableViewModel
                                                    {
                                                        DeliverableId = a.DeliverableId,
-                                                       MileStoneId = a.MileStoneId,                                                       
+                                                       MileStoneId = a.MileStoneId,
                                                        DeliverableName = a.DeliverableName,
                                                        Status = a.Status,
                                                        CreatedBy = a.CreatedBy,
@@ -326,7 +326,8 @@ namespace DCI.PMS.Repository
                                                        StatusName = statusLookup.TryGetValue(a.Status, out var name) ? name : "",
                                                    }
                                                )
-                                                .ToList()}
+                                                .ToList()
+                                    }
                                 )
                                  .ToList();
 
@@ -344,9 +345,9 @@ namespace DCI.PMS.Repository
                 //           MileStoneId = a.MileStoneId,
                 //           ProjectCreationId = a.ProjectCreationId,
                 //          // StatusName = a.MilesttaoneName,
-                        
+
                 //           Status = a.Status,
-            
+
                 //           CreatedBy = a.CreatedBy,
                 //           CreatedName = u.Fullname,
                 //           DateCreated = a.DateCreated,
@@ -359,11 +360,11 @@ namespace DCI.PMS.Repository
                 {
                     result = new ProjectViewModel();
                 }
-          
+
                 result.ClientList = _clientList;
                 result.AttachmentList = attachList;//.Where(x => x.MileStoneId == 0 && x.DeliverableId == 0 && x.AttachmentType == (int)EnumAttachmentType.OTHER).ToList();
 
-                var noa =  attachList.FirstOrDefault(x => x.AttachmentType == (int)EnumAttachmentType.NOA && x.MileStoneId == 0 && x.DeliverableId == 0 && x.IsActive);
+                var noa = attachList.FirstOrDefault(x => x.AttachmentType == (int)EnumAttachmentType.NOA && x.MileStoneId == 0 && x.DeliverableId == 0 && x.IsActive);
                 result.IsNOAFile = noa is not null;
                 result.NOAFileId = noa?.AttachmentId ?? 0;
 
@@ -376,7 +377,7 @@ namespace DCI.PMS.Repository
                 result.MOAFileId = moa?.AttachmentId ?? 0;
 
                 result.MilestoneList = milestone;
-               // result.DeliveryList = Deliverable;
+                // result.DeliveryList = Deliverable;
 
                 return result;
 
@@ -599,7 +600,7 @@ namespace DCI.PMS.Repository
 
                         await SaveAttachment(new AttachmentViewModel
                         {
-                            ProjectCreationId = model.ProjectCreationId,                            
+                            ProjectCreationId = model.ProjectCreationId,
                             MileStoneId = 0,
                             DeliverableId = 0,
                             AttachmentType = (int)EnumAttachmentType.OTHER,
@@ -654,11 +655,11 @@ namespace DCI.PMS.Repository
                 var attachmentIdList = await _pmsdbContext.Attachment.Where(x => x.IsActive).ToListAsync();
 
 
-                
+
                 var attachList = _pmsdbContext.Attachment
                                 .AsNoTracking()
                                 .Where(a => a.IsActive && a.ProjectCreationId == model.ProjectCreationId)
-                                .AsEnumerable() 
+                                .AsEnumerable()
                                 .Join(
                                     users,
                                     a => a.CreatedBy,
@@ -706,8 +707,8 @@ namespace DCI.PMS.Repository
                                   ModifiedBy = m.ModifiedBy,
                                   IsActive = m.IsActive,
                                   Remarks = m.Remarks,
-                                  AttachmentListId =  attachmentIdList.Where(x => x.MileStoneId == m.MileStoneId).Select(x => x.AttachmentId).ToList(),
-                                  AttachmentList = attachList.Where(x => x.MileStoneId ==  m.MileStoneId).ToList()
+                                  AttachmentListId = attachmentIdList.Where(x => x.MileStoneId == m.MileStoneId).Select(x => x.AttachmentId).ToList(),
+                                  AttachmentList = attachList.Where(x => x.MileStoneId == m.MileStoneId).ToList()
                               }).ToList();
 
                 model.MilestoneList = result;
@@ -738,7 +739,7 @@ namespace DCI.PMS.Repository
                     entity.MilestoneName = model.MilestoneName;
                     entity.Percentage = model.Percentage;
                     entity.TargetCompletedDate = model.TargetCompletedDate;
-                    entity.ActualCompletionDate = model.ActualCompletionDate; 
+                    entity.ActualCompletionDate = model.ActualCompletionDate;
                     entity.PaymentStatus = model.PaymentStatus;
                     entity.Status = model.Status;
                     entity.CreatedBy = model.CreatedBy;
@@ -773,7 +774,7 @@ namespace DCI.PMS.Repository
                     entity.Remarks = model.Remarks;
                     _pmsdbContext.Milestone.Entry(entity).State = EntityState.Modified;
                     await _pmsdbContext.SaveChangesAsync();
-                                       
+
                     await SaveFileMilestone(model);
 
                     ProjectViewModel projModel = new ProjectViewModel();
@@ -781,7 +782,7 @@ namespace DCI.PMS.Repository
                     await GetMilestoneByProjectId(projModel);
                     // return (StatusCodes.Status200OK, "Successfully updated");
                 }
-              
+
             }
             catch (Exception ex)
             {
@@ -801,7 +802,7 @@ namespace DCI.PMS.Repository
 
                 if (!Directory.Exists(fileloc))
                     Directory.CreateDirectory(fileloc);
-                             
+
 
 
                 if (model.OtherAttachmentMilestone != null && model.OtherAttachmentMilestone.Any())
@@ -967,7 +968,7 @@ namespace DCI.PMS.Repository
 
                     _pmsdbContext.Deliverable.Entry(entity).State = EntityState.Modified;
                     await _pmsdbContext.SaveChangesAsync();
-             
+
                     await SaveFileDeliverable(model);
 
                     MilestoneViewModel miles = new MilestoneViewModel();
@@ -1153,7 +1154,7 @@ namespace DCI.PMS.Repository
                     return (StatusCodes.Status406NotAcceptable, "Invalid Attachment Id");
                 }
 
-                entity.IsActive = false;               
+                entity.IsActive = false;
                 _pmsdbContext.Attachment.Entry(entity).State = EntityState.Modified;
                 await _pmsdbContext.SaveChangesAsync();
                 return (StatusCodes.Status200OK, "Successfully deleted");
@@ -1209,8 +1210,43 @@ namespace DCI.PMS.Repository
                 DateCreated = DateTime.Now,
                 model.CreatedBy
             });
-
-
         }
+
+        public async Task<AttachmentViewModel> ViewFile(AttachmentViewModel model)
+        {
+            try
+            {
+                var entity = await _pmsdbContext.Attachment.FirstOrDefaultAsync(x => x.AttachmentId == model.AttachmentId && x.IsActive == true);
+
+
+                 var result = new AttachmentViewModel
+                 {
+                     AttachmentId = entity.AttachmentId,
+                     ProjectCreationId = entity.ProjectCreationId,
+                     MileStoneId = entity.MileStoneId,
+                     DeliverableId = entity.DeliverableId,
+                     AttachmentType = entity.AttachmentType,
+                     Filename = entity.Filename,
+                     FileLocation = entity.FileLocation,
+                     DateCreated = entity.DateCreated,
+                     CreatedBy = entity.CreatedBy,
+                     IsActive = entity.IsActive
+                 };
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());               
+            }
+            finally
+            {
+               
+                Log.CloseAndFlush();
+            }
+            return new AttachmentViewModel();
+           
+        }
+
     }
 }

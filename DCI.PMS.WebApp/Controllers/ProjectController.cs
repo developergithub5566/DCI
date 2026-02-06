@@ -683,5 +683,54 @@ namespace DCI.PMS.WebApp.Controllers
         }
 
 
+        public async Task<IActionResult> ViewFile(int id)
+        {
+           
+
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    if (currentUser == null)
+                        return RedirectToAction("Logout", "Account");
+                    // model.CreatedBy = currentUser.UserId;
+
+
+                    AttachmentViewModel model = new AttachmentViewModel();
+                    model.AttachmentId = id;
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/ViewFile");
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    var responseBody = await response.Content.ReadAsStringAsync();                   
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        AttachmentViewModel vm = JsonConvert.DeserializeObject<AttachmentViewModel>(responseBody)!;
+
+               
+
+                        var filePath = Path.Combine(vm.FileLocation, vm.Filename);
+
+                        byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
+
+                        return File(fileBytes, "application/pdf", enableRangeProcessing: true);
+    
+                    }
+                    return Json(new { success = false, message = responseBody });
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
     }
 }

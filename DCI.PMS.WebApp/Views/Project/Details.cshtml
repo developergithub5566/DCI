@@ -1,4 +1,4 @@
-﻿@model DCI.PMS.Models.ViewModel.ProjectViewModel
+﻿@model DCI.PMS.Models.ViewModel.ProjectViewModel 
 @using Newtonsoft.Json;
 @using DCI.Core.Common;
 @using DCI.Models.ViewModel;
@@ -22,7 +22,7 @@
             <li><a href="~/Project/Index">Project</a></li>
             <li><a href="~/Project/CreateEdit">Overview</a></li>
 
-        </ul>
+                                                 </ul>
     </div>
 
     <div class="card shadow mb-4">
@@ -33,7 +33,7 @@
                     <div class="card shadow-sm mb-4">
                         <div class="card-body">
 
-                            <h3 class="fw-bold mb-1">Project Management System</h3>
+                            <h3 class="fw-bold mb-1">@Model.ProjectName</h3>
                             <div class="text-muted mb-3">@Model.ClientName</div>
 
                             <div class="row small">
@@ -52,15 +52,15 @@
                           <hr>
                             <!-- PROJECT ATTACHMENTS -->
                             <div class="mb-4">
-                             <strong>Project Attachments</strong>
+                             <strong> Supporting Documents</strong>
                                 <ul class="list-unstyled small mb-0">
                          
                                     @foreach(var attach in Model.AttachmentList.Where(x => x.MileStoneId == 0 && x.DeliverableId == 0))
                                     {
                                      <li>
                                             <i class="fa-solid fa-paperclip me-1"></i>
-                                            <a href="#" class="text-decoration-none">
-                                                attach.Filename.pdf
+                                    <a href="/Project/ViewFile/@attach.AttachmentId" class="text-decoration-none" target="_blank">
+                                                @attach.Filename
                                             </a>
                                     </li>
                             }
@@ -107,8 +107,8 @@
                                     {
                                         <li>
                                             <i class="fa-solid fa-paperclip me-1"></i>
-                                            <a href="#" class="text-decoration-none">
-                                              @m.Filename
+                                            <a href="/Project/ViewFile/@m.AttachmentId" class="text-decoration-none" target="_blank">
+                                                @m.Filename
                                             </a>
                                         </li>
                                     }
@@ -131,7 +131,10 @@
                                             {
                                                 <li>
                                                     <i class="fa-solid fa-paperclip me-1"></i>
-                                                    <a href="#">@dd.Filename </a>
+                                                   @*  <a href="#">@dd.Filename </a> *@
+                                                    <a href="/Project/ViewFile/@dd.AttachmentId" class="text-decoration-none" target="_blank">
+                                                        @dd.Filename
+                                                    </a>
                                                 </li>
                                             }
 
@@ -149,8 +152,9 @@
 
                     <!-- ACTIONS -->
                     <div class="text-end mt-4">
-                        <button class="btn btn-outline-secondary">Edit</button>
-                     
+                       @*  <button class="btn btn-outline-secondary" >Edit</button> *@
+                <a asp-controller="Project" asp-action="CreateEdit" asp-route-id="@Model.ProjectCreationId" class="btn btn-info"><i class="fa fa-edit"></i>Edit</a>
+               
                     </div>
 
                 </div>
