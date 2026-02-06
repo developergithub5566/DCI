@@ -1,0 +1,296 @@
+﻿@model IEnumerable<DCI.PMS.Models.ViewModel.TrackerViewModel>
+@using Newtonsoft.Json;
+@using DCI.Core.Common;
+@using DCI.Models.ViewModel;
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Task Tracker with Project Details</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+  
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f4f6f8;
+    }
+
+    /* Top Bar */
+    .top-bar {
+        background: #ffffff;
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .app-title {
+        font-weight: bold;
+        font-size: 18px;
+        color: #333;
+    }
+
+    .actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn {
+        border: none;
+        padding: 8px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: #e9ecef;
+        color: #333;
+    }
+
+    .btn-primary {
+        background: #1a73e8;
+        color: #fff;
+    }
+
+    .btn:hover {
+        opacity: 0.9;
+    }
+
+    /* Main content */
+    .container {
+        padding: 20px;
+        overflow-x: auto;
+    }
+
+    .tracker {
+        display: flex;
+        gap: 20px;
+        min-width: 900px; /* force horizontal scroll if container smaller */
+    }
+
+    .column {
+        background: #fff;
+        border-radius: 8px;
+        padding: 10px;
+        flex: 1;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        display: flex;
+        flex-direction: column;
+        max-height: 600px; /* adjust as needed */
+    }
+
+    .column h4 {
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+        flex-shrink: 0;
+    }
+
+    /* Scrollable list */
+    .task-list {
+        overflow-y: auto;
+        margin-top: 10px;
+        padding-right: 5px; /* for scrollbar spacing */
+        flex-grow: 1;
+    }
+
+    .task, .project-detail {
+        background: #f9fafb;
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+    }
+
+    .menu-btn {
+        cursor: pointer;
+        color: #6c757d;
+        padding: 6px;
+    }
+
+    .menu {
+        position: absolute;
+        top: 35px;
+        right: 10px;
+        background: #fff;
+        border-radius: 6px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        width: 150px;
+        display: none;
+        z-index: 10;
+    }
+
+    .menu a {
+        display: block;
+        padding: 8px 12px;
+        font-size: 13px;
+        text-decoration: none;
+        color: #333;
+    }
+
+    .menu a:hover {
+        background: #f1f1f1;
+    }
+
+    .divider {
+        height: 1px;
+        background: #eee;
+        margin: 4px 0;
+    }
+
+    /* Status colors */
+    .not-started h4 { color: #dc3545; }
+    .in-progress h4 { color: #f4b400; }
+    .completed h4 { color: #0f9d58; }
+
+    .completed .task {
+        color: #6c757d;
+        background: #eef1f4;
+    }
+
+    /* Project details styling */
+    .project-detail {
+        font-size: 13px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .project-detail span {
+        margin-bottom: 4px;
+    }
+</style>
+</head>
+
+<body>
+
+    <!-- Top Navigation -->
+    <div class="top-bar">
+        <div class="app-title">📋 Task Tracker</div>
+
+        <div class="actions">
+            <button class="btn btn-primary" onclick="newTask()">
+                <i class="fas fa-plus"></i> New Task
+            </button>
+            <button class="btn" onclick="showTracker()">
+                <i class="fas fa-list"></i> Tracker
+            </button>
+            <button class="btn" onclick="showCalendar()">
+                <i class="fas fa-calendar"></i> Calendar
+            </button>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="container">
+
+        <div class="tracker">               
+
+            <!-- Not Started -->
+            <div class="column not-started">
+                <h4>Not Started</h4>
+                <div class="task-list">
+                    @foreach (var x in Model.Where(x => x.Status == 1))
+                    {
+                        <div class="task">
+                            @x.MilestoneName
+                            <i class="fas fa-ellipsis-v menu-btn"></i>
+                            <div class="menu">
+                                <a href="#">Move to In Progress</a>
+                                <a href="#">Mark Completed</a>
+                                <div class="divider"></div>
+                                <a href="#">View Details</a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- In Progress -->
+            <div class="column in-progress">
+                <h4>In Progress</h4>
+                @foreach (var x in Model.Where(x => x.Status == 2))
+                {
+                    <div class="task">
+                        DBM SCMS - Draft & finalize Business Requirements Document (BRD) including AI Chatbot Requirements(2)
+                        <i class="fas fa-ellipsis-v menu-btn"></i>
+                        <div class="menu">
+                            <a href="#">Mark Completed</a>
+                            <div class="divider"></div>
+                            <a href="#">View Details</a>
+                        </div>
+                    </div>
+
+                }
+             
+           
+            </div>
+
+            <!-- Completed -->
+            <div class="column completed">
+                <h4>Completed</h4>
+                 @foreach (var x in Model.Where(x => x.Status == 3))
+                {
+                    <div class="task">
+                        DBM SCMS - Finalization of Timeline(1)
+                        <i class="fas fa-ellipsis-v menu-btn"></i>
+                        <div class="menu">
+                            <a href="#">View Details</a>
+                        </div>
+                    </div>
+                }
+
+            </div>
+
+            <!-- Project Details Column -->
+            <div class="column">
+                <h4>Details</h4>
+
+                <div class="project-detail">
+                    <span><strong>Project:</strong> Website Redesign</span>
+                    <span><strong>Client:</strong> DSHUD Doe</span>
+                    <span><strong>Status:</strong> In Progress</span>
+                    <span><strong>Project Duration:</strong> 4 months</span>
+                    <span><strong>NOA Date:</strong> Feb 23, 2026</span>
+                    <span><strong>NTP Date:</strong> Dec 1, 2025</span>
+                    <span><strong>MOA Date:</strong> Nov 29, 2025</span>
+                </div>
+
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.menu-btn').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                document.querySelectorAll('.menu').forEach(m => m.style.display = 'none');
+                this.nextElementSibling.style.display = 'block';
+            });
+        });
+
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.menu').forEach(m => m.style.display = 'none');
+        });
+
+        function newTask() { alert('Open New Task modal'); }
+        function showTracker() { alert('Tracker view'); }
+        function showCalendar() { alert('Calendar view'); }
+    </script>
+
+</body>
+</html>

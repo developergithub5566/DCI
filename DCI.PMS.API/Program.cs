@@ -30,6 +30,7 @@ builder.Services.AddScoped<IDbConnection>(sp => new SqlConnection(sp.GetRequired
 
 
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+builder.Services.AddScoped<ITrackerRepository, TrackerRepository>();
 
 //builder.Services.Configure<SMTPModel>(builder.Configuration.GetSection("SmtpSettings"));
 //builder.Services.AddSingleton<AuthenticationModel>();

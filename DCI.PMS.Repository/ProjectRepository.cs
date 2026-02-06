@@ -707,7 +707,7 @@ namespace DCI.PMS.Repository
                                   ModifiedBy = m.ModifiedBy,
                                   IsActive = m.IsActive,
                                   Remarks = m.Remarks,
-                                  AttachmentListId = attachmentIdList.Where(x => x.MileStoneId == m.MileStoneId).Select(x => x.AttachmentId).ToList(),
+                                  //AttachmentListId = attachmentIdList.Where(x => x.MileStoneId == m.MileStoneId).Select(x => x.AttachmentId).ToList(),
                                   AttachmentList = attachList.Where(x => x.MileStoneId == m.MileStoneId).ToList()
                               }).ToList();
 
