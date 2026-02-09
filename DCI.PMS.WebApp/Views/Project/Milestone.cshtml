@@ -43,14 +43,14 @@
                             <div class="row">
                                 <label for="MilestoneName" class="col-sm-2 col-form-label">Milestone</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control" id="MilestoneName" name="MilestoneName" placeholder="Milestone">
-                                  
+                                    <input type="text" class="form-control" id="MilestoneName" name="MilestoneName" placeholder="Milestone" value="@Model.Milestone.MilestoneName">
+
                                 </div>
                             </div>
                             <div class="row">
                                 <label for="Percentage" class="col-sm-2 col-form-label">Percentage</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control" id="Percentage" name="Percentage" placeholder="Percentage">
+                                    <input type="text" class="form-control" id="Percentage" name="Percentage" placeholder="Percentage" value="@Model.Milestone.Percentage">
                                 </div>
                             </div>
 
@@ -83,8 +83,8 @@
                             <div class="row">
                                 <label for="inputEmail3" class="col-sm-2 col-form-label">Payment Status</label>
                                 <div class="col-sm-8">
-                                  @*   <input type="text" class="form-control" id="PaymentStatus" name="PaymentStatus" placeholder="Payment Status"> *@
-                                    @Html.DropDownListFor(m => m.PaymentStatus, new SelectList(Model.StatusList, "StatusId", "StatusName"), "Select", new { @class = "form-control frmField", required = "required", id = "PaymentStatus"}) 
+                                    @*   <input type="text" class="form-control" id="PaymentStatus" name="PaymentStatus" placeholder="Payment Status"> *@
+                                    @Html.DropDownListFor(m => m.PaymentStatus, new SelectList(Model.StatusList, "StatusId", "StatusName"), "Select", new { @class = "form-control frmField", required = "required", id = "PaymentStatus" })
                                 </div>
                             </div>
 
@@ -92,13 +92,14 @@
                                 <label for="inputEmail3" class="col-sm-2 col-form-label">Milestone Status</label>
                                 <div class="col-sm-8">
                                     @* <input type="text" class="form-control" id="Status" name="Status" placeholder="Milestone Status"> *@
-                                    @Html.DropDownListFor(m => m.Status, new SelectList(Model.StatusList, "StatusId", "StatusName"), "Select", new { @class = "form-control frmField", required = "required", id = "Status" }) 
+                                    @Html.DropDownListFor(m => m.Status, new SelectList(Model.StatusList, "StatusId", "StatusName"), "Select", new { @class = "form-control frmField", required = "required", id = "Status" })
                                 </div>
                             </div>
                             <div class="row">
                                 <label for="remarks" class="col-sm-2 col-form-label">Remarks</label>
                                 <div class="col-sm-8">
-                                    <textarea type="text" rows="2" class="form-control" id="Remarks" name="Remarks" value=""> </textarea>
+                                    <textarea type="text" rows="2" class="form-control" id="Remarks" name="Remarks"> @Model.Milestone.Remarks</textarea>
+                                    
                                 </div>
                             </div>
                             <div class="row">
@@ -107,19 +108,19 @@
                                     <input type="file" id="OtherAttachmentMilestone" name="OtherAttachmentMilestone" class="form-control" accept="application/pdf" multiple onchange="">
                                 </div>
                             </div>
-                       
-                      @*       <div class="row">
+
+                            @*       <div class="row">
                                 <label for="inputEmail3" class="col-sm-2 col-form-label"></label>
                                     <div id="attachmentContainer" class="attachment-icons"></div>                             
                             </div> *@
-                            
+
                             <div class="row">
                                 <label for="inputEmail3" class="col-sm-2 col-form-label"></label>
                                 <div class="col-sm-8">
                                     <table class="table table-borderless" style="font-size:small">
                                         <thead>
                                             <tr>
-                                               
+
                                                 <th>
                                                     <label>File Name</label>
                                                 </th>
@@ -135,6 +136,32 @@
                                             </tr>
                                         </thead>
                                         <tbody id="tblAttachment">
+                                            @if (Model.Milestone.AttachmentList?.Any() == true)
+                                            {
+                                                foreach (var x in Model.Milestone.AttachmentList)
+                                                {
+                                                    <tr>
+                                                        <td>@x.Filename</td>
+                                                        <td>@x.DateCreated.ToString("MM/dd/yyyy")</td>
+                                                        <td>@x.CreatedName</td>
+                                                        <td class="text-center">
+                                                            <a href="@Url.Action("Download", "Attachment", new { id = x.AttachmentId })"
+                                                               class="btn btn-primary"
+                                                               title="Download">
+                                                                <i class="fa fa-download"></i>
+                                                            </a>
+
+                                                            <a href="javascript:void(0)"
+                                                               class="btn btn-danger"
+                                                               title="Delete"
+                                                               onclick="removeAttachment(@x.AttachmentId, 0)">
+                                                                <i class="far fa-trash-alt"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                              
+                                            }
                                         </tbody>
                                     </table>
                                 </div>
@@ -155,7 +182,8 @@
 
                 </div>
             </form>
-            <div class="table-responsive mt20">
+            <div id="milestoneList">
+                <div class="table-responsive mt20">
                 <table class="table table-bordered" id="tblDTR">
                     <thead>
                         <tr>
@@ -185,50 +213,52 @@
                         </tr>
                     </thead>
                     <tbody>
-
-                        @foreach (var x in Model.MilestoneList)
+                        @if (Model.MilestoneList?.Any() == true)
                         {
-                            <tr>
-                                <td>@x.MilestoneName</td>
-                                <td>@x.Percentage</td>
-                                <td>@x.TargetCompletedDate.Value.ToString("MM/dd/yyyy") </td>
-                                <td>@x.ActualCompletionDate.Value.ToString("MM/dd/yyyy") </td>
+                            @foreach (var x in Model.MilestoneList)
+                            {
+                                <tr>
+                                    <td>@x.MilestoneName</td>
+                                    <td>@x.Percentage</td>
+                                    <td>@x.TargetCompletedDate.Value.ToString("MM/dd/yyyy") </td>
+                                    <td>@x.ActualCompletionDate.Value.ToString("MM/dd/yyyy") </td>
 
-                                <td>@x.PaymentStatusName</td>
-                                <td>@x.StatusName</td>
-                                <td class="text-center">
-                                 @*    <a href="javascript:void(0)" title="EDIT">EDIT</a> | *@
-                                    <a asp-controller="Project" asp-action="Deliverables" asp-route-MileStoneId="@x.MileStoneId" class="btn btn-primary" title="View">
-                                        <i class="fas fa-search"></i>
-                                    </a>
-                                    <a href="javascript:void(0)" onclick='editForm({
-                                                                            projectCreationId:"@x.ProjectCreationId",
-                                                                            mileStoneId : "@x.MileStoneId",
-                                                                            milestoneName:"@x.MilestoneName",
-                                                                            percentage:"@x.Percentage",
-                                                                            targetCompletedDate :"@x.TargetCompletedDateString" ,
-                                                                            actualCompletionDate : "@x.ActualCompletionDateString",
-                                                                            paymentStatus:"@x.PaymentStatus",
-                                                                            status : "@x.Status",
-                                                                            remarks : "@x.Remarks",
-                                            attachmentList: @Html.Raw(Json.Serialize(x.AttachmentListId)),
-                                                            attachList: @Html.Raw(Json.Serialize(x.AttachmentList))
+                                    <td>@x.PaymentStatusName</td>
+                                    <td>@x.StatusName</td>
+                                    <td class="text-center">
+                                        @*    <a href="javascript:void(0)" title="EDIT">EDIT</a> | *@
+                                        <a asp-controller="Project" asp-action="Deliverables" asp-route-MileStoneId="@x.MileStoneId" class="btn btn-primary" title="View">
+                                            <i class="fas fa-search"></i>
+                                        </a>
+                                        <a href="javascript:void(0)" onclick='editForm({
+                                                                                    projectCreationId:"@x.ProjectCreationId",
+                                                                                    mileStoneId : "@x.MileStoneId",
+                                                                                    milestoneName:"@x.MilestoneName",
+                                                                                    percentage:"@x.Percentage",
+                                                                                    targetCompletedDate :"@x.TargetCompletedDateString" ,
+                                                                                    actualCompletionDate : "@x.ActualCompletionDateString",
+                                                                                    paymentStatus:"@x.PaymentStatus",
+                                                                                    status : "@x.Status",
+                                                                                    remarks : "@x.Remarks",
+                                                    attachmentList: @Html.Raw(Json.Serialize(x.AttachmentListId)),
+                                                                    attachList: @Html.Raw(Json.Serialize(x.AttachmentList))
 
-                                                                                    })' title="Edit" class="btn btn-info"><i class="fas fa-edit"></i></a>
+                                                                                            })' title="Edit" class="btn btn-info"><i class="fas fa-edit"></i></a>
 
-                                    <a href="javascript:void(0)" title="Delete" class="btn btn-danger" id="deleteform"  onclick="deleteform(@x.MileStoneId)"><i class="fas fa-trash"></i></a>
+                                        <a href="javascript:void(0)" title="Delete" class="btn btn-danger" id="deleteform" onclick="deleteform(@x.MileStoneId)"><i class="fas fa-trash"></i></a>
 
-                                    <a asp-controller="Project" asp-action="Deliverables" asp-route-MileStoneId="@x.MileStoneId" class="btn btn-secondary" title="Deliverables">
-                                        <i class="fas fa-truck"></i>
+                                        <a asp-controller="Project" asp-action="Deliverables" asp-route-MileStoneId="@x.MileStoneId" class="btn btn-secondary" title="Deliverables">
+                                            <i class="fas fa-truck"></i>
                                         </a>
                                     </td>
                                 </tr>
-                            }                
+                            }
+                        }
                     </tbody>
                 </table>
             </div>
 
-
+            </div>@*  end milestone list *@
         </div>
     </div>
 </div>
@@ -330,13 +360,13 @@
 
                     flatpickr("#ActualCompletionDate", {
                                           dateFormat: "m/d/Y",
-                                         defaultDate: new Date(),
+                                          defaultDate: "@Model.Milestone.ActualCompletionDate?.ToString("M/d/yyyy")",
                                     });
 
 
                          flatpickr("#TargetCompletedDate", {
                                       dateFormat: "m/d/Y",
-                                       defaultDate: new Date(),
+                                          defaultDate: "@Model.Milestone.TargetCompletedDate?.ToString("M/d/yyyy")",
                                     });
 
 
@@ -344,9 +374,9 @@
 
 
             function editForm(dataMile){
-            
+
                 console.log(dataMile);
-                               
+
                                   $('#ProjectCreationId').val(dataMile.projectCreationId);
                                 $('#MileStoneId').val(dataMile.mileStoneId);
                                $('#MilestoneName').val(dataMile.milestoneName);
@@ -364,7 +394,7 @@
                                     // container.innerHTML = "<small>No attachments</small>";
                                     // return;
                                     //          }
-                                                   
+
                                     //           dataMile.attachmentList.forEach(att => {
                                     //                console.log(att);
                                     //             const html = `
@@ -387,8 +417,8 @@
                                                     tbodyAttachment.empty();
                                                     if (dataMile.attachList.length > 0) {
                                                           $.each(dataMile.attachList, function(index, item) {
-                                                                            var row = `<tr> 
-                                                                           
+                                                                            var row = `<tr>
+
                                                                                     <td>${item.filename}</td>
                                                                                     <td>${item.dateCreated}</td>
                                                                                     <td>${item.createdName}</td>
@@ -471,7 +501,7 @@
                                                             confirmButtonText: "Ok"
                                                         }).then((result) => {
                                                             location.reload();
-                                                                                                                               
+
                                                         });
                                                     } else {
                                                         Swal.fire({

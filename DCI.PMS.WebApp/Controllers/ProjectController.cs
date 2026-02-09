@@ -288,14 +288,14 @@ namespace DCI.PMS.WebApp.Controllers
             return Json(new { success = false, message = "An error occurred. Please try again." });
         }
 
-        public async Task<IActionResult> Milestone(int id)
+        public async Task<IActionResult> Milestone(int id,int? mileid)
         {
             try
             {
 
                 ProjectViewModel model = new ProjectViewModel();
                 model.ProjectCreationId = id;
-
+                model.MilestoneId = mileid ?? 0;
                 using (var _httpclient = new HttpClient())
                 {
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
@@ -307,7 +307,7 @@ namespace DCI.PMS.WebApp.Controllers
 
                     if (response.IsSuccessStatusCode)
                     {
-                        return View(model);
+                         return View(model);
                     }
                     //return View(model);
                 }
@@ -395,7 +395,8 @@ namespace DCI.PMS.WebApp.Controllers
                     //var response = await _httpclient.SendAsync(request);
                     //var responseBody = await response.Content.ReadAsStringAsync();
 
-                    return RedirectToAction("Milestone", new { projectCreationId = model.ProjectCreationId });
+                    //return RedirectToAction("Milestone", new { projectCreationId = model.ProjectCreationId });
+                    return RedirectToAction("Milestone", new { id = model.ProjectCreationId , mileid = model.MileStoneId > 0 ? model.MileStoneId : (int?)null });
                 }
 
             }

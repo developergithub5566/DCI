@@ -57,5 +57,7 @@ namespace DCI.PMS.Models.ViewModel
         public int MOAFileId { get; set; } = 0;
 
         public List<IFormFile> OtherAttachment { get; set; } = new();
+
+        public int MilestoneId { get; set; } = 0;
     }
 }

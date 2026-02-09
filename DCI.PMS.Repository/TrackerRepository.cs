@@ -129,10 +129,12 @@ namespace DCI.PMS.Repository
                              {
                                  MileStoneId = m.MileStoneId,
                                  ProjectCreationId = p.ProjectCreationId,
+                                 ProjectName = p.ProjectName,
+                                 ProjectNo = p.ProjectNo,
                                  MilestoneName = m.MilestoneName,
                                  Percentage = m.Percentage,
-                                 TargetCompletedDate = m.TargetCompletedDate,
-                                 ActualCompletionDate = m.ActualCompletionDate,
+                                 TargetCompletedDate = m.TargetCompletedDate?.ToString("MMM dd yyyy"),
+                                 ActualCompletionDate = m.ActualCompletionDate?.ToString("MMM dd yyyy"),
                                  PaymentStatus = m.PaymentStatus,
                                  PaymentStatusName = m.PaymentStatusName,
                                  Status = m.Status,
@@ -141,10 +143,14 @@ namespace DCI.PMS.Repository
                                  MilestoneOwnerName = u.Fullname,
                                  DateModified = m.DateModified,
                                  ModifiedBy = m.ModifiedBy,
-                                 IsActive = p.IsActive,                               
-                                 StatusName = s.StatusName,
+                                 IsActive = p.IsActive,
+                                 MilestoneStatusName = s.StatusName,
                                  ProjectOwnerId = p.CreatedBy,
                                  ProjectOwnerName = u.Fullname,
+                                 ProjectDuration = p.ProjectDuration,
+                                 NOADateString = p.NOADate.ToString("MMM dd yyyy"),
+                                 NTPDateString = p.NTPDate.ToString("MMM dd yyyy"),
+                                 MOADateString = p.MOADate.ToString("MMM dd yyyy")
                              };
 
                 return result.ToList();

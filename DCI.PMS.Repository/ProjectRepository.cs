@@ -652,7 +652,7 @@ namespace DCI.PMS.Repository
                                         .AsNoTracking()
                                         .Where(p => p.IsActive).ToList();
 
-                var attachmentIdList = await _pmsdbContext.Attachment.Where(x => x.IsActive).ToListAsync();
+             //   var attachmentIdList = await _pmsdbContext.Attachment.Where(x => x.IsActive).ToListAsync();
 
 
 
@@ -714,6 +714,49 @@ namespace DCI.PMS.Repository
                 model.MilestoneList = result;
                 model.StatusList = statusList;
 
+                if(model.MilestoneId > 0)
+                {
+                    model.Milestone =
+                                        (
+                                            from m in milestone
+                                            join u in users on m.CreatedBy equals u.UserId
+                                            join s in _pmsdbContext.Status.AsNoTracking() on m.Status equals s.StatusId
+                                            join paystat in _pmsdbContext.Status.AsNoTracking() on m.PaymentStatus equals paystat.StatusId into ps
+                                            from paystat in ps.DefaultIfEmpty()
+                                            where m.MileStoneId == model.MilestoneId
+                                            select new MilestoneViewModel
+                                            {
+                                                MileStoneId = m.MileStoneId,
+                                                ProjectCreationId = m.ProjectCreationId,
+                                                MilestoneName = m.MilestoneName,
+                                                Percentage = m.Percentage,
+                                                TargetCompletedDate = m.TargetCompletedDate,
+                                                ActualCompletionDate = m.ActualCompletionDate,
+                                                TargetCompletedDateString = m.TargetCompletedDate.HasValue
+                                                    ? m.TargetCompletedDate.Value.ToString("MM/dd/yyyy")
+                                                    : "",
+                                                ActualCompletionDateString = m.ActualCompletionDate.HasValue
+                                                    ? m.ActualCompletionDate.Value.ToString("MM/dd/yyyy")
+                                                    : "",
+                                                Status = m.Status,
+                                                StatusName = s.StatusName,
+                                                PaymentStatus = m.PaymentStatus,
+                                                PaymentStatusName = paystat != null ? paystat.StatusName : "",
+                                                DateCreated = m.DateCreated,
+                                                CreatedBy = m.CreatedBy,
+                                                DateModified = m.DateModified,
+                                                ModifiedBy = m.ModifiedBy,
+                                                IsActive = m.IsActive,
+                                                Remarks = m.Remarks,
+                                                AttachmentList = attachList
+                                                    .Where(x => x.MileStoneId == m.MileStoneId)
+                                                    .ToList()
+                                            }
+                                        ).FirstOrDefault();
+
+                    model.PaymentStatus = model.Milestone.PaymentStatus;
+                    model.Status = model.Milestone.Status;
+                }      
                 return model;
 
             }

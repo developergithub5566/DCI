@@ -106,13 +106,14 @@
 
     .task, .project-detail {
         background: #f9fafb;
-        padding: 10px;
+        padding: 7px;
         border-radius: 6px;
-        margin-bottom: 10px;
+        margin-bottom: 8px; 
         display: flex;
         justify-content: space-between;
         align-items: center;
         position: relative;
+        color: #000000;
     }
 
     .menu-btn {
@@ -170,7 +171,18 @@
 
     .project-detail span {
         margin-bottom: 4px;
+
     }
+    .details-card {
+    position: relative;
+}
+
+.details-header {
+/*     display: flex; */
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
 </style>
 </head>
 
@@ -178,15 +190,15 @@
 
     <!-- Top Navigation -->
     <div class="top-bar">
-        <div class="app-title">📋 Task Tracker</div>
+        <div class="app-title"><i class="fa fa-th-list" aria-hidden="true"></i> Task Tracker</div>
 
         <div class="actions">
             <button class="btn btn-primary" onclick="newTask()">
                 <i class="fas fa-plus"></i> New Task
             </button>
-            <button class="btn" onclick="showTracker()">
+         @*    <button class="btn" onclick="showTracker()">
                 <i class="fas fa-list"></i> Tracker
-            </button>
+            </button> *@
             <button class="btn" onclick="showCalendar()">
                 <i class="fas fa-calendar"></i> Calendar
             </button>
@@ -204,14 +216,25 @@
                 <div class="task-list">
                     @foreach (var x in Model.Where(x => x.Status == 1))
                     {
-                        <div class="task">
+                   @*      <a href="#" class="task" onclick='details(@Html.Raw(JsonConvert.SerializeObject(x)))'>
                             @x.MilestoneName
                             <i class="fas fa-ellipsis-v menu-btn"></i>
-                            <div class="menu">
-                                <a href="#">Move to In Progress</a>
-                                <a href="#">Mark Completed</a>
+                            <div class="menu">        
+                                <a asp-controller="Project" asp-action="Milestone" asp-route-id="@x.ProjectCreationId">Edit</a>
+                                <a href="#">Delete</a>
                                 <div class="divider"></div>
                                 <a href="#">View Details</a>
+                            </div>
+                        </a> *@
+                        <div class="task">
+                            <a href="#" class="task" onclick='details(@Html.Raw(JsonConvert.SerializeObject(x)))'> <strong>@x.MilestoneName</strong> </a>
+                            <i class="fas fa-ellipsis-v menu-btn"></i>
+                            <div class="menu">
+                                <a asp-controller="Project" asp-action="Milestone" asp-route-id="@x.ProjectCreationId" asp-route-mileid="@x.MileStoneId">Edit</a>
+                            @*     <a href="#">Delete</a> *@
+                          @*       <div class="divider"></div> *@
+                              @*   <a href="#">View Details</a> *@
+                                <a asp-controller="Project" asp-action="Details" asp-route-id="@x.ProjectCreationId">View Details</a>
                             </div>
                         </div>
                     }
@@ -221,56 +244,75 @@
             <!-- In Progress -->
             <div class="column in-progress">
                 <h4>In Progress</h4>
-                @foreach (var x in Model.Where(x => x.Status == 2))
-                {
-                    <div class="task">
-                        DBM SCMS - Draft & finalize Business Requirements Document (BRD) including AI Chatbot Requirements(2)
-                        <i class="fas fa-ellipsis-v menu-btn"></i>
-                        <div class="menu">
-                            <a href="#">Mark Completed</a>
-                            <div class="divider"></div>
-                            <a href="#">View Details</a>
-                        </div>
-                    </div>
+                <div class="task-list">
+                    @foreach (var x in Model.Where(x => x.Status == 2))
+{
+                        <div class="task">
 
-                }
-             
+                            <a href="#" class="task" onclick='details(@Html.Raw(JsonConvert.SerializeObject(x)))'> <strong>@x.MilestoneName</strong> </a>
+                          
+                            <i class="fas fa-ellipsis-v menu-btn"></i>
+                            <div class="menu">
+                                <a asp-controller="Project" asp-action="Milestone" asp-route-id="@x.ProjectCreationId" asp-route-mileid="@x.MileStoneId">Edit</a>
+                      
+                            @*     <a href="#">Delete</a> *@
+                            @*     <div class="divider"></div> *@
+                                <a asp-controller="Project" asp-action="Details" asp-route-id="@x.ProjectCreationId">View Details</a>
+                            </div>
+                        </div>
+
+                    }
+                </div>
            
             </div>
 
             <!-- Completed -->
             <div class="column completed">
                 <h4>Completed</h4>
+                <div class="task-list">
                  @foreach (var x in Model.Where(x => x.Status == 3))
                 {
-                    <div class="task">
-                        DBM SCMS - Finalization of Timeline(1)
+                           <div class="task">
+                            <a href="#" class="task" onclick='details(@Html.Raw(JsonConvert.SerializeObject(x)))'> <strong>@x.MilestoneName</strong> </a>
+                      
                         <i class="fas fa-ellipsis-v menu-btn"></i>
                         <div class="menu">
-                            <a href="#">View Details</a>
+                                <a asp-controller="Project" asp-action="Details" asp-route-id="@x.ProjectCreationId">View Details</a>
                         </div>
-                    </div>
+                        </div>
                 }
-
+                </div>
             </div>
 
             <!-- Project Details Column -->
-            <div class="column">
-                <h4>Details</h4>
+       <div class="column details-card">
+                <div class="details-header">
+                    <h4>Tracker Detail</h4>
+                    <button type="button"
+                            class="btn btn-sm btn-outline-primary" 
+                            id="btnEditMilestone"
+                            onclick="editMilestone()"
+                            hidden>
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
 
-                <div class="project-detail">
-                    <span><strong>Project:</strong> Website Redesign</span>
-                    <span><strong>Client:</strong> DSHUD Doe</span>
-                    <span><strong>Status:</strong> In Progress</span>
-                    <span><strong>Project Duration:</strong> 4 months</span>
-                    <span><strong>NOA Date:</strong> Feb 23, 2026</span>
-                    <span><strong>NTP Date:</strong> Dec 1, 2025</span>
-                    <span><strong>MOA Date:</strong> Nov 29, 2025</span>
                 </div>
 
-
-            </div>
-
+                <div class="project-detail">
+                    <input type="hidden" id="ProjectCreationId" />
+                    <input type="hidden" id="MileStoneId" />
+                    <span><strong>Milestone:</strong> <label id="MilestoneName"></label></span>
+                    <span><strong>Project:</strong> <label id="ProjectName"></label></span>
+                    <span><strong>Owner:</strong> <label id="MilestoneOwnerName"></label></span>
+                    <span><strong>Status:</strong> <label id="MilestoneStatusName"></label></span>
+                    <span><strong>Target Completed:</strong> <label id="TargetCompletedDate"></label></span>
+                    <span><strong>Actual Completion:</strong> <label id="ActualCompletionDate"></label></span>
+                    <span><strong>Payment Status:</strong> <label id="PaymentStatusName"></label></span>
+                    <span><strong>Percentage:</strong> <label id="Percentage"></label>%</span>
+                </div>
+          </div>
+            
+    
         </div>
     </div>
 
@@ -289,7 +331,48 @@
 
         function newTask() { alert('Open New Task modal'); }
         function showTracker() { alert('Tracker view'); }
-        function showCalendar() { alert('Calendar view'); }
+        function showCalendar() { alert('Coming Soon'); }
+
+        function details(x){
+            console.log(x)
+             $('#ProjectCreationId').text(x.ProjectCreationId);
+             $('#MileStoneId').text(x.MileStoneId);
+               $('#MilestoneName').text(x.MilestoneName);
+               $('#ProjectName').text(x.ProjectName);
+                 $('#MilestoneOwnerName').text(x.MilestoneOwnerName);
+                   $('#MilestoneStatusName').text(x.MilestoneStatusName);
+                  $('#TargetCompletedDate').text(x.TargetCompletedDate);
+                   $('#ActualCompletionDate').text(x.ActualCompletionDate); 
+                          $('#TargetCompletedDate').text(x.TargetCompletedDate);
+                   $('#PaymentStatusName').text(x.PaymentStatusName);
+                    $('#Percentage').text(x.Percentage);       
+                    
+                    // const id = x.ProjectCreationId;
+                    // alert(id)
+                    if(x.ProjectCreationId >0){
+                           $('#btnEditMilestone').show();
+                    }else{
+                           $('#btnEditMilestone').hide();
+                    }
+        }
+
+                function editMilestone() {
+            const projectId = $('#ProjectCreationId').text().trim();
+            const mileid = $('#MileStoneId').text().trim();
+
+            if (!projectId) {
+                console.error('ProjectCreationId is missing');
+                return;
+            }
+
+            let url = `/Project/Milestone/${projectId}`;
+
+            if (mileid && mileid !== '0') {
+                url += `?mileid=${mileid}`;
+            }
+
+            window.location.href = url;
+        }
     </script>
 
 </body>

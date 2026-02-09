@@ -7,17 +7,19 @@ namespace DCI.PMS.Models.ViewModel
         public int MileStoneId { get; set; } = 0;
 
         public int ProjectCreationId { get; set; } = 0;
+        public string? ProjectNo { get; set; } = string.Empty;
 
+        public string ProjectName { get; set; } = string.Empty;
         public string MilestoneName { get; set; } = string.Empty;
 
         public double Percentage { get; set; } = 0;
 
-        public DateTime? TargetCompletedDate { get; set; } = DateTime.Now;
-        public DateTime? ActualCompletionDate { get; set; } = DateTime.Now;
+        public string? TargetCompletedDate { get; set; } = string.Empty;
+        public string? ActualCompletionDate { get; set; } = string.Empty;
 
         public int PaymentStatus { get; set; } = 0;
         public int Status { get; set; } = 0;
-        public string? StatusName { get; set; } = string.Empty;
+        public string? MilestoneStatusName { get; set; } = string.Empty;
         public string? PaymentStatusName { get; set; } = string.Empty;
 
         public DateTime DateCreated { get; set; } = DateTime.Now;
@@ -42,5 +44,9 @@ namespace DCI.PMS.Models.ViewModel
         public int MilestoneOwnerId { get; set; } = 0;
 
         public string MilestoneOwnerName { get; set; } = string.Empty;
+        public int ProjectDuration { get; set; } = 0;
+        public string NOADateString { get; set; } = string.Empty;
+        public string NTPDateString { get; set; } = string.Empty;
+        public string MOADateString { get; set; } = string.Empty;
     }
 }
