@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Diagnostics.Contracts;
 
 namespace DCI.PMS.Models.ViewModel
@@ -59,5 +60,15 @@ namespace DCI.PMS.Models.ViewModel
         public List<IFormFile> OtherAttachment { get; set; } = new();
 
         public int MilestoneId { get; set; } = 0;
+
+      //  public UserSelectViewModel SelectedCoordinator = new();
+        public List<int>? SelectedCoordinator { get; set; } = new();
+        public List<SelectListItem>? UserList { get; set; } = new();
     }
+
+    //public class UserSelectViewModel
+    //{
+    //    public List<int>? SelectedUserIds { get; set; } = new();
+    //    public List<SelectListItem>? Users { get; set; } = new();
+    //}
 }

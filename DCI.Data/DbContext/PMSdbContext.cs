@@ -21,6 +21,7 @@ namespace DCI.Data
          public DbSet<Attachment> Attachment { get; set; }
         public DbSet<Client> Client { get; set; }
         public DbSet<Status> Status { get; set; }
+        public DbSet<Coordinator> Coordinator { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<AuditLog>().Property(ae => ae.Changes).HasConversion(

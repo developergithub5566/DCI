@@ -350,9 +350,9 @@
                     // const id = x.ProjectCreationId;
                     // alert(id)
                     if(x.ProjectCreationId >0){
-                           $('#btnEditMilestone').show();
+                        document.getElementById('btnEditMilestone').hidden = false;
                     }else{
-                           $('#btnEditMilestone').hide();
+                          document.getElementById('btnEditMilestone').hidden = true;
                     }
         }
 

@@ -266,6 +266,12 @@ namespace DCI.PMS.WebApp.Controllers
                         }
 
                     }
+
+                    foreach (var userId in model.SelectedCoordinator ?? new List<int>())
+                    {
+                        data.Add(new StringContent(userId.ToString()), "SelectedCoordinator");
+                    }
+
                     var response = await _httpclient.PostAsync(_apiconfig.Value.apiPMS + "api/Project/SaveProject", data);
                     var responseBody = await response.Content.ReadAsStringAsync();
 

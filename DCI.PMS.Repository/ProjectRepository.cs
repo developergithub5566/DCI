@@ -9,6 +9,7 @@ using DCI.PMS.Models.Entities;
 using DCI.PMS.Models.ViewModel;
 using DCI.PMS.Repository.Interface;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -19,6 +20,7 @@ using System.Data;
 using System.IO;
 using System.Net.Mail;
 using System.Net.Sockets;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace DCI.PMS.Repository
 {
@@ -181,6 +183,29 @@ namespace DCI.PMS.Repository
                                             u.Fullname
                                         })
                                         .ToListAsync();
+
+                var usersList = _dbContext.User
+                                .AsNoTracking()
+                                .Where(p => p.IsActive)
+                                .Select(u => new SelectListItem
+                                {
+                                    Value = u.UserId.ToString(),
+                                    Text = u.Fullname
+                                })
+                                .ToList();
+
+                var selectedUserIdList = _pmsdbContext.Coordinator
+                                .Where(pu => pu.ProjectCreationId == model.ProjectCreationId)
+                                .Select(pu => pu.UserId)
+                                .ToList();
+
+     
+                //var selectedList = new UserSelectViewModel
+                //{
+                //    Users = usersList,
+                //    SelectedUserIds = selectedUserIdList ?? new List<int>()
+                //};
+
 
                 var _clientList = await _pmsdbContext.Client
                                     .AsNoTracking()
@@ -379,6 +404,9 @@ namespace DCI.PMS.Repository
                 result.MilestoneList = milestone;
                 // result.DeliveryList = Deliverable;
 
+                result.UserList = usersList;
+                result.SelectedCoordinator = selectedUserIdList;
+
                 return result;
 
             }
@@ -405,24 +433,7 @@ namespace DCI.PMS.Repository
             {
                 if (model.ProjectCreationId == 0)
                 {
-                    //Project entity = new Project();
-                    //entity.ProjectCreationId = model.ProjectCreationId;
-                    //entity.ClientId = model.ClientId;
-                    //entity.ProjectNo =  await GenereteRequestNo();
-                    //entity.ProjectName = model.ProjectName;
-                    //entity.NOADate = model.NOADate;
-                    //entity.NTPDate = model.NTPDate;
-                    //entity.MOADate = model.MOADate;
-                    //entity.ProjectDuration = model.ProjectDuration;
-                    //entity.ProjectCost = model.ProjectCost;
-                    //entity.ModeOfPayment = model.ModeOfPayment;
-                    //entity.CreatedBy = model.CreatedBy;
-                    //entity.DateCreated = DateTime.Now;
-                    //entity.ModifiedBy = null;
-                    //entity.DateModified = null;
-                    //entity.IsActive = true;
-                    //await _pmsdbContext.Project.AddAsync(entity);
-                    //await _pmsdbContext.SaveChangesAsync();
+                    
                     await _pmsdbContext.Database.ExecuteSqlInterpolatedAsync($@"
                                 INSERT INTO dbo.Project
                                 (
@@ -458,29 +469,12 @@ namespace DCI.PMS.Repository
                                 )
                             ");
 
-                    await SaveFile(model);
-                    // return (StatusCodes.Status200OK, "Successfully saved");
+                    await SaveCoordinator(model);
+                    await SaveFile(model);                  
                 }
                 else
                 {
-                    //var entity = await _pmsdbContext.Project.FirstOrDefaultAsync(x => x.ProjectCreationId == model.ProjectCreationId);
-                    //entity.ProjectCreationId = model.ProjectCreationId;
-                    //entity.ClientId = model.ClientId;
-                    //entity.ProjectNo = model.ProjectNo;
-                    //entity.ProjectName = model.ProjectName;
-                    //entity.NOADate = model.NOADate;
-                    //entity.NTPDate = model.NTPDate;
-                    //entity.MOADate = model.MOADate;
-                    //entity.ProjectDuration = model.ProjectDuration;
-                    //entity.ProjectCost = model.ProjectCost;
-                    //entity.ModeOfPayment = model.ModeOfPayment;
-                    //entity.DateCreated = entity.DateCreated;
-                    //entity.CreatedBy = entity.CreatedBy;
-                    //entity.DateModified = DateTime.Now;
-                    //entity.ModifiedBy = model.ModifiedBy;
-                    //entity.IsActive = true;
-                    //_pmsdbContext.Project.Entry(entity).State = EntityState.Modified;
-                    //await _pmsdbContext.SaveChangesAsync();
+                  
 
                     await _pmsdbContext.Database.ExecuteSqlInterpolatedAsync($@"
                         UPDATE dbo.Project
@@ -498,16 +492,14 @@ namespace DCI.PMS.Repository
                         WHERE ProjectCreationId = {model.ProjectCreationId}
                     ");
 
-                    await SaveFile(model);
-                    //return (StatusCodes.Status200OK, "Successfully updated");
+                    await SaveCoordinator(model);
+                    await SaveFile(model);                 
                 }
-
 
             }
             catch (Exception ex)
             {
-                Log.Error(ex.ToString());
-                //return (StatusCodes.Status406NotAcceptable, ex.ToString());
+                Log.Error(ex.ToString());              
             }
             finally
             {
@@ -527,7 +519,7 @@ namespace DCI.PMS.Repository
 
                 if (model.NOAFile != null && model.NOAFile.Length > 0)
                 {
-                    string noa_filename = model.NOAFile.FileName;//Constants.Attachment_Type_NOA + DateTime.Now.ToString("yyyyMMddHHmmss") + Core.Common.Constants.Filetype_Pdf; //model.NOAFile.FileName;
+                    string noa_filename = model.NOAFile.FileName;
                     string noa_filenameLocation = Path.Combine(fileloc, noa_filename);
                     using (var stream = new FileStream(noa_filenameLocation, FileMode.Create, FileAccess.Write))
                     {
@@ -621,6 +613,161 @@ namespace DCI.PMS.Repository
             {
                 Log.CloseAndFlush();
             }
+        }
+
+        private async Task SaveCoordinator(ProjectViewModel model)
+        {
+            try
+            {
+                //var connStr = _connection.GetConnectionString("DCIConnectionPMS")
+                //  ?? throw new InvalidOperationException("Connection string not found.");
+
+
+
+                var sql = @"
+                                    INSERT INTO Coordinator (ProjectCreationId, MileStoneId, UserId, DateCreated, IsActive)
+                                    SELECT @ProjectCreationId, @MileStoneId, value, GETDATE(), 1
+                                    FROM STRING_SPLIT(@SelectedIds, ',')
+                                    WHERE NOT EXISTS (
+                                        SELECT 1 FROM Coordinator c
+                                        WHERE c.ProjectCreationId = @ProjectCreationId AND c.UserId = value
+                                    );
+
+                                    -- Reactivate
+                                    UPDATE c
+                                    SET IsActive = 1
+                                    FROM Coordinator c
+                                    JOIN STRING_SPLIT(@SelectedIds, ',') s
+                                        ON c.UserId = CAST(s.value AS INT)
+                                    WHERE c.ProjectCreationId = @ProjectCreationId AND c.IsActive = 0;
+
+                                    -- Deactivate unselected
+                                    UPDATE c
+                                    SET IsActive = 0
+                                    FROM Coordinator c
+                                    LEFT JOIN STRING_SPLIT(@SelectedIds, ',') s
+                                        ON c.UserId = CAST(s.value AS INT)
+                                    WHERE c.ProjectCreationId = @ProjectCreationId AND s.value IS NULL AND c.IsActive = 1;
+                                    ";
+
+                var selectedIds = string.Join(',', model.SelectedCoordinator ?? Enumerable.Empty<int>());
+
+                await _connection.ExecuteAsync(sql, new
+                {
+                    model.ProjectCreationId,
+                    model.MilestoneId,
+                    SelectedIds = selectedIds
+                });
+
+
+
+                //var sql = @"
+                //                    INSERT INTO Coordinator
+                //                    (
+                //                        ProjectCreationId,
+                //                        MileStoneId,
+                //                        UserId,
+                //                        DateCreated,
+                //                        IsActive
+                //                    )
+                //                    SELECT
+                //                        @ProjectCreationId,
+                //                        @MileStoneId,
+                //                        s.UserId,
+                //                        GETDATE(),
+                //                        1
+                //                    FROM @SelectedIds s
+                //                    LEFT JOIN Coordinator c
+                //                        ON c.ProjectCreationId = @ProjectCreationId
+                //                       AND c.UserId = s.UserId
+                //                    WHERE c.UserId IS NULL;
+
+                //                    -- 2️⃣ Reactivate
+                //                    UPDATE c
+                //                    SET
+                //                        c.IsActive = 1,
+                //                        c.DateModified = GETDATE()
+                //                    FROM Coordinator c
+                //                    JOIN @SelectedIds s
+                //                        ON s.UserId = c.UserId
+                //                    WHERE
+                //                        c.ProjectCreationId = @ProjectCreationId
+                //                        AND c.IsActive = 0;
+
+                //                    -- 3️⃣ Deactivate unselected
+                //                    UPDATE c
+                //                    SET
+                //                        c.IsActive = 0,
+                //                        c.DateModified = GETDATE()
+                //                    FROM Coordinator c
+                //                    LEFT JOIN @SelectedIds s
+                //                        ON s.UserId = c.UserId
+                //                    WHERE
+                //                        c.ProjectCreationId = @ProjectCreationId
+                //                        AND s.UserId IS NULL
+                //                        AND c.IsActive = 1;                            
+
+                //                    ";
+
+                //await _connection.ExecuteAsync(sql, new
+                //{
+                //    model.ProjectCreationId,
+                //    model.MileStoneId,
+                //    model.DeliverableId,
+                //    model.AttachmentType,
+                //    model.Filename,
+                //    model.FileLocation,
+                //    DateCreated = DateTime.Now,
+                //    model.CreatedBy
+                //});
+                //  await _connection.ExecuteAsync(sql, new { ProjectCreationId = model.ProjectCreationId, MileStoneId = model.MilestoneId, SelectedIds = model.SelectedCoordinator });
+
+                //var selectedIds = model.SelectedCoordinator?.ToHashSet() ?? new HashSet<int>();
+                //foreach (var userId in selectedIds)
+                //{
+                //    var existing = existingCoordinators.FirstOrDefault(x => x.UserId == userId);
+
+                //    if (existing == null)
+                //    {
+                //        // New coordinator
+                //        _pmsdbContext.Coordinator.Add(new Coordinator
+                //        {
+                //            ProjectCreationId = model.ProjectCreationId,
+                //            MileStoneId = model.MilestoneId,
+                //            UserId = userId,
+                //            DateCreated = DateTime.Now,
+                //            IsActive = true
+                //        });
+                //    }
+                //    else if (!existing.IsActive)
+                //    {
+                //        // Reactivate previously deactivated
+                //        existing.IsActive = true;
+                //        // existing.DateModified = DateTime.Now;
+                //    }
+                //}
+
+                //// 2️⃣ DEACTIVATE unselected
+                //foreach (var existing in existingCoordinators)
+                //{
+                //    if (!selectedIds.Contains(existing.UserId) && existing.IsActive)
+                //    {
+                //        existing.IsActive = false;
+                //        //existing.DateModified = DateTime.Now;
+                //    }
+                //}
+
+                //await _pmsdbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }           
+
         }
 
         public async Task<ProjectViewModel> GetMilestoneByProjectId(ProjectViewModel model)
