@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System.Security.Claims;
 using System.Text;
+using Serilog;
 
 namespace DCI.PMS.WebApp.Controllers
 {
@@ -112,6 +113,159 @@ namespace DCI.PMS.WebApp.Controllers
             {
                // Log.CloseAndFlush();
             }
+            return View();
+        }
+
+        public async Task<IActionResult> PasswordReset(string email)
+        {
+            PasswordResetViewModel model = new PasswordResetViewModel();
+            model.Email = email;
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiESS + "api/Account/PasswordReset");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = "Email sent successfully." });
+                    }
+                    else
+                    {
+                        return Json(new { success = false, message = "Email address does not exist." });
+                    }
+                }
+                return Json(new { success = false, message = "An error occurred. Please try again." });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return View();
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+        public async Task<IActionResult> VerifyToken()
+        {
+            return View();
+        }
+
+
+        public async Task<IActionResult> ValidateToken(ValidateTokenViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Account/ValidateToken");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode)
+                    {
+                        ChangePasswordViewModel changemodel = new ChangePasswordViewModel();
+                        changemodel.Email = responseBody;
+                        changemodel.Token = model.Token;
+                        return RedirectToAction("ChangePassword", changemodel);
+                    }
+                    return RedirectToAction("VerifyToken");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return View();
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+
+        }
+        public async Task<IActionResult> ChangePassword(ValidateTokenViewModel model)
+        {
+            try
+            {
+                using (var _httpclient = new HttpClient())
+                {
+                    var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Account/ValidateToken");
+
+                    request.Content = stringContent;
+                    var response = await _httpclient.SendAsync(request);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        ViewBag.Email = responseBody;
+                        return View();
+                    }
+                    ViewBag.Email = "";
+                    return RedirectToAction("VerifyToken");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return View();
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+
+
+        public async Task<IActionResult> HomeChangePassword(ChangePasswordViewModel model)
+        {
+            try
+            {
+                if (!model.IsResetPassword)
+                {
+                    var currentUser = _userSessionHelper.GetCurrentUser();
+                    model.Email = currentUser?.Email != null ? currentUser.Email : model.Email;
+                }
+
+                if (model.NewPassword != "" && model.ConfirmPassword != "")
+                {
+                    using (var _httpclient = new HttpClient())
+                    {
+                        var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                        var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Account/ChangePassword");
+
+                        request.Content = stringContent;
+                        var response = await _httpclient.SendAsync(request);
+                        string responseBody = await response.Content.ReadAsStringAsync();
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            return Json(new { success = true, message = responseBody });
+                        }
+                        return Json(new { success = false, message = responseBody });
+                    }
+                }
+                return Json(new { success = false, message = "An error occurred. Please try again." });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+                return Json(new { success = false, message = ex.Message });
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+
+        }
+        public IActionResult ForgotPassword()
+        {
             return View();
         }
     }

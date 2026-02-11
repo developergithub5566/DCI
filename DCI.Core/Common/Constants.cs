@@ -23,8 +23,8 @@
         public const string Msg_Deduction = "Deductions successfully applied to all selected employees.";
 
 
-        public const string Email_Subject_SetPassword = "DCI ESS - Set Password";
-		public const string Email_Subject_ResetPassword = "DCI ESS - Reset Password";
+        public const string Email_Subject_SetPassword = "DCI - Set Password";
+		public const string Email_Subject_ResetPassword = "DCI - Reset Password";
 		public const string Email_Subject_UploadFile = "DCI ESS - Please Upload Your Document No";
         public const string Email_Subject_BiometricAttendance = "DCI ESS - Biometric Attendance Logged";
         

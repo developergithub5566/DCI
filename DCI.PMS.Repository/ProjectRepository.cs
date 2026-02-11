@@ -619,7 +619,9 @@ namespace DCI.PMS.Repository
         {
             try
             {
-                var sql = @"
+                if(model.SelectedCoordinator.Count() > 0)
+                {
+                    var sql = @"
                                     INSERT INTO Coordinator (ProjectCreationId, MileStoneId, UserId, DateCreated, IsActive)
                                     SELECT @ProjectCreationId, @MileStoneId, value, GETDATE(), 1
                                     FROM STRING_SPLIT(@SelectedIds, ',')
@@ -645,14 +647,15 @@ namespace DCI.PMS.Repository
                                     WHERE c.ProjectCreationId = @ProjectCreationId AND s.value IS NULL AND c.IsActive = 1;
                                     ";
 
-                var selectedIds = string.Join(',', model.SelectedCoordinator ?? Enumerable.Empty<int>());
+                    var selectedIds = string.Join(',', model.SelectedCoordinator ?? Enumerable.Empty<int>());
 
-                await _connection.ExecuteAsync(sql, new
-                {
-                    model.ProjectCreationId,
-                    model.MilestoneId,
-                    SelectedIds = selectedIds
-                });
+                    await _connection.ExecuteAsync(sql, new
+                    {
+                        model.ProjectCreationId,
+                        model.MilestoneId,
+                        SelectedIds = selectedIds
+                    });
+                }           
 
             }
             catch (Exception ex)

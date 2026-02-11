@@ -8,6 +8,8 @@ namespace DCI.PMS.Models.ViewModel
 
         public int ProjectCreationId { get; set; } = 0;
 
+        public string ProjectName { get; set; } = string.Empty;
+
         public string MilestoneName { get; set; } = string.Empty;
 
         public double Percentage { get; set; } = 0;
