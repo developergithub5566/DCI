@@ -5,9 +5,7 @@ namespace DCI.PMS.Models.ViewModel
     public class MilestoneViewModel
     {
         public int MileStoneId { get; set; } = 0;
-
         public int ProjectCreationId { get; set; } = 0;
-
         public string ProjectName { get; set; } = string.Empty;
 
         public string MilestoneName { get; set; } = string.Empty;
@@ -43,5 +41,6 @@ namespace DCI.PMS.Models.ViewModel
 
         public List<int> AttachmentListId { get; set; } = new();
         public List<AttachmentViewModel>? AttachmentList { get; set; } = new();
+        
     }
 }

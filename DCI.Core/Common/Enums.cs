@@ -268,12 +268,13 @@ namespace DCI.Core.Common
         Pending = 2,
         NotStarted = 3,
         InProgress = 4,
-        Completed = 5       
+        Completed = 5,
+        Created = 6,
     }
     public enum EnumPMSPaymentStatus
     {       
         Pending = 1,
         Paid = 2,    
         Completed = 3
-    }
+    }   
 }

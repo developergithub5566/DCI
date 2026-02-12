@@ -64,11 +64,16 @@ namespace DCI.PMS.Models.ViewModel
       //  public UserSelectViewModel SelectedCoordinator = new();
         public List<int>? SelectedCoordinator { get; set; } = new();
         public List<SelectListItem>? UserList { get; set; } = new();
+        public string? EmailBody { get; set; } = string.Empty;
+        public List<UserEmailList>? UserEmailList { get; set; } = new();
+         public string? Fullname { get; set; } = string.Empty;
+
+        public int ProjectStatusType { get; set; } = 0;
     }
 
-    //public class UserSelectViewModel
-    //{
-    //    public List<int>? SelectedUserIds { get; set; } = new();
-    //    public List<SelectListItem>? Users { get; set; } = new();
-    //}
+    public class UserEmailList
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Fullname { get; set; } = string.Empty;
+    }
 }

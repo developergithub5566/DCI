@@ -9,6 +9,7 @@ using DCI.PMS.Models.Entities;
 using DCI.PMS.Models.ViewModel;
 using DCI.PMS.Repository.Interface;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -29,22 +30,28 @@ namespace DCI.PMS.Repository
         private readonly IOptions<DCI.Models.ViewModel.FileModel> _fileconfig;
         private readonly DCIdbContext _dbContext;
         private readonly PMSdbContext _pmsdbContext;
-        private readonly IDbConnection _connection;
-        public ProjectRepository(DCIdbContext context, PMSdbContext pmsContext, IOptions<DCI.Models.ViewModel.FileModel> fileconfig, IConfiguration configuration)
+        private readonly IDbConnection _pmsconnection;
+        private readonly IDbConnection _essconnection;
+        IPMSEmailRepository _pmsEmailNotificationRepository;
+
+        public ProjectRepository(DCIdbContext context, PMSdbContext pmsContext, IOptions<DCI.Models.ViewModel.FileModel> fileconfig, 
+            IConfiguration pmsconfiguration, IConfiguration essconfiguration,IPMSEmailRepository pMSEmailRepository)
         {
             this._dbContext = context;
             this._pmsdbContext = pmsContext;
-            this._fileconfig = fileconfig;
-            // this._connection = connection;
+            this._fileconfig = fileconfig;            
 
-            var connStr = configuration.GetConnectionString("DCIConnectionPMS") ?? throw new InvalidOperationException("Connection string not found.");
-            _connection = new SqlConnection(connStr);
+            var connStrESS = essconfiguration.GetConnectionString("DCIConnectionESS") ?? throw new InvalidOperationException("Connection string not found.");
+            _essconnection = new SqlConnection(connStrESS);
 
+            var connStrPMS = pmsconfiguration.GetConnectionString("DCIConnectionPMS") ?? throw new InvalidOperationException("Connection string not found.");
+            _pmsconnection = new SqlConnection(connStrPMS);
 
+            _pmsEmailNotificationRepository = pMSEmailRepository;
         }
         public void Dispose()
         {
-            _dbContext.Dispose();
+            //_dbContext.Dispose();
             _pmsdbContext.Dispose();
         }
 
@@ -433,11 +440,10 @@ namespace DCI.PMS.Repository
             {
                 if (model.ProjectCreationId == 0)
                 {
-
+                    model.ProjectNo = await GenereteRequestNo();
                     await _pmsdbContext.Database.ExecuteSqlInterpolatedAsync($@"
                                 INSERT INTO dbo.Project
-                                (
-                                    ProjectCreationId,
+                                (                                   
                                     ClientId,
                                     ProjectNo,
                                     ProjectName,
@@ -452,8 +458,7 @@ namespace DCI.PMS.Repository
                                     IsActive
                                 )
                                 VALUES
-                                (
-                                    {model.ProjectCreationId},
+                                (                             
                                     {model.ClientId},
                                     {model.ProjectNo},
                                     {model.ProjectName},
@@ -471,6 +476,8 @@ namespace DCI.PMS.Repository
 
                     await SaveCoordinator(model);
                     await SaveFile(model);
+                    model.ProjectStatusType = (int)EnumPMSStatus.Created;
+                    await SendEmailNotification(model);
                 }
                 else
                 {
@@ -494,6 +501,12 @@ namespace DCI.PMS.Repository
 
                     await SaveCoordinator(model);
                     await SaveFile(model);
+
+                    if(model.Status == (int)EnumPMSStatus.Completed)
+                    {
+                        model.ProjectStatusType = (int)EnumPMSStatus.Completed;
+                        await SendEmailNotification(model);
+                    }
                 }
 
             }
@@ -649,7 +662,7 @@ namespace DCI.PMS.Repository
 
                     var selectedIds = string.Join(',', model.SelectedCoordinator ?? Enumerable.Empty<int>());
 
-                    await _connection.ExecuteAsync(sql, new
+                    await _pmsconnection.ExecuteAsync(sql, new
                     {
                         model.ProjectCreationId,
                         model.MilestoneId,
@@ -667,6 +680,68 @@ namespace DCI.PMS.Repository
                 Log.CloseAndFlush();
             }
 
+        }
+
+        public async Task SendEmailNotification(ProjectViewModel model)
+        {
+            try
+            {
+                if(model.ProjectStatusType == (int)EnumPMSStatus.Created)
+                {
+                    int creatorId = model.CreatedBy;
+                    var subId = model.SelectedCoordinator ?? new List<int>();
+
+                    var allIds = new List<int> { creatorId };
+                    allIds.AddRange(subId);
+
+                    var sql = @"
+                        SELECT DISTINCT Email, Fullname
+                        FROM [User]
+                        WHERE IsActive = 1
+                          AND UserId IN @UserIds
+                    ";
+
+
+                    model.UserEmailList = (await _essconnection.QueryAsync<UserEmailList>(
+                            sql,
+                            new { UserIds = allIds }
+                        )).ToList();
+
+                    await _pmsEmailNotificationRepository.SendProjectCreation(model);
+                }
+                else if(model.ProjectStatusType == (int)EnumPMSStatus.Completed)
+                {
+
+                    int modefiedby = model.CreatedBy;                  
+
+                    var allIds = new List<int> { modefiedby };
+                    allIds.AddRange(allIds);
+
+                    var sql = @"
+                        SELECT DISTINCT Email, Fullname
+                        FROM [User]
+                        WHERE IsActive = 1
+                          AND UserId IN @UserIds
+                    ";
+
+
+                    model.UserEmailList = (await _essconnection.QueryAsync<UserEmailList>(
+                            sql,
+                            new { UserIds = allIds }
+                        )).ToList();
+
+                    await _pmsEmailNotificationRepository.SendProjectCompleted(model);
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
         public async Task<ProjectViewModel> GetMilestoneByProjectId(ProjectViewModel model)
@@ -1288,7 +1363,7 @@ namespace DCI.PMS.Repository
                         1
                     )";
 
-            await _connection.ExecuteAsync(sql, new
+            await _pmsconnection.ExecuteAsync(sql, new
             {
                 model.ProjectCreationId,
                 model.MileStoneId,

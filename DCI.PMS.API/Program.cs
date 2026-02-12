@@ -18,6 +18,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<DCIdbContext>(Options => Options.UseSqlServer(builder.Configuration.GetConnectionString("DCIConnectionESS")));
 builder.Services.AddDbContext<PMSdbContext>(Options => Options.UseSqlServer(builder.Configuration.GetConnectionString("DCIConnectionPMS")));
 builder.Services.AddScoped<IDbConnection>(sp => new SqlConnection(sp.GetRequiredService<IConfiguration>().GetConnectionString("DCIConnectionPMS")));
+builder.Services.AddScoped<IDbConnection>(sp => new SqlConnection(sp.GetRequiredService<IConfiguration>().GetConnectionString("DCIConnectionESS")));
 
 //var pmsConnectionString =
 //    builder.Configuration.GetConnectionString("DCIConnectionPMS");
@@ -32,8 +33,9 @@ builder.Services.AddScoped<IDbConnection>(sp => new SqlConnection(sp.GetRequired
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<ITrackerRepository, TrackerRepository>();
 builder.Services.AddScoped<IHomeRepository, HomeRepository>();
+builder.Services.AddScoped<IPMSEmailRepository, PMSEmailRepository>();
 
-//builder.Services.Configure<SMTPModel>(builder.Configuration.GetSection("SmtpSettings"));
+builder.Services.Configure<SMTPModel>(builder.Configuration.GetSection("SmtpSettings"));
 //builder.Services.AddSingleton<AuthenticationModel>();
 //builder.Services.Configure<AuthenticationModel>(builder.Configuration.GetSection("Authentication"));
 //builder.Services.Configure<FileModel>(builder.Configuration.GetSection("DocumentStorage"));
