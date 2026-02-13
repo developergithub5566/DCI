@@ -13,7 +13,7 @@ namespace DCI.PMS.Models.ViewModel
         public double Percentage { get; set; } = 0;
 
         public DateTime? TargetCompletedDate { get; set; } = DateTime.Now;
-        public DateTime? ActualCompletionDate { get; set; } = DateTime.Now; 
+        public DateTime? ActualCompletionDate { get; set; } = DateTime.Now;
 
         public int PaymentStatus { get; set; } = 0;
         public int Status { get; set; } = 0;
@@ -41,6 +41,12 @@ namespace DCI.PMS.Models.ViewModel
 
         public List<int> AttachmentListId { get; set; } = new();
         public List<AttachmentViewModel>? AttachmentList { get; set; } = new();
-        
+        public int EmailDaysBefore { get; set; } = 0;
+
+        public string? Fullname { get; set; } = string.Empty;
+
+        public string? BODYTABLE { get; set; } = string.Empty;
+
+        public List<UserEmailList>? UserEmailList { get; set; } = new();
     }
 }

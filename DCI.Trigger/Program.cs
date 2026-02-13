@@ -4,10 +4,12 @@ using Hangfire;
 using Hangfire.Console;
 using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using System.Data;
 
 public class Program
 {
@@ -15,32 +17,34 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);   
 
-        builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerA")));
+        //builder.Services.AddDbContext<AppDbContext>(options =>
+        //    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerA")));
 
         builder.Services.AddDbContext<DestinationDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerB")));
 
         builder.Services.AddHangfire(x =>
-            x.UseSqlServerStorage(builder.Configuration.GetConnectionString("SqlServerA")));
+            x.UseSqlServerStorage(builder.Configuration.GetConnectionString("PMS")));
 
-        builder.Services.AddHangfire((serviceProvider, config) =>
-        {
-            config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-                  .UseSimpleAssemblyNameTypeSerializer()
-                  .UseRecommendedSerializerSettings()
-                  .UseSqlServerStorage(
-                      builder.Configuration.GetConnectionString("SqlServerA"),
-                      new SqlServerStorageOptions
-                      {
-                          CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-                          SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
-                          QueuePollInterval = TimeSpan.FromSeconds(15),
-                          UseRecommendedIsolationLevel = true,
-                          DisableGlobalLocks = true
-                      })
-                  .UseConsole(); 
-        });
+        builder.Services.AddScoped<IDbConnection>(sp => new SqlConnection(sp.GetRequiredService<IConfiguration>().GetConnectionString("PMS")));
+
+        //builder.Services.AddHangfire((serviceProvider, config) =>
+        //{
+        //    config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+        //          .UseSimpleAssemblyNameTypeSerializer()
+        //          .UseRecommendedSerializerSettings()
+        //          .UseSqlServerStorage(
+        //              builder.Configuration.GetConnectionString("SqlServerA"),
+        //              new SqlServerStorageOptions
+        //              {
+        //                  CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+        //                  SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+        //                  QueuePollInterval = TimeSpan.FromSeconds(15),
+        //                  UseRecommendedIsolationLevel = true,
+        //                  DisableGlobalLocks = true
+        //              })
+        //          .UseConsole(); 
+        //});
 
 
         builder.Services.AddHangfireServer();

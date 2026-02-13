@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="Hangfire" Version="1.8.20" />
     <PackageReference Include="Hangfire.Console" Version="1.4.3" />
     <PackageReference Include="Hangfire.SqlServer" Version="1.8.20" />
@@ -19,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DCI.Core\DCI.Core.csproj" />
     <ProjectReference Include="..\DCI.Models\DCI.Models.csproj" />
+    <ProjectReference Include="..\DCI.PMS.Models\DCI.PMS.Models.csproj" />
   </ItemGroup>
 
   <ItemGroup>

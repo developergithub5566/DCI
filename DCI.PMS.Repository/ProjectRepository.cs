@@ -494,6 +494,7 @@ namespace DCI.PMS.Repository
                             ProjectDuration= {model.ProjectDuration},
                             ProjectCost     = {model.ProjectCost},
                             ModeOfPayment  = {model.ModeOfPayment},
+                            Status = {model.Status}
                             ModifiedBy     = {model.ModifiedBy},
                             DateModified   = {DateTime.Now}
                         WHERE ProjectCreationId = {model.ProjectCreationId}

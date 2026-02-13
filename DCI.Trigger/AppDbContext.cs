@@ -6,7 +6,7 @@ namespace DCI.Trigger
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        public DbSet<OutboxMessage> OutboxQueue { get; set; }
-        public DbSet<TblRawLog> TblRawLogs { get; set; }
+        //public DbSet<OutboxMessage> OutboxQueue { get; set; }
+        //public DbSet<TblRawLog> TblRawLogs { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using DCI.Models.ViewModel;
+using DCI.PMS.Models.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,6 @@ namespace DCI.Trigger
         Task SendEmailBiometricsNotification(BiometricViewModel model);
         Task SendEmailAttendanceConfirmationNotification(BiometricViewModel model);
         Task SendEmailAttendanceConfirmationNotificationMonthly(BiometricViewModel model);
+        Task SendTargetCompletionDueDate(MilestoneViewModel model);
     }
 }
