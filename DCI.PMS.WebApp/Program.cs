@@ -11,24 +11,24 @@ builder.Services.AddSingleton<UserManager>();
 
 builder.Services.Configure<APIConfigModel>(builder.Configuration.GetSection("ServiceUrls"));
 
-//builder.Services.AddAuthentication(options =>
-//{
-//    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-//    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-//})
-//      .AddCookie(options =>
-//      {
-//          options.Cookie.Name = CookieAuthenticationDefaults.AuthenticationScheme;
-//          options.Cookie.HttpOnly = builder.Configuration.GetValue<bool>("Authentication:Cookie:HttpOnly");
-//          options.Cookie.SecurePolicy = builder.Configuration.GetValue<CookieSecurePolicy>("Authentication:Cookie:SecurePolicy");
-//          options.Cookie.SameSite = builder.Configuration.GetValue<SameSiteMode>("Authentication:Cookie:SameSite");
-//          options.Cookie.MaxAge = TimeSpan.FromDays(builder.Configuration.GetValue<int>("Authentication:Cookie:MaxAge"));
-//          options.SlidingExpiration = builder.Configuration.GetValue<bool>("Authentication:Cookie:SlidingExpiration");
-//          options.ExpireTimeSpan = TimeSpan.FromDays(builder.Configuration.GetValue<int>("Authentication:Cookie:ExpireTimeSpan"));
-//          options.LoginPath = builder.Configuration["Authentication:Cookie:LoginPath"];
-//          options.LogoutPath = builder.Configuration["Authentication:Cookie:LogoutPath"];
-//          options.AccessDeniedPath = builder.Configuration["Authentication:Cookie:AccessDeniedPath"];
-//      });
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+})
+      .AddCookie(options =>
+      {
+          options.Cookie.Name = CookieAuthenticationDefaults.AuthenticationScheme;
+          options.Cookie.HttpOnly = builder.Configuration.GetValue<bool>("Authentication:Cookie:HttpOnly");
+          options.Cookie.SecurePolicy = builder.Configuration.GetValue<CookieSecurePolicy>("Authentication:Cookie:SecurePolicy");
+          options.Cookie.SameSite = builder.Configuration.GetValue<SameSiteMode>("Authentication:Cookie:SameSite");
+          options.Cookie.MaxAge = TimeSpan.FromDays(builder.Configuration.GetValue<int>("Authentication:Cookie:MaxAge"));
+          options.SlidingExpiration = builder.Configuration.GetValue<bool>("Authentication:Cookie:SlidingExpiration");
+          options.ExpireTimeSpan = TimeSpan.FromDays(builder.Configuration.GetValue<int>("Authentication:Cookie:ExpireTimeSpan"));
+          options.LoginPath = builder.Configuration["Authentication:Cookie:LoginPath"];
+          options.LogoutPath = builder.Configuration["Authentication:Cookie:LogoutPath"];
+          options.AccessDeniedPath = builder.Configuration["Authentication:Cookie:AccessDeniedPath"];
+      });
 
 builder.Services.AddHttpContextAccessor();
 //builder.Services.AddSession();
@@ -49,6 +49,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAllOrigins",
         builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials());
 });
+
 
 
 var app = builder.Build();

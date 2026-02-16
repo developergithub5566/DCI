@@ -28,7 +28,7 @@ namespace DCI.PMS.WebApp.Controllers
             try
             {
 
-                DashboardViewModel model = new DashboardViewModel();
+                PMSDashboardViewModel model = new PMSDashboardViewModel();
               
                 using (var _httpclient = new HttpClient())
                 {
@@ -37,7 +37,7 @@ namespace DCI.PMS.WebApp.Controllers
                     request.Content = stringContent;
                     var response = await _httpclient.SendAsync(request);
                     var responseBody = await response.Content.ReadAsStringAsync();
-                    model = JsonConvert.DeserializeObject<DashboardViewModel>(responseBody)!;
+                    model = JsonConvert.DeserializeObject<PMSDashboardViewModel>(responseBody)!;
 
                     if (response.IsSuccessStatusCode)
                     {

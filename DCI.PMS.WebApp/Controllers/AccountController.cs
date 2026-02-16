@@ -89,11 +89,11 @@ namespace DCI.PMS.WebApp.Controllers
                             new Claim(ClaimTypes.Name,um.GetFullname())
                         };
 
-                        //HttpContext.Session.SetString("currentFullname", um.GetFullname());
-                        //HttpContext.Session.SetString("ModulePageAccess", JsonConvert.SerializeObject(um.ModulePageAccess));
+                        HttpContext.Session.SetString("currentFullname", um.GetFullname());
+                       // HttpContext.Session.SetString("ModulePageAccess", JsonConvert.SerializeObject(um.ModulePageAccess));
 
-                        //var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                        //await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+                        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
                         return RedirectToAction("Index", "Home");
                     }

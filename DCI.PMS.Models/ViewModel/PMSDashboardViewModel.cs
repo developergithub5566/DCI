@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DCI.PMS.Models.ViewModel
+﻿namespace DCI.PMS.Models.ViewModel
 {
-    public class DashboardViewModel
+    public class PMSDashboardViewModel
     {
         public List<MilestoneViewModel> ProjectList { get; set; } = new();
         public int TotalProject { get; set; } = 0;
