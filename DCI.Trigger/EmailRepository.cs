@@ -293,12 +293,14 @@ namespace DCI.Trigger
         #region PMS
         public async Task SendTargetCompletionDueDate(MilestoneViewModel model)
         {
+            var Email = model.UserEmailList.FirstOrDefault()?.Email;
+
             MailMessage mail = new MailMessage();
             mail.From = new System.Net.Mail.MailAddress(_smtpSettings.FromEmail);
-            mail.Subject = $"DCI PMS - Action Required: Please Check Target Completion Date for Project {model.ProjectName}}";
+            mail.Subject = $"DCI PMS - Action Required: Please Check Target Completion Date for Project {model.ProjectName}";
             mail.Body = await SetTargetCompletionDueDateNotificationMonthly(model);
             mail.IsBodyHtml = true;
-            mail.To.Add(model.Email);
+            mail.To.Add(Email);
             await SendMessage(mail);
         }
 
@@ -306,25 +308,32 @@ namespace DCI.Trigger
         {
             try
             {
+                var fullname = model.UserEmailList.FirstOrDefault()?.Fullname;
+                var reminder = model.EmailDaysBefore == 1 ? "day" : "days";
+
                 string emailBody = $@"
                                 <html>
                                   <body style='font-family: Arial, sans-serif; font-size: 14px; color: #333;'>
-                                    <p>Hi {model.Fullname.ToUpper()},</p>
+                                    <p>Hi {fullname.ToUpper()},</p>
     
-                                    <p>This is an automated message from the <strong>ESS System</strong>.</p>
+                                    <p>This is an automated message from the <strong>Project Management System.</strong>.</p>
 
-                                    <p>Kindly check the details below:</p>
-                                    {model.BODYTABLE}
+                                    <p>Please review the Target Completion Date for the project below:</p>
+                                    <table style='border-collapse: collapse;'>
+                                      <tr><td style='padding: 2px 8px;'>Project Name:</td><td>{model.ProjectName}</td></tr>                            
+                                        <tr><td style='padding: 2px 8px;'>Milestone:</td><td>{model.MilestoneName}</td></tr>                        
+                                      <tr><td style='padding: 2px 8px;'>Target Completion Date:</td><td>{model.TargetCompletedDate?.ToString("MMM dd yyyy")}</td></tr>
+                                        <tr><td style='padding: 2px 8px;'>Reminder:</td><td>{model.EmailDaysBefore} {reminder} before target completion</td></tr>
 
-                                    <p>
+                                    </table>
+
+                                      <p>
                                         You may log in to your account using the link below:<br />
-                                        <a href=' {_apiconfig.Value.WebAppConnection}' target='_blank' >
-                                            Click here to log in to the DCI ESS System
+                                        <a href='{_apiconfig.Value.webAppPMS}' target='_blank' >
+                                            Click here to log in to the DCI Project Management System
                                         </a>
                                     </p>
-
-                                    <br>                              
-
+                             
                                     <hr style='border:none; border-top:1px solid #ddd; margin:20px 0;' />
 
                                     <p style='font-size:13px; color:#777;'>
@@ -334,8 +343,8 @@ namespace DCI.Trigger
 
                                     <p style='font-size:13px; color:#777;'>
                                       Best regards,<br>
-                                      <strong>ESS System Administrator</strong><br>
-                                      <span style='color:#999;'>DCI Employee Self-Service Portal</span>
+                                      <strong>PMS System Administrator</strong><br>
+                                      <span style='color:#999;'>DCI Project Management System</span>
                                     </p>
 
                                     <p style='font-size:11px; color:#aaa; margin-top:20px;'>

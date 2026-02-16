@@ -1,4 +1,5 @@
 ﻿using DCI.Models.Configuration;
+using DCI.PMS.Models.ViewModel;
 using DCI.Trigger;
 using Hangfire;
 using Hangfire.Console;
@@ -23,10 +24,13 @@ public class Program
         builder.Services.AddDbContext<DestinationDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerB")));
 
-        builder.Services.AddHangfire(x =>
-            x.UseSqlServerStorage(builder.Configuration.GetConnectionString("PMS")));
 
-        builder.Services.AddScoped<IDbConnection>(sp => new SqlConnection(sp.GetRequiredService<IConfiguration>().GetConnectionString("PMS")));
+        builder.Services.AddHangfire(x => x.UseSqlServerStorage(builder.Configuration.GetConnectionString("SqlServerB")));
+        builder.Services.AddHangfire(x => x.UseSqlServerStorage(builder.Configuration.GetConnectionString("PMS")));
+
+        builder.Services.AddTransient<IDbConnection>(sp => new SqlConnection(sp.GetRequiredService<IConfiguration>().GetConnectionString("SqlServerB")));
+        builder.Services.AddTransient<IDbConnection>(sp => new SqlConnection(sp.GetRequiredService<IConfiguration>().GetConnectionString("PMS")));
+
 
         //builder.Services.AddHangfire((serviceProvider, config) =>
         //{
@@ -52,6 +56,10 @@ public class Program
         builder.Services.AddTransient<AttendanceProcessor>();
         builder.Services.AddTransient<OutboxProcessor>();
         builder.Services.AddTransient<LeaveProcessor>();
+        builder.Services.AddTransient<ProjectProcessor>();
+
+
+
         builder.Services.Configure<SMTPModel>(builder.Configuration.GetSection("SmtpSettings"));
         builder.Services.AddScoped<IEmailRepository, EmailRepository>();
         Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).CreateLogger();
@@ -62,19 +70,20 @@ public class Program
 
 
 
-        RecurringJob.AddOrUpdate<AttendanceProcessor>("attendance-confirmation-job-monthly",
-             processor => processor.AttendanceConfirmationProcessorMonthly(), "0 22 28-31 * *", TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila")); // 11:00 PM, END OF THE MONTH
+        //RecurringJob.AddOrUpdate<AttendanceProcessor>("attendance-confirmation-job-monthly",
+        //     processor => processor.AttendanceConfirmationProcessorMonthly(), "0 22 28-31 * *", TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila")); // 11:00 PM, END OF THE MONTH
 
-        RecurringJob.AddOrUpdate<AttendanceProcessor>("attendance-confirmation-job",
-        processor => processor.AttendanceConfirmationProcessor(), "0 22 * * 1-5", TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila")); // 10:00 PM, Monday–Friday
+        //RecurringJob.AddOrUpdate<AttendanceProcessor>("attendance-confirmation-job",
+        //processor => processor.AttendanceConfirmationProcessor(), "0 22 * * 1-5", TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila")); // 10:00 PM, Monday–Friday
 
-        RecurringJob.AddOrUpdate<OutboxProcessor>("outbox-job",
-         processor => processor.ProcessPendingMessages(), Cron.Minutely);
+        //RecurringJob.AddOrUpdate<OutboxProcessor>("outbox-job",
+        // processor => processor.ProcessPendingMessages(), Cron.Minutely);
 
-        RecurringJob.AddOrUpdate<LeaveProcessor>("leave-credit-job",
-         processor => processor.MonthlyLeaveCredit(), "0 5 1 * *", TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila")); // Runs on the 1st day of every month at 5:00am
+        //RecurringJob.AddOrUpdate<LeaveProcessor>("leave-credit-job",
+        // processor => processor.MonthlyLeaveCredit(), "0 5 1 * *", TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila")); // Runs on the 1st day of every month at 5:00am
 
-
+        //RecurringJob.AddOrUpdate<ProjectProcessor>("project-target-completion",
+        // processor => processor.TargetCompletion(), Cron.Minutely);
 
         app.MapGet("/", () => "SQL Outbox + Hangfire is running");
 

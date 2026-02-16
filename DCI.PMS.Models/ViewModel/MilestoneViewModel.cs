@@ -48,5 +48,7 @@ namespace DCI.PMS.Models.ViewModel
         public string? BODYTABLE { get; set; } = string.Empty;
 
         public List<UserEmailList>? UserEmailList { get; set; } = new();
+
+        public int UserId { get; set; } = 0;
     }
 }
