@@ -37,5 +37,6 @@ namespace DCI.PMS.API.Controllers
             var markAsRead = _homeRepository.MarkAsRead(model);
             return Ok();
         }
+
     }
 }

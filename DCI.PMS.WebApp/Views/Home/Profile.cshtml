@@ -1,0 +1,135 @@
+﻿@model DCI.Models.ViewModel.UserViewModel
+
+<link href="~/css/DCIcustom.css" rel="stylesheet" />
+
+<div class="d-sm-flex align-items-center justify-content-between mb-3">
+	<h6 class="m-0 font-weight-bold text-gray-800">Profile</h6>
+
+	<div class="upperRightDivBtn">
+		<a asp-controller="Home" asp-action="ChangePass" class="btn btn-primary btn-icon-split">
+			<span class="icon"><i class="fas fa-lock text-xs"></i></span>
+			<span class="text"><small>Change Password</small></span>
+		</a>
+	</div>
+</div>
+<div class="col-12 p0">
+	<ul class="breadcrumb">
+		<li><a href="~/Home/Index">Dashboard</a></li>
+		<li>Profile</li>
+	</ul>
+</div>
+
+
+<div class="card shadow">
+	<div class="card-header py-3">
+		<h5 class="text-gray-800 mb0"></h5>
+	</div>
+	<div class="card-body">
+		<div class="spinner-overlay">
+			<div class="spinner-border text-light" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
+
+		<div class="cardTitle">
+			<label>My Profile</label>
+			<p>Manage and protect your account</p>
+		</div>
+		<form id="createForm">
+			<input type="hidden" id="UserId" name="UserId" value="@Model.UserId">
+			<input type="hidden" id="RoleId" name="RoleId" value="@Model.RoleId">
+			<div class="form-group">
+				<label class="frmText">Email Address:</label>
+				<input type="text" class="form-control frmField" id="Email" name="Email" value="@Model.Email" readonly>
+			</div>
+
+			<div class="form-group">
+				<label class="frmText">Employee No:</label>
+				<input type="text" class="form-control frmField" id="Employee No" name="Employee No" value="@Model.EmployeeNo" readonly>
+			</div>
+
+			<div class="form-group">
+				<label class="frmText">Full Name:</label>
+				<input type="text" class="form-control frmField" id="Fullname" name="Fullname" value="@Model.Fullname" readonly>
+			</div>
+
+		
+
+			<div class="form-group">
+				<label class="frmText">Role:</label>
+				<input type="text" class="form-control frmField" id="RoleName" name="RoleName" value="@Model.RoleName" readonly>
+			</div>
+
+			<div class="d-flex align-items-center my-3">
+				<hr class="flex-grow-1">
+				<span class="mx-2 fw-bold">Notification </span>
+				<hr class="flex-grow-1">
+			</div>
+			<style>
+				.form-check-input.force-color {
+					background-color: #d1d1d1 !important;
+					border-color: #bcbcbc !important;
+					cursor: pointer;
+					box-shadow: none !important;
+				}
+
+					/* The small toggle circle */
+					.form-check-input.force-color::before {
+						background-color: white !important;
+					}
+
+					/* When checked (ON) */
+					.form-check-input.force-color:checked {
+						background-color: #0d6efd !important; /* green */
+						border-color: #0d6efd !important;
+					}
+
+						/* Optional hover effect */
+						.form-check-input.force-color:checked:hover {
+							background-color: #218838 !important;
+						}
+
+					/* Optional: When focused */
+					.form-check-input.force-color:focus {
+						box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25) !important;
+					}
+			</style>
+			<div class="form-switch">
+				<input class="form-check-input force-color" type="checkbox" role="switch" id="switchCheckDefault" checked >
+				<label class="form-check-label" for="switchCheckDefault">Enable Email Notifications for Milestone Target Completion</label>
+			</div>
+
+	 
+		</form>
+		<div class="form-group mt30">
+			<a asp-controller="Home" asp-action="Index" class="btn btn-secondary"><small>Back</small></a>
+		</div>
+	</div>
+
+
+@section scripts {
+
+
+		<script type="text/javascript">
+
+			var js = jQuery.noConflict(true);
+
+				$('.spinner-overlay').show();
+
+				setTimeout(() => {
+					$('.spinner-overlay').hide();
+				}, 200);
+
+
+			js(document).ready(function () {
+
+
+
+			});
+
+
+			
+
+
+		</script>
+}

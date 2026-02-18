@@ -5,7 +5,7 @@ namespace DCI.PMS.Repository.Interface
     public interface IProjectRepository : IDisposable
     {
         Task<ProjectViewModel> GetProjectId(int projectId);
-        Task<IList<ProjectViewModel>> GetAllProject();
+        Task<IList<ProjectViewModel>> GetAllProject(ProjectViewModel model);
         // Task<(int statuscode, string message)> SaveProject(ProjectViewModel model);
         Task SaveProject(ProjectViewModel model);
         Task<ProjectViewModel> GetProjectById(ProjectViewModel model);

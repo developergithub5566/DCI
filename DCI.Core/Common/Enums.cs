@@ -263,18 +263,24 @@ namespace DCI.Core.Common
         DELIVERABLES = 5
     }
     public enum EnumPMSStatus
-    {           
-        Draft = 1,
-        Pending = 2,
-        NotStarted = 3,
-        InProgress = 4,
-        Completed = 5,
-        Created = 6,
+    {              
+        NotStarted = 1,
+        InProgress = 2,
+        Completed = 3,
+        Created = 4,
     }
     public enum EnumPMSPaymentStatus
     {       
         Pending = 1,
         Paid = 2,    
         Completed = 3
-    }   
+    }
+
+    public enum EnumPMSRole
+    {
+        Head = 1,
+        Manager = 2,
+        Coordinator = 3,
+        User= 4,
+    }
 }

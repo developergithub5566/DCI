@@ -42,7 +42,7 @@ namespace DCI.PMS.WebApp.Service
 
                 _filterRoleModel.AssignId = currentUser.UserId;
                 var stringContent = new StringContent(JsonConvert.SerializeObject(_filterRoleModel), Encoding.UTF8, "application/json");
-                var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Home/GetAllNotification");
+                var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Home/GetAllNotification");
 
                 request.Content = stringContent;
                 var response = await _httpclient.SendAsync(request);

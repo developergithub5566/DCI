@@ -69,6 +69,10 @@ namespace DCI.PMS.Models.ViewModel
          public string? Fullname { get; set; } = string.Empty;
 
         public int ProjectStatusType { get; set; } = 0;
+
+        public List<CoordinatorViewModel> CoordinatorsList { get; set; } = new();
+
+         public int CurrentUserId { get; set; } = 0;
     }
 
     public class UserEmailList

@@ -80,7 +80,7 @@ namespace DCI.PMS.Repository
             return result;
         }
 
-        public async Task<IList<ProjectViewModel>> GetAllProject()
+        public async Task<IList<ProjectViewModel>> GetAllProject(ProjectViewModel model)
         {
 
             try
@@ -140,11 +140,26 @@ namespace DCI.PMS.Repository
                       })
                       .ToListAsync();
 
+                var _coordinatorList = await _pmsdbContext.Coordinator
+                         .AsNoTracking()
+                         .Where(c => c.IsActive)
+                         .Select(c => new CoordinatorViewModel
+                         {
+                             Id = c.Id,
+                             ProjectCreationId = c.ProjectCreationId,
+                             MileStoneId = c.MileStoneId,
+                             UserId = c.UserId,
+                           //  DateCreated = c.DateCreated,                             
+                             IsActive = c.IsActive
+                         })
+                         .ToListAsync();
+
 
                 var result = from p in projects
                              join u in users on p.CreatedBy equals u.UserId
                              join s in status on p.Status equals s.StatusId
                              join c in _clientList on p.ClientId equals c.ClientId
+                             join co in _coordinatorList on p.ProjectCreationId equals co.ProjectCreationId into coGroup
                              select new ProjectViewModel
                              {
                                  ProjectCreationId = p.ProjectCreationId,
@@ -160,8 +175,23 @@ namespace DCI.PMS.Repository
                                  ClientName = c.ClientName,
                                  IsActive = p.IsActive,
                                  CreatedName = u.Fullname,
-                                 StatusName = s.StatusName
+                                 StatusName = s.StatusName,
+                                 CoordinatorsList = coGroup.ToList(),
+                                 // SelectedCoordinator = _coordinatorList.Where(co => co.ProjectCreationId == p.ProjectCreationId).Select(co => co.UserId).ToList(),
                              };
+
+                if ((int)EnumPMSRole.Head == 1)
+                {
+                    result = result.ToList();
+                }
+                else if ((int)EnumPMSRole.Manager == 2)
+                {
+                    result = result.Where(x => x.CreatedBy == model.CurrentUserId).ToList(); // Filter projects created by user with ID 2 or 3
+                }
+                else if ((int)EnumPMSRole.Coordinator == 3)
+                {
+                    result = result.Where(x => x.CoordinatorsList.Any(co => co.UserId == model.CurrentUserId)).ToList();
+                }
 
                 return result.ToList();
             }

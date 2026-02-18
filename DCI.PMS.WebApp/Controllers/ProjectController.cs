@@ -519,6 +519,7 @@ namespace DCI.PMS.WebApp.Controllers
                 using (var _httpclient = new HttpClient())
                 {
 
+                    model.CurrentUserId = 6;
                     var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiPMS + "api/Project/GetAllProject");
                     request.Content = stringContent;

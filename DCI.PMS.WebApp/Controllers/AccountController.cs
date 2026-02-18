@@ -76,7 +76,7 @@ namespace DCI.PMS.WebApp.Controllers
 
                     if (response.IsSuccessStatusCode == true)
                     {
-                        //var result = _userContextService.GetUserContext();
+                    
                         UserManager um = JsonConvert.DeserializeObject<UserManager>(responseBody);
                         _httpContextAccessor.HttpContext!.Session.SetString("UserManager", JsonConvert.SerializeObject(um));
 
@@ -226,7 +226,7 @@ namespace DCI.PMS.WebApp.Controllers
         public async Task<IActionResult> HomeChangePassword(ChangePasswordViewModel model)
         {
             try
-            {
+            {                                                                                                                                                                                            
                 if (!model.IsResetPassword)
                 {
                     var currentUser = _userSessionHelper.GetCurrentUser();
@@ -238,7 +238,7 @@ namespace DCI.PMS.WebApp.Controllers
                     using (var _httpclient = new HttpClient())
                     {
                         var stringContent = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-                        var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiConnection + "api/Account/ChangePassword");
+                        var request = new HttpRequestMessage(HttpMethod.Post, _apiconfig.Value.apiESS + "api/Account/ChangePassword");
 
                         request.Content = stringContent;
                         var response = await _httpclient.SendAsync(request);

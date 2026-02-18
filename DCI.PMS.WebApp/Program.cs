@@ -1,5 +1,6 @@
 ﻿using DCI.Models.Configuration;
 using DCI.PMS.WebApp.Configuration;
+using DCI.PMS.WebApp.Service;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -87,5 +88,9 @@ app.UseEndpoints(endpoints =>
         name: "default",
         pattern: "{controller=Account}/{action=Login}/{id?}");
 });
+
+
+
+app.MapHub<NotificationHub>("/notificationHub");
 
 app.Run();

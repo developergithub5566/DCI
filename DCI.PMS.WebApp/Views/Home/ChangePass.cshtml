@@ -1,0 +1,114 @@
+﻿
+
+<link href="~/css/DCIcustom.css" rel="stylesheet" />
+
+<div class="container-fluid">
+	<div class="spinner-overlay">
+		<div class="spinner-border text-light" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</div>
+	</div>
+
+	<!-- Page Heading -->
+	<div class="d-sm-flex align-items-center justify-content-between mb-4">
+		<h6 class="m-0 font-weight-bold text-gray-800">Change Password</h6>
+	</div>
+	<div class="col-12 p0">
+		<ul class="breadcrumb">
+			<li><a href="~/Home/Index">Dashboard</a></li>
+			<li><a href="~/Home/Profile">Profile</a></li>
+			<li>Change Password</li>
+		</ul>
+	</div>
+
+	<!-- DataTales Example -->
+	<div class="card shadow">
+		<div class="card-header py-3">
+		</div>
+		<div class="card-body">
+			<div class="cardTitle">
+				<label>Change Password</label>
+				<p>To update your password, please confirm your identity by verifying your current password</p>
+			</div>
+			<form id="ChangePasswordForm" method="POST">
+				<input type="hidden" name="IsResetPassword" id="IsResetPassword" value="false" />
+				<div class="form-group">
+					<label class="frmText">Current Password:</label>
+					<input type="password" class="form-control" name="CurrentPassword" id="CurrentPassword" required>
+				</div>
+				<div class="form-group">
+					<label class="frmText">New Password:</label>
+					<input type="password" class="form-control" name="NewPassword" id="NewPassword" required>
+				</div>
+				<div class="form-group">
+					<label class="frmText">Confirm New Password:</label>
+					<input type="password" class="form-control" name="ConfirmPassword" id="ConfirmPassword" required />
+				</div>
+				<div class="form-group">
+					@* 			<button type="submit" class="btn btn-primary" onclick="ChangePassword()"><small>Update</small></button> *@
+					<button type="submit" class="btn btn-primary"><small>Update</small></button>
+					<a asp-controller="Home" asp-action="Profile" class="btn btn-secondary"><small>Back</small></a>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+
+	<script type="text/javascript">
+		$('.spinner-overlay').show();
+
+		setTimeout(() => {
+			$('.spinner-overlay').hide();
+		}, 200);
+
+
+		$(document).ready(function () {
+
+			$('#ChangePasswordForm').submit(function (event) {
+				event.preventDefault();
+				var formData = $(this).serialize();
+
+			
+				Swal.fire({
+					text: "Are you sure you want to change your password?",
+					icon: "warning",
+					showCancelButton: true,
+					confirmButtonText: "Ok"
+				}).then((result) => {
+					if (result.isConfirmed) {
+						$.ajax({
+							type: 'POST',
+							url: '@Url.Action("HomeChangePassword", "Account")',
+							data: formData,
+							success: function (response) {
+								if (response.success) {
+									Swal.fire({
+										text: response.message,
+										icon: "success",
+										confirmButtonText: "Ok"
+									}).then((result) => {
+										//location.reload();
+										window.location = "/Home/Profile";
+									});
+								} else {
+									Swal.fire({
+										text: response.message,
+										icon: "error"
+									});
+								}
+							},
+							error: function () {
+								Swal.fire({
+									text: "An error occurred. Please try again.",
+									icon: "error"
+								});
+							}
+						});
+					}
+				});
+			});
+		});
+	</script>
+}

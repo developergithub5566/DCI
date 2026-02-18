@@ -18,9 +18,9 @@ namespace DCI.PMS.API.Controllers
 
         [HttpPost]
         [Route("GetAllProject")]
-        public async Task<IActionResult> GetAllProject([FromForm] ProjectViewModel model)
+        public async Task<IActionResult> GetAllProject([FromBody] ProjectViewModel model)
         {
-            return Ok(await _projectRepository.GetAllProject());
+            return Ok(await _projectRepository.GetAllProject(model));
         }
 
         [HttpPost]
